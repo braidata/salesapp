@@ -10,7 +10,7 @@ import {
   PersonalInfo,
   ProductsInfo,
   PaymentsInfo,
-} from "../components/Forms";
+} from "../components/forms";
 import FormCompleted from "../components/FormCompleted";
 import RefreshButton from "../components/refreshButton";
 import UnformHubspot from "../components/forms/unformHubspot";
