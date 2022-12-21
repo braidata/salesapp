@@ -15,13 +15,13 @@ export default async function handler(
     password: process.env.DB_PLANET_PW,
     server: process.env.DB_PLANET_HOST,
     database: process.env.DB_PLANET,
-    options: {
-      encrypt: false,
-      trustServerCertificate: true,
-      cryptoCredentialsDetails: {
-        minVersion: "TLSv1",
-      },
-    },
+    // options: {
+    //   encrypt: false,
+    //   trustServerCertificate: true,
+    //   cryptoCredentialsDetails: {
+    //     minVersion: "TLSv1",
+    //   },
+    // },
   });
 
   try {
