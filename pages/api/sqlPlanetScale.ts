@@ -8,8 +8,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(req.body.order);
-  const ord = req.body.order;
+//   console.log(req.body.order);
+//   const ord = req.body.order;
   const pool = new sql.ConnectionPool({
     user: process.env.DB_PANET_UNAME,
     password: process.env.DB_PLANET_PW,
