@@ -2,7 +2,7 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-import sql from "mssql";
+const sql = require("mssql2");
 
 export default async function handler(
   req: NextApiRequest,
