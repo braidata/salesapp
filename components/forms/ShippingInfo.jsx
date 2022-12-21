@@ -36,7 +36,7 @@ const schema = yup.object().shape({
   }),
 });
 
-export default function shippingInfo({ formStep, nextFormStep }) {
+export default function shippingInfos({ formStep, nextFormStep }) {
   const Data = Datas;
   const { setFormValues } = useFormData();
   const formRef = useRef();
