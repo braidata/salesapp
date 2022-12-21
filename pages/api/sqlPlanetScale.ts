@@ -1,39 +1,40 @@
-//nextjs sql connector "SELECT CodigoExterno FROM pedidos_externos WHERE CodigoExterno BETWEEN 169666 AND 200000 AND pedidos_externos.Ecommerce='VENTUS'"
+//mysql planet scale connector
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-const sql = require("mssql");
+const sql = require("mysql2/promise");
 
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-//   console.log(req.body.order);
-//   const ord = req.body.order;
-  const pool = new sql.ConnectionPool({
-    user: process.env.DB_PANET_UNAME,
-    password: process.env.DB_PLANET_PW,
-    server: process.env.DB_PLANET_HOST,
-    database: process.env.DB_PLANET,
-    // options: {
-    //   encrypt: false,
-    //   trustServerCertificate: true,
-    //   cryptoCredentialsDetails: {
-    //     minVersion: "TLSv1",
-    //   },
-    // },
-  });
+    req: NextApiRequest,
+    res: NextApiResponse
+    ) {
+    //   console.log(req.body.order);
+    //   const ord = req.body.order;
+    const pool = new sql.createPool({
+        user: process.env.DB_PLANET_UNAME,
+        password: process.env.DB_PLANET_PW,
+        host: process.env.DB_PLANET_HOST,
+        database: process.env.DB_PLANET,
+        // options: {
+        //   encrypt: false,
+        //   trustServerCertificate: true,
+        //   cryptoCredentialsDetails: {
+        //     minVersion: "TLSv1",
+        //   },
+        // },
+    }); 
 
-  try {
-    await pool.connect();
-    const result = await pool
-      .request()
-      .query(`SELECT * FROM users`);
-    res.status(200).json(result.recordset);
-  } catch (err) {
-    res.status(500);
-    res.send(err);
-  }
+    try {
+        await pool.connect();
+        const result = await pool
+        .request()
+        .query(`SELECT * FROM users`);
+        res.status(200).json(result.recordset);
+    } catch (err) {
+
+        res.status(500);
+        res.send(err);
+    }
 }
 
 // Path: pages\api\sqlPlanetScale.jsx
