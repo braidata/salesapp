@@ -28,7 +28,7 @@ export default async function handler(
     await pool.connect();
     const result = await pool
       .request()
-      .query(`INSERT INTO users (name) VALUES ('John')`);
+      .query(`SELECT * FROM users`);
     res.status(200).json(result.recordset);
   } catch (err) {
     res.status(500);
