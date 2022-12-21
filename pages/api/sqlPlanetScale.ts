@@ -30,6 +30,7 @@ export default async function handler(
         .request()
         .query(`SHOW TABLES`);
         res.status(200).json(result.recordset);
+        console.log(result.recordset);
     } catch (err) {
 
         res.status(500);
