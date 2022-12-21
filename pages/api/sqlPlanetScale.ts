@@ -28,7 +28,7 @@ export default async function handler(
         await pool.connect();
         const result = await pool
         .request()
-        .query(`SELECT * FROM users`);
+        .query(`SHOW TABLES`);
         res.status(200).json(result.recordset);
     } catch (err) {
 
