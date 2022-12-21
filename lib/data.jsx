@@ -1,5 +1,19 @@
 let rut = "23157989-3";
 
+const campos3 = [
+  { campo: "shipping.Tipo_de_Despacho", type: "text", detalle: "Tipo de Despacho", valua: "Envío Región FedEx" },
+  { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha", valua: "22-12-2022" },
+  { campo: "shipping.Nombre_Retira", type: "text", detalle: "Nombre de Retira", valua: "Carlos Espinoza" },
+  { campo: "shipping.Rut_Retira", type: "text", detalle: "Rut de Retira", valua: "15020576k" },
+  { campo: "shipping.Observación", type: "text", detalle: "Observación", valua: "Dejar en la el local azúl de enfrente, Preguntar por Yolanda" },
+];
+
+//tipo de despacho
+//fecha de despacho o retiro
+// datos de retira rut nombre patente
+//crear campo flete en negocio
+//observacion
+
 const campos2 = [
   // {
   //   campo: "billing.Tipo_de_DTE",
@@ -147,10 +161,10 @@ const pago1 = [
     campo: "payment.Fecha_de_Pago",
     type: "date",
     detalle: "Fecha",
-  valua: 22-12-2022
+  valua: "22-12-2022"
   },
 ];
 
-const Datas = [campos1, dirFac1, dirEnv1, products1, pago1, campos2];
+const Datas = [campos1, dirFac1, dirEnv1, products1, pago1, campos2, campos3];
 
 export default { Datas };

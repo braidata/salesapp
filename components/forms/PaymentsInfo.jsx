@@ -59,7 +59,7 @@ export default function PaymentsInfo({ formStep, nextFormStep }) {
   }
 
   return (
-    <div className={formStep === 4 ? styles.showForm : styles.hideForm}>
+    <div className={formStep === 5 ? styles.showForm : styles.hideForm}>
       <h2 className="mt-2 border rounded-md border-gray-500 bg-gray-200 dark:bg-gray-700 p-2.5 text-gray-200 text-center text-xl dark:text-gray-100">
         Información de Pagos
       </h2>

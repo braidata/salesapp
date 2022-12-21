@@ -40,7 +40,7 @@ export default function ConfirmPurchase({ formStep, nextFormStep }) {
   }
 
   return (
-    <div className={formStep === 5 ? styles.showForm : styles.hideForm}>
+    <div className={formStep === 6 ? styles.showForm : styles.hideForm}>
       <h2 className="mt-2 border rounded-md border-gray-500 bg-gray-200 dark:bg-gray-700 p-2.5 text-gray-200 text-center text-xl dark:text-gray-100">
         Revisar Información y Envíar Pedido
       </h2>

@@ -9,6 +9,7 @@ import {
   ConfirmPurchase,
   PersonalInfo,
   ProductsInfo,
+  ShippingInfo,
   PaymentsInfo,
 } from "../components/forms";
 import FormCompleted from "../components/FormCompleted";
@@ -75,13 +76,16 @@ const App = () => {
           <ProductsInfo formStep={formStep} nextFormStep={nextFormStep} />
         )}
         {formStep >= 4 && (
-          <PaymentsInfo formStep={formStep} nextFormStep={nextFormStep} />
+          <ShippingInfo formStep={formStep} nextFormStep={nextFormStep} />
         )}
         {formStep >= 5 && (
+          <PaymentsInfo formStep={formStep} nextFormStep={nextFormStep} />
+        )}
+        {formStep >= 6 && (
           <ConfirmPurchase formStep={formStep} nextFormStep={nextFormStep} />
         )}
 
-        {formStep > 5 && <FormCompleted />}
+        {formStep > 6 && <FormCompleted />}
       </FormCard>
 
       <div className="mt-10">
