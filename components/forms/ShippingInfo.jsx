@@ -123,11 +123,11 @@ export default function shippingInfo({ formStep, nextFormStep }) {
               )
             )
           )}
-          <ButtonToAddComponent
+          {/* <ButtonToAddComponent
             nombre={"Dirección de Envío"}
             dataSelect={2}
             children={<CreatedAtomForm />}
-          />
+          /> */}
           <button type="submit">Siguiente</button>
           {datosShipping.map(
             (datos, Bill) => (
