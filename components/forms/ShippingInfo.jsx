@@ -85,7 +85,7 @@ export default function shippingInfos({ formStep, nextFormStep }) {
           : "No Data"}
       </div>
       <h2 className="mt-2 border rounded-md border-gray-500 bg-gray-200 dark:bg-gray-700 p-2.5 text-gray-200 text-center text-xl dark:text-gray-100">
-        Información de Facturación
+        Información de Despacho y Retiro
       </h2>
 
       <Form ref={formRef} onSubmit={handleSubmit}>
