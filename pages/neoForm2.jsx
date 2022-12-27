@@ -18,6 +18,7 @@ import FinalInterface from "../components/forms/finalInterface";
 import { useSession } from "next-auth/react";
 
 
+
 const App = () => {
   const { status } = useSession({
     required: true,
@@ -63,31 +64,7 @@ const App = () => {
       <FinalInterface />
       {/* <AtomCounter /> */}
       <RefreshButton functions={refreshPage} />
-      {/* <FormCard currentStep={formStep} prevFormStep={prevFormStep}>
-        {formStep >= 0 && (
-          <PersonalInfo formStep={formStep} nextFormStep={nextFormStep} />
-        )}
-        {formStep >= 1 && (
-          <BillingInfo formStep={formStep} nextFormStep={nextFormStep} />
-        )}
-        {formStep >= 2 && (
-          <BillingInfo2 formStep={formStep} nextFormStep={nextFormStep} />
-        )}
-        {formStep >= 3 && (
-          <ProductsInfo formStep={formStep} nextFormStep={nextFormStep} />
-        )}
-        {formStep >= 4 && (
-          <ShippingInfo formStep={formStep} nextFormStep={nextFormStep} />
-        )}
-        {formStep >= 5 && (
-          <PaymentsInfo formStep={formStep} nextFormStep={nextFormStep} />
-        )}
-        {formStep >= 6 && (
-          <ConfirmPurchase formStep={formStep} nextFormStep={nextFormStep} />
-        )}
 
-        {formStep > 6 && <FormCompleted />}
-      </FormCard> */}
 
       <div className="mt-10">
         {/* <BuscaHubspotD functions={refreshPage} /> */}

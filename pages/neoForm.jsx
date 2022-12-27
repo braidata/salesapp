@@ -21,7 +21,7 @@ const App = () => {
   const { status } = useSession({
     required: true,
     onUnauthenticated() {
-      // The user is not authenticated, handle it here.
+      // The user is not authenticated, handle it here
     },
   });
 
