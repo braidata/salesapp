@@ -12,10 +12,11 @@ type Response = {
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   //console.log(req.body.first)
   //const first = req.body.first
-  console.log(req.body.id)
+  //console.log(req.body.id)
   //const last = req.body.last
-  const id = req.body.id //? req.body.id : "3963440582"
+
   try {
+    const id = req.body.id //? req.body.id : "3963440582"
     const url = `https://api.hubapi.com/crm/v3/objects/company/search/?hapikey=${process.env.APP_KEY}`
     const response = await axios({
       method: "POST",

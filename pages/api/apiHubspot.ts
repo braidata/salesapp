@@ -9,9 +9,10 @@ type Response = {
 
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
-  console.log(req.body.id)
-  const id = req.body.id
+  //console.log(req.body.id)
+ 
   try {
+    const id = req.body.id
     const url = `https://api.hubapi.com/crm/v4/objects/contacts/${id}/associations/deals/?hapikey=${process.env.APP_KEY}`
     const response = await axios({
       method: "GET",
