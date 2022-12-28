@@ -2,20 +2,10 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import styles from "../styles/styles.module.scss";
-import FormCard from "../components/FormCard";
-import {
-  BillingInfo,
-  BillingInfo2,
-  ConfirmPurchase,
-  PersonalInfo,
-  ProductsInfo,
-  ShippingInfo,
-  PaymentsInfo,
-} from "../components/forms";
-import FormCompleted from "../components/FormCompleted";
 import RefreshButton from "../components/refreshButton";
-import FinalInterface from "../components/forms/finalInterface";
 import { useSession } from "next-auth/react";
+import BuscaOrdSQL from "../components/buscaOrdSQL";
+import BuscaProdSQL from "../components/buscaProdSQL";
 
 
 
@@ -38,7 +28,7 @@ const App = () => {
     return (
       <div>
         <h1 className="mt-24 bg-gray-100   border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
-          ENVÍA TU NEGOCIO A SAP
+          CREA TU VENTA
         </h1>
         <p className="mt-10 bg-gray-100 text-sm  border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
           Identificate con tu cuenta de Hubspot para acceder al Creador de
@@ -51,12 +41,15 @@ const App = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Creador de Pedidos</title>
+        <title>Consultas SQL</title>
       </Head>
       <h1 className="mt-10 bg-gray-100   border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
-      ENVÍA TU NEGOCIO A SAP
+        CONSULTAS SQL
       </h1>
-      <FinalInterface />
+      <h2 className=" mt-10 bg-gray-100   border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500">Consulta de Stock</h2>
+      {/* <BuscaOrdSQL /> */}
+      <BuscaProdSQL />
+      
       {/* <AtomCounter /> */}
       <RefreshButton functions={refreshPage} />
 

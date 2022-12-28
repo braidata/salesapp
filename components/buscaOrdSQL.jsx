@@ -69,32 +69,32 @@ export default function PageWithJSbasedForm2() {
                 Object.entries(order).map(
                   ([keyO, index]) => (
                     console.log(keyO ),
-                    (    <ProductTable keyN={keyO} value={index} />
-                    //   <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-900">
-                    //     <thead className="bg-gray-50 dark:bg-gray-900">
-                    //       <tr>
-                    //         <th
-                    //           scope="row"
-                    //           className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-50 uppercase tracking-wider"
-                    //         >
-                    //           {key}
-                    //         </th>
-                    //       </tr>
-                    //     </thead>
-                    //     <tbody className="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-800">
-                    //       <tr>
-                    //         <td  className="px-6 py-4 whitespace-nowrap">
-                    //           <div className="flex items-center">
-                    //             <div className="ml-4">
-                    //               <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
-                    //                 {index}
-                    //               </div>
-                    //             </div>
-                    //           </div>
-                    //         </td>
-                    //       </tr>
-                    //     </tbody>
-                    //   </table>
+                    (    //<ProductTable keyN={keyO} value={index} />
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-900">
+                        <thead className="bg-gray-50 dark:bg-gray-900">
+                          <tr>
+                            <th
+                              scope="row"
+                              className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-50 uppercase tracking-wider"
+                            >
+                              {keyO}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-800">
+                          <tr>
+                            <td  className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
+                                    {index}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     )
                   )
                 )
