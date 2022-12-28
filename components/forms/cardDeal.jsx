@@ -17,26 +17,26 @@ export default function DealCard({ name, id, stage, amount, sendFunction, editFu
         <div key={id} className="flex flex-col items-center justify-center w-full h-full">
         <div  className="flex flex-col items-center justify-center w-full h-full">
         {/* deal card */}
-            <table className=" mt-2 w-full h-full">
-            <thead className=" text-gray-600 text-sm font-semibold">
-                <tr className="bg-gray-200 dark:bg-gray-800">
-                <th className="px-4 py-3">Nombre</th>
-                <th className="px-4 py-3">ID</th>
-                <th className="px-4 py-3">Etapa</th>
-                <th className="px-4 py-3">Monto</th>
+            <table className="rounded-lg mt-1 w-full h-full">
+            <thead className="w-full rounded-lg text-gray-800 dark:text-gray-300 text-sm font-semibold">
+                <tr className="w-full rounded-lg bg-gray-200 dark:bg-gray-800">
+                <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">Nombre</th>
+                <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">ID</th>
+                <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">Etapa</th>
+                <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">Monto</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     
-                <td >{name} </td>
+                <td className="text-center mr-4 text-sm" >{name} </td>
     
-                <td  ref={refE
+                <td className="text-center mr-4 text-sm"  ref={refE
                 }>{id}</td>
     
-                <td >{stage}</td>
+                <td className="text-center mr-4 text-sm" >{stage}</td>
     
-                <td >{amount}</td>
+                <td className="text-center mr-4 text-sm" >{amount}</td>
                 </tr>
             </tbody>
             </table>

@@ -344,7 +344,7 @@ export default function PageWithJSbasedForm3() {
             >
               <div
                 key={index}
-                className="text-left text-gray-800 dark:text-gray-100
+                className="w-full rounded-lg text-left text-gray-800 dark:text-gray-100
                     bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 transform transition duration-500 hover:scale-105
                     "
               >
@@ -366,7 +366,7 @@ export default function PageWithJSbasedForm3() {
               </div>
             </div>
           ))
-        : <h4 className="text-center text-gray-800 dark:text-gray-100">No hay negocios, recuerda cambiar el estado a Pagado</h4>} 
+        : <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">No hay negocios, recuerda cambiar el estado a Pagado</h4>} 
         
     </div>
   );
