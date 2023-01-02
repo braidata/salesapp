@@ -18,6 +18,7 @@ import RefreshButton from "../components/refreshButton";
 //import FinalInterface from "../components/forms/finalInterface";
 import { useSession } from "next-auth/react";
 import SpinnerButton from "../components/spinnerButton";
+//import CardClosable from "../components/cardClosable";
 
 
 
@@ -62,6 +63,7 @@ const App = () => {
       ENVÍA TU NEGOCIO A SAP
       </h1>
       <FinalInterface />
+    
       {/* <AtomCounter /> */}
       <RefreshButton functions={refreshPage} />
 

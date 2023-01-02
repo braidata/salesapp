@@ -37,7 +37,10 @@ export default function PageWithJSbasedForm3() {
     companies: companies,
     billing: billing,
     deals: deals,
+    //deale without duplicates
+     
     deale: deale,
+
     lines: lines,
     products: new Set(products),
     id: id,
@@ -50,7 +53,9 @@ export default function PageWithJSbasedForm3() {
       companies: companies,
       billing: billing,
       deals: deals,
-      deale: deale,
+      deale: deale.filter((thing, index, self) =>
+      index === self.findIndex((t) => t.id === thing.id)
+      ),
       lines: lines,
       products: products,
       id: id,
@@ -59,12 +64,12 @@ export default function PageWithJSbasedForm3() {
 
   const liniera = (event, idD) => {
     
-    idDeals(event, idD);
+    //idDeals(event, idD);
     //setId(idD);
     idLinea(event, idD);
     lines.map((line) => idProducts(event, line));
     // lines ? lines.map((line) => idProducts(event, line)) : null;
-    //setIsDisabled(true);
+    setIsDisabled(true);
   };
 
   const sendData = async (event) => {
