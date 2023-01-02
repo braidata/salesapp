@@ -4,15 +4,15 @@ import { useState, useEffect, useRef, createRef } from "react";
 import { useDataData } from "../../context/data";
 import SpinnerButton from "../spinnerButton";
 import CardDeal from "../forms/cardDeal";
-import SuccessMessage from  "../forms/succesMessage";
+import SuccessMessage from "../forms/succesMessage";
 
 let negocios = [];
 let negoci;
 
 export default function PageWithJSbasedForm3() {
   //console.log("hubspot api client", createClient({ apiKey: process.env.APP_KEY }))
-  //const tdRef = useRef(null);
-  const tdRef = createRef();
+  const tdRef = useRef(null);
+  //const tdRef = createRef([]);
   const [contacts, setContacts] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [billing, setBilling] = useState([]);
@@ -24,6 +24,7 @@ export default function PageWithJSbasedForm3() {
   const [id, setId] = useState([]);
   const { setDataValues } = useDataData();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   //crete context for objects
   const [context, setContext] = useState({
@@ -47,35 +48,38 @@ export default function PageWithJSbasedForm3() {
       deale: deale,
       lines: lines,
       products: products,
+      id: id,
     });
   }, [contacts, companies, billing, deals, deale, lines, products, id]);
 
-  //send context data to sql data base
+  const liniera =  (event, idD) => {
+    
+    idDeals(event, idD)
+    idLinea(event, idD);
+    lines.map((line) => idProducts(event, line));
+    // lines ? lines.map((line) => idProducts(event, line)) : null;
+    //setIsDisabled(true);
+  };
+
   const sendData = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-    try {
-      console.log("tdRef", tdRef.current.innerHTML);
-      const idD = tdRef.current.innerHTML;
-      //idDeals(event, idD)
-      idLinea(event, parseInt(idD));
-      lines ? lines.map((line) => idProducts(event, line)) : null;
-      console.log("el negocios es ", context);
-      stateChanger(event, parseInt(idD));
-      
-    } catch (error) {
-      console.log(error);
-    }
-    
+    const prob = await event.target.children[0].htmlFor;
+    console.log("tdRef:", prob);
+    const idD = prob;
+
+    liniera(event, idD);
+
+    console.log("el negocios es ", context);
+
+    //await stateChanger(event, parseInt(idD));
+    //setIsDisabled(true);
+
     setIsLoading(false);
-    
   };
 
   //edit data of the context
-  const editData = async (event) => {
-  }
-
-
+  const editData = async (event) => {};
 
   //indica el id del contacto
   const contactoAsociado = async (event) => {
@@ -109,7 +113,7 @@ export default function PageWithJSbasedForm3() {
   };
 
   const idCompanies = async (event, id) => {
-    event.preventDefault();
+    //event.preventDefault();
 
     try {
       const data = {
@@ -131,7 +135,40 @@ export default function PageWithJSbasedForm3() {
       setCompanies(ids);
     } catch {
       console.log("No se encontró La Empresa");
+      setIsLoading(false);
     }
+  };
+
+  //ejecutadora de funciones
+  const ejecutadora0 = async (event) => {
+    contactoAsociado(event);
+
+    // //wait for 2 seconds
+    // setTimeout(() => {
+    //   //your code to be executed after 2 seconds
+    //   contactoAsociado(event);
+
+    // }, 5000);
+  };
+
+  const ejecutadora = async (event) => {
+    sendData(event);
+
+    // //wait for 2 seconds
+    // setTimeout(() => {
+    //   //your code to be executed after 2 seconds
+    //   sendData(event);
+    // }, 1000);
+
+    setTimeout(() => {
+      //your code to be executed after 2 seconds
+      sendData(event);
+    }, 5000);
+
+    setTimeout(() => {
+        //your code to be executed after 2 seconds
+        sendData(event);
+      }, 5000);
   };
 
   //indica los números de negocios asociados al contacto
@@ -166,7 +203,7 @@ export default function PageWithJSbasedForm3() {
 
   //id line items hubspot
   const idLinea = async (event, id) => {
-    event.preventDefault();
+    //event.preventDefault();
 
     try {
       const data = {
@@ -194,20 +231,21 @@ export default function PageWithJSbasedForm3() {
   };
   //info de empresa
   const idEmpresa = async (event, id) => {
-    event.preventDefault();
+    //event.preventDefault();
+
+    const data = {
+      id: id,
+    };
+    const JSONdata = JSON.stringify(data);
+    const endpoint = "/api/apiBilling";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSONdata,
+    };
     try {
-      const data = {
-        id: id,
-      };
-      const JSONdata = JSON.stringify(data);
-      const endpoint = "/api/apiBilling";
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSONdata,
-      };
       const response = await fetch(endpoint, options);
       let result = await response.json();
       setBilling(result.data);
@@ -219,7 +257,7 @@ export default function PageWithJSbasedForm3() {
   };
 
   const idProducts = async (event, id) => {
-    event.preventDefault();
+    //event.preventDefault();
     try {
       const data = {
         id: id,
@@ -270,7 +308,7 @@ export default function PageWithJSbasedForm3() {
 
       negoci = negocios.length > 0 ? negocios[0].hs_object_id : "No hay linea";
       setDeal(negocios);
-      setDataValues(context);
+      //setDataValues(context);
       //console.log("negocios", context)
     } catch {
       console.log("No hay negocios");
@@ -295,11 +333,16 @@ export default function PageWithJSbasedForm3() {
       };
       let response = await fetch(endpoint, options);
       let result = await response.json();
-     
-      console.log("estados", result)
+
+      console.log("estados", result);
     } catch {
       console.log("No cambio de estado");
     }
+  };
+
+  const stateSetter = (s) => {
+    setIsDisabled(s);
+    return isDisabled;
   };
 
   const spinner = () => {
@@ -334,40 +377,52 @@ export default function PageWithJSbasedForm3() {
         </div>
       </form>
 
-      {context.deale.length > 0
-        ? context.deale.map((deal, index) => (
-            //grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6
-            //deal transparent blurred tailwind small card
+      {context.companies.length < 1 ? (
+        <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
+          Debes completar los datos de Empresa en HubSpot para continuar
+        </h4>
+      ) : null}
+
+      {/* {context.companies.length < 1 ? stateSetter(false) : "hola" } */}
+
+      {context.deale.length > 0 ? (
+        context.deale.map((deal, index) => (
+          //grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6
+          //deal transparent blurred tailwind small card
+          <div
+            key={index}
+            className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 m-5"
+          >
             <div
               key={index}
-              className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 m-5"
-            >
-              <div
-                key={index}
-                className="w-full rounded-lg text-left text-gray-800 dark:text-gray-100
+              className="w-full rounded-lg text-left text-gray-800 dark:text-gray-100
                     bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 transform transition duration-500 hover:scale-105
                     "
-              >
-                <CardDeal
-                  name={deal.dealname}
-                  id={deal.hs_object_id}
-                  stage={
-                    deal.dealstage === "decisionmakerboughtin"
-                      ? "Pagado"
-                      : "por pagar"
-                  }
-                  amount={deal.amount}
-                  editFunction={editData}
-                  sendFunction={sendData}
-                  refE={tdRef}
-                  index={index}
-                  comp ={<SuccessMessage />}
-                />
-              </div>
+            >
+              <CardDeal
+                name={deal.dealname}
+                id={deal.hs_object_id}
+                stage={
+                  deal.dealstage === "decisionmakerboughtin"
+                    ? "Pagado"
+                    : "por pagar"
+                }
+                amount={deal.amount}
+                editFunction={editData}
+                sendFunction={sendData}
+                refE={tdRef}
+                index={index}
+                comp={<SuccessMessage />}
+                status={isDisabled}
+              />
             </div>
-          ))
-        : <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">No hay negocios, recuerda cambiar el estado a Pagado</h4>} 
-        
+          </div>
+        ))
+      ) : (
+        <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
+          No hay negocios, recuerda cambiar el estado a Pagado
+        </h4>
+      )}
     </div>
   );
 }
