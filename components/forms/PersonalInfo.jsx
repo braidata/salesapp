@@ -46,8 +46,8 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
   const formRef = useRef();
   const { dataH } = useDataData();
   let dato1 = [];
-  const contactos = dataH.contacts ? dataH.contacts[0] : "no data";
-  const contactosP = contactos ? contactos.properties : "no data";
+  // const contactos = dataH.contacts ? dataH.contacts[0] : "no data";
+  // const contactosP = contactos ? contactos.properties : "no data";
 
   async function handleSubmit(data) {
     try {
@@ -76,7 +76,7 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
   return (
     <div className={formStep === 0 ? styles.showForm : styles.hideForm}>
       <div className="mb-10 text-gray-100 dark:text-gray-400 max-h-0 max-w-0">
-        {contactosP != null
+        {/* {contactosP != null
           ? datosContacto.push(
               contactosP.rut,
               contactosP.firstname,
@@ -84,7 +84,7 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
               contactosP.email,
               contactosP.mobilephone
             )
-          : "No Data"}
+          : "No Data"} */}
       </div>
 
       <h2 className="mt-2 border rounded-md border-gray-500 bg-gray-200 dark:bg-gray-700 p-2.5 text-gray-200 text-center text-xl dark:text-gray-100">
@@ -96,21 +96,12 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
           {/* Tailwind forom Card */}
           {/* Datas contiene info para generar formularios */}
           <div className="invisible text-gray-100 dark:text-gray-400 max-h-8 max-w-0">
-            {datosContacto.length >= 5
+            {/* {datosContacto.length >= 5
               ? datosContacto.map((datos) =>
                   datos != null ? dato1.push(datos) : "no info"
                 )
-              : "no data"}
+              : "no data"} */}
           </div>{" "}
-          {dato1.length > 0 ? (
-            <h3 className="mb-5 bg-orange-500 px-4 rounded-md w-60 text-gray-100 text-sm font-bold dark:text-gray-200">
-              DATOS HUBSPOT CARGADOS
-            </h3>
-          ) : (
-            <h3 className="mb-5 bg-orange-700 px-4 rounded-md w-60 text-gray-100 text-md dark:text-gray-200">
-              No hay datos HubSpot Cargados
-            </h3>
-          )}
           {Data != null
             ? Data.Datas[0].slice(0, 5).map((data, index) => (
                 // call internal api
@@ -119,11 +110,11 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
                   name={data.campo}
                   label={data.detalle}
                   type={data.type}
-                  valua={dato1[index]}
+                  valua={data.valua}
                 />
               ))
             : "no data"}
-          <button type="submit">Siguiente</button>
+          <button className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="submit">Siguiente</button>
         </div>
       </Form>
     </div>

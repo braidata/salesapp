@@ -9,7 +9,7 @@ export default function FormCompleted() {
   return (
     <>
       <h2 className="mt-2 mb-4 text-2xl font-bold text-center text-gray-600 dark:text-gray-200"
-      >Felicidades por tu venta! 🎉</h2>
+      >Tu venta fue envíada a SAP con éxito!</h2>
       <h3 className="mt-4 text-lg font-bold text-left text-gray-600 dark:text-gray-200" >Información del Pedido</h3>
       {/**Code TailwindCSS Block */}
       <div className="flex flex-col items-center justify-center w-full h-full p-4 mx-auto mt-10 bg-white rounded-lg shadow-md dark:bg-gray-800"> 
@@ -18,13 +18,13 @@ export default function FormCompleted() {
       </code>
       </div>
       {/**Code TailwindCSS Block */}
-      <h3 className="mt-4 text-lg font-bold text-left text-gray-600 dark:text-gray-200" >Información del Cliente en HubSpot</h3>
+      {/* <h3 className="mt-4 text-lg font-bold text-left text-gray-600 dark:text-gray-200" >Información del Cliente en HubSpot</h3> */}
       {/**Code TailwindCSS Block */}
-      <div className="flex flex-col items-center justify-center w-full h-full p-4 mx-auto mt-10 bg-white rounded-lg shadow-md dark:bg-gray-800"> 
+      {/* <div className="flex flex-col items-center justify-center w-full h-full p-4 mx-auto mt-10 bg-white rounded-lg shadow-md dark:bg-gray-800"> 
      <code className="mr-96 -ml-20 max-w-0 mt-10 bg-white rounded-lg shadow-md dark:bg-gray-800">
       <pre>{JSON.stringify(dataH, null, 1)}</pre>
       </code>
-      </div>
+      </div> */}
      
     </>
   );

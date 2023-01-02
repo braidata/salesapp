@@ -20,7 +20,7 @@ export default function ButtonToAddComponent({ children, nombre, dataSelect, dat
 
     return (
         <div className="w-100">
-            <button className="w-100" type="button" onClick={addComponent}>Agregar {nombre}</button>
+            <button className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="button" onClick={addComponent}>Agregar {nombre}</button>
             {components.map((component) => (
                 <div className="w-100" key={component}>
                     {React.createElement(children.type, {cuenta: component, dataSelect: dataSelect, dato1: dato1})}
