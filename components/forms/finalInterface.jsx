@@ -61,6 +61,7 @@ export default function PageWithJSbasedForm3() {
     //setIsDisabled(true);
   };
 
+
   const sendData = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -72,7 +73,7 @@ export default function PageWithJSbasedForm3() {
 
     console.log("el negocios es ", context);
 
-    //await stateChanger(event, parseInt(idD));
+    await stateChanger(event, parseInt(idD));
     //setIsDisabled(true);
 
     setIsLoading(false);
