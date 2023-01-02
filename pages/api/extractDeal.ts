@@ -22,7 +22,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
       method: "POST",
       url: url,
       data: {
-        "properties": [ "dealname","dealstage","hs_object_id", "amount" ],
+        "properties": [ "dealname","dealstage","hs_object_id", "amount", "flete", "fecha_despacho_retiro", "nombre_retira", "rut_de_retiro", "tipo_de_despacho", "rut_de_retiro", "observacion" ],
 
         "filterGroups": [
             { "filters": [

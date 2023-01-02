@@ -58,8 +58,9 @@ export default function PageWithJSbasedForm3() {
   }, [contacts, companies, billing, deals, deale, lines, products, id]);
 
   const liniera = (event, idD) => {
+    
     idDeals(event, idD);
-    setId(idD);
+    //setId(idD);
     idLinea(event, idD);
     lines.map((line) => idProducts(event, line));
     // lines ? lines.map((line) => idProducts(event, line)) : null;
@@ -383,20 +384,26 @@ export default function PageWithJSbasedForm3() {
         </div>
 
         {!context.billing ? (
+            <div>
+                <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
+                  Debes completar los datos de Empresa en HubSpot para continuar.
+                </h4>
           <button
             className="mt-2 mb-5 bg-orange-800/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-orange-700/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             type="submit"
           >
             Cargar Datos{" "}
           </button>
+            </div>
+                  
         ) : null}
       </form>
 
-      {context.companies.length < 1 ? (
+      {/* {context.companies.length < 1 ? (
         <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
           Debes completar los datos de Empresa en HubSpot para continuar
         </h4>
-      ) : null}
+      ) : null} */}
 
       {/* {context.companies.length < 1 ? stateSetter(false) : "hola" } */}
 
