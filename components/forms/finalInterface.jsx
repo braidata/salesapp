@@ -11,11 +11,10 @@ let negocios = [];
 let negoci;
 
 export default function PageWithJSbasedForm3() {
-
-//   const CardDeal = dynamic(() => import("../forms/cardDeal"), {
-//         ssr: false,
-//         //loading: () => <p>Loading...</p>
-//       }); 
+  //   const CardDeal = dynamic(() => import("../forms/cardDeal"), {
+  //         ssr: false,
+  //         //loading: () => <p>Loading...</p>
+  //       });
   //console.log("hubspot api client", createClient({ apiKey: process.env.APP_KEY }))
   const tdRef = useRef(null);
   //const tdRef = createRef([]);
@@ -58,16 +57,14 @@ export default function PageWithJSbasedForm3() {
     });
   }, [contacts, companies, billing, deals, deale, lines, products, id]);
 
-  const liniera =  (event, idD) => {
-    
-    idDeals(event, idD)
-    setId(idD)
+  const liniera = (event, idD) => {
+    idDeals(event, idD);
+    setId(idD);
     idLinea(event, idD);
     lines.map((line) => idProducts(event, line));
     // lines ? lines.map((line) => idProducts(event, line)) : null;
     //setIsDisabled(true);
   };
-
 
   const sendData = async (event) => {
     event.preventDefault();
@@ -174,9 +171,9 @@ export default function PageWithJSbasedForm3() {
     }, 5000);
 
     setTimeout(() => {
-        //your code to be executed after 2 seconds
-        sendData(event);
-      }, 5000);
+      //your code to be executed after 2 seconds
+      sendData(event);
+    }, 5000);
   };
 
   //indica los números de negocios asociados al contacto
@@ -212,10 +209,10 @@ export default function PageWithJSbasedForm3() {
   //id line items hubspot
   const idLinea = async (event, id) => {
     //event.preventDefault();
-    
-        const data = {
-          id: id,
-        };
+
+    const data = {
+      id: id,
+    };
     try {
       const JSONdata = JSON.stringify(data);
       const endpoint = "/api/apihubspotline";
@@ -375,7 +372,7 @@ export default function PageWithJSbasedForm3() {
         />
 
         <button
-          className="mt-2 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           type="submit"
         >
           Buscar datos en HubSpot{" "}
@@ -385,13 +382,14 @@ export default function PageWithJSbasedForm3() {
           {isLoading == true ? <SpinnerButton texto="Cargando..." /> : null}
         </div>
 
-        {!context.billing ? <button
-          className="mt-2 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          type="submit"
-        >
-          Cargar Datos{" "}
-        </button> : null}
-
+        {!context.billing ? (
+          <button
+            className="mt-2 mb-5 bg-orange-800/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-orange-700/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            type="submit"
+          >
+            Cargar Datos{" "}
+          </button>
+        ) : null}
       </form>
 
       {context.companies.length < 1 ? (

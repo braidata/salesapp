@@ -37,6 +37,7 @@ export default function DealCard({
     console.log("Cuántos clicks: ", clicks);
 
     clicks >= 4 ? setIsDisabled(true) : setIsDisabled(false);
+    clicks >= 4 ? setShow(true) : setShow(false);
   };
 
   const handleClick = () => {
@@ -109,8 +110,10 @@ export default function DealCard({
               type="submit"
               onClick={handleClick}
               disabled={status}
-              className={`bg-blue-500 hover:bg-blue-700 text-gray-800 font-bold py-2 px-2 mt-12 rounded-sm w-1 h-14 dark:text-gray-800 ${
-                status ? "opacity-50 cursor-not-allowed" : ""
+              className={`bg-blue-900/90  text-gray-800 font-bold py-2 px-2 mt-12 rounded-sm w-1 h-14 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:text-gray-800 ${
+                status
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-blue-800/90"
               }`}
             >
               {nameD}
