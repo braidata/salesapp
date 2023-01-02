@@ -1,4 +1,5 @@
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import styles from "../styles/styles.module.scss";
@@ -14,8 +15,9 @@ import {
 } from "../components/forms";
 import FormCompleted from "../components/FormCompleted";
 import RefreshButton from "../components/refreshButton";
-import FinalInterface from "../components/forms/finalInterface";
+//import FinalInterface from "../components/forms/finalInterface";
 import { useSession } from "next-auth/react";
+import SpinnerButton from "../components/spinnerButton";
 
 
 
@@ -27,6 +29,9 @@ const App = () => {
     },
   });
  
+  const FinalInterface = dynamic(() => import("../components/forms/finalInterface"), {
+    loading: () => <SpinnerButton texto="Cargando..." />
+  }); 
  const router = useRouter();
  const [refresh, setRefresh] = useState(false);
   const refreshPage = () => {

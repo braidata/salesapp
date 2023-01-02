@@ -1,6 +1,7 @@
 // //nextjs tailwind unform hubspot component
 
 import { useState, useEffect, useRef, createRef } from "react";
+import dynamic from "next/dynamic";
 import { useDataData } from "../../context/data";
 import SpinnerButton from "../spinnerButton";
 import CardDeal from "../forms/cardDeal";
@@ -10,6 +11,11 @@ let negocios = [];
 let negoci;
 
 export default function PageWithJSbasedForm3() {
+
+//   const CardDeal = dynamic(() => import("../forms/cardDeal"), {
+//         ssr: false,
+//         //loading: () => <p>Loading...</p>
+//       }); 
   //console.log("hubspot api client", createClient({ apiKey: process.env.APP_KEY }))
   const tdRef = useRef(null);
   //const tdRef = createRef([]);
@@ -55,6 +61,7 @@ export default function PageWithJSbasedForm3() {
   const liniera =  (event, idD) => {
     
     idDeals(event, idD)
+    setId(idD)
     idLinea(event, idD);
     lines.map((line) => idProducts(event, line));
     // lines ? lines.map((line) => idProducts(event, line)) : null;
@@ -205,11 +212,11 @@ export default function PageWithJSbasedForm3() {
   //id line items hubspot
   const idLinea = async (event, id) => {
     //event.preventDefault();
-
+    
+        const data = {
+          id: id,
+        };
     try {
-      const data = {
-        id: id,
-      };
       const JSONdata = JSON.stringify(data);
       const endpoint = "/api/apihubspotline";
       const options = {
@@ -373,9 +380,18 @@ export default function PageWithJSbasedForm3() {
         >
           Buscar datos en HubSpot{" "}
         </button>
+
         <div>
           {isLoading == true ? <SpinnerButton texto="Cargando..." /> : null}
         </div>
+
+        {!context.billing ? <button
+          className="mt-2 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          type="submit"
+        >
+          Cargar Datos{" "}
+        </button> : null}
+
       </form>
 
       {context.companies.length < 1 ? (

@@ -15,15 +15,33 @@ export default function DealCard({
   refE,
   index,
   comp,
-  status,
 }) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [show, setShow] = useState(false);
   const refE2 = useRef();
+  const status = isDisabled;
+  const [nameD, setName] = useState("Seleccionar");
+  const [clicks, setClicks] = useState(1);
   //console.log("lA REFE", refE2 != null ? refE2 : "no hay ref")
 
   const sendingShow = () => {
     setShow(true);
+  };
+
+  const nameChanger = () => {
+    setClicks(clicks + 1);
+    setName("Validar");
+    clicks >= 2 ? setName("Enviar") : setName("Validar");
+    clicks === 3 && setName("Finalizar");
+    clicks >= 4 && setName("Enviado");
+    console.log("Cuántos clicks: ", clicks);
+
+    clicks >= 4 ? setIsDisabled(true) : setIsDisabled(false);
+  };
+
+  const handleClick = () => {
+    nameChanger();
+    sendFunction;
   };
 
   useEffect(
@@ -89,13 +107,13 @@ export default function DealCard({
 
             <button
               type="submit"
-              onClick={sendingShow}
+              onClick={handleClick}
               disabled={status}
               className={`bg-blue-500 hover:bg-blue-700 text-gray-800 font-bold py-2 px-2 mt-12 rounded-sm w-1 h-14 dark:text-gray-800 ${
                 status ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              Enviar
+              {nameD}
             </button>
 
             {show ? comp : null}
