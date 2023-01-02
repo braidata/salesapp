@@ -31,11 +31,11 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
   const formRef = useRef();
 
   const { dataH } = useDataData();
-  let dato1 = [];
+  // let dato1 = [];
   let datoM = [];
   let lin = dataH.lines;
-  const products = dataH.products[0] ? dataH.products[0] : "no data";
-  const productsP = products ? products[0].properties : "no data";
+  // const products = dataH.products[0] ? dataH.products[0] : "no data";
+  // const productsP = products ? products[0].properties : "no data";
 
   async function handleSubmit(data) {
     try {
@@ -64,14 +64,6 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
   return (
     <div className={formStep === 3 ? styles.showForm : styles.hideForm}>
       <div className="mb-10 text-gray-100 dark:text-gray-400 max-h-0 max-w-0">
-        {productsP
-          ? datosProducts.push(
-              productsP.hs_sku,
-              productsP.name,
-              productsP.amount,
-              productsP.quantity
-            )
-          : "No Data"}
       </div>
       <h2 className="mt-2 border rounded-md border-gray-500 bg-gray-200 dark:bg-gray-700 p-2.5 text-gray-200 text-center text-xl dark:text-gray-100">
         Información de Productos
@@ -82,17 +74,9 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
           {/* Tailwind forom Card */}
           {/* Datas contiene info para generar formularios */}
           <div className="invisible text-gray-100 dark:text-gray-400 max-h-8 max-w-0">
-            {datosProducts.map((datos, Bill) => dato1.push(datos))}
+           
           </div>{" "}
-          {dato1.length > 0 ? (
-            <h3 className="mb-5 bg-orange-500 px-4 rounded-md w-60 text-gray-100 text-sm font-bold dark:text-gray-200">
-              DATOS HUBSPOT CARGADOS
-            </h3>
-          ) : (
-            <h3 className="mb-5 bg-orange-700 px-4 rounded-md w-60 text-gray-100 text-md dark:text-gray-200">
-              No hay datos HubSpot Cargados
-            </h3>
-          )}
+         
           {Data.Datas[3].map((data, index) => (
             // call internal api
             <Input
@@ -100,8 +84,9 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
               name={data.campo}
               label={data.detalle}
               type={data.type}
-              valua={dato1[index]}
+              valua={data.valua}
             />
+
           ))}
           <ButtonToAddComponent
             nombre={"Producto"}
