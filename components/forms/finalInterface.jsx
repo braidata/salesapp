@@ -6,6 +6,8 @@ import { useDataData } from "../../context/data";
 import SpinnerButton from "../spinnerButton";
 import CardDeal from "../forms/cardDeal";
 import SuccessMessage from "../forms/succesMessage";
+import { useSession } from "next-auth/react";
+import SessionInfo from "../forms/sessionInfo";
 
 let negocios = [];
 let negoci;
@@ -31,6 +33,13 @@ export default function PageWithJSbasedForm3() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
+  const { data, status } = useSession({
+    required: true,
+  });
+  const [user, setUser] = useState(data.user.email ? data.user.email : null);
+
+  console.log(data, status, data.user.email);
+
   //crete context for objects
   const [context, setContext] = useState({
     contacts: contacts,
@@ -38,11 +47,12 @@ export default function PageWithJSbasedForm3() {
     billing: billing,
     deals: deals,
     //deale without duplicates
-     
+
     deale: deale,
 
     lines: lines,
     products: new Set(products),
+    user: user,
     id: id,
   });
 
@@ -53,17 +63,18 @@ export default function PageWithJSbasedForm3() {
       companies: companies,
       billing: billing,
       deals: deals,
-      deale: deale.filter((thing, index, self) =>
-      index === self.findIndex((t) => t.id === thing.id)
+      deale: deale.filter(
+        (thing, index, self) =>
+          index === self.findIndex((t) => t.id === thing.id)
       ),
       lines: lines,
       products: products,
+      user: user,
       id: id,
     });
   }, [contacts, companies, billing, deals, deale, lines, products, id]);
 
   const liniera = (event, idD) => {
-    
     //idDeals(event, idD);
     //setId(idD);
     idLinea(event, idD);
@@ -313,9 +324,7 @@ export default function PageWithJSbasedForm3() {
       let response = await fetch(endpoint, options);
       let result = await response.json();
       result.data ? negocios.push(result.data[0].properties) : "NO HAY DATOS";
-      negocios = negocios.filter(
-        (negocio) => negocio.dealstage === "50940199"
-      );
+      negocios = negocios.filter((negocio) => negocio.dealstage === "50940199");
 
       negoci = negocios.length > 0 ? negocios[0].hs_object_id : "No hay linea";
       setDeal(negocios);
@@ -362,6 +371,7 @@ export default function PageWithJSbasedForm3() {
 
   return (
     <div className="mt-10">
+      {/* <SessionInfo /> */}
       <form onSubmit={contactoAsociado}>
         <label
           className="mt-2 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -389,18 +399,17 @@ export default function PageWithJSbasedForm3() {
         </div>
 
         {!context.billing ? (
-            <div>
-                <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
-                  Debes completar los datos de Empresa en HubSpot para continuar.
-                </h4>
-          <button
-            className="mt-2 mb-5 bg-orange-800/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-orange-700/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            type="submit"
-          >
-            Cargar Datos{" "}
-          </button>
-            </div>
-                  
+          <div>
+            <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
+              Debes completar los datos de Empresa en HubSpot para continuar.
+            </h4>
+            <button
+              className="mt-2 mb-5 bg-orange-800/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-orange-700/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              type="submit"
+            >
+              Cargar Datos{" "}
+            </button>
+          </div>
         ) : null}
       </form>
 
@@ -429,18 +438,15 @@ export default function PageWithJSbasedForm3() {
               <CardDeal
                 name={deal.dealname}
                 id={deal.hs_object_id}
-                stage={
-                  deal.dealstage === "50940199"
-                    ? "Pagado"
-                    : "por pagar"
-                }
+                stage={deal.dealstage === "50940199" ? "Pagado" : "por pagar"}
                 amount={deal.amount}
                 editFunction={editData}
                 sendFunction={sendData}
                 refE={tdRef}
                 index={index}
                 comp={<SuccessMessage />}
-                status={isDisabled}
+                context={context}
+                // status={isDisabled}
               />
             </div>
           </div>

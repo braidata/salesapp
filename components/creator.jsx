@@ -20,6 +20,7 @@ const Creator = () => {
     const draw = p5 => {
         p5.background(0);
         p5.ellipse(x, y, 70, 70);
+        //y++;
         
     };
     

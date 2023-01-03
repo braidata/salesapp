@@ -22,16 +22,16 @@ const ProductTable = ({ keyN, value, value2, component}) => {
           <tr className="rounded-lg bg-gray-100 divide-x dark:bg-gray-800/75 dark:border-gray-700">
           {component}
 
-           {value.map(
-              (item, index) => (
-                <th className="rounded-md py-1 border-b px-1 text-center text-sm dark:border-gray-600" key={index}>{item}</th>
+           {value && value.map(
+              (item) => (
+                <th className="rounded-md py-1 border-b px-1 text-center text-sm dark:border-gray-600" >{item}</th>
               )
             )}
             </tr>
             <tr className="rounded-sm bg-white border-b divide-x dark:bg-gray-700/75 dark:border-gray-700">
-           {value2.map(
-              (item, index) => (
-                <td className="rounded-md border-b py-1 px-1 text-sm text-justify dark:border-gray-500" key={index}>{item}</td>
+           {value2 && value2.map(
+              (item) => (
+                <td className="rounded-md border-b py-1 px-1 text-sm text-justify dark:border-gray-500" >{item}</td>
               )
             )}
             

@@ -4,7 +4,7 @@
 
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-
+import FormatContext from "../../lib/formatContext";
 export default function DealCard({
   name,
   id,
@@ -15,6 +15,7 @@ export default function DealCard({
   refE,
   index,
   comp,
+  context,
 }) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [show, setShow] = useState(false);
@@ -127,6 +128,7 @@ export default function DealCard({
                 </button> */}
         </div>
       </div>
+      {show ? <FormatContext context={context}/> : null}
     </div>
   );
 }

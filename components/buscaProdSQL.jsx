@@ -1,29 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import ProductTable from "../components/productTable";
 import CopyButton from "../components/copyButton";
+//import IFramer from "../components/iFramer";
+import dynamic from "next/dynamic";
 
 export default function PageWithJSbasedForm2() {
   // Handles the submit event on form submit.
   let result;
   let refer;
+  const Creator = dynamic(() => import("../components/creator"), {
+    ssr: false,
+  });
   const textAreaRef = useRef([]);
   const text = useCallback(() => {
     return textAreaRef.current;
-    }, []);
+  }, []);
   const [products, setProducts] = useState([]);
   const [alm, setAlm] = useState([]);
   const [texto, setTexto] = useState([]);
-   
-  useEffect( () => { setTexto(text);
+
+  useEffect(() => {
+    setTexto(text);
   }, [text]);
-
-
-  
-
-
-
-
-
 
   const handleSubmit = async (event) => {
     // Stop the form from submitting and refreshing the page.
@@ -61,18 +59,12 @@ export default function PageWithJSbasedForm2() {
     result = await response.json();
     //result = JSON.stringify(result);
     //console.log(result[0]);
-    
+
     setProducts(result);
     setAlm(data.alm);
-    
-    
-
-    
-    
   };
 
   return (
-    
     <div className="flex flex-col">
       <form onSubmit={handleSubmit}>
         <label
@@ -115,48 +107,47 @@ export default function PageWithJSbasedForm2() {
         >
           Buscar Producto
         </button>
-        
       </form>
 
-
       {/* Table */}
-      <div  className="flex flex-col mt-5 mb-5">
+      <div className="flex flex-col mt-5 mb-5">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">Almacén {alm ? alm : "Elige un almacén"}
-            <div ref={textAreaRef} className="mb-2 mt-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+            Almacén {alm ? alm : "Elige un almacén"}
+            <div
+              ref={textAreaRef}
+              className="mb-2 mt-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
+            >
               {products.map((product) =>
                 Object.entries(product).map(
-                  ([keyN, index]) => (
-                    
-                    (  //<ProductTable   keyN={keyN} value={index} />
-                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-900">
-                        <thead className="bg-gray-50 dark:bg-gray-900">
-                          <tr>
-                            <th
-                              scope="col"
-                              className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-50 uppercase tracking-wider"
-                            >
-                              {keyN}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-800">
-                          <tr>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
-                                    {index}
-                                  </div>
+                  (
+                    [keyN, index] //<ProductTable   keyN={keyN} value={index} />
+                  ) => (
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-900">
+                      <thead className="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                          <th
+                            scope="col"
+                            className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-50 uppercase tracking-wider"
+                          >
+                            {keyN}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-800">
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
+                                  {index}
                                 </div>
                               </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-
-                    )
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   )
                 )
               )}
@@ -166,7 +157,13 @@ export default function PageWithJSbasedForm2() {
           </div>
         </div>
       </div>
-
+      {/* <IFramer
+        url="https://calculadora-fedex.glitch.me"
+        allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; ambient-light-sensor; encrypted-media;"
+        width="100%"
+        height="100%"
+      /> */}
+      <Creator />
     </div>
   );
 }
