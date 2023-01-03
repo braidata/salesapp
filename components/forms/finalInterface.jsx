@@ -314,7 +314,7 @@ export default function PageWithJSbasedForm3() {
       let result = await response.json();
       result.data ? negocios.push(result.data[0].properties) : "NO HAY DATOS";
       negocios = negocios.filter(
-        (negocio) => negocio.dealstage === "decisionmakerboughtin"
+        (negocio) => negocio.dealstage === "50940199"
       );
 
       negoci = negocios.length > 0 ? negocios[0].hs_object_id : "No hay linea";
@@ -430,7 +430,7 @@ export default function PageWithJSbasedForm3() {
                 name={deal.dealname}
                 id={deal.hs_object_id}
                 stage={
-                  deal.dealstage === "decisionmakerboughtin"
+                  deal.dealstage === "50940199"
                     ? "Pagado"
                     : "por pagar"
                 }
