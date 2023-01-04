@@ -29,6 +29,8 @@ export default function PageWithJSbasedForm3() {
   const [products, setProducts] = useState([]);
   const [productsA, setProductsA] = useState([]);
   const [id, setId] = useState([]);
+  const [owner, setOwner] = useState([]);
+  const [owners, setOwners] = useState([]);
   const { setDataValues } = useDataData();
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -53,6 +55,8 @@ export default function PageWithJSbasedForm3() {
     lines: lines,
     products: new Set(products),
     user: user,
+    owner: owner,
+    owners: owners,
     id: id,
   });
 
@@ -70,16 +74,19 @@ export default function PageWithJSbasedForm3() {
       lines: lines,
       products: products,
       user: user,
+      owner: owner,
+      owners: owners,
       id: id,
     });
   }, [contacts, companies, billing, deals, deale, lines, products, id]);
 
   const liniera = (event, idD) => {
-    //idDeals(event, idD);
+    idDeals(event, idD);
     //setId(idD);
     idLinea(event, idD);
     lines.map((line) => idProducts(event, line));
     // lines ? lines.map((line) => idProducts(event, line)) : null;
+    //owner ? setOwners(owner) : null;
     setIsDisabled(true);
   };
 
@@ -327,6 +334,9 @@ export default function PageWithJSbasedForm3() {
       negocios = negocios.filter((negocio) => negocio.dealstage === "50940199");
 
       negoci = negocios.length > 0 ? negocios[0].hs_object_id : "No hay linea";
+      console.log("ID OWNER DEAL ", negocios[0].hubspot_owner_id);
+      setOwner(negocios[0].hubspot_owner_id);
+      owner ? idOwners(event, owner) : "No hay owner";
       setDeal(negocios);
       //setDataValues(context);
       //console.log("negocios", context)
@@ -334,6 +344,42 @@ export default function PageWithJSbasedForm3() {
       console.log("No hay negocios");
     }
   };
+
+//ownerInfo
+const idOwners = async (event, id) => {
+    //event.preventDefault();
+    try {
+      const data = {
+        id: id,
+      };
+      const JSONdata = JSON.stringify(data);
+      const endpoint = "/api/getHubspotOwners";
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSONdata,
+      };
+      const response = await fetch(endpoint, options);
+      const result =  response
+      const resO = await result.json()
+      console.log("dueños", resO
+      );
+      
+      setOwners(resO
+        );
+ 
+    } catch {
+      console.log("No hay dueños");
+    }
+  };
+
+
+
+
+
+
 
   //dealInfo
   const stateChanger = async (event, id) => {

@@ -13,8 +13,9 @@ export default function SessionInfo() {
         
       });
     const router = useRouter();
+    
 
-    console.log(data, status, data.user.email)
+    console.log("DATA",data, "STATUS",status, "DATO",data.user)
     
     return (
         <div className="flex flex-col items-center justify-center w-full h-full">
