@@ -81,6 +81,7 @@ export default function PageWithJSbasedForm3() {
   }, [contacts, companies, billing, deals, deale, lines, products, id]);
 
   const liniera = (event, idD) => {
+    event.preventDefault();
     idDeals(event, idD);
     //setId(idD);
     idLinea(event, idD);
