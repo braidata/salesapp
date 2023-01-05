@@ -11,8 +11,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             method: "GET",
             url: url,
         });
-        res.status(200).json({ success: response.data.email, data: response.data.results });
-        console.log("OWNERS", response.data.email) //response.data.email, response.data.firstName, response.data.lastName, response.data.ownerId
+        res.status(200).json({ success: [response.data.email, response.data.firstName, response.data.lastName, response.data.ownerId], data: response.data.results });
+        //console.log("OWNERS", response.data.email) //response.data.email, response.data.firstName, response.data.lastName, response.data.ownerId
 
         
 

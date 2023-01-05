@@ -3,92 +3,199 @@
 import React, { useState, useEffect } from "react";
 import { useDataData } from "../context/data";
 import ProductTable from "../components/productTable";
+//prisma
+import { PrismaClient } from "@prisma/client";
+
 
 export default function FormatContext({ context }) {
   const { dataValues } = useDataData;
   //context = JSON.stringify(context)
   const [contexts, setContext] = useState(context);
 
-  console.log("los datavalues son:  ", JSON.stringify(contexts));
+  console.log("los data values son:  ", JSON.stringify(contexts));
 
-  //sen context data to database mysql
-  const sendData = async () => {
-    const response = await fetch("/api/sendData", {
+
+
+ // console.log("la data es", datas)
+
+
+
+
+
+//create entries in database
+const userSender = async (event) => {
+  //event.preventDefault();
+  try {
+    const data = {
+      name: contexts.owners.success[1],
+      email: contexts.owners.success[0],
+      ownerId: contexts.owners.success[3],
+    };
+    const JSONdata = JSON.stringify(data);
+    const endpoint = "/api/mysqlConnector";
+    const options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(context),
-    });
-    const result = await response.json();
-    console.log(result);
+      body: JSONdata,
+    };
+    const response = await fetch(endpoint, options);
+    const result =  response
+    const resDB = await result.json()
+    console.log("base", resDB
+    );
+   
+
+  } catch {
+    console.log("No hay datos DB");
+  }
+};
+
+
+const orderSender = async (event) => {
+  //event.preventDefault();
+  const datas = {
+    id: contexts.deale[0].id,
+    customer_name: contexts.contacts[0].properties.firstname,
+    customer_last_name: contexts.contacts[0].properties.lastname,
+    customer_rut: contexts.contacts[0].properties.rut,
+    customer_email: contexts.contacts[0].properties.email,
+    customer_phone: contexts.contacts[0].properties.mobilephone,
+    billing_street: contexts.billing[0].properties.calle,
+    billing_number: contexts.billing[0].properties.numero_direccion,
+    billing_commune: contexts.billing[0].properties.comuna,
+    billing_city: contexts.billing[0].properties.city,
+    billing_region: contexts.billing[0].properties.state,
+    billing_department: contexts.billing[0].properties.casa_depto,
+    billing_zip_code: contexts.billing[0].properties.zip,
+    billing_company_name: contexts.billing[0].properties.razon_social,
+    billing_company_rut: contexts.billing[0].properties.rut_de_empresa,
+    billing_company_business: contexts.billing[0].properties.giro_empresa,
+    Shipping_Tipo_de_Despacho: contexts.deale[0].tipo_de_despacho,
+    Shipping_Fecha_de_Despacho_o_Retiro: contexts.deale[0].fecha_despacho_retiro,
+    Shipping_Rut_Retira: contexts.deale[0].rut_de_retiro,
+    Shipping_Nombre_Retira: contexts.deale[0].nombre_retira,
+    Shipping_Observacion: contexts.deale[0].observacion,
+    Shipping_flete: contexts.deale[0].flete,
+    user: contexts.user,
+
   };
 
-  return (
+ 
+
+  console.log("la data es", datas)
+  try {
+   
+    const JSONdata = JSON.stringify(datas);
+    const endpoint = "/api/mysqlWriter";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSONdata,
+    };
+    const response = await fetch(endpoint, options);
+    const result =  response
+    const resDB = await result.json()
+    console.log("base", resDB, datas
+    );
+   
+
+  } catch(e) {
+    console.log("No hay datos DB", e);
+  }
+};
+
+return(
+
     <div>
-      <h2>Datos del Negocio Enviado</h2>
-      {/* show context data on table */}
 
-      {contexts
-        ? contexts.deale.map((deale, index) => (
-            <p className="text-gray-700 dark:text-gray-300" key={index}>
-              {`${deale.dealname} $ ${deale.amount}`}
-            </p>
-          ))
-        : null}
+        <button onClick={orderSender}>Enviar Orden</button>
 
-      {contexts
-        ? contexts.contacts.map((deale, index) => (
-            <div>
-              <p className="text-gray-700 dark:text-gray-300" key={index}>
-                {`${deale.properties.firstname} ${deale.properties.lastname}`}
-              </p>
-            </div>
-          ))
-        : null}
-
-      {contexts
-        ? contexts.contacts.map((deale) => (
-            <div>
-              <p className="text-gray-700 dark:text-gray-300">
-                {Object.entries(deale.properties).map((key, value) => (
-                //   <p className="text-gray-700 dark:text-gray-300">
-                //     {`${key[0]} ${key[1]}`}
-                //   </p>,
-                          <ProductTable
-                          keyN={key[0]}
-                          //value={Object.keys(key)}
-                          value2={Object.values(key)}
-                        />
-                ))}
-              </p>
-            </div>
-          ))
-        : null}
-
-
-{contexts
-        ? contexts.products.map((deale) => (
-            <div>
-              <p className="text-gray-700 dark:text-gray-300">
-                {deale.map((key) => (
-                //   <p className="text-gray-700 dark:text-gray-300">
-                //     {`${key[0]} ${key[1]}`}
-                //   </p>,
-                          <ProductTable
-                          keyN={key.id}
-                          value={Object.keys(key.properties)}
-                          value2={Object.values(key.properties)}
-                        />
-                ))}
-              </p>
-            </div>
-          ))
-        : null}
-
-      {/* <button onClick={sendData}>Send Data</button> */}
+        <button onClick={userSender}>Guarda Ownera</button>
     </div>
-  );
+
+
+
+
+
+
+)
+
+
+
+
+
+
+
+
+//   return (
+//     <div>
+//       <h2>Datos del Negocio Enviado</h2>
+//       {/* show context data on table */}
+
+//       {contexts
+//         ? contexts.deale.map((deale, index) => (
+//             <p className="text-gray-700 dark:text-gray-300" key={index}>
+//               {`${deale.dealname} $ ${deale.amount}`}
+//             </p>
+//           ))
+//         : null}
+
+//       {contexts
+//         ? contexts.contacts.map((deale, index) => (
+//             <div>
+//               <p className="text-gray-700 dark:text-gray-300" key={index}>
+//                 {`${deale.properties.firstname} ${deale.properties.lastname}`}
+//               </p>
+//             </div>
+//           ))
+//         : null}
+
+//       {contexts
+//         ? contexts.contacts.map((deale) => (
+//             <div>
+//               <p className="text-gray-700 dark:text-gray-300">
+//                 {Object.entries(deale.properties).map((key, value) => (
+//                 //   <p className="text-gray-700 dark:text-gray-300">
+//                 //     {`${key[0]} ${key[1]}`}
+//                 //   </p>,
+//                           <ProductTable
+//                           keyN={key[0]}
+//                           //value={Object.keys(key)}
+//                           value2={Object.values(key)}
+//                         />
+//                 ))}
+//               </p>
+//             </div>
+//           ))
+//         : null}
+
+
+// {contexts
+//         ? contexts.products.map((deale) => (
+//             <div>
+//               <p className="text-gray-700 dark:text-gray-300">
+//                 {deale.map((key) => (
+//                 //   <p className="text-gray-700 dark:text-gray-300">
+//                 //     {`${key[0]} ${key[1]}`}
+//                 //   </p>,
+//                           <ProductTable
+//                           keyN={key.id}
+//                           value={Object.keys(key.properties)}
+//                           value2={Object.values(key.properties)}
+//                         />
+//                 ))}
+//               </p>
+//             </div>
+//           ))
+//         : null}
+
+//       {/* <button onClick={sendData}>Send Data</button> */}
+//     </div>
+//   );
 }
 
 // const [context, setContext] = useState({

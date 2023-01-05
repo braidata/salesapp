@@ -40,7 +40,7 @@ export default function PageWithJSbasedForm3() {
   });
   const [user, setUser] = useState(data.user.email ? data.user.email : null);
 
-  console.log(data, status, data.user.email);
+//   console.log(data, status, data.user.email);
 
   //crete context for objects
   const [context, setContext] = useState({
@@ -95,7 +95,7 @@ export default function PageWithJSbasedForm3() {
     event.preventDefault();
     setIsLoading(true);
     const prob = await event.target.children[0].htmlFor;
-    console.log("tdRef:", prob);
+    // console.log("tdRef:", prob);
     const idD = prob;
 
     liniera(event, idD);
