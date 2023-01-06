@@ -36,6 +36,7 @@ export default async function handler(
   const payment_amount = req.body.payment_amount;
   const payment_date = req.body.payment_date;
   const order_items = req.body.order_items;
+  const payments = [];
 
   const productos = order_items
     .filter(
@@ -90,8 +91,8 @@ export default async function handler(
             authorization_code,
             payment_count,
             payment_amount,
-            payment_date,
-          },
+            payment_date
+          }
         },
 
         order_items: {

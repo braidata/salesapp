@@ -15,10 +15,13 @@ try {
 
 
 const user = await prisma.users.findMany();
+const orders = await prisma.orders.findMany();
+const order_items = await prisma.order_items.findMany();
+const payments = await prisma.payments.findMany();
 
 console.log(user);
 
-res.status(200).json(user);}
+res.status(200).json({user, orders, order_items, payments});}
 catch{
 console.log("error");
 }
