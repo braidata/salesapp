@@ -44,7 +44,7 @@ model orders {
   Shipping_flete                      String?       @db.VarChar(255)
   customer_last_name                  String        @db.VarChar(255)
   user                                String        @db.VarChar(255)
-  dealId                              String        @db.VarChar(255)   @unique
+  dealId                              String        @db.VarChar(255) @unique
   payments                            payments[]
   order_items                         order_items[]
 }
