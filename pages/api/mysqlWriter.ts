@@ -8,6 +8,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const user = req.body.user;
+  const dealId = req.body.dealId
   const customer_name = req.body.customer_name;
   const customer_last_name = req.body.customer_last_name;
   const customer_rut = req.body.customer_rut;
@@ -85,6 +86,7 @@ export default async function handler(
         Shipping_Observacion,
         Shipping_flete,
         user,
+        dealId,
         payments: {
           create: {
             method,

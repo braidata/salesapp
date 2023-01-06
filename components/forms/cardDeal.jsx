@@ -120,7 +120,7 @@ export default function DealCard({
               {nameD}
             </button>
 
-            {show ? comp : null}
+            {show ? <FormatContext context={context} status={status}/> : null}
           </form>
 
           {/* <button className="bg-blue-500 hover:bg-blue-700 text-gray-800 font-bold py-4 px-4 rounded-sm w-1 h-16 dark:text-gray-800">
@@ -128,7 +128,7 @@ export default function DealCard({
                 </button> */}
         </div>
       </div>
-      {show ? <FormatContext context={context}/> : null}
+      {show ? comp : null}
     </div>
   );
 }
