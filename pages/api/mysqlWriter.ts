@@ -37,23 +37,25 @@ export default async function handler(
   const payment_date = req.body.payment_date;
   const order_items = req.body.order_items;
 
-  const productos = order_items.filter(//filtrar repetido
-  (thing: any, index: any, self: any) =>
-      index === self.findIndex((t: any) => (
-          t.name === thing.name && t.price !== undefined && t.quantity !== undefined && t.sku !== undefined
-      ))
-).map((item: any) => ({
-  name: item.name,
-  price: item.price,
-  quantity: item.quantity,
-  sku: item.sku,
-
-
-}))
-
-
-
-
+  const productos = order_items
+    .filter(
+      //filtrar repetido
+      (thing: any, index: any, self: any) =>
+        index ===
+        self.findIndex(
+          (t: any) =>
+            t.name === thing.name &&
+            t.price !== undefined &&
+            t.quantity !== undefined &&
+            t.sku !== undefined
+        )
+    )
+    .map((item: any) => ({
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      sku: item.sku,
+    }));
 
   const prisma = new PrismaClient();
 
@@ -93,17 +95,14 @@ export default async function handler(
         },
 
         order_items: {
-            create: productos
-        }
-    
-    
-    
-    } });
-       
+          create: productos,
+        },
+      },
+    });
 
     const orders = await prisma.orders.findMany();
 
-    console.log("DATOTES", orders, orderA);
+    //console.log("DATOTES", orders, orderA);
 
     res.status(200).json(orders);
   } catch (e) {
