@@ -54,7 +54,8 @@ const userSender = async (event) => {
 
 
 const orderSender = async (event) => {
-  //event.preventDefault();
+  event.preventDefault();
+
   const datas = {
     id: contexts.deale[0].id,
     customer_name: contexts.contacts[0].properties.firstname,
@@ -79,8 +80,27 @@ const orderSender = async (event) => {
     Shipping_Observacion: contexts.deale[0].observacion,
     Shipping_flete: contexts.deale[0].flete,
     user: contexts.user,
+    method: contexts.deale[0].metodo_pago,
+    authorization_code: contexts.deale[0].codigos_de_autorizacion,
+    payment_count: contexts.deale[0].cantidad_de_pagos,
+    payment_amount: contexts.deale[0].amount,
+    payment_date: contexts.deale[0].fecha_de_validacion_de_pagos,
+    order_items: []
+    }
 
-  };
+    contexts.products.map((product, index) => {
+      console.log("el producto es", index < product.length ? product[index].properties.name : product[0].properties.name , datas.order_items),
+      datas.order_items.push({
+        name: index < product.length ? product[index].properties.name : product[0].properties.name,
+        price: index < product.length ? product[index].properties.price : product[0].properties.amount,
+        quantity: index < product.length ? product[index].properties.quantity : product[0].properties.quantity,
+        sku: index < product.length ? product[index].properties.sku : product[0].properties.hs_sku
+      })})
+
+      
+
+
+    
 
  
 
