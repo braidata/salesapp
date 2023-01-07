@@ -15,7 +15,7 @@ import {
 } from "../components/forms";
 import FormCompleted from "../components/FormCompleted";
 import RefreshButton from "../components/refreshButton";
-//import FinalInterface from "../components/forms/finalInterface";
+import FinalInterface from "../components/forms/finalInterface";
 import { useSession } from "next-auth/react";
 import SpinnerButton from "../components/spinnerButton";
 //import CardClosable from "../components/cardClosable";
@@ -30,9 +30,9 @@ const App = () => {
     },
   });
  
-  const FinalInterface = dynamic(() => import("../components/forms/finalInterface"), {
-    loading: () => <SpinnerButton texto="Cargando..." />
-  }); 
+  // const FinalInterface = dynamic(() => import("../components/forms/finalInterface"), {
+  //   loading: () => <SpinnerButton texto="Cargando..." />
+  // }); 
  const router = useRouter();
  const [refresh, setRefresh] = useState(false);
   const refreshPage = () => {
