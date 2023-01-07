@@ -133,7 +133,10 @@ export default async function handler(
     //console.log("DATOTES", orders, orderA);
 
     res.status(200).json(orders);
-  } catch (e) {
-    console.log("error", e);
+  } catch (error: any) {
+   
+    res.status(500).json([error.code, error.meta, error.message]);
+    console.log("El error ", error.meta); 
+    
   }
 }

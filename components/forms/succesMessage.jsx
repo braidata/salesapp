@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 const SuccessMessage = () => {
 
     return (
-        <div className="flex flex-col items-center justify-center w-full h-full mt-5">
+        <div className="flex flex-col text-center items-center justify-center w-full h-full mt-5">
                 {/* order send succes */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-96">
                     <div className="flex items-center justify-center">
@@ -17,8 +17,8 @@ const SuccessMessage = () => {
                         </span>
                     </div>
                     <div className="mt-4">
-                        <h1 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Orden Enviada</h1>
-                        <p className="mt-2 text-gray-600 dark:text-gray-400">La orden se ha enviado correctamente.</p>
+                        <h1 className="text-xl text-center font-semibold text-gray-700 dark:text-gray-200">Orden Enviada</h1>
+                        <p className="mt-2 text-center text-gray-600 dark:text-gray-400">La orden se ha enviado correctamente.</p>
                     </div>
                 </div>
             </div>
