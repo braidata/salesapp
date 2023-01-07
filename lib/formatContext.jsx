@@ -6,11 +6,12 @@ import ProductTable from "../components/productTable";
 //prisma
 import { PrismaClient } from "@prisma/client";
 
-export default function FormatContext({ context }) {
+export default function FormatContext({ context, componente }) {
   const { dataValues } = useDataData;
   //context = JSON.stringify(context)
   const [contexts, setContext] = useState(context);
   const [statusQ, setStatusQ] = useState(false);
+  const [errorStatus, setErrorStatus] = useState(null);
 
   console.log("los data values son:  ", JSON.stringify(contexts));
 
@@ -47,7 +48,7 @@ export default function FormatContext({ context }) {
     event.preventDefault();
 
     const datas = {
-      
+
       id: contexts.deale[0].id,
       customer_name: contexts.contacts[0].properties.firstname,
       customer_last_name: contexts.contacts[0].properties.lastname,
@@ -131,15 +132,18 @@ export default function FormatContext({ context }) {
       const response = await fetch(endpoint, options);
       const result = response;
       const resDB = await result.json();
-      console.log("base", resDB, datas);
+      console.log("base", resDB[0], datas);
+      resDB[0] === "P2002"  ? setErrorStatus(true) : null;
       setStatusQ(true);
     } catch (e) {
+      
       console.log("No hay datos DB", e);
     }
   };
 
   return (
     <div>
+     
       <button
       className={`bg-blue-900/90  text-gray-800 font-bold py-2 px-2 mt-12 rounded-sm w-1 h-14 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:text-gray-800 ${
         statusQ
@@ -147,6 +151,11 @@ export default function FormatContext({ context }) {
           : "hover:bg-blue-800/90"
       }`}
        onClick={orderSender}>Enviar Orden a SAP</button>
+
+{errorStatus ? <div className="mt-5 mb-5 bg-orange-700/90 border border-gray-300 text-center text-gray-900 text-md rounded-lg hover:bg-orange-600/90 focus:ring-blue-500 focus:border-blue-500 block w-96 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+ >Este pedido ya fue ingresado! Intenta con otro.</div> : null}
+
+{statusQ && !errorStatus  ? componente : null}
 
       {/* <button onClick={userSender}>Guarda Ownera</button> */}
     </div>
