@@ -31,6 +31,13 @@ export default async function handler(
   const Shipping_Nombre_Retira = req.body.Shipping_Nombre_Retira;
   const Shipping_Observacion = req.body.Shipping_Observacion;
   const Shipping_flete = req.body.Shipping_flete;
+  const Shipping_street = req.body.Shipping_street;
+  const Shipping_number = req.body.Shipping_number;
+  const Shipping_department = req.body.Shipping_department;
+  const Shipping_region = req.body.Shipping_region;
+  const Shipping_city = req.body.Shipping_city;
+  const Shipping_commune = req.body.Shipping_commune;
+  const Shipping_zip_code = req.body.Shipping_zip_code;
   const method = req.body.method;
   const authorization_code = req.body.authorization_code;
   const payment_count = req.body.payment_count;
@@ -60,9 +67,62 @@ export default async function handler(
     }));
 
   const prisma = new PrismaClient();
+  //data types
+  type data = {
+    customer_name: string;
+    customer_last_name: string;
+    customer_rut: string;
+    customer_email: string;
+    customer_phone: string;
+    billing_street: string;
+    billing_number: string;
+    billing_commune: string;
+    billing_city: string;
+    billing_region: string;
+    billing_department: string;
+    billing_zip_code: string;
+    billing_company_name: string;
+    billing_company_rut: string;
+    billing_company_business: string;
+    Shipping_Tipo_de_Despacho: string;
+    Shipping_Fecha_de_Despacho_o_Retiro: string;
+    Shipping_Rut_Retira: string;
+    Shipping_Nombre_Retira: string;
+    Shipping_Observacion: string;
+    Shipping_flete: string;
+    Shipping_street: string;
+    Shipping_number: string;
+    Shipping_department: string;
+    Shipping_region: string;
+    Shipping_city: string;
+    Shipping_commune: string;
+    Shipping_zip_code: string;
+    user: string;
+    dealId: string;
+    payments: {
+      create: {
+        method: string;
+        authorization_code: string;
+        payment_count: number;
+        payment_amount: number;
+        payment_date: string;
+      };
+    };
+    order_items: {
+      create: {
+        name: string;
+        price: number;
+        quantity: number;
+        sku: string;
+      };
+    }[];
+  };
+ 
+
 
   try {
     const orderA = await prisma.orders.create({
+      
       data: {
         customer_name,
         customer_last_name,
@@ -85,6 +145,13 @@ export default async function handler(
         Shipping_Nombre_Retira,
         Shipping_Observacion,
         Shipping_flete,
+        Shipping_street,
+        Shipping_number,
+        Shipping_department,
+        Shipping_region,
+        Shipping_city,
+        Shipping_commune,
+        Shipping_zip_code,
         user,
         dealId,
         payments: {
