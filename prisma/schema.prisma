@@ -52,6 +52,11 @@ model orders {
   Shipping_zip_code                   String?       @default("sin envio") @db.VarChar(255)
   user                                String        @db.VarChar(255)
   dealId                              String        @unique @db.VarChar(255)
+  ownerId                             Int?              
+  order_date                          DateTime?      @default(now())
+  statusSAP                           String?        @db.VarChar(255)
+  sapID                               String?        @db.VarChar(255)
+  dateSAP                             String?        @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
