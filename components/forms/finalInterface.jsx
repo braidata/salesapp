@@ -348,7 +348,7 @@ export default function PageWithJSbasedForm3() {
 
 //ownerInfo
 const idOwners = async (event, id) => {
-    //event.preventDefault();
+    event.preventDefault();
     try {
       const data = {
         id: id,
