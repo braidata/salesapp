@@ -1,5 +1,7 @@
 import { useFormData } from "../context";
 import { useDataData } from "../context/data";
+import FormularioDatas from "../lib/formularioDatas";
+import SuccessMessage from "../components/forms/succesMessage";
 
 export default function FormCompleted() {
   const { data } = useFormData();
@@ -13,9 +15,12 @@ export default function FormCompleted() {
       <h3 className="mt-4 text-lg font-bold text-left text-gray-600 dark:text-gray-200" >Información del Pedido</h3>
       {/**Code TailwindCSS Block */}
       <div className="flex flex-col items-center justify-center w-full h-full p-4 mx-auto mt-10 bg-white rounded-lg shadow-md dark:bg-gray-800"> 
-     <code className=" p-4 mx-auto w-full mt-10 bg-white rounded-lg shadow-md dark:bg-gray-800">
+     {/* <code className=" p-4 mx-auto w-full mt-10 bg-white rounded-lg shadow-md dark:bg-gray-800">
       <pre>{JSON.stringify(data, null, 1)}</pre>
-      </code>
+      </code> */}
+
+      <FormularioDatas context={data} componente={SuccessMessage} />
+      
       </div>
       {/**Code TailwindCSS Block */}
       {/* <h3 className="mt-4 text-lg font-bold text-left text-gray-600 dark:text-gray-200" >Información del Cliente en HubSpot</h3> */}

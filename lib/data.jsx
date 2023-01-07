@@ -1,8 +1,20 @@
 let rut = "23157989-3";
 
 const campos3 = [
+  { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
+  { campo: "shippingAddress.Numero", type: "text", detalle: "Numero de Envío", valua: "15487" },
+  { campo: "shippingAddress.Casa_o_depto", type: "text", detalle: "Casa o depto de Envío", valua: "1100" },
+  { campo: "shippingAddress.Comuna", type: "town", detalle: "Comuna de Envío", valua: "Antofagasta" },
+  { campo: "shippingAddress.Región", type: "state", detalle: "Región de Envío", valua: "Antofagasta" },
+  { campo: "shippingAddress.Ciudad", type: "city", detalle: "Ciudad de Envío", valua: "Antofagasta" },
+  {
+    campo: "shippingAddress.Código_Postal",
+    type: "text",
+    detalle: "Código Postal de Envío",
+    valua: "120123"
+  },
   { campo: "shipping.Tipo_de_Despacho", type: "text", detalle: "Tipo de Despacho", valua: "Envío Región FedEx" },
-  { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha", valua: "22-12-2022" },
+  { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha de Retiro o Despacho", valua: "22-12-2022" },
   { campo: "shipping.Nombre_Retira", type: "text", detalle: "Nombre de Retira", valua: "Carlos Espinoza" },
   { campo: "shipping.Rut_Retira", type: "text", detalle: "Rut de Retira", valua: "15020576k" },
   { campo: "shipping.Observación", type: "text", detalle: "Observación", valua: "Dejar en la el local azúl de enfrente, Preguntar por Yolanda" },
@@ -31,7 +43,7 @@ const campos2 = [
     campo: "billing.Rut_Empresa",
     type: "text",
     detalle: "Ingresa tu Rut de Empresa",
-    valua: "96584759-8",
+    valua: "966848502",
   },
   {
     campo: "billing.Giro",
@@ -114,12 +126,12 @@ const dirFac1 = [
 const dirEnv1 = [
   { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
   { campo: "shippingAddress.Numero", type: "text", detalle: "Numero de Envío", valua: "15487" },
-  { campo: "shippingAddress.Casa o depto", type: "text", detalle: "Casa o depto de Envío", valua: "1100" },
+  { campo: "shippingAddress.Casa_o_depto", type: "text", detalle: "Casa o depto de Envío", valua: "1100" },
   { campo: "shippingAddress.Comuna", type: "town", detalle: "Comuna de Envío", valua: "Antofagasta" },
   { campo: "shippingAddress.Región", type: "state", detalle: "Región de Envío", valua: "Antofagasta" },
   { campo: "shippingAddress.Ciudad", type: "city", detalle: "Ciudad de Envío", valua: "Antofagasta" },
   {
-    campo: "shippingAddress.Código Postal",
+    campo: "shippingAddress.Código_Postal",
     type: "text",
     detalle: "Código Postal de Envío",
     valua: "120123"
