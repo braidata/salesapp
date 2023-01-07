@@ -23,7 +23,8 @@ model order_items {
 model orders {
   id                                  Int           @id @default(autoincrement())
   customer_name                       String        @db.VarChar(255)
-  customer_rut                        String?       @db.VarChar(255)
+  customer_last_name                  String        @db.VarChar(255)
+  customer_rut                        String        @db.VarChar(255)
   customer_email                      String        @db.VarChar(255)
   customer_phone                      String        @db.VarChar(255)
   billing_street                      String        @db.VarChar(255)
@@ -36,15 +37,21 @@ model orders {
   billing_company_name                String        @db.VarChar(255)
   billing_company_rut                 String        @db.VarChar(255)
   billing_company_business            String        @db.VarChar(255)
-  Shipping_Tipo_de_Despacho           String?       @db.VarChar(255)
+  Shipping_Tipo_de_Despacho           String        @db.VarChar(255)
   Shipping_Fecha_de_Despacho_o_Retiro String        @db.VarChar(255)
   Shipping_Rut_Retira                 String?       @db.VarChar(255)
   Shipping_Nombre_Retira              String?       @db.VarChar(255)
   Shipping_Observacion                String?       @db.VarChar(255)
-  Shipping_flete                      String?       @db.VarChar(255)
-  customer_last_name                  String        @db.VarChar(255)
+  Shipping_flete                      String        @db.VarChar(255)
+  Shipping_street                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_number                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_department                 String?       @default("sin envio") @db.VarChar(255)
+  Shipping_region                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_city                       String?       @default("sin envio") @db.VarChar(255)
+  Shipping_commune                    String?       @default("sin envio") @db.VarChar(255)
+  Shipping_zip_code                   String?       @default("sin envio") @db.VarChar(255)
   user                                String        @db.VarChar(255)
-  dealId                              String        @db.VarChar(255) @unique
+  dealId                              String        @unique @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
