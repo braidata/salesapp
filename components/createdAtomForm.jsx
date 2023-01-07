@@ -70,7 +70,7 @@ export default function ProductsInfo({ formStep, nextFormStep, cuenta, dataSelec
                 
                 console.log(data, cuentaI),
                 
-                <Input  key={index} name={data.campo + "-" + cuentaI} label={data.detalle} type={data.type} valua={dato1} /> 
+                <Input  key={index} name={data.campo + "-" + cuentaI} label={data.detalle} type={data.type} valua={data.valua} /> 
                 
        
         ))}
