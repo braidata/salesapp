@@ -1,6 +1,7 @@
 //prisma api connector
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
+import { array } from "yup";
 
 //sending data to prisma
 export default async function handler(
@@ -9,6 +10,7 @@ export default async function handler(
 ) {
   const user = req.body.user;
   const dealId = req.body.dealId
+  const ownerId = req.body.ownerId
   const customer_name = req.body.customer_name;
   const customer_last_name = req.body.customer_last_name;
   const customer_rut = req.body.customer_rut;
@@ -44,6 +46,9 @@ export default async function handler(
   const payment_amount = req.body.payment_amount;
   const payment_date = req.body.payment_date;
   const order_items = req.body.order_items;
+
+  
+
   
 
   const productos = order_items
@@ -68,55 +73,7 @@ export default async function handler(
 
   const prisma = new PrismaClient();
   //data types
-  type data = {
-    customer_name: string;
-    customer_last_name: string;
-    customer_rut: string;
-    customer_email: string;
-    customer_phone: string;
-    billing_street: string;
-    billing_number: string;
-    billing_commune: string;
-    billing_city: string;
-    billing_region: string;
-    billing_department: string;
-    billing_zip_code: string;
-    billing_company_name: string;
-    billing_company_rut: string;
-    billing_company_business: string;
-    Shipping_Tipo_de_Despacho: string;
-    Shipping_Fecha_de_Despacho_o_Retiro: string;
-    Shipping_Rut_Retira: string;
-    Shipping_Nombre_Retira: string;
-    Shipping_Observacion: string;
-    Shipping_flete: string;
-    Shipping_street: string;
-    Shipping_number: string;
-    Shipping_department: string;
-    Shipping_region: string;
-    Shipping_city: string;
-    Shipping_commune: string;
-    Shipping_zip_code: string;
-    user: string;
-    dealId: string;
-    payments: {
-      create: {
-        method: string;
-        authorization_code: string;
-        payment_count: number;
-        payment_amount: number;
-        payment_date: string;
-      };
-    };
-    order_items: {
-      create: {
-        name: string;
-        price: number;
-        quantity: number;
-        sku: string;
-      };
-    }[];
-  };
+  
  
 
 
@@ -154,6 +111,7 @@ export default async function handler(
         Shipping_zip_code,
         user,
         dealId,
+        ownerId,
         payments: {
           create: {
             method,
