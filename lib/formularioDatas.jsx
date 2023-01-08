@@ -83,7 +83,7 @@ export default function FormatContext({ context, componente }) {
         payment_count: contexts.payment.Cantidad_de_Pagos,
         payment_amount: contexts.payment.Monto_de_Pagos,
         payment_date: contexts.payment.Fecha_de_Pago,
-        dealId: Math.random(10,200).toString(36),
+        dealId: contexts.contact.DealId,
         ownerId: parseInt(Math.random(10,200)*10),
         order_items: [],
       };

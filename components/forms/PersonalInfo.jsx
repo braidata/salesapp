@@ -18,6 +18,10 @@ const schema = yup.object().shape({
       .string()
       .min(2, "Ingresa un Nombre válido")
       .required("Nombre es obligatorio"),
+      DealId: yup
+      .string()
+      .min(2, "Ingresa un Nombre válido")
+      .required("Nombre es obligatorio"),
     Apellido: yup
       .string()
       .min(2, "Ingresa un apellido válida")
@@ -103,7 +107,7 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
               : "no data"} */}
           </div>{" "}
           {Data != null
-            ? Data.Datas[0].slice(0, 5).map((data, index) => (
+            ? Data.Datas[0].slice(0, 6).map((data, index) => (
                 // call internal api
                 <Input
                   key={index}
