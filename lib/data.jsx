@@ -1,4 +1,5 @@
 let rut = "23157989-3";
+const id = Math.random(10,200).toString(36)
 
 const campos3 = [
   { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
@@ -53,6 +54,7 @@ const campos2 = [
   },
 ];
 const campos1 = [
+  { campo: "contact.DealId", type: "text", detalle: "Id del Negocio", valua: `${id}` },
   { campo: "contact.Rut", type: "text", detalle: "Rut del cliente", valua: `${rut}` },
   {
     campo: "contact.Nombre",
