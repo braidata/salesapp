@@ -2,25 +2,59 @@ import NextAuth from "next-auth"
 import HubspotProvider from "next-auth/providers/hubspot"
 import CredentialsProvider from "next-auth/providers/credentials"
 
+
 export default NextAuth({
   providers: [
     CredentialsProvider({
           name: "Credenciales de Acceso",
           credentials: {
-            username: {
+            useremail: {
               label: "Nombre",
               type: "text",
               placeholder: "jsanchez",
             },
             password: { label: "Contraseña", type: "password" },
           },
-          async authorize() {
-            return {
-              id: 1,
-              name: "Joana Sanchez",
-              email: "jsanchez@example.com",
-              image: "https://i.pravatar.cc/150?",
+          async authorize(credentials) {
+
+            //fetch api of users database
+            //if user exists return user data
+            //if not return null
+
+            const user = await fetch(`${process.env.NEXTAUTH_URL}/api/mysqlUsers`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                useremail: credentials.useremail,
+                password: credentials.password,
+              }),
+            })
+            const userJson = await user.json()
+
+            if (userJson.user[0].password === credentials.password) {
+              console.log("credentials si: ", userJson.user[0].email)
+              return userJson
+            } else {
+              console.log("credentials no: ", userJson
+              )
+              return null
             }
+
+
+        //   },
+        // }),
+
+
+
+
+        //     return {
+        //       id: 1,
+        //       name: "Joana Sanchez",
+        //       email: "jsanchez@example.com",
+        //       image: "https://i.pravatar.cc/150?",
+        //     }
           },
         })
       , 
