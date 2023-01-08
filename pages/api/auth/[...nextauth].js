@@ -30,10 +30,12 @@ export default NextAuth({
         }),
   ],
   // A database is optional, but required to persist accounts in a database
+  
+
   theme: {
     colorScheme: "auto", // "auto" | "dark" | "light"
-    brandColor: "#aaaa55", // Hex color code
-    buttonText: "ffff22" // Hex color code
+    brandColor: "#72d1db", // Hex color code
+    buttonText: "#83a1cc" // Hex color code
   }
 
 })
