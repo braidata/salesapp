@@ -21,7 +21,7 @@ const schema = yup.object().shape({
   // .required("Precio es obligatorio"),
   Cantidad: yup.string().min(1, "Ingresa una Cantidad válida"),
   // .required("Cantidad es obligatorio"),
-  Flete: yup.string().min(3, "Ingresa un Flete válido"),
+  // Flete: yup.string().min(3, "Ingresa un Flete válido"),
   // .required("Flete es obligatorio"),
 });
 
@@ -95,13 +95,8 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
           />
           {datosProducts.map(
             (datos, Bill) => (
-              productsInfo.push(datos),
-              (
-                <pre className="text-gray-100 dark:text-gray-400 max-h-0 max-w-0">
-                  {JSON.stringify(datos)}
-                </pre>
-              ),
-              (<div></div>)
+              console.log(datos),
+              productsInfo.push(datos)
             )
           )}
         </div>

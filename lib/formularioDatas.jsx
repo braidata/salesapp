@@ -38,6 +38,10 @@ export default function FormatContext({ context, componente }) {
         console.log("No hay datos DB");
       }
     };
+
+    const chunkSize = 5;
+      const product  = []
+      const size = contexts.products.length
   
     const orderSender = async (event) => {
       event.preventDefault();
@@ -79,40 +83,70 @@ export default function FormatContext({ context, componente }) {
         payment_count: contexts.payment.Cantidad_de_Pagos,
         payment_amount: contexts.payment.Monto_de_Pagos,
         payment_date: contexts.payment.Fecha_de_Pago,
-        dealId: Math.random().toString(36),
-        ownerId: Math.random().toString(36),
+        dealId: Math.random(10,200).toString(36),
+        ownerId: parseInt(Math.random(10,200)*10),
         order_items: [],
       };
+
+      
+//const chunkSize = 5;
+let counter = 0;
+
+const product = Object.entries(contexts.products).map(function(element) {
+  counter += 1;
+  if (counter % chunkSize === 1) {
+    // es el primer elemento de un nuevo pedazo, así que corta el array
+    return Object.entries(contexts.products).slice(counter - 1, counter + chunkSize - 1);
+  } else {
+    // es un elemento más de un pedazo existente, así que regresa undefined
+    // para que no se incluya en el nuevo array
+    return undefined;
+  }
+});
+//imprime product filtrado sin los undefined
+console.log("rey", product.filter(function(element) {
+    return element !== undefined;
+    }));
+
+
+      
+      
+
+        // Object.entries(contexts.products).map(
+        //     (item, i) => {
+        //     console.log("rey", i)
+        //     const chunk =  Object.entries(contexts.products).slice(i, i + chunkSize);
+        //     product.push(chunk);
+            
+        // })
+
+        product.filter(function(element) {
+            return element !== undefined;
+            }).map((item,i) => {
+            datas.order_items.push({
+                
+                name: item[1][1],
+                price: item[2][1],
+                quantity: item[3][1],
+                sku: item[0][1],
+               
+            }),
+            console.log("reyx", item, i)
+
+            
+            
+
+        });
+
+       
+
+        
+
+
   
-    //   contexts.products.map((product, index) => {
-    //     console.log(
-    //       "el producto es",
-    //       index < product.length
-    //         ? product[index].properties.name
-    //         : product[0].properties.name,
-    //       datas.order_items
-    //     ),
-    //       datas.order_items.push({
-    //         name:
-    //           index < product.length
-    //             ? product[index].properties.name
-    //             : product[0].properties.name,
-    //         price:
-    //           index < product.length
-    //             ? product[index].properties.price
-    //             : product[0].properties.amount,
-    //         quantity:
-    //           index < product.length
-    //             ? product[index].properties.quantity
-    //             : product[0].properties.quantity,
-    //         sku:
-    //           index < product.length
-    //             ? product[index].properties.sku
-    //             : product[0].properties.hs_sku,
-    //       });
-    //   });
+      
   
-      console.log("la data es", datas);
+      console.log("la data es rey", datas);
       try {
         const JSONdata = JSON.stringify(datas);
         const endpoint = "/api/mysqlWriter";
