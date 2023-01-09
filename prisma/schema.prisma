@@ -22,7 +22,11 @@ model order_items {
 
 model orders {
   id                                  Int           @id @default(autoincrement())
+  user                                String        @db.VarChar(255)
+  dealId                              String        @unique @db.VarChar(255)
+  order_date                          DateTime?     @default(now())
   customer_name                       String        @db.VarChar(255)
+  customer_last_name                  String        @db.VarChar(255)
   customer_rut                        String        @db.VarChar(255)
   customer_email                      String        @db.VarChar(255)
   customer_phone                      String        @db.VarChar(255)
@@ -42,17 +46,14 @@ model orders {
   Shipping_Nombre_Retira              String?       @db.VarChar(255)
   Shipping_Observacion                String?       @db.VarChar(255)
   Shipping_flete                      String        @db.VarChar(255)
-  customer_last_name                  String        @db.VarChar(255)
-  user                                String        @db.VarChar(255)
-  dealId                              String        @unique @db.VarChar(255)
+  Shipping_street                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_number                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_department                 String?       @default("sin envio") @db.VarChar(255)
+  Shipping_region                     String?       @default("sin envio") @db.VarChar(255)
   Shipping_city                       String?       @default("sin envio") @db.VarChar(255)
   Shipping_commune                    String?       @default("sin envio") @db.VarChar(255)
-  Shipping_department                 String?       @default("sin envio") @db.VarChar(255)
-  Shipping_number                     String?       @default("sin envio") @db.VarChar(255)
-  Shipping_region                     String?       @default("sin envio") @db.VarChar(255)
-  Shipping_street                     String?       @default("sin envio") @db.VarChar(255)
   Shipping_zip_code                   String?       @default("sin envio") @db.VarChar(255)
-  order_date                          DateTime?     @default(now())
+  ownerIdM                            String?       
   ownerId                             Int?
   sapID                               String?       @db.VarChar(255)
   statusSAP                           String?       @db.VarChar(255)
@@ -82,21 +83,3 @@ model users {
   password String? @db.VarChar(255)
 }
 
-model e86be_6ca3_5104_9f61_d062da0a29b6_20230108062653_vrepl {
-  id       Int    @id @default(autoincrement())
-  name     String @db.VarChar(255)
-  email    String @unique(map: "users_email_key") @db.VarChar(255)
-  ownerId  Int    @unique(map: "users_ownerId_key")
-  password String @db.VarChar(255)
-
-  @@map("_188e86be_6ca3_5104_9f61_d062da0a29b6_20230108062653_vrepl")
-}
-
-model ea2e44d1_d67f_5443_b57f_e55c1fc7affe_20230108063014_vrepl {
-  id      Int    @id @default(autoincrement())
-  name    String @db.VarChar(255)
-  email   String @unique(map: "users_email_key") @db.VarChar(255)
-  ownerId Int    @unique(map: "users_ownerId_key")
-
-  @@map("_ea2e44d1_d67f_5443_b57f_e55c1fc7affe_20230108063014_vrepl")
-}

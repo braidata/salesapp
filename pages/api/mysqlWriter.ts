@@ -11,6 +11,7 @@ export default async function handler(
   const user = req.body.user;
   const dealId = req.body.dealId
   const ownerId = req.body.ownerId
+  const ownerIdM = req.body.ownerIdM
   const customer_name = req.body.customer_name;
   const customer_last_name = req.body.customer_last_name;
   const customer_rut = req.body.customer_rut;
@@ -112,6 +113,7 @@ export default async function handler(
         user,
         dealId,
         ownerId,
+        ownerIdM,
         payments: {
           create: {
             method,

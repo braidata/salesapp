@@ -6,12 +6,21 @@ import { useFormData } from "../../context";
 import * as yup from "yup";
 import ProductTable from "../../components/productTable";
 
+
 const schema = yup.object().shape({
   checkbox: yup.bool().oneOf([true], "Confirma que revisaste los datos"),
 });
 
+
+
 export default function ConfirmPurchase({ formStep, nextFormStep }) {
   const { data, setFormValues } = useFormData();
+
+
+
+  
+
+  
 
   const formRef = useRef();
 

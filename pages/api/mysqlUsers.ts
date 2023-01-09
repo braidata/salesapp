@@ -18,7 +18,7 @@ const user = await prisma.users.findMany({where:{email: email, password: passwor
 
 
 
-console.log(user);
+//console.log(user);
 
 res.status(200).json({user});}
 catch{

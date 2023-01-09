@@ -87,8 +87,12 @@ export default function FormatContext({ context, componente }) {
       payment_date: contexts.deale[0].fecha_de_validacion_de_pagos,
       dealId: contexts.deale[0].hs_object_id,
       ownerId: contexts.owners.success[3],
+      ownerIdM: contexts.owners.success[0],
       order_items: [],
     };
+
+  
+     
 
     contexts.products.map((product, index) => {
       console.log(
