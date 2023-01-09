@@ -34,8 +34,8 @@ export default NextAuth({
             const userJson = await user.json()
 
             if (userJson.user[0].password === credentials.password) {
-              console.log("credentials si ahora: ", userJson.user[0].id)
-              return  { _id: parseInt(userJson.user[0].id) , name: userJson.user[0].name , email: userJson.user[0].email}
+              console.log("credentials si ahora: ", userJson.user[0].email)
+              return  { id: userJson.user[0].id , name: userJson.user[0].name , email: userJson.user[0].email}
             } else {
               //console.log("credentials no: ", userJson)
               return null

@@ -22,7 +22,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
       method: "POST",
       url: url,
       data: {
-        "properties": [ "dealname","hubspot_owner_id","dealstage","hs_object_id", "amount","numero_envio","region_de_envio", "comuna_de_envio", "codigo_postal_de_envio","ciudad_de_envio","casa_o_depto_de_envio","calle_envio",
+        "properties": [ "dealname","hubspot_owner_id","dealstage","hs_object_id", "amount","numero_envio","region_envio", "comuna_envio", "codigo_postal_de_envio","ciudad_envio","casa_o_depto_de_envio","calle_envio",
         "flete", "fecha_despacho_retiro", "nombre_retira", "rut_de_retiro", "tipo_de_despacho", "rut_de_retiro", "observacion", "cantidad_de_pagos", "codigos_de_autorizacion", "fecha_de_validacion_de_pagos", "metodo_pago" ],
 
         "filterGroups": [

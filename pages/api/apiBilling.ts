@@ -22,7 +22,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
       method: "POST",
       url: url,
       data: {
-        "properties": [ "razon_social", "giro_empresa", "rut_de_empresa", "name","phone","city","zip", "comuna","state","calle","casa_depto","numero_direccion", "hubspot_owner_id","hubspot_owner_assigneddate","mobilephone", ],
+        "properties": [ "razon_social", "giro_empresa", "rut_de_empresa", "name","phone","ciudad_facturacion","zip", "comuna_facturacion","region_facturacion","calle","casa_depto","numero_direccion", "hubspot_owner_id","hubspot_owner_assigneddate","mobilephone", ],
 
         "filterGroups": [
             { "filters": [
