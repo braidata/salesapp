@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+import {useSession} from "next-auth/react";
 import { useDataData } from "../context/data";
+
+
 
 export default function FormatContext({ context, componente }) {
     //const { dataValues } = useDataData;
@@ -7,8 +10,8 @@ export default function FormatContext({ context, componente }) {
     const [contexts, setContext] = useState(context);
     const [statusQ, setStatusQ] = useState(false);
     const [errorStatus, setErrorStatus] = useState(null);
-  
-    console.log("los data values del form son:  ", JSON.stringify(contexts));
+    const providers = useSession()
+    console.log("los data values del form son:  ", JSON.stringify(contexts), "y el user es: ", null);
   
     // console.log("la data es", datas)
   
@@ -45,6 +48,8 @@ export default function FormatContext({ context, componente }) {
   
     const orderSender = async (event) => {
       event.preventDefault();
+      
+      console.log("Providers", providers)
   
       const datas = {
   
@@ -77,14 +82,15 @@ export default function FormatContext({ context, componente }) {
         Shipping_city: contexts.shippingAddress.Ciudad,
         Shipping_commune: contexts.shippingAddress.Comuna,
         Shipping_zip_code: contexts.shippingAddress.Código_Postal,
-        user: "ibraidab@gmail.com",
+        user: providers.data.user.email,
         method: contexts.payment.Metodo_de_Pago,
         authorization_code: contexts.payment.Código_de_Autorización,
         payment_count: contexts.payment.Cantidad_de_Pagos,
         payment_amount: contexts.payment.Monto_de_Pagos,
         payment_date: contexts.payment.Fecha_de_Pago,
         dealId: contexts.contact.DealId,
-        ownerId: parseInt(Math.random(10,200)*10),
+        ownerId: null,
+        ownerIdM: providers.data.user.email,//parseInt(Math.random(10,200)*10),
         order_items: [],
       };
 

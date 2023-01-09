@@ -1,5 +1,8 @@
+
+
 let rut = "23157989-3";
 const id = Math.random(10,200).toString(36)
+const date = '1988-12-22';
 
 const campos3 = [
   { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
@@ -15,7 +18,7 @@ const campos3 = [
     valua: "120123"
   },
   { campo: "shipping.Tipo_de_Despacho", type: "text", detalle: "Tipo de Despacho", valua: "Envío Región FedEx" },
-  { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha de Retiro o Despacho", valua: "22-12-2022" },
+  { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha de Retiro o Despacho", valua: `${date}` },
   { campo: "shipping.Nombre_Retira", type: "text", detalle: "Nombre de Retira", valua: "Carlos Espinoza" },
   { campo: "shipping.Rut_Retira", type: "text", detalle: "Rut de Retira", valua: "15020576k" },
   { campo: "shipping.Observación", type: "text", detalle: "Observación", valua: "Dejar en la el local azúl de enfrente, Preguntar por Yolanda" },
@@ -54,6 +57,7 @@ const campos2 = [
   },
 ];
 const campos1 = [
+  // { campo: "contact.user", type: "text", detalle: "Id del Usuario", valua: `${0}` },
   { campo: "contact.DealId", type: "text", detalle: "Id del Negocio", valua: `${id}` },
   { campo: "contact.Rut", type: "text", detalle: "Rut del cliente", valua: `${rut}` },
   {
@@ -175,7 +179,7 @@ const pago1 = [
     campo: "payment.Fecha_de_Pago",
     type: "date",
     detalle: "Fecha",
-  valua: "22-12-2022"
+  valua: `${date}`
   },
 ];
 
