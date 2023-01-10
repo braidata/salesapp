@@ -8,6 +8,7 @@ import * as yup from "yup";
 import Datas from "../../lib/data";
 import CreatedAtomForm from "../createdAtomForm";
 import ButtonToAddComponent from "../buttonToAddComponent";
+import SelectLocalidades from "./SelectLocalidades";
 
 const datosBilling = [];
 const billingInfo = [];
@@ -17,10 +18,13 @@ const schema = yup.object().shape({
     Código_Postal: yup.string().required("Ingresa un Código Postal válido"),
     Calle: yup
       .string()
+      .matches(/^[a-zA-Z0-9\s]+$/, "Ingresa una Calle válida")
       .min(2, "Ingresa una Calle válida")
       .required("Calle es obligatoria"),
     Departamento: yup
       .string()
+      //solo caracteres alfanumericos
+      .matches(/^[a-zA-Z0-9\s]+$/, "Ingresa un Número de Casa o depto válido")
       .min(1, "Ingresa un Número de Casa o depto válido")
       .required("Casa o depto es obligatorio"),
     Ciudad: yup
@@ -37,6 +41,8 @@ const schema = yup.object().shape({
       .required("Región es obligatoria"),
     Número: yup
       .string()
+      //omitir caracteres especiales
+      .matches(/^[0-9]+$/, "Ingresa un Número de Dirección válido")
       .min(1, "Ingresa un Número de Dirección válido")
       .required("Número de Dirección es obligatorio"),
   }),
@@ -104,6 +110,7 @@ export default function BillingInfo({ formStep, nextFormStep }) {
               )
             )
           )}
+          <SelectLocalidades />
           {/* <ButtonToAddComponent
             nombre={"Dirección de Envío"}
             dataSelect={2}

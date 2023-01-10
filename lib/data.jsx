@@ -1,6 +1,6 @@
 
 
-let rut = "23157989-3";
+let rut = "231579893";
 const id = Math.random(10,200).toString(36)
 const date = '1988-12-22';
 
@@ -64,7 +64,7 @@ const campos1 = [
     campo: "contact.Nombre",
     type: "text",
     detalle: "Nombre del cliente",
-    valua: "Juan Ramón",
+    valua: "Juan Ramon",
   },
   {
     campo: "contact.Apellido",
@@ -82,7 +82,7 @@ const campos1 = [
     campo: "contact.Telefono",
     type: "phone",
     detalle: "Telefono del cliente",
-    valua: "+56987654321",
+    valua: "56987654321",
   },
 ];
 const dirFac1 = [
@@ -527,6 +527,6 @@ const comunas = [
   { id: 303, nombre: 'Peñaflor', region: 13 },
   { id: 304, nombre: 'Talagante', region: 13 }]
 
-const Datas = [campos1, dirFac1, dirEnv1, products1, pago1, campos2, campos3];
+const Datas = [campos1, dirFac1, dirEnv1, products1, pago1, campos2, campos3, regiones, comunas, ciudades];
 
 export default { Datas };
