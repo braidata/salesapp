@@ -9,7 +9,7 @@ export default NextAuth({
           name: "Credenciales de Acceso",
           credentials: {
             useremail: {
-              label: "Nombre",
+              label: "Correo Electrónico",
               type: "text",
               placeholder: "jsanchez@ventuscorp.cl",
             },
