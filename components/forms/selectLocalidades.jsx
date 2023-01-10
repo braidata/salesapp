@@ -42,7 +42,7 @@ const SelectLocalidades = () => {
     useEffect(() => {
             
             if (ciudad) {
-                console.log("ciudadanocouma", ciudad)
+                console.log("ciudadan o couma", ciudad)
                 setComunas(Data.Datas[8][ciudad]);
             } else {
                 setComunas([]);
