@@ -11,7 +11,7 @@ export default NextAuth({
             useremail: {
               label: "Nombre",
               type: "text",
-              placeholder: "jsanchez",
+              placeholder: "jsanchez@ventuscorp.cl",
             },
             password: { label: "Contraseña", type: "password" },
           },
