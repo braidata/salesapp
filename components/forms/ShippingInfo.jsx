@@ -41,7 +41,7 @@ const schema = yup.object().shape({
 });
 
 export default function shippingInfos({ formStep, nextFormStep }) {
-  const SelectLocalidades = dynamic(() => import("./SelectLocalidades"), {
+  const SelectLocalidades = dynamic(() => import("./selectLocalidades"), {
     ssr: false,
   });
 
