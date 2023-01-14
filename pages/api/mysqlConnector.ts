@@ -32,7 +32,9 @@ console.log(user2);
 res.status(200).json(user);}
 catch{
 console.log("error");
-}
+} finally {
+    await prisma.$disconnect();
+    }
 
 }
 

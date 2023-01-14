@@ -141,4 +141,7 @@ export default async function handler(
     console.log("El error ", error.meta); 
     
   }
+    finally {
+    await prisma.$disconnect();
+    }
 }

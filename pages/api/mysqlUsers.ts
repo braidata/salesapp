@@ -23,6 +23,8 @@ const user = await prisma.users.findMany({where:{email: email, password: passwor
 res.status(200).json({user});}
 catch{
 console.log("error");
-}
+} finally {
+    await prisma.$disconnect();
+    }
 
 }
