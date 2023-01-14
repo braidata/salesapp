@@ -8,6 +8,9 @@ import * as yup from "yup";
 import Datas from "../../lib/data";
 import CreatedAtomForm from "../createdAtomForm";
 import ButtonToAddComponent from "../buttonToAddComponent";
+//import SelectLocalidades from "./SelectLocalidades";
+import dynamic from "next/dynamic";
+
 
 const datosShipping = [];
 const shippingInfo = [];
@@ -23,12 +26,13 @@ const schema = yup.object().shape({
       .required("Fecha_de_Despacho_o_Retiro es obligatoria"),
     Nombre_Retira: yup
       .string()
-      .min(3, "Ingresa un Nombre_Retira válido")
-      .required("Nombre_Retira es obligatorio"),
+      .min(3, "Ingresa un Nombre_Retira válido"),
     Rut_Retira: yup
       .string()
-      .min(1, "Ingresa un Rut_Retira válido")
-      .required("Rut_Retira es obligatorio"),
+      .min(1, "Ingresa un Rut_Retira válido"),
+    Comunas: yup
+      .string()
+      .min(1, "Ingresa una Comuna válida"),  
     Observación: yup
       .string()
       .min(1, "Ingresa una Observación válida")
@@ -37,9 +41,15 @@ const schema = yup.object().shape({
 });
 
 export default function shippingInfos({ formStep, nextFormStep }) {
+  const SelectLocalidades = dynamic(() => import("./SelectLocalidades"), {
+    ssr: false,
+  });
+
+
   const Data = Datas;
   const { setFormValues } = useFormData();
   const formRef = useRef();
+  const selectRef = useRef(null);
   const { dataH } = useDataData();
 
 
@@ -84,10 +94,12 @@ export default function shippingInfos({ formStep, nextFormStep }) {
           <div className="invisible text-gray-100 dark:text-gray-400 max-h-8 max-w-0">
            
           </div>{" "}
+
+          <SelectLocalidades selectRef={selectRef} name="shippingAddress.Comunas" />
           
           {Data.Datas[6].map(
             (data, index) => (
-              console.log("Esto es la data de shipping: ", data),
+              // console.log("Esto es la data de shipping: ", data),
               (
                 // call internal api
                 <Input
@@ -100,6 +112,7 @@ export default function shippingInfos({ formStep, nextFormStep }) {
               )
             )
           )}
+          
           {/* <ButtonToAddComponent
             nombre={"Dirección de Envío"}
             dataSelect={2}

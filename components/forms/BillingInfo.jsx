@@ -8,7 +8,7 @@ import * as yup from "yup";
 import Datas from "../../lib/data";
 import CreatedAtomForm from "../createdAtomForm";
 import ButtonToAddComponent from "../buttonToAddComponent";
-//import SelectLocalidades from "../SelectLocalidades";
+import dynamic from "next/dynamic";
 
 const datosBilling = [];
 const billingInfo = [];
@@ -27,18 +27,22 @@ const schema = yup.object().shape({
       .matches(/^[a-zA-Z0-9\s]+$/, "Ingresa un Número de Casa o depto válido")
       .min(1, "Ingresa un Número de Casa o depto válido")
       .required("Casa o depto es obligatorio"),
-    Ciudad: yup
+    // Ciudad: yup
+    //   .string()
+    //   .min(3, "Ingresa una Ciudad válida")
+    //   .required("Ciudad es obligatoria"),
+    // Comuna: yup
+    //   .string()
+    //   .min(3, "Ingresa una Comuna válida")
+    //   .required("Comuna es obligatoria"),
+    // Región: yup
+    //   .string()
+    //   .min(1, "Ingresa una Región válida")
+    //   .required("Región es obligatoria"),
+      Comunas: yup
       .string()
-      .min(3, "Ingresa una Ciudad válida")
-      .required("Ciudad es obligatoria"),
-    Comuna: yup
-      .string()
-      .min(3, "Ingresa una Comuna válida")
-      .required("Comuna es obligatoria"),
-    Región: yup
-      .string()
-      .min(1, "Ingresa una Región válida")
-      .required("Región es obligatoria"),
+      .min(1, "Ingresa una Comuna válida")
+      .required("Comuna es obligatoria"),  
     Número: yup
       .string()
       //omitir caracteres especiales
@@ -49,12 +53,19 @@ const schema = yup.object().shape({
 });
 
 export default function BillingInfo({ formStep, nextFormStep }) {
+
+  const SelectLocalidades = dynamic(() => import("./SelectLocalidades"), {
+    ssr: false,
+  });
+  
   const Data = Datas;
   const { setFormValues } = useFormData();
   const formRef = useRef();
+  const selectRef = useRef(null);
   const { dataH } = useDataData();
 
   async function handleSubmit(data) {
+    console.log(selectRef.current.value);
     try {
       formRef.current.setErrors({});
 
@@ -97,7 +108,7 @@ export default function BillingInfo({ formStep, nextFormStep }) {
         
           {Data.Datas[1].map(
             (data, index) => (
-              console.log("Esto es la data de billing: ", data),
+              // console.log("Esto es la data de billing: ", data),
               (
                 // call internal api
                 <Input
@@ -106,11 +117,12 @@ export default function BillingInfo({ formStep, nextFormStep }) {
                   label={data.detalle}
                   type={data.type}
                   valua={data.valua}
+                  // component={data.component}
                 />
               )
             )
           )}
-          {/* <SelectLocalidades /> */}
+          <SelectLocalidades selectRef={selectRef} name="billingAddress.Comunas" />
           {/* <ButtonToAddComponent
             nombre={"Dirección de Envío"}
             dataSelect={2}

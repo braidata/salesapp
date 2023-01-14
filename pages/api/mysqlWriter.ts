@@ -20,8 +20,8 @@ export default async function handler(
   const billing_street = req.body.billing_street;
   const billing_number = req.body.billing_number;
   const billing_commune = req.body.billing_commune;
-  const billing_city = req.body.billing_city;
-  const billing_region = req.body.billing_region;
+  const billing_city = "ver comuna";
+  const billing_region = "ver comuna";
   const billing_department = req.body.billing_department;
   const billing_zip_code = req.body.billing_zip_code;
   const billing_company_name = req.body.billing_company_name;
@@ -37,8 +37,8 @@ export default async function handler(
   const Shipping_street = req.body.Shipping_street;
   const Shipping_number = req.body.Shipping_number;
   const Shipping_department = req.body.Shipping_department;
-  const Shipping_region = req.body.Shipping_region;
-  const Shipping_city = req.body.Shipping_city;
+  const Shipping_region = "ver comuna de envío";
+  const Shipping_city = "ver comuna de envío";
   const Shipping_commune = req.body.Shipping_commune;
   const Shipping_zip_code = req.body.Shipping_zip_code;
   const method = req.body.method;
@@ -141,4 +141,7 @@ export default async function handler(
     console.log("El error ", error.meta); 
     
   }
+    finally {
+    await prisma.$disconnect();
+    }
 }

@@ -24,6 +24,8 @@ console.log(user);
 res.status(200).json({user, orders, order_items, payments});}
 catch{
 console.log("error");
-}
+}finally {
+    await prisma.$disconnect();
+    }
 
 }
