@@ -54,7 +54,7 @@ const schema = yup.object().shape({
 
 export default function BillingInfo({ formStep, nextFormStep }) {
 
-  const SelectLocalidades = dynamic(() => import("./SelectLocalidades"), {
+  const SelectLocalidades = dynamic(() => import("./selectLocalidades"), {
     ssr: false,
   });
   
