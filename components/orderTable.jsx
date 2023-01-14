@@ -2,7 +2,17 @@
 
 import React from "react";
 
+
 const OrderTable = () => {
+
+  //extraer los pedidos de la base de datos
+
+  
+  
+
+
+
+
   return (
     <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">

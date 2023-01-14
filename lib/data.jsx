@@ -1,4 +1,4 @@
-
+// import SelectLocalidades from "../components/forms/selectLocalidades";
 
 let rut = "231579893";
 const id = Math.random(10,200).toString(36)
@@ -8,9 +8,9 @@ const campos3 = [
   { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
   { campo: "shippingAddress.Numero", type: "text", detalle: "Numero de Envío", valua: "15487" },
   { campo: "shippingAddress.Casa_o_depto", type: "text", detalle: "Casa o depto de Envío", valua: "1100" },
-  { campo: "shippingAddress.Comuna", type: "town", detalle: "Comuna de Envío", valua: "Antofagasta" },
-  { campo: "shippingAddress.Región", type: "state", detalle: "Región de Envío", valua: "Antofagasta" },
-  { campo: "shippingAddress.Ciudad", type: "city", detalle: "Ciudad de Envío", valua: "Antofagasta" },
+  // { campo: "shippingAddress.Comuna", type: "town", detalle: "Comuna de Envío", valua: "Antofagasta" },
+  // { campo: "shippingAddress.Región", type: "state", detalle: "Región de Envío", valua: "Antofagasta" },
+  // { campo: "shippingAddress.Ciudad", type: "city", detalle: "Ciudad de Envío", valua: "Antofagasta" },
   {
     campo: "shippingAddress.Código_Postal",
     type: "text",
@@ -84,6 +84,9 @@ const campos1 = [
     detalle: "Telefono del cliente",
     valua: "56987654321",
   },
+  {
+    component: "",
+  }
 ];
 const dirFac1 = [
   {
@@ -104,24 +107,24 @@ const dirFac1 = [
     detalle: "Casa o depto de Facturación",
     valua: "777",
   },
-  {
-    campo: "billingAddress.Región",
-    type: "state",
-    detalle: "Región de Facturación",
-    valua: "Metropolitana",
-  },
-  {
-    campo: "billingAddress.Ciudad",
-    type: "city",
-    detalle: "Ciudad de Facturación",
-    valua: "Santiago de Chile",
-  },
-  {
-    campo: "billingAddress.Comuna",
-    type: "town",
-    detalle: "Comuna de Facturación",
-    valua: "Providencia",
-  },
+  // {
+  //   campo: "billingAddress.Región",
+  //   type: "state",
+  //   detalle: "Región de Facturación",
+  //   valua: "Metropolitana",
+  // },
+  // {
+  //   campo: "billingAddress.Ciudad",
+  //   type: "city",
+  //   detalle: "Ciudad de Facturación",
+  //   valua: "Santiago de Chile",
+  // },
+  // {
+  //   campo: "billingAddress.Comuna",
+  //   type: "town",
+  //   detalle: "Comuna de Facturación",
+  //   valua: "Providencia",
+  // },
   {
     campo: "billingAddress.Código_Postal",
     type: "text",
@@ -191,13 +194,13 @@ const regiones = [
   { id: 4, nombre: 'Atacama' },
   { id: 5, nombre: 'Coquimbo' },
   { id: 6, nombre: 'Valparaíso' },
-  { id: 13, nombre: 'Metropolitana de Santiago' },
   { id: 7, nombre: 'Libertador General Bernardo O\'Higgins' },
   { id: 8, nombre: 'Maule' },
   { id: 9, nombre: 'Biobío' },
   { id: 10, nombre: 'La Araucanía' },
   { id: 11, nombre: 'Los Ríos' },
   { id: 12, nombre: 'Los Lagos' },
+  { id: 13, nombre: 'Metropolitana de Santiago' },
   { id: 14, nombre: 'Aysén del General Carlos Ibáñez del Campo' },
   { id: 15, nombre: 'Magallanes y de la Antártica Chilena' },
 ];
