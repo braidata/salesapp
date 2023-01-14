@@ -20,6 +20,8 @@ export default async function handler(
   const billing_street = req.body.billing_street;
   const billing_number = req.body.billing_number;
   const billing_commune = req.body.billing_commune;
+  const billing_city = "ver comuna";
+  const billing_region = "ver comuna";
   const billing_department = req.body.billing_department;
   const billing_zip_code = req.body.billing_zip_code;
   const billing_company_name = req.body.billing_company_name;
@@ -35,6 +37,8 @@ export default async function handler(
   const Shipping_street = req.body.Shipping_street;
   const Shipping_number = req.body.Shipping_number;
   const Shipping_department = req.body.Shipping_department;
+  const Shipping_region = "ver comuna de envío";
+  const Shipping_city = "ver comuna de envío";
   const Shipping_commune = req.body.Shipping_commune;
   const Shipping_zip_code = req.body.Shipping_zip_code;
   const method = req.body.method;
@@ -86,6 +90,8 @@ export default async function handler(
         billing_street,
         billing_number,
         billing_commune,
+        billing_city,
+        billing_region,
         billing_department,
         billing_zip_code,
         billing_company_name,
@@ -100,6 +106,8 @@ export default async function handler(
         Shipping_street,
         Shipping_number,
         Shipping_department,
+        Shipping_region,
+        Shipping_city,
         Shipping_commune,
         Shipping_zip_code,
         user,

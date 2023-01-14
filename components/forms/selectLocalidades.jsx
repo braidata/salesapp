@@ -50,12 +50,14 @@ const SelectLocalidades = (props, ...rest) => {
   }, [region]);
 
   useEffect(() => {
-    comunas.length = 0;
+    
     if (ciudad) {
+      comus.splice(0, comus.length);
       for (var i = 0; i < Data.Datas[8].length; i++) {
         if (Data.Datas[8][i].region == ciudad) {
-          //push y quitar anteriores de comunas
-
+          //limpiar array de comunas
+          
+          //agregar comunas al array
           comus.push(Data.Datas[8][i].nombre);
 
           // // console.log(

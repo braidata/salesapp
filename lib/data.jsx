@@ -8,9 +8,6 @@ const campos3 = [
   { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
   { campo: "shippingAddress.Numero", type: "text", detalle: "Numero de Envío", valua: "15487" },
   { campo: "shippingAddress.Casa_o_depto", type: "text", detalle: "Casa o depto de Envío", valua: "1100" },
-  // { campo: "shippingAddress.Comuna", type: "town", detalle: "Comuna de Envío", valua: "Antofagasta" },
-  // { campo: "shippingAddress.Región", type: "state", detalle: "Región de Envío", valua: "Antofagasta" },
-  // { campo: "shippingAddress.Ciudad", type: "city", detalle: "Ciudad de Envío", valua: "Antofagasta" },
   {
     campo: "shippingAddress.Código_Postal",
     type: "text",
@@ -21,7 +18,7 @@ const campos3 = [
   { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha de Retiro o Despacho", valua: `${date}` },
   { campo: "shipping.Nombre_Retira", type: "text", detalle: "Nombre de Retira", valua: "Carlos Espinoza" },
   { campo: "shipping.Rut_Retira", type: "text", detalle: "Rut de Retira", valua: "15020576k" },
-  { campo: "shipping.Observación", type: "text", detalle: "Observación", valua: "Dejar en la el local azúl de enfrente, Preguntar por Yolanda" },
+  { campo: "shipping.Observación", type: "text", detalle: "Observación", valua: "Dejar en la el local azúl de en frente, Preguntar por Yolanda" },
 ];
 
 //tipo de despacho
@@ -93,7 +90,7 @@ const dirFac1 = [
     campo: "billingAddress.Calle",
     type: "street",
     detalle: "Calle de Facturación",
-    valua: "El Sultán de Berlín",
+    valua: "El Sultan de Berlin",
   },
   {
     campo: "billingAddress.Número",
