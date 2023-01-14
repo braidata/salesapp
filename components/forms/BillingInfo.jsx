@@ -8,9 +8,7 @@ import * as yup from "yup";
 import Datas from "../../lib/data";
 import CreatedAtomForm from "../createdAtomForm";
 import ButtonToAddComponent from "../buttonToAddComponent";
-//import SelectLocalidades from "./SelectLocalidades";
 import dynamic from "next/dynamic";
-
 
 const datosBilling = [];
 const billingInfo = [];
