@@ -5,7 +5,8 @@ import CopyButton from "../components/copyButton";
 import dynamic from "next/dynamic";
 
 export default function PageWithJSbasedForm2() {
-  // Handles the submit event on form submit.
+  // Handles the submit event on form submit. 
+  // Sends the form data to the server and gets a response.
   let result;
   let refer;
   const Creator = dynamic(() => import("../components/creator"), {
