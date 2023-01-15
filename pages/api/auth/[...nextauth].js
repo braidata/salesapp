@@ -4,6 +4,23 @@ import CredentialsProvider from "next-auth/providers/credentials"
 
 
 export default NextAuth({
+
+  callbacks: {
+    async jwt(
+      token,
+      user) {
+      if (user) {
+        token = user
+      }
+      return token
+  },
+  async session(session, token) {
+    session.user = token
+    return session
+  }
+  },
+  
+
   providers: [
     CredentialsProvider({
           name: "Credenciales de Acceso",
@@ -15,6 +32,8 @@ export default NextAuth({
             },
             password: { label: "Contraseña", type: "password" },
           },
+
+
           async authorize(credentials) {
 
             //fetch api of users database
@@ -34,34 +53,23 @@ export default NextAuth({
             const userJson = await user.json()
 
             if (userJson.user[0].password === credentials.password) {
-              console.log("credentials si ahora: ", userJson.user[0].email)
-              return  { id: userJson.user[0].id , name: userJson.user[0].name , email: userJson.user[0].email}
+              console.log("credentials si ahora: ", userJson.user[0].rol)
+              return  { id: userJson.user[0].id , name: userJson.user[0].name , email: userJson.user[0].email, role: userJson.user[0].rol, permissions: userJson.user[0].permissions, image: userJson.user[0].image}
             } else {
               //console.log("credentials no: ", userJson)
               return null
             }
-
-
-        //   },
-        // }),
-
-
-
-
-        //     return {
-        //       id: 1,
-        //       name: "Joana Sanchez",
-        //       email: "jsanchez@example.com",
-        //       image: "https://i.pravatar.cc/150?",
-        //     }
           },
         })
       , 
-    HubspotProvider({
-          clientId: process.env.HUBSPOT_ID,
-          clientSecret: process.env.HUBSPOT_SECRET,
-        }),
+
+    // HubspotProvider({
+    //       clientId: process.env.HUBSPOT_ID,
+    //       clientSecret: process.env.HUBSPOT_SECRET,
+    //     }),
   ],
+
+
   // A database is optional, but required to persist accounts in a database
   
 

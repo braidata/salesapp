@@ -27,7 +27,7 @@ export default function SessionInfo() {
         )}
         {session && (
             <>
-            Signed in as {session.user.email} <br />
+            Signed in as {session.token.token.user ? session.token.token.user.email : "No conectado"} <br />
             <button onClick={() => signOut()}>Sign out</button>
             </>
         )} */}
