@@ -40,7 +40,7 @@ const App = () => {
     setRefresh(true);
     router.reload();
   };
-  console.log("la session", session ? session.token.token.user.permissions : "No conectado")
+  //console.log("la session", session ? session.token.token.user.permissions : "No conectado")
   if (status === "loading" || session.token.token.user.permissions !== "hubspot") {
     return (
       <div>
