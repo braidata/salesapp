@@ -23,6 +23,7 @@ import SpinnerButton from "../components/spinnerButton";
 
 
 const App = () => {
+  const { data: session } = useSession()
   const { status } = useSession({
     required: true,
     onUnauthenticated() {
@@ -39,16 +40,15 @@ const App = () => {
     setRefresh(true);
     router.reload();
   };
-
-  if (status === "loading") {
+  //console.log("la session", session ? session.token.token.user.permissions : "No conectado")
+  if (status === "loading" || session.token.token.user.permissions !== "hubspot") {
     return (
       <div>
         <h1 className="mt-24 bg-gray-100   border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
           ENVÍA TU NEGOCIO A SAP
         </h1>
         <p className="mt-10 bg-gray-100 text-sm  border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
-          Identificate con tu cuenta de Hubspot para acceder al Creador de
-          Pedidos
+          Identificate con tu cuenta de Hubspot para acceder a los Negocios de HubSpot o solicita un acceso con los permisos necesarios a tu administrador de Ventus Sales y HubSpot.
         </p>
       </div>
     );

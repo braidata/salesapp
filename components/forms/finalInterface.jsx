@@ -38,7 +38,7 @@ export default function PageWithJSbasedForm3() {
   const { data, status } = useSession({
     required: true,
   });
-  const [user, setUser] = useState(data.user.email ? data.user.email : null);
+  const [user, setUser] = useState(data.token.token.user.email ? data.token.token.user.email : null);
 
 //   console.log(data, status, data.user.email);
 

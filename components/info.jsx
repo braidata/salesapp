@@ -5,7 +5,7 @@ export default function Component() {
   if (session) {
     return (
       <>
-        Conectado como: {session.user.email} <br />
+        Conectado como: {session.token.token.user ? session.token.token.user.email : "No conectado"} <br />
         <button
           className="hover:backdrop-blur rounded p-1 m-4 hover:bg-blue-300/20 
                 active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
