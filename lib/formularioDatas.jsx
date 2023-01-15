@@ -10,7 +10,7 @@ export default function FormatContext({ context, componente }) {
     const [contexts, setContext] = useState(context);
     const [statusQ, setStatusQ] = useState(false);
     const [errorStatus, setErrorStatus] = useState(null);
-    const providers = useSession()
+    const {data: session} = useSession()
     console.log("los data values del form son:  ", JSON.stringify(contexts), "y el user es: ", null);
   
     // console.log("la data es", datas)
@@ -49,7 +49,7 @@ export default function FormatContext({ context, componente }) {
     const orderSender = async (event) => {
       event.preventDefault();
       
-      console.log("Providers", providers)
+      console.log("Providers", session)
   
       const datas = {
   
@@ -82,7 +82,7 @@ export default function FormatContext({ context, componente }) {
         // Shipping_city: contexts.shippingAddress.Ciudad,
         Shipping_commune: contexts.shippingAddress.Comunas,
         Shipping_zip_code: contexts.shippingAddress.Código_Postal,
-        user: providers.data.user.email,
+        user: session.token.token.user.email,
         method: contexts.payment.Metodo_de_Pago,
         authorization_code: contexts.payment.Código_de_Autorización,
         payment_count: contexts.payment.Cantidad_de_Pagos,
@@ -90,7 +90,7 @@ export default function FormatContext({ context, componente }) {
         payment_date: contexts.payment.Fecha_de_Pago,
         dealId: contexts.contact.DealId,
         ownerId: null,
-        ownerIdM: providers.data.user.email,//parseInt(Math.random(10,200)*10),
+        ownerIdM: session.token.token.user.email,//parseInt(Math.random(10,200)*10),
         order_items: [],
       };
 
