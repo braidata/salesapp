@@ -12,7 +12,7 @@ import SessionInfo from "../forms/sessionInfo";
 let negocios = [];
 let negoci;
 
-export default function PageWithJSbasedForm3() {
+export default function PageWithJSbasedForm3({session}) {
   //   const CardDeal = dynamic(() => import("../forms/cardDeal"), {
   //         ssr: false,
   //         //loading: () => <p>Loading...</p>
@@ -35,8 +35,8 @@ export default function PageWithJSbasedForm3() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
-  const { data: session } = useSession();
-  const [user, setUser] = useState(session.token.token.user.email ? session.token.token.user.email : null);
+  //const { data: session } = useSession();
+  const [user, setUser] = useState(session ? session.token.email : null);
 
 //   console.log(data, status, data.user.email);
 

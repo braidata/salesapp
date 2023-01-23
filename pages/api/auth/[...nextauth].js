@@ -2,28 +2,21 @@ import NextAuth from "next-auth"
 import HubspotProvider from "next-auth/providers/hubspot"
 import CredentialsProvider from "next-auth/providers/credentials"
 
+let user = null
 
 export default NextAuth({
 
-  callbacks: {
-    async jwt(
-      token,
-      user) {
-      if (user) {
-        token = user
-      }
-      return token
-  },
-  async session(session, token) {
-    session.user = token
-    return session
-  }
-  },
+  
   
 
   providers: [
     CredentialsProvider({
           name: "Credenciales de Acceso",
+        //   session: {
+        //     jwt: true,
+        //     maxAge: 30 * 24 * 60 * 60
+    
+        // },
           credentials: {
             useremail: {
               label: "Correo Electrónico",
@@ -40,7 +33,7 @@ export default NextAuth({
             //if user exists return user data
             //if not return null
 
-            const user = await fetch(`${process.env.NEXTAUTH_URL}/api/mysqlUsers`, {
+            user = await fetch(`${process.env.NEXTAUTH_URL}/api/mysqlUsers`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -69,6 +62,22 @@ export default NextAuth({
     //     }),
   ],
 
+
+  callbacks: {
+    //   async jwt(
+    //     token,
+    //     user) {
+    //     if (user) {
+    //       token = user
+    //     }
+    //     //return token
+    // },
+    async session(session, token, user) {
+      
+      session.token.user = user
+      return session
+    }
+    },
 
   // A database is optional, but required to persist accounts in a database
   

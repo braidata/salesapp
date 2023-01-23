@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     <ThemeProvider enableSystem={true} attribute="class">
     <DataProvider>
       <FormProvider>
-      <Layout>
+      <Layout >
       <Component {...pageProps} />
       </Layout>
       </FormProvider>
