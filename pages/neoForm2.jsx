@@ -16,14 +16,15 @@ import {
 import FormCompleted from "../components/FormCompleted";
 import RefreshButton from "../components/refreshButton";
 import FinalInterface from "../components/forms/finalInterface";
-import { useSession } from "next-auth/react";
+import { useSession, getSession } from "next-auth/react";
 import SpinnerButton from "../components/spinnerButton";
+import requireAuthentication from "../utils/requireAuthentication";
 //import CardClosable from "../components/cardClosable";
 
 
 
 const App = () => {
-  const { data: session } = useSession()
+  const {data: session} = useSession();
   const { status } = useSession({
     required: true,
     onUnauthenticated() {
@@ -36,12 +37,19 @@ const App = () => {
   // }); 
  const router = useRouter();
  const [refresh, setRefresh] = useState(false);
+ const [sessionInfo, setSessionInfo] = useState()
   const refreshPage = () => {
     setRefresh(true);
     router.reload();
   };
-  //console.log("la session", session ? session.token.token.user.permissions : "No conectado")
-  if (status === "loading" || session.token.token.user.permissions !== "hubspot") {
+  const permis = ["hubspot", "admin", "all"];
+  //const permisoDato = session ? session.user.permissions : "No conectado";
+  //const permiso = permis.some((el) => permisoDato.includes(el));
+  console.log("el permiso: ", permis, session );
+       
+
+  //console.log("la session", session ? session.token.token.user.permissions : "No conectado")  session.token.token.user.permissions !== "hubspot"
+  if (status === "loading") {
     return (
       <div>
         <h1 className="mt-24 bg-gray-100   border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
@@ -60,9 +68,9 @@ const App = () => {
         <title>Creador de Pedidos</title>
       </Head>
       <h1 className="mt-10 bg-gray-100   border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
-      ENVÍA TU NEGOCIO A SAP
+      ENVÍA TU GATO A SAP
       </h1>
-      <FinalInterface />
+      <FinalInterface session={session} />
     
       {/* <AtomCounter /> */}
       <RefreshButton functions={refreshPage} />
@@ -77,4 +85,16 @@ const App = () => {
   );
 };
 
+export async function getServerSideProps(context) {
+  const session = await getSession()
+
+  return {
+    props: {
+      session
+    }
+  }
+}
+
 export default App;
+
+

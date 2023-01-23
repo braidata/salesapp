@@ -20,12 +20,12 @@ export default function FormatContext({ context, componente }) {
       //event.preventDefault();
       try {
         const data = {
-          name: contexts.owners.success[1],
-          email: contexts.owners.success[0],
-          ownerId: contexts.owners.success[3],
+          name: session.token.name,//contexts.owners.success[1] ,
+          email: session.token.email,//contexts.owners.success[0],
+          id: parseInt(session.token.sub)
         };
         const JSONdata = JSON.stringify(data);
-        const endpoint = "/api/mysqlConnector";
+        const endpoint = "/api/mysqlConsulta";
         const options = {
           method: "POST",
           headers: {
@@ -53,7 +53,7 @@ export default function FormatContext({ context, componente }) {
   
       const datas = {
   
-        id: contexts.g,
+        
         customer_name: contexts.contact.Nombre,
         customer_last_name: contexts.contact.Apellido,
         customer_rut: contexts.contact.Rut,
@@ -82,15 +82,15 @@ export default function FormatContext({ context, componente }) {
         // Shipping_city: contexts.shippingAddress.Ciudad,
         Shipping_commune: contexts.shippingAddress.Comunas,
         Shipping_zip_code: contexts.shippingAddress.Código_Postal,
-        user: session.token.token.user.email,
+        user: session.token.email,
         method: contexts.payment.Metodo_de_Pago,
         authorization_code: contexts.payment.Código_de_Autorización,
         payment_count: contexts.payment.Cantidad_de_Pagos,
         payment_amount: contexts.payment.Monto_de_Pagos,
         payment_date: contexts.payment.Fecha_de_Pago,
         dealId: contexts.contact.DealId,
-        ownerId: null,
-        ownerIdM: session.token.token.user.email,//parseInt(Math.random(10,200)*10),
+        ownerId: parseInt(session.token.sub),
+        ownerIdM: session.token.email,//parseInt(Math.random(10,200)*10),
         order_items: [],
       };
 
@@ -191,7 +191,7 @@ console.log("rey", product.filter(function(element) {
   
   {statusQ && !errorStatus  ? componente : null}
   
-        {/* <button onClick={userSender}>Guarda Ownera</button> */}
+        <button onClick={userSender}>Guarda Ownera</button>
       </div>
     );
   }

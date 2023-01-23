@@ -7,21 +7,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const name = req.body.name ? req.body.name : null
     const email = req.body.email ? req.body.email : null
+    const id = req.body.id ? req.body.id : null
 
 const prisma = new PrismaClient();
 
 try {
 
+    const userdos = await prisma.users.findMany()
+
+const user = await prisma.users.findMany(
 
 
-const user = await prisma.users.findMany();
-const orders = await prisma.orders.findMany();
-const order_items = await prisma.order_items.findMany();
-const payments = await prisma.payments.findMany();
+    {   select: {
+        id: true,
+        rol: true,
+        permissions: true,
+        },
+
+
+        where: {
+            id: id,
+            name: name,
+            email: email
+        }
+    }
+
+);
+const orders = await prisma.orders.findMany(
+    {
+        where: {
+            user: email,
+        }
+    }
+);
+//const order_items = await prisma.order_items.findMany();
+//const payments = await prisma.payments.findMany();
 
 console.log(user);
 
-res.status(200).json({user, orders, order_items, payments});}
+res.status(200).json({user, orders, userdos});}
 catch{
 console.log("error");
 }finally {
@@ -29,3 +53,5 @@ console.log("error");
     }
 
 }
+
+//order_items, payments

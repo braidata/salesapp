@@ -138,7 +138,7 @@ export default async function handler(
   } catch (error: any) {
    
     res.status(500).json([error.code, error.meta, error.message]);
-    console.log("El error ", error.meta); 
+    console.log("El error ", error); 
     
   }
     finally {
