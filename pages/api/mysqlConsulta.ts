@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 
 try {
 
-    const userdos = await prisma.users.findMany()
+    //const userdos = await prisma.users.findMany()
 
 const user = await prisma.users.findMany(
 
@@ -45,7 +45,7 @@ const orders = await prisma.orders.findMany(
 
 console.log(user);
 
-res.status(200).json({user, orders, userdos});}
+res.status(200).json({user, orders});}
 catch{
 console.log("error");
 }finally {
