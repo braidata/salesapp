@@ -16,9 +16,29 @@ const OrderTable = ({data}) => {
   return (
 
     //create table with data info
+          <table className="py-3 px-6">
+    
+          <thead>
 
-    
-    
+          <tr>
+             <th scope="col" className="py-3 px-6">
+               ID
+             </th>
+             <th scope="col" className="py-3 px-6">
+               Cliente
+             </th>
+             <th scope="col" className="py-3 px-6">
+               Rut
+             </th>
+             <th scope="col" className="py-3 px-6">
+               Correo
+             </th>
+             <th scope="col" className="py-3 px-6">
+               Teléfono
+             </th>
+           </tr>
+
+          </thead>
           
           <tbody>
             {datas ? Object.entries(datas).map((item, i) => (
@@ -29,7 +49,7 @@ const OrderTable = ({data}) => {
                   
 
                   <td className="py-3 px-6">
-                    {item.email}
+                    {item.id}
                   </td>
 
                   <td className="py-3 px-6">
@@ -64,7 +84,7 @@ const OrderTable = ({data}) => {
               ))
             )) : null}
           </tbody>
-        
+          </table>
 
 
 

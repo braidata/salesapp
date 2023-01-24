@@ -17,7 +17,10 @@ const schema = yup.object().shape({
   // .required("SKU es obligatorio"),
   Nombre_Producto: yup.string().min(2, "Ingresa un Nombre de Producto válido"),
   // .required("Nombre de Producto es obligatorio"),
-  Precio: yup.string().min(4, "Ingresa un Precio válido"),
+  Precio: yup.string().matches(
+    //onli numbers
+    /^[0-9]+$/,
+    "Ingresa un Número de Precio válido").min(4, "Ingresa un Precio válido"), 
   // .required("Precio es obligatorio"),
   Cantidad: yup.string().min(1, "Ingresa una Cantidad válida"),
   // .required("Cantidad es obligatorio"),

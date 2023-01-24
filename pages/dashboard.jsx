@@ -11,7 +11,7 @@ const Dashboard = () => {
   const userSender = async (event) => {
     //event.preventDefault();
     try {
-      const data = {
+      let data = {
         name: session.token.name,//contexts.owners.success[1] ,
         email: session.token.email,//contexts.owners.success[0],
         id: parseInt(session.token.sub)
