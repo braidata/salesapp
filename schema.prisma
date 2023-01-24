@@ -58,6 +58,7 @@ model orders {
   statusSAP                           String?       @db.VarChar(255)
   dateSAP                             String?       @db.VarChar(255)
   ownerIdM                            String?
+  team                                String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
@@ -84,4 +85,60 @@ model users {
   image       String?
   permissions String? @db.VarChar(255)
   rol         String? @db.VarChar(255)
+  team        String? @db.VarChar(255)
+}
+
+model dff_51a5_9a2f_2c4603fd282a_20230124041116_vrepl {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  email       String  @unique(map: "users_email_key") @db.VarChar(255)
+  ownerId     Int     @unique(map: "users_ownerId_key")
+  password    String? @db.VarChar(255)
+  image       String?
+  permissions String? @db.VarChar(255)
+  rol         String? @db.VarChar(255)
+
+  @@map("_18509131_7dff_51a5_9a2f_2c4603fd282a_20230124041116_vrepl")
+}
+
+model b9a0_57b9_b10f_6d567344a916_20230124041111_vrepl {
+  id                                  Int       @id @default(autoincrement())
+  customer_name                       String    @db.VarChar(255)
+  customer_rut                        String    @db.VarChar(255)
+  customer_email                      String    @db.VarChar(255)
+  customer_phone                      String    @db.VarChar(255)
+  billing_street                      String    @db.VarChar(255)
+  billing_number                      String    @db.VarChar(255)
+  billing_department                  String    @db.VarChar(255)
+  billing_region                      String    @db.VarChar(255)
+  billing_city                        String    @db.VarChar(255)
+  billing_commune                     String    @db.VarChar(255)
+  billing_zip_code                    String    @db.VarChar(255)
+  billing_company_name                String    @db.VarChar(255)
+  billing_company_rut                 String    @db.VarChar(255)
+  billing_company_business            String    @db.VarChar(255)
+  Shipping_Tipo_de_Despacho           String    @db.VarChar(255)
+  Shipping_Fecha_de_Despacho_o_Retiro String    @db.VarChar(255)
+  Shipping_Rut_Retira                 String?   @db.VarChar(255)
+  Shipping_Nombre_Retira              String?   @db.VarChar(255)
+  Shipping_Observacion                String?   @db.VarChar(255)
+  Shipping_flete                      String    @db.VarChar(255)
+  customer_last_name                  String    @db.VarChar(255)
+  user                                String    @db.VarChar(255)
+  dealId                              String    @unique(map: "orders_dealId_key") @db.VarChar(255)
+  Shipping_city                       String?   @default("sin envio") @db.VarChar(255)
+  Shipping_commune                    String?   @default("sin envio") @db.VarChar(255)
+  Shipping_department                 String?   @default("sin envio") @db.VarChar(255)
+  Shipping_number                     String?   @default("sin envio") @db.VarChar(255)
+  Shipping_region                     String?   @default("sin envio") @db.VarChar(255)
+  Shipping_street                     String?   @default("sin envio") @db.VarChar(255)
+  Shipping_zip_code                   String?   @default("sin envio") @db.VarChar(255)
+  order_date                          DateTime? @default(now())
+  ownerId                             Int?
+  sapID                               String?   @db.VarChar(255)
+  statusSAP                           String?   @db.VarChar(255)
+  dateSAP                             String?   @db.VarChar(255)
+  ownerIdM                            String?
+
+  @@map("_82930753_b9a0_57b9_b10f_6d567344a916_20230124041111_vrepl")
 }
