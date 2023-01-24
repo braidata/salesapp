@@ -44,6 +44,7 @@ model orders {
     Shipping_flete                      String        @db.VarChar(255)
     customer_last_name                  String        @db.VarChar(255)
     user                                String        @db.VarChar(255)
+    team                                String        @db.VarChar(255)
     dealId                              String        @unique @db.VarChar(255)
     Shipping_city                       String?       @default("sin envio") @db.VarChar(255)
     Shipping_commune                    String?       @default("sin envio") @db.VarChar(255)
