@@ -37,6 +37,7 @@ export default function PageWithJSbasedForm3({session}) {
 
   //const { data: session } = useSession();
   const [user, setUser] = useState(session ? session.token.email : null);
+  const [team, setTeam] = useState(session ? session.token.sub : null);
 
 //   console.log(data, status, data.user.email);
 
@@ -53,6 +54,7 @@ export default function PageWithJSbasedForm3({session}) {
     lines: lines,
     products: new Set(products),
     user: user,
+    team: team,
     owner: owner,
     owners: owners,
     id: id,
@@ -72,6 +74,7 @@ export default function PageWithJSbasedForm3({session}) {
       lines: lines,
       products: products,
       user: user,
+      team: team,
       owner: owner,
       owners: owners,
       id: id,

@@ -83,6 +83,7 @@ export default function FormatContext({ context, componente }) {
         Shipping_commune: contexts.shippingAddress.Comunas,
         Shipping_zip_code: contexts.shippingAddress.Código_Postal,
         user: session.token.email,
+        team: session.token.sub,
         method: contexts.payment.Metodo_de_Pago,
         authorization_code: contexts.payment.Código_de_Autorización,
         payment_count: contexts.payment.Cantidad_de_Pagos,

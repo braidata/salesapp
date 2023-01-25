@@ -66,8 +66,7 @@ export default function FormatContext({ context, componente }) {
       billing_company_rut: contexts.billing[0].properties.rut_de_empresa,
       billing_company_business: contexts.billing[0].properties.giro_empresa,
       Shipping_Tipo_de_Despacho: contexts.deale[0].tipo_de_despacho,
-      Shipping_Fecha_de_Despacho_o_Retiro:
-        contexts.deale[0].fecha_despacho_retiro,
+      Shipping_Fecha_de_Despacho_o_Retiro: contexts.deale[0].fecha_despacho_retiro,
       Shipping_Rut_Retira: contexts.deale[0].rut_de_retiro,
       Shipping_Nombre_Retira: contexts.deale[0].nombre_retira,
       Shipping_Observacion: contexts.deale[0].observacion,
@@ -80,6 +79,7 @@ export default function FormatContext({ context, componente }) {
       Shipping_commune: contexts.deale[0].comuna_envio,
       Shipping_zip_code: contexts.deale[0].codigo_postal_de_envio,
       user: contexts.user,
+      team: contexts.team,
       method: contexts.deale[0].metodo_pago,
       authorization_code: contexts.deale[0].codigos_de_autorizacion,
       payment_count: contexts.deale[0].cantidad_de_pagos,
