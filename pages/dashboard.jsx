@@ -42,7 +42,10 @@ const Dashboard = () => {
         title="Dashboard"
         description="En esta sección podrás ver las ordenes que se han creado y las que se han entregado."
       />
-      <button onClick={userSender}>Ver Data</button>
+      <button className="border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 bg-white text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow
+       hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out 
+       "
+       onClick={userSender}>Ver Data</button>
       <OrderTable data={data}/>
     </div>
   );

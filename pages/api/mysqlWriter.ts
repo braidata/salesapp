@@ -9,6 +9,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const user = req.body.user;
+  const team = req.body.team;
   const dealId = req.body.dealId
   const ownerId = req.body.ownerId
   const ownerIdM = req.body.ownerIdM
@@ -111,6 +112,7 @@ export default async function handler(
         Shipping_commune,
         Shipping_zip_code,
         user,
+        team,
         dealId,
         ownerId,
         ownerIdM,
