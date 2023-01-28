@@ -68,7 +68,7 @@ const App = () => {
         <title>Creador de Pedidos</title>
       </Head>
       <h1 className="mt-10 bg-gray-100   border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
-      ENVÍA TU GATO A SAP
+      ENVÍA TU PEDIDO A SAP
       </h1>
       <FinalInterface session={session} />
     

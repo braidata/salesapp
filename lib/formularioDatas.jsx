@@ -168,7 +168,8 @@ console.log("rey", product.filter(function(element) {
         const result = response;
         const resDB = await result.json();
         console.log("base", resDB[0], datas);
-        resDB[0] === "P2002"  ? setErrorStatus(true) : null;
+        resDB[0] === "P2002" || resDB[0] === "P2009" ? setErrorStatus(true) : null;
+        //resDB[0] === "P2009"  ? setErrorStatus(true) : null;
         setStatusQ(true);
       } catch (e) {
         
