@@ -10,8 +10,6 @@ export default async function handler(
 ) {
   const user = req.body.user;
   const team = req.body.team;
-  const rut_pagador = req.body.rut_pagador;
-  const oc = req.body.oc;
   const dealId = req.body.dealId
   const ownerId = req.body.ownerId
   const ownerIdM = req.body.ownerIdM
@@ -49,6 +47,8 @@ export default async function handler(
   const payment_count = req.body.payment_count;
   const payment_amount = req.body.payment_amount;
   const payment_date = req.body.payment_date;
+  const rut_pagador = req.body.rut_pagador;
+  const oc = req.body.oc;
   const order_items = req.body.order_items;
 
   
@@ -77,12 +77,11 @@ export default async function handler(
 
   const prisma = new PrismaClient();
   //data types
-  
- 
-
 
   try {
     const orderA = await prisma.orders.create({
+
+      
       
       data: {
         customer_name,
@@ -115,10 +114,10 @@ export default async function handler(
         Shipping_zip_code,
         user,
         team,
-        oc,
         dealId,
         ownerId,
         ownerIdM,
+        oc,
         payments: {
           create: {
             method,
@@ -126,7 +125,8 @@ export default async function handler(
             authorization_code,
             payment_count,
             payment_amount,
-            payment_date
+            payment_date,
+            
           }
         },
 

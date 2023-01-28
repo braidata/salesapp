@@ -68,7 +68,7 @@ model payments {
     id                 Int    @id @default(autoincrement())
     order_id           Int
     method             String @db.VarChar(255)
-    rut_pagador        String @db.VarChar(255)
+    rut_pagador        String? @db.VarChar(255)
     authorization_code String? @db.VarChar(255)
     payment_count      String @db.VarChar(255)
     payment_amount     String @db.VarChar(255)
