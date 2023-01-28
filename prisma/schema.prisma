@@ -78,6 +78,8 @@ model payments {
     @@index([order_id])
 }
 
+// por favor cargar los datos
+
 model users {
     id          Int     @id @default(autoincrement())
     name        String  @db.VarChar(255)
