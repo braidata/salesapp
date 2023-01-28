@@ -59,6 +59,7 @@ model orders {
     statusSAP                           String?       @db.VarChar(255)
     dateSAP                             String?       @db.VarChar(255)
     ownerIdM                            String?
+    OC                                  String?
     payments                            payments[]
     order_items                         order_items[]
 }
@@ -67,7 +68,8 @@ model payments {
     id                 Int    @id @default(autoincrement())
     order_id           Int
     method             String @db.VarChar(255)
-    authorization_code String @db.VarChar(255)
+    rut_pagador        String @db.VarChar(255)
+    authorization_code String? @db.VarChar(255)
     payment_count      String @db.VarChar(255)
     payment_amount     String @db.VarChar(255)
     payment_date       String @db.VarChar(255)
