@@ -158,6 +158,18 @@ const pago1 = [
   valua: "Transbank"
   },
   {
+    campo: "payment.rut_pagador",
+    type: "text",
+    detalle: "Rut del Pagador",
+  valua: "15020576k"
+  },
+  {
+    campo: "payment.orden_de_compra",
+    type: "text",
+    detalle: "Orden de Compra",
+  valua: "76667"
+  },
+  {
     campo: "payment.Código_de_Autorización",
     type: "text",
     detalle: "Código de Autorización",

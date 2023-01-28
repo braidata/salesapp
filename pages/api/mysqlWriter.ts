@@ -10,6 +10,8 @@ export default async function handler(
 ) {
   const user = req.body.user;
   const team = req.body.team;
+  const rut_pagador = req.body.rut_pagador;
+  const oc = req.body.oc;
   const dealId = req.body.dealId
   const ownerId = req.body.ownerId
   const ownerIdM = req.body.ownerIdM
@@ -113,12 +115,14 @@ export default async function handler(
         Shipping_zip_code,
         user,
         team,
+        oc,
         dealId,
         ownerId,
         ownerIdM,
         payments: {
           create: {
             method,
+            rut_pagador,
             authorization_code,
             payment_count,
             payment_amount,
