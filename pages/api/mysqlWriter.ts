@@ -117,9 +117,11 @@ export default async function handler(
         dealId,
         ownerId,
         ownerIdM,
+        OC,
         payments: {
           create: {
             method,
+            rut_pagador,
             authorization_code,
             payment_count,
             payment_amount,
