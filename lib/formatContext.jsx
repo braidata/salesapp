@@ -82,7 +82,7 @@ export default function FormatContext({ context, componente }) {
       user: contexts.user,
       team: contexts.team,
       method: contexts.deale[0].metodo_pago,
-      oc: contexts.deale[0].orden_de_compra,
+      OC: contexts.deale[0].orden_de_compra,
       rut_pagador: contexts.deale[0].rut_pagador,
       authorization_code: contexts.deale[0].codigos_de_autorizacion,
       payment_count: contexts.deale[0].cantidad_de_pagos,
