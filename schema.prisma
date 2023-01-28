@@ -59,19 +59,21 @@ model orders {
   dateSAP                             String?       @db.VarChar(255)
   ownerIdM                            String?
   team                                String?       @db.VarChar(255)
+  OC                                  String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
 
 model payments {
-  id                 Int    @id @default(autoincrement())
+  id                 Int     @id @default(autoincrement())
   order_id           Int
-  method             String @db.VarChar(255)
-  authorization_code String @db.VarChar(255)
-  payment_count      String @db.VarChar(255)
-  payment_amount     String @db.VarChar(255)
-  payment_date       String @db.VarChar(255)
-  orders             orders @relation(fields: [order_id], references: [id])
+  method             String  @db.VarChar(255)
+  authorization_code String  @db.VarChar(255)
+  payment_count      String  @db.VarChar(255)
+  payment_amount     String  @db.VarChar(255)
+  payment_date       String  @db.VarChar(255)
+  rut_pagador        String? @db.VarChar(255)
+  orders             orders  @relation(fields: [order_id], references: [id])
 
   @@index([order_id])
 }
@@ -88,20 +90,7 @@ model users {
   team        String? @db.VarChar(255)
 }
 
-model dff_51a5_9a2f_2c4603fd282a_20230124041116_vrepl {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(255)
-  email       String  @unique(map: "users_email_key") @db.VarChar(255)
-  ownerId     Int     @unique(map: "users_ownerId_key")
-  password    String? @db.VarChar(255)
-  image       String?
-  permissions String? @db.VarChar(255)
-  rol         String? @db.VarChar(255)
-
-  @@map("_18509131_7dff_51a5_9a2f_2c4603fd282a_20230124041116_vrepl")
-}
-
-model b9a0_57b9_b10f_6d567344a916_20230124041111_vrepl {
+model a247618_f2e5_5c3d_ab7f_a9c6d42101a6_20230128025639_vrepl {
   id                                  Int       @id @default(autoincrement())
   customer_name                       String    @db.VarChar(255)
   customer_rut                        String    @db.VarChar(255)
@@ -139,6 +128,20 @@ model b9a0_57b9_b10f_6d567344a916_20230124041111_vrepl {
   statusSAP                           String?   @db.VarChar(255)
   dateSAP                             String?   @db.VarChar(255)
   ownerIdM                            String?
+  team                                String?   @db.VarChar(255)
 
-  @@map("_82930753_b9a0_57b9_b10f_6d567344a916_20230124041111_vrepl")
+  @@map("_1a247618_f2e5_5c3d_ab7f_a9c6d42101a6_20230128025639_vrepl")
+}
+
+model ac5c2_e8b3_531e_bfa1_7f900bae764c_20230128025644_vrepl {
+  id                 Int    @id @default(autoincrement())
+  order_id           Int
+  method             String @db.VarChar(255)
+  authorization_code String @db.VarChar(255)
+  payment_count      String @db.VarChar(255)
+  payment_amount     String @db.VarChar(255)
+  payment_date       String @db.VarChar(255)
+
+  @@index([order_id], map: "payments_order_id_idx")
+  @@map("_527ac5c2_e8b3_531e_bfa1_7f900bae764c_20230128025644_vrepl")
 }
