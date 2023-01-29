@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+#except nexth auth folder to make a commit
+!/node_modules/next-auth
 /.pnp
 .pnp.js
 
