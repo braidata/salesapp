@@ -6,6 +6,7 @@ import { SessionProvider } from "next-auth/react"
 
 export default function Component() {
 
+
   //get user session data
   const { data: session, status } = useSession()
   //save the session token data permanently

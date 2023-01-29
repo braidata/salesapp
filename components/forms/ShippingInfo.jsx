@@ -10,6 +10,7 @@ import CreatedAtomForm from "../createdAtomForm";
 import ButtonToAddComponent from "../buttonToAddComponent";
 //import SelectLocalidades from "./SelectLocalidades";
 import dynamic from "next/dynamic";
+import Select from "../Input Fields/Select";
 
 
 const datosShipping = [];
@@ -102,13 +103,23 @@ export default function shippingInfos({ formStep, nextFormStep }) {
               // console.log("Esto es la data de shipping: ", data),
               (
                 // call internal api
-                <Input
-                  key={index}
-                  name={data.campo}
-                  label={data.detalle}
-                  type={data.type}
-                  valua={data.valua}
-                />
+                data.campo != "shipping.Tipo_de_Despacho" ?
+
+           <Input
+              key={index}
+              name={data.campo}
+              label={data.detalle}
+              type={data.type}
+              valua={data.valua}
+            /> :
+              <Select
+              key={index}
+              name={data.campo}
+              label={data.detalle}
+              type={data.type}
+              valua={data.valua}
+              options={data.options}
+            />
               )
             )
           )}

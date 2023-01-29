@@ -2,18 +2,20 @@ import { useRef } from "react";
 import styles from "../../styles/styles.module.scss";
 import { Form } from "@unform/web";
 import Input from "../Input Fields/Input";
+//import Select from "../Select Fields/Select";
 import { useFormData } from "../../context";
 import * as yup from "yup";
 import Datas from "../../lib/data";
 import CreatedAtomForm from "../../components/createdAtomForm";
 import ButtonToAddComponent from "../../components/buttonToAddComponent";
 import { validateRUT, getCheckDigit, generateRandomRUT } from "validar-rut";
+import Select from "../Input Fields/Select";
 
 const schema = yup.object().shape({
   payment: yup.object().shape({
     Metodo_de_Pago: yup
       .string()
-      .min(2, "Ingresa un Método de Pago válido")
+      .min(1, "Ingresa un Método de Pago válido")
       .required("Método de Pago es obligatorio"),
     rut_pagador: yup
       .string()
@@ -78,13 +80,27 @@ export default function PaymentsInfo({ formStep, nextFormStep }) {
       <Form ref={formRef} onSubmit={handleSubmit}>
         <div className={styles.formRow}>
           {Data.Datas[4].map((data, index) => (
-            <Input
+
+            data.campo != "payment.Metodo_de_Pago" ?
+
+           <Input
               key={index}
               name={data.campo}
               label={data.detalle}
               type={data.type}
               valua={data.valua}
+            /> :
+              <Select
+              key={index}
+              name={data.campo}
+              label={data.detalle}
+              type={data.type}
+              valua={data.valua}
+              options={data.options}
             />
+            
+
+
           ))}
           {/* <ButtonToAddComponent
             nombre={"Medio de Pago"}

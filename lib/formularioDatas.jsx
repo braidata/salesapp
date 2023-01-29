@@ -195,7 +195,7 @@ console.log("rey", product.filter(function(element) {
   
   {statusQ && !errorStatus  ? componente : null}
   
-        <button onClick={userSender}>Guarda Ownera</button>
+        {/* <button onClick={userSender}>Guarda Ownera</button> */}
       </div>
     );
   }
