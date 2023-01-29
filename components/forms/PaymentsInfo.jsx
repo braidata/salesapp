@@ -7,6 +7,7 @@ import * as yup from "yup";
 import Datas from "../../lib/data";
 import CreatedAtomForm from "../../components/createdAtomForm";
 import ButtonToAddComponent from "../../components/buttonToAddComponent";
+import { validateRUT, getCheckDigit, generateRandomRUT } from "validar-rut";
 
 const schema = yup.object().shape({
   payment: yup.object().shape({
@@ -14,6 +15,17 @@ const schema = yup.object().shape({
       .string()
       .min(2, "Ingresa un Método de Pago válido")
       .required("Método de Pago es obligatorio"),
+    rut_pagador: yup
+      .string()
+      .test({
+        name: "Rut",
+        message: "Rut no válido",
+        test: (value) => {
+          return validateRUT(value);
+        },
+      })
+      .min(9, "Ingresa un rut válido")
+      .required("Rut es obligatorio"),
     Código_de_Autorización: yup
       .string()
       .min(2, "Ingresa un Código de Autorización válido")

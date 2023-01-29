@@ -60,13 +60,6 @@ const SelectLocalidades = (props, ...rest) => {
           //agregar comunas al array
           comus.push(Data.Datas[8][i].nombre);
 
-          // // console.log(
-          //   "ciudadan o couma",
-          //   ciudad,
-          //   "la cosa. ",
-          //   Data.Datas[8][i].nombre,
-          //   comunas
-          // );
         }
       }
       setComunas(comus);
@@ -75,15 +68,6 @@ const SelectLocalidades = (props, ...rest) => {
     }
   }, [ciudad]);
 
-  // // console.log(
-  //   "ciudadan regione",
-  //   region,
-  //   comuna,
-  //   ciudad,
-  //   regiones,
-  //   ciudades,
-  //   comunas
-  // );
 
   return (
    <>
