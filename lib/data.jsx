@@ -14,7 +14,7 @@ const campos3 = [
     detalle: "Código Postal de Envío",
     valua: "120123"
   },
-  { campo: "shipping.Tipo_de_Despacho", type: "text", detalle: "Tipo de Despacho", valua: "Envío Región FedEx" },
+  { campo: "shipping.Tipo_de_Despacho", type: "text", detalle: "Tipo de Despacho", valua: "Envío Región FedEx", options: ["Envío Gratis Santiago","Envío Fedex Regiones", "Retira en Local", "Envío Santiago Pago"] },
   { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha de Retiro o Despacho", valua: `${date}` },
   { campo: "shipping.Nombre_Retira", type: "text", detalle: "Nombre de Retira", valua: "Carlos Espinoza" },
   { campo: "shipping.Rut_Retira", type: "text", detalle: "Rut de Retira", valua: "15020576k" },
@@ -155,7 +155,20 @@ const pago1 = [
     campo: "payment.Metodo_de_Pago",
     type: "text",
     detalle: "Metodo de Pago",
-  valua: "Transbank"
+  valua: "",
+  options: [ "Pago con Tarjeta de Crédito", "Pago con Tarjeta de Débito", "Efectivo", "Transferencia Bancaría", "Depósito"]
+  },
+  {
+    campo: "payment.rut_pagador",
+    type: "text",
+    detalle: "Rut del Pagador",
+  valua: "15020576k"
+  },
+  {
+    campo: "payment.orden_de_compra",
+    type: "text",
+    detalle: "Orden de Compra",
+  valua: "76667"
   },
   {
     campo: "payment.Código_de_Autorización",

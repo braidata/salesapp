@@ -18,6 +18,7 @@ export default NextAuth({
     
         // },
           credentials: {
+
             useremail: {
               label: "Correo Electrónico",
               type: "text",
@@ -26,7 +27,7 @@ export default NextAuth({
             password: { label: "Contraseña", type: "password" },
           },
 
-
+          
           async authorize(credentials) {
 
             //fetch api of users database
@@ -86,6 +87,9 @@ export default NextAuth({
     colorScheme: "auto", // "auto" | "dark" | "light"
     brandColor: "#72d1db", // Hex color code
     buttonText: "#83a1cc" // Hex color code
+    
+
+
   }
 
 })

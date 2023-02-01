@@ -12,6 +12,7 @@ export default function FormatContext({ context, componente }) {
   const [contexts, setContext] = useState(context);
   const [statusQ, setStatusQ] = useState(false);
   const [errorStatus, setErrorStatus] = useState(null);
+  const [errorStatus2, setErrorStatus2] = useState(null);
 
   console.log("los data values son:  ", JSON.stringify(contexts));
 
@@ -81,6 +82,8 @@ export default function FormatContext({ context, componente }) {
       user: contexts.user,
       team: contexts.team,
       method: contexts.deale[0].metodo_pago,
+      OC: contexts.deale[0].orden_de_compra,
+      rut_pagador: contexts.deale[0].rut_pagador,
       authorization_code: contexts.deale[0].codigos_de_autorizacion,
       payment_count: contexts.deale[0].cantidad_de_pagos,
       payment_amount: contexts.deale[0].amount,
@@ -138,6 +141,7 @@ export default function FormatContext({ context, componente }) {
       const resDB = await result.json();
       console.log("base", resDB[0], datas);
       resDB[0] === "P2002"  ? setErrorStatus(true) : null;
+      resDB[0] === "P2009"  ? setErrorStatus2(true) : null;
       setStatusQ(true);
     } catch (e) {
       
@@ -159,7 +163,10 @@ export default function FormatContext({ context, componente }) {
 {errorStatus ? <div className="mt-5 mb-5 bg-orange-700/90 border border-gray-300 text-center text-gray-900 text-md rounded-lg hover:bg-orange-600/90 focus:ring-blue-500 focus:border-blue-500 block w-96 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
  >Este pedido ya fue ingresado! Intenta con otro.</div> : null}
 
-{statusQ && !errorStatus  ? componente : null}
+{errorStatus2 ? <div className="mt-5 mb-5 bg-orange-700/90 border border-gray-300 text-center text-gray-900 text-md rounded-lg hover:bg-orange-600/90 focus:ring-blue-500 focus:border-blue-500 block w-96 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+ >Este negocio está incompleto y no pudo ser cargado, revisa los datos obligatorios e intenta nuevamente.</div> : null}
+
+{statusQ && !errorStatus && !errorStatus2  ? componente : null}
 
       {/* <button onClick={userSender}>Guarda Ownera</button> */}
     </div>

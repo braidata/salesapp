@@ -47,6 +47,8 @@ export default async function handler(
   const payment_count = req.body.payment_count;
   const payment_amount = req.body.payment_amount;
   const payment_date = req.body.payment_date;
+  const rut_pagador = req.body.rut_pagador;
+  const OC = req.body.OC;
   const order_items = req.body.order_items;
 
   
@@ -75,12 +77,11 @@ export default async function handler(
 
   const prisma = new PrismaClient();
   //data types
-  
- 
-
 
   try {
     const orderA = await prisma.orders.create({
+
+      
       
       data: {
         customer_name,
@@ -116,13 +117,16 @@ export default async function handler(
         dealId,
         ownerId,
         ownerIdM,
+        OC,
         payments: {
           create: {
             method,
+            rut_pagador,
             authorization_code,
             payment_count,
             payment_amount,
-            payment_date
+            payment_date,
+            
           }
         },
 

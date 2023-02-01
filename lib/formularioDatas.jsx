@@ -84,6 +84,8 @@ export default function FormatContext({ context, componente }) {
         Shipping_zip_code: contexts.shippingAddress.Código_Postal,
         user: session.token.email,
         team: session.token.sub,
+        rut_pagador: contexts.payment.rut_pagador,
+        OC: contexts.payment.orden_de_compra,
         method: contexts.payment.Metodo_de_Pago,
         authorization_code: contexts.payment.Código_de_Autorización,
         payment_count: contexts.payment.Cantidad_de_Pagos,
@@ -168,7 +170,8 @@ console.log("rey", product.filter(function(element) {
         const result = response;
         const resDB = await result.json();
         console.log("base", resDB[0], datas);
-        resDB[0] === "P2002"  ? setErrorStatus(true) : null;
+        resDB[0] === "P2002" || resDB[0] === "P2009" ? setErrorStatus(true) : null;
+        //resDB[0] === "P2009"  ? setErrorStatus(true) : null;
         setStatusQ(true);
       } catch (e) {
         
@@ -192,7 +195,7 @@ console.log("rey", product.filter(function(element) {
   
   {statusQ && !errorStatus  ? componente : null}
   
-        <button onClick={userSender}>Guarda Ownera</button>
+        {/* <button onClick={userSender}>Guarda Ownera</button> */}
       </div>
     );
   }

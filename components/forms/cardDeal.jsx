@@ -32,9 +32,9 @@ export default function DealCard({
   const nameChanger = () => {
     setClicks(clicks + 1);
     setName("Validar");
-    clicks >= 2 ? setName("Enviar") : setName("Validar");
-    clicks === 3 && setName("Finalizar");
-    clicks >= 4 && setName("Enviado");
+    clicks >= 2 ? setName("Cargar") : setName("Validar");
+    clicks === 3 && setName("Siguiente");
+    clicks >= 4 && setName("Cargado");
     console.log("Cuántos clicks: ", clicks);
 
     clicks >= 4 ? setIsDisabled(true) : setIsDisabled(false);

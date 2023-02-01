@@ -59,21 +59,19 @@ model orders {
   dateSAP                             String?       @db.VarChar(255)
   ownerIdM                            String?
   team                                String?       @db.VarChar(255)
-  OC                                  String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
 
 model payments {
-  id                 Int     @id @default(autoincrement())
+  id                 Int    @id @default(autoincrement())
   order_id           Int
-  method             String  @db.VarChar(255)
-  authorization_code String  @db.VarChar(255)
-  payment_count      String  @db.VarChar(255)
-  payment_amount     String  @db.VarChar(255)
-  payment_date       String  @db.VarChar(255)
-  rut_pagador        String? @db.VarChar(255)
-  orders             orders  @relation(fields: [order_id], references: [id])
+  method             String @db.VarChar(255)
+  authorization_code String @db.VarChar(255)
+  payment_count      String @db.VarChar(255)
+  payment_amount     String @db.VarChar(255)
+  payment_date       String @db.VarChar(255)
+  orders             orders @relation(fields: [order_id], references: [id])
 
   @@index([order_id])
 }
@@ -88,60 +86,4 @@ model users {
   permissions String? @db.VarChar(255)
   rol         String? @db.VarChar(255)
   team        String? @db.VarChar(255)
-}
-
-model a247618_f2e5_5c3d_ab7f_a9c6d42101a6_20230128025639_vrepl {
-  id                                  Int       @id @default(autoincrement())
-  customer_name                       String    @db.VarChar(255)
-  customer_rut                        String    @db.VarChar(255)
-  customer_email                      String    @db.VarChar(255)
-  customer_phone                      String    @db.VarChar(255)
-  billing_street                      String    @db.VarChar(255)
-  billing_number                      String    @db.VarChar(255)
-  billing_department                  String    @db.VarChar(255)
-  billing_region                      String    @db.VarChar(255)
-  billing_city                        String    @db.VarChar(255)
-  billing_commune                     String    @db.VarChar(255)
-  billing_zip_code                    String    @db.VarChar(255)
-  billing_company_name                String    @db.VarChar(255)
-  billing_company_rut                 String    @db.VarChar(255)
-  billing_company_business            String    @db.VarChar(255)
-  Shipping_Tipo_de_Despacho           String    @db.VarChar(255)
-  Shipping_Fecha_de_Despacho_o_Retiro String    @db.VarChar(255)
-  Shipping_Rut_Retira                 String?   @db.VarChar(255)
-  Shipping_Nombre_Retira              String?   @db.VarChar(255)
-  Shipping_Observacion                String?   @db.VarChar(255)
-  Shipping_flete                      String    @db.VarChar(255)
-  customer_last_name                  String    @db.VarChar(255)
-  user                                String    @db.VarChar(255)
-  dealId                              String    @unique(map: "orders_dealId_key") @db.VarChar(255)
-  Shipping_city                       String?   @default("sin envio") @db.VarChar(255)
-  Shipping_commune                    String?   @default("sin envio") @db.VarChar(255)
-  Shipping_department                 String?   @default("sin envio") @db.VarChar(255)
-  Shipping_number                     String?   @default("sin envio") @db.VarChar(255)
-  Shipping_region                     String?   @default("sin envio") @db.VarChar(255)
-  Shipping_street                     String?   @default("sin envio") @db.VarChar(255)
-  Shipping_zip_code                   String?   @default("sin envio") @db.VarChar(255)
-  order_date                          DateTime? @default(now())
-  ownerId                             Int?
-  sapID                               String?   @db.VarChar(255)
-  statusSAP                           String?   @db.VarChar(255)
-  dateSAP                             String?   @db.VarChar(255)
-  ownerIdM                            String?
-  team                                String?   @db.VarChar(255)
-
-  @@map("_1a247618_f2e5_5c3d_ab7f_a9c6d42101a6_20230128025639_vrepl")
-}
-
-model ac5c2_e8b3_531e_bfa1_7f900bae764c_20230128025644_vrepl {
-  id                 Int    @id @default(autoincrement())
-  order_id           Int
-  method             String @db.VarChar(255)
-  authorization_code String @db.VarChar(255)
-  payment_count      String @db.VarChar(255)
-  payment_amount     String @db.VarChar(255)
-  payment_date       String @db.VarChar(255)
-
-  @@index([order_id], map: "payments_order_id_idx")
-  @@map("_527ac5c2_e8b3_531e_bfa1_7f900bae764c_20230128025644_vrepl")
 }
