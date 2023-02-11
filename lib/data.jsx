@@ -1,6 +1,6 @@
 // import SelectLocalidades from "../components/forms/selectLocalidades";
 
-let rut = "231579893";
+let rut = "781094706";
 const id = Math.random(10,200).toString(36)
 const date = '1988-12-22';
 
@@ -38,19 +38,19 @@ const campos2 = [
     campo: "billing.Razón_Social",
     type: "text",
     detalle: "Ingresa la Razón Social",
-    valua: "Fabrica de Chivitos",
+    valua: "INDUSTRIAS DE ALIMENTOS TRENDY S.A.",
   },
   {
     campo: "billing.Rut_Empresa",
     type: "text",
     detalle: "Ingresa tu Rut de Empresa",
-    valua: "966848502",
+    valua: "781094706",
   },
   {
     campo: "billing.Giro",
     type: "text",
     detalle: "Ingresa tu Giro",
-    valua: "Sanguchería",
+    valua: "HELADOS",
   },
 ];
 const campos1 = [
@@ -90,13 +90,13 @@ const dirFac1 = [
     campo: "billingAddress.Calle",
     type: "street",
     detalle: "Calle de Facturación",
-    valua: "El Sultan de Berlin",
+    valua: "LO ZAÑARTU",
   },
   {
     campo: "billingAddress.Número",
     type: "text",
     detalle: "Número de Dirección Facturación",
-    valua: "7666",
+    valua: "11",
   },
   {
     campo: "billingAddress.Departamento",
@@ -130,7 +130,7 @@ const dirFac1 = [
   },
 ];
 const dirEnv1 = [
-  { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
+  { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "Calle Manuel Rodriguez" },
   { campo: "shippingAddress.Numero", type: "text", detalle: "Numero de Envío", valua: "15487" },
   { campo: "shippingAddress.Casa_o_depto", type: "text", detalle: "Casa o depto de Envío", valua: "1100" },
   { campo: "shippingAddress.Comuna", type: "town", detalle: "Comuna de Envío", valua: "Antofagasta" },
@@ -144,11 +144,11 @@ const dirEnv1 = [
   },
 ];
 const products1 = [
-  { campo: "products.SKU", type: "text", detalle: "SKU", valua: "103011100044" },
-  { campo: "products.Nombre_Producto", type: "text", detalle: "Nombre", valua: "HORNO VHG DE 1 CÁMARA GAS" },
-  { campo: "products.Precio", type: "text", detalle: "Precio", valua: "299990" },
-  { campo: "products.Cantidad", type: "text", detalle: "Cantidad", valua: "15" },
-  { campo: "products.Flete", type: "text", detalle: "Flete", valua: "15990" },
+  { campo: "products.SKU", type: "text", detalle: "SKU", valua: "100021" },
+  { campo: "products.Nombre_Producto", type: "text", detalle: "Nombre", valua: "LAVAPLATOS 2 TAZAS SECADOR VENELP-160SD" },
+  { campo: "products.Precio", type: "text", detalle: "Precio", valua: "150000" },
+  { campo: "products.Cantidad", type: "text", detalle: "Cantidad", valua: "5" },
+  { campo: "products.Flete", type: "text", detalle: "Flete", valua: "0" },
 ];
 const pago1 = [
   {
@@ -162,7 +162,7 @@ const pago1 = [
     campo: "payment.rut_pagador",
     type: "text",
     detalle: "Rut del Pagador",
-  valua: "15020576k"
+  valua: "77261280K"
   },
   {
     campo: "payment.orden_de_compra",

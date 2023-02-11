@@ -1,0 +1,4141 @@
+{
+    "update": [
+        {
+            "id": 173271,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T22:12:51",
+            "date_modified": "2023-02-08T11:59:42",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "7841",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "61521",
+            "total_tax": "0",
+            "customer_id": 18692,
+            "order_key": "wc_order_JZwuPXhBUv6rb",
+            "billing": {
+                "first_name": "Carlos",
+                "last_name": "Montes carrasco",
+                "company": "",
+                "address_1": "Los copihues",
+                "address_2": "",
+                "city": "BIOBÍO",
+                "state": "228",
+                "postcode": "",
+                "country": "CL",
+                "email": "marketroble@gmail.com",
+                "phone": "956167980"
+            },
+            "shipping": {
+                "first_name": "Lorena",
+                "last_name": "Carrasco",
+                "company": "",
+                "address_1": "Eleuterio Ramírez 121",
+                "address_2": "",
+                "city": "BIOBÍO",
+                "state": "228",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "190.47.149.42",
+            "customer_user_agent": "Mozilla/5.0 (Linux; Android 10; POT-LX3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "Casa rosada frente a una placita",
+            "date_completed": null,
+            "date_paid": "2023-01-23T22:13:49",
+            "cart_hash": "291fb230e154ee88c3d908b6a066613a",
+            "number": "173271",
+            "meta_data": [
+                {
+                    "id": 6810711,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6810712,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6810713,
+                    "key": "_billing_rut",
+                    "value": "17887316-4"
+                },
+                {
+                    "id": 6810714,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "77682287-6"
+                },
+                {
+                    "id": 6810715,
+                    "key": "_billing_giro",
+                    "value": "Mininarket"
+                },
+                {
+                    "id": 6810716,
+                    "key": "_billing_razon_social",
+                    "value": "Comercial Carlos Andres montes"
+                },
+                {
+                    "id": 6810717,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "Mininarket el roble"
+                },
+                {
+                    "id": 6810718,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "100"
+                },
+                {
+                    "id": 6810719,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810720,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "121"
+                },
+                {
+                    "id": 6810721,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810722,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6810723,
+                    "key": "RUT",
+                    "value": "17887316-4"
+                },
+                {
+                    "id": 6810730,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6810732,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6810733,
+                    "key": "buyOrder",
+                    "value": "173271"
+                },
+                {
+                    "id": 6810734,
+                    "key": "authorizationCode",
+                    "value": "333532"
+                },
+                {
+                    "id": 6810735,
+                    "key": "cardNumber",
+                    "value": "3323"
+                },
+                {
+                    "id": 6810736,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Deb&iacute;to"
+                },
+                {
+                    "id": 6810737,
+                    "key": "amount",
+                    "value": "61521"
+                },
+                {
+                    "id": 6810738,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6810739,
+                    "key": "transactionDate",
+                    "value": "23-01-2023 / 22:12:54"
+                },
+                {
+                    "id": 6810740,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811116,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183409,
+                    "name": "Balanza Digital 40 Kg B40",
+                    "product_id": 35681,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "24690",
+                    "subtotal_tax": "0",
+                    "total": "24690",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585672,
+                            "key": "_regular_price",
+                            "value": "24690",
+                            "display_key": "_regular_price",
+                            "display_value": "24690"
+                        },
+                        {
+                            "id": 1585690,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "102012300002",
+                    "price": 24690,
+                    "image": {
+                        "id": "56210",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2020/02/Balanza-Digital-B-40.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                },
+                {
+                    "id": 183410,
+                    "name": "Balanza Digital 40 kg Visor Aéreo B40VA",
+                    "product_id": 44754,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "28990",
+                    "subtotal_tax": "0",
+                    "total": "28990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585682,
+                            "key": "_regular_price",
+                            "value": "28990",
+                            "display_key": "_regular_price",
+                            "display_value": "28990"
+                        },
+                        {
+                            "id": 1585691,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "102012300001",
+                    "price": 28990,
+                    "image": {
+                        "id": "56218",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2020/02/Balanza-digital-B-40VA.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183411,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "7841",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585688,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585689,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173271/?pay_for_order=true&key=wc_order_JZwuPXhBUv6rb",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-24T01:12:51",
+            "date_modified_gmt": "2023-02-08T14:59:42",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-24T01:13:49",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173271"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ],
+                "customer": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/customers/18692"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173144,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-20T11:37:43",
+            "date_modified": "2023-02-08T11:59:45",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "91314",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "961304",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_KIviJWvhb3yO5",
+            "billing": {
+                "first_name": "Victoria",
+                "last_name": "Martinez Santana",
+                "company": "",
+                "address_1": "Pedro Lagos",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "328",
+                "postcode": "",
+                "country": "CL",
+                "email": "victoriamsantana.991@gmail.com",
+                "phone": "953375911"
+            },
+            "shipping": {
+                "first_name": "Victoria",
+                "last_name": "Martinez Santana",
+                "company": "",
+                "address_1": "Pedro Lagos",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "328",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "bacs",
+            "payment_method_title": "Transferencia Bancaria",
+            "transaction_id": "",
+            "customer_ip_address": "190.107.228.82",
+            "customer_user_agent": "Mozilla/5.0 (Linux; Android 12; moto g51 5G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "",
+            "date_completed": null,
+            "date_paid": "2023-01-23T12:08:38",
+            "cart_hash": "f8c225097bbee974239f96cfe97c09fc",
+            "number": "173144",
+            "meta_data": [
+                {
+                    "id": 6805955,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6805956,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6805957,
+                    "key": "_billing_rut",
+                    "value": "18133900-4"
+                },
+                {
+                    "id": 6805958,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "18133900-4"
+                },
+                {
+                    "id": 6805959,
+                    "key": "_billing_giro",
+                    "value": "Venta de alcohol"
+                },
+                {
+                    "id": 6805960,
+                    "key": "_billing_razon_social",
+                    "value": "Victoria Martinez santana"
+                },
+                {
+                    "id": 6805961,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "El infierno"
+                },
+                {
+                    "id": 6805962,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "527"
+                },
+                {
+                    "id": 6805963,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6805964,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "527"
+                },
+                {
+                    "id": 6805965,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6805966,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6805967,
+                    "key": "RUT",
+                    "value": "18133900-4"
+                },
+                {
+                    "id": 6805973,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6809272,
+                    "key": "_billing_comuna",
+                    "value": "cargando"
+                },
+                {
+                    "id": 6809273,
+                    "key": "_billing_mail",
+                    "value": ""
+                },
+                {
+                    "id": 6809274,
+                    "key": "_shipping_comuna",
+                    "value": "cargando"
+                },
+                {
+                    "id": 6809278,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6811098,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837807,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183259,
+                    "name": "Conservadora Triple Función Tapa de Vidrio Curvo CTV720Q",
+                    "product_id": 35099,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "869990",
+                    "subtotal_tax": "0",
+                    "total": "869990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1584359,
+                            "key": "_regular_price",
+                            "value": "990990",
+                            "display_key": "_regular_price",
+                            "display_value": "990990"
+                        },
+                        {
+                            "id": 1584367,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "101012900027",
+                    "price": 869990,
+                    "image": {
+                        "id": "154391",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2022/05/CTV720Q_1-copia.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183260,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "91314",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1584365,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1584366,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173144/?pay_for_order=true&key=wc_order_KIviJWvhb3yO5",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-20T14:37:43",
+            "date_modified_gmt": "2023-02-08T14:59:45",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T15:08:38",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173144"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173170,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-20T18:07:33",
+            "date_modified": "2023-02-08T11:59:48",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "8954",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "449944",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_V27zQrPhMBJoO",
+            "billing": {
+                "first_name": "Odlan",
+                "last_name": "fernandez",
+                "company": "",
+                "address_1": "Las pelargonias 842",
+                "address_2": "",
+                "city": "VALPARAÍSO",
+                "state": "45",
+                "postcode": "",
+                "country": "CL",
+                "email": "ferraros.spa@gmai.com",
+                "phone": "944578957"
+            },
+            "shipping": {
+                "first_name": "Odlan",
+                "last_name": "fernandez",
+                "company": "",
+                "address_1": "costa de montemar",
+                "address_2": "",
+                "city": "VALPARAÍSO",
+                "state": "45",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "bacs",
+            "payment_method_title": "Transferencia Bancaria",
+            "transaction_id": "",
+            "customer_ip_address": "186.78.243.161",
+            "customer_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "Dejar en conserjeria a nombre de odlan fernandez o maria jose aros.",
+            "date_completed": null,
+            "date_paid": "2023-01-23T09:56:25",
+            "cart_hash": "c7d627e5f5c0c832b8bfdee6b86f34a6",
+            "number": "173170",
+            "meta_data": [
+                {
+                    "id": 6806866,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6806867,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6806868,
+                    "key": "_billing_rut",
+                    "value": "16976348-8"
+                },
+                {
+                    "id": 6806869,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "77479935-4"
+                },
+                {
+                    "id": 6806870,
+                    "key": "_billing_giro",
+                    "value": "Peluquería y otros tratamientos de belleza"
+                },
+                {
+                    "id": 6806871,
+                    "key": "_billing_razon_social",
+                    "value": "ferraros spa"
+                },
+                {
+                    "id": 6806872,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "rokos barberclub"
+                },
+                {
+                    "id": 6806873,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "Local 19"
+                },
+                {
+                    "id": 6806874,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6806875,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "186"
+                },
+                {
+                    "id": 6806876,
+                    "key": "_shipping_Numero_dpto",
+                    "value": "DPTO1504"
+                },
+                {
+                    "id": 6806877,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6806878,
+                    "key": "RUT",
+                    "value": "16976348-8"
+                },
+                {
+                    "id": 6806884,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6809171,
+                    "key": "_billing_comuna",
+                    "value": "cargando"
+                },
+                {
+                    "id": 6809172,
+                    "key": "_billing_mail",
+                    "value": ""
+                },
+                {
+                    "id": 6809173,
+                    "key": "_shipping_comuna",
+                    "value": "cargando"
+                },
+                {
+                    "id": 6809177,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6811094,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837809,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183293,
+                    "name": "Máquina de Café GAIA4S",
+                    "product_id": 32013,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "440990",
+                    "subtotal_tax": "0",
+                    "total": "440990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1584660,
+                            "key": "_regular_price",
+                            "value": "440990",
+                            "display_key": "_regular_price",
+                            "display_value": "440990"
+                        },
+                        {
+                            "id": 1584668,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "103012200065",
+                    "price": 440990,
+                    "image": {
+                        "id": "49875",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2018/03/Máquina-Expendedora-de-Bebidas-Calientes-GAIA-4S-Ventus.png"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183294,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "8954",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1584666,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1584667,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173170/?pay_for_order=true&key=wc_order_V27zQrPhMBJoO",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-20T21:07:33",
+            "date_modified_gmt": "2023-02-08T14:59:48",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T12:56:25",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173170"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173245,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T14:09:38",
+            "date_modified": "2023-02-08T11:59:53",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "12259",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "202249",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_4uyZdtY5ZCVSQ",
+            "billing": {
+                "first_name": "Carlos",
+                "last_name": "Sepulveda fredes",
+                "company": "",
+                "address_1": "Baquedano 489",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "357",
+                "postcode": "",
+                "country": "CL",
+                "email": "profesepulvedafredes@hotmail.com",
+                "phone": "959609449"
+            },
+            "shipping": {
+                "first_name": "Carlos",
+                "last_name": "Sepulveda fredes",
+                "company": "",
+                "address_1": "Baquedano 489",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "357",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "181.226.73.97",
+            "customer_user_agent": "Mozilla/5.0 (Linux; Android 10; MAR-LX3A) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "Tienda de vestuario femenino crisalida horario de atención de 11 a 13.30 hrs y 15.00 a 19.00 hrs",
+            "date_completed": null,
+            "date_paid": "2023-01-23T14:12:30",
+            "cart_hash": "64e4a9b6a31218aa3255d72d64c780c4",
+            "number": "173245",
+            "meta_data": [
+                {
+                    "id": 6809510,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6809511,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6809512,
+                    "key": "_billing_rut",
+                    "value": "15026960-1"
+                },
+                {
+                    "id": 6809513,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "77603535-1"
+                },
+                {
+                    "id": 6809514,
+                    "key": "_billing_giro",
+                    "value": "Otras actividades"
+                },
+                {
+                    "id": 6809515,
+                    "key": "_billing_razon_social",
+                    "value": "Servicios seromca"
+                },
+                {
+                    "id": 6809516,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "Servicios seromca"
+                },
+                {
+                    "id": 6809517,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "Tienda vestuario crisalida"
+                },
+                {
+                    "id": 6809518,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6809519,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "Tienda vestuario crisalida"
+                },
+                {
+                    "id": 6809520,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6809521,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6809522,
+                    "key": "RUT",
+                    "value": "15026960-1"
+                },
+                {
+                    "id": 6809576,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6809578,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6809579,
+                    "key": "buyOrder",
+                    "value": "173245"
+                },
+                {
+                    "id": 6809580,
+                    "key": "authorizationCode",
+                    "value": "008122"
+                },
+                {
+                    "id": 6809581,
+                    "key": "cardNumber",
+                    "value": "1318"
+                },
+                {
+                    "id": 6809582,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Deb&iacute;to"
+                },
+                {
+                    "id": 6809583,
+                    "key": "amount",
+                    "value": "202249"
+                },
+                {
+                    "id": 6809584,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6809585,
+                    "key": "transactionDate",
+                    "value": "23-01-2023 / 14:09:43"
+                },
+                {
+                    "id": 6809586,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811101,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837811,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183375,
+                    "name": "Exprimidor de cítricos inox Skymsen ESB-N",
+                    "product_id": 171219,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "189990",
+                    "subtotal_tax": "0",
+                    "total": "189990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585374,
+                            "key": "_regular_price",
+                            "value": "189990",
+                            "display_key": "_regular_price",
+                            "display_value": "189990"
+                        },
+                        {
+                            "id": 1585398,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "102009300001",
+                    "price": 189990,
+                    "image": {
+                        "id": "171220",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2022/12/1_1500x1500-5.png"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183376,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "12259",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585380,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585381,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173245/?pay_for_order=true&key=wc_order_4uyZdtY5ZCVSQ",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-23T17:09:38",
+            "date_modified_gmt": "2023-02-08T14:59:53",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T17:12:30",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173245"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173249,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T14:58:31",
+            "date_modified": "2023-02-08T11:59:55",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "4968",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "25558",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_FSg6fanByM9Bd",
+            "billing": {
+                "first_name": "Mara",
+                "last_name": "Crdenas Torres",
+                "company": "",
+                "address_1": "Calle dieciocho",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "357",
+                "postcode": "",
+                "country": "CL",
+                "email": "angelicamateos@gmail.com",
+                "phone": "985955995"
+            },
+            "shipping": {
+                "first_name": "Mara",
+                "last_name": "Crdenas Torres",
+                "company": "",
+                "address_1": "Calle dieciocho",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "357",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "woo-mercado-pago-custom",
+            "payment_method_title": "Paga con tarjetas de débito y crédito",
+            "transaction_id": "",
+            "customer_ip_address": "201.239.188.106",
+            "customer_user_agent": "Mozilla/5.0 (Linux; Android 12; SM-G985F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "La Española",
+            "date_completed": null,
+            "date_paid": "2023-01-23T14:59:39",
+            "cart_hash": "72e3733cda925d4c31cef561f46e47a7",
+            "number": "173249",
+            "meta_data": [
+                {
+                    "id": 6809742,
+                    "key": "_billing_documento",
+                    "value": "boleta"
+                },
+                {
+                    "id": 6809743,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6809744,
+                    "key": "_billing_rut",
+                    "value": "4231536-2"
+                },
+                {
+                    "id": 6809745,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "190"
+                },
+                {
+                    "id": 6809746,
+                    "key": "_billing_Numero_dpto",
+                    "value": "Local 1"
+                },
+                {
+                    "id": 6809747,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "190"
+                },
+                {
+                    "id": 6809748,
+                    "key": "_shipping_Numero_dpto",
+                    "value": "LOCAL1"
+                },
+                {
+                    "id": 6809749,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6809750,
+                    "key": "RUT",
+                    "value": "4231536-2"
+                },
+                {
+                    "id": 6809751,
+                    "key": "is_production_mode",
+                    "value": "yes"
+                },
+                {
+                    "id": 6809752,
+                    "key": "_used_gateway",
+                    "value": "WC_WooMercadoPago_Notification_Webhook"
+                },
+                {
+                    "id": 6809754,
+                    "key": "Email del comprador",
+                    "value": "angelicamateos@gmail.com"
+                },
+                {
+                    "id": 6809755,
+                    "key": "Tipo de método de pago",
+                    "value": "debit_card"
+                },
+                {
+                    "id": 6809756,
+                    "key": "Método de pago",
+                    "value": "debvisa"
+                },
+                {
+                    "id": 6809757,
+                    "key": "Mercado Pago - Payment 53933124290",
+                    "value": "[Date 2023-01-23 17:59:36]/[Amount 25558]/[Paid 25558]/[Coupon 0]/[Refund 0]"
+                },
+                {
+                    "id": 6809758,
+                    "key": "_Mercado_Pago_Payment_IDs",
+                    "value": "53933124290"
+                },
+                {
+                    "id": 6809765,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6809767,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811103,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837812,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183381,
+                    "name": "Sobadora Manual Sobremesa VSS280Mirella",
+                    "product_id": 38477,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "20590",
+                    "subtotal_tax": "0",
+                    "total": "20590",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585424,
+                            "key": "_regular_price",
+                            "value": "20590",
+                            "display_key": "_regular_price",
+                            "display_value": "20590"
+                        },
+                        {
+                            "id": 1585432,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "102014100009",
+                    "price": 20590,
+                    "image": {
+                        "id": "82721",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2021/02/Sobadora-Manual-Sobremesa-VSS-280Mirella_0004_01.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183382,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "4968",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585430,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585431,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173249/?pay_for_order=true&key=wc_order_FSg6fanByM9Bd",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-23T17:58:31",
+            "date_modified_gmt": "2023-02-08T14:59:55",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T17:59:39",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173249"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173251,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T16:16:31",
+            "date_modified": "2023-02-08T11:59:58",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "3884",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "46674",
+            "total_tax": "0",
+            "customer_id": 18689,
+            "order_key": "wc_order_2IT6YK1YFeocC",
+            "billing": {
+                "first_name": "Francisco Javier",
+                "last_name": "Arriaza Barra",
+                "company": "",
+                "address_1": "Galvarino",
+                "address_2": "",
+                "city": "BIOBÍO",
+                "state": "232",
+                "postcode": "",
+                "country": "CL",
+                "email": "fco.arriaza.b@gmail.com",
+                "phone": "975780765"
+            },
+            "shipping": {
+                "first_name": "Francisco Javier",
+                "last_name": "Arriaza Barra",
+                "company": "",
+                "address_1": "Galvarino",
+                "address_2": "",
+                "city": "BIOBÍO",
+                "state": "232",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "190.54.144.161",
+            "customer_user_agent": "Mozilla/5.0 (Linux; Android 12; M2012K11AG) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "",
+            "date_completed": null,
+            "date_paid": "2023-01-23T16:27:04",
+            "cart_hash": "43b73c7a8181261dfea025726604298c",
+            "number": "173251",
+            "meta_data": [
+                {
+                    "id": 6809943,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6809944,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6809945,
+                    "key": "_billing_rut",
+                    "value": "16986044-0"
+                },
+                {
+                    "id": 6809946,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "16986044-0"
+                },
+                {
+                    "id": 6809947,
+                    "key": "_billing_giro",
+                    "value": "Comida rápida"
+                },
+                {
+                    "id": 6809948,
+                    "key": "_billing_razon_social",
+                    "value": "Francisco Arriaza"
+                },
+                {
+                    "id": 6809949,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "Sushi PacMan"
+                },
+                {
+                    "id": 6809950,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "500"
+                },
+                {
+                    "id": 6809951,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6809952,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "500"
+                },
+                {
+                    "id": 6809953,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6809955,
+                    "key": "RUT",
+                    "value": "16986044-0"
+                },
+                {
+                    "id": 6809973,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6809981,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6809983,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6809984,
+                    "key": "buyOrder",
+                    "value": "173251"
+                },
+                {
+                    "id": 6809985,
+                    "key": "authorizationCode",
+                    "value": "000002"
+                },
+                {
+                    "id": 6809986,
+                    "key": "cardNumber",
+                    "value": "9585"
+                },
+                {
+                    "id": 6809987,
+                    "key": "paymentCodeResult",
+                    "value": "Sin cuotas"
+                },
+                {
+                    "id": 6809988,
+                    "key": "amount",
+                    "value": "46674"
+                },
+                {
+                    "id": 6809989,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6809990,
+                    "key": "transactionDate",
+                    "value": "23-01-2023 / 16:26:31"
+                },
+                {
+                    "id": 6809991,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811105,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183387,
+                    "name": "Picadora de papas y cebollas corte de 8mm VPPC8",
+                    "product_id": 67562,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "42790",
+                    "subtotal_tax": "0",
+                    "total": "42790",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585476,
+                            "key": "_regular_price",
+                            "value": "42790",
+                            "display_key": "_regular_price",
+                            "display_value": "42790"
+                        },
+                        {
+                            "id": 1585484,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "102012200109",
+                    "price": 42790,
+                    "image": {
+                        "id": "103489",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2021/05/Picadora-de-papas-y-cebollas-corte-de-10mm-VPPC-10_0003_VPPC-10_03.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183388,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "3884",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585482,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585483,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173251/?pay_for_order=true&key=wc_order_2IT6YK1YFeocC",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-23T19:16:31",
+            "date_modified_gmt": "2023-02-08T14:59:58",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T19:27:04",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173251"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ],
+                "customer": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/customers/18689"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173258,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T17:15:37",
+            "date_modified": "2023-02-08T12:00:03",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "62720",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "662710",
+            "total_tax": "0",
+            "customer_id": 18691,
+            "order_key": "wc_order_vU9P3NnfFQj12",
+            "billing": {
+                "first_name": "josefina",
+                "last_name": "pino",
+                "company": "",
+                "address_1": "los clarines",
+                "address_2": "",
+                "city": "O'HIGGINS",
+                "state": "82",
+                "postcode": "",
+                "country": "CL",
+                "email": "egonzalezpino@yahoo.es",
+                "phone": "950038438"
+            },
+            "shipping": {
+                "first_name": "josefina",
+                "last_name": "pino",
+                "company": "",
+                "address_1": "los clarines",
+                "address_2": "",
+                "city": "O'HIGGINS",
+                "state": "82",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "201.215.91.148",
+            "customer_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "",
+            "date_completed": null,
+            "date_paid": "2023-01-23T17:18:36",
+            "cart_hash": "4d62e2c0593c98f4bd4b2dedc883a93a",
+            "number": "173258",
+            "meta_data": [
+                {
+                    "id": 6810249,
+                    "key": "_billing_documento",
+                    "value": "boleta"
+                },
+                {
+                    "id": 6810250,
+                    "key": "_billing_fijo",
+                    "value": "950038438"
+                },
+                {
+                    "id": 6810251,
+                    "key": "_billing_rut",
+                    "value": "7467706-1"
+                },
+                {
+                    "id": 6810252,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "1434"
+                },
+                {
+                    "id": 6810253,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810254,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "1434"
+                },
+                {
+                    "id": 6810255,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810256,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6810257,
+                    "key": "RUT",
+                    "value": "7467706-1"
+                },
+                {
+                    "id": 6810258,
+                    "key": "is_production_mode",
+                    "value": "yes"
+                },
+                {
+                    "id": 6810259,
+                    "key": "_used_gateway",
+                    "value": "WC_WooMercadoPago_Notification_Webhook"
+                },
+                {
+                    "id": 6810260,
+                    "key": "mp_installments",
+                    "value": "1"
+                },
+                {
+                    "id": 6810261,
+                    "key": "mp_transaction_details",
+                    "value": "662710"
+                },
+                {
+                    "id": 6810262,
+                    "key": "mp_transaction_amount",
+                    "value": "662710"
+                },
+                {
+                    "id": 6810263,
+                    "key": "mp_total_paid_amount",
+                    "value": "662710"
+                },
+                {
+                    "id": 6810264,
+                    "key": "Tipo de método de pago",
+                    "value": "debit_card"
+                },
+                {
+                    "id": 6810265,
+                    "key": "Método de pago",
+                    "value": "debvisa"
+                },
+                {
+                    "id": 6810266,
+                    "key": "Mercado Pago - Payment 53937490290",
+                    "value": "[Date 2023-01-23 20:15:39]/[Amount 662710]/[Paid 662710]/[Coupon 0]/[Refund 0]"
+                },
+                {
+                    "id": 6810267,
+                    "key": "_Mercado_Pago_Payment_IDs",
+                    "value": "53937490290"
+                },
+                {
+                    "id": 6810276,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6810278,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6810279,
+                    "key": "buyOrder",
+                    "value": "173258"
+                },
+                {
+                    "id": 6810280,
+                    "key": "authorizationCode",
+                    "value": "829282"
+                },
+                {
+                    "id": 6810281,
+                    "key": "cardNumber",
+                    "value": "8745"
+                },
+                {
+                    "id": 6810282,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Deb&iacute;to"
+                },
+                {
+                    "id": 6810283,
+                    "key": "amount",
+                    "value": "662710"
+                },
+                {
+                    "id": 6810284,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6810285,
+                    "key": "transactionDate",
+                    "value": "23-01-2023 / 17:16:26"
+                },
+                {
+                    "id": 6811109,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183398,
+                    "name": "Conservadora Triple Función Tapa Sólida CTVD600",
+                    "product_id": 35278,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "599990",
+                    "subtotal_tax": "0",
+                    "total": "599990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585572,
+                            "key": "_regular_price",
+                            "value": "623990",
+                            "display_key": "_regular_price",
+                            "display_value": "623990"
+                        },
+                        {
+                            "id": 1585580,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "101012900033",
+                    "price": 599990,
+                    "image": {
+                        "id": "50199",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2018/06/Conservadora-Tapa-Solida-CTVD-600.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183399,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "62720",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585578,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585579,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173258/?pay_for_order=true&key=wc_order_vU9P3NnfFQj12",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-23T20:15:37",
+            "date_modified_gmt": "2023-02-08T15:00:03",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T20:18:36",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173258"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ],
+                "customer": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/customers/18691"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173261,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T17:38:05",
+            "date_modified": "2023-02-08T12:00:08",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "42834",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "581814",
+            "total_tax": "0",
+            "customer_id": 18690,
+            "order_key": "wc_order_8M4ndh5ljpHDu",
+            "billing": {
+                "first_name": "john",
+                "last_name": "Aedo",
+                "company": "",
+                "address_1": "avenida olimpia",
+                "address_2": "",
+                "city": "ARAUCANÍA",
+                "state": "271",
+                "postcode": "",
+                "country": "CL",
+                "email": "John.aedo93@gmail.com",
+                "phone": "978811784"
+            },
+            "shipping": {
+                "first_name": "john",
+                "last_name": "Aedo",
+                "company": "",
+                "address_1": "avenida olimpia",
+                "address_2": "",
+                "city": "ARAUCANÍA",
+                "state": "271",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "200.126.105.85",
+            "customer_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "torre 2, depto 306",
+            "date_completed": null,
+            "date_paid": "2023-01-23T17:40:02",
+            "cart_hash": "4da9116c7793273d3dce2934d40819f2",
+            "number": "173261",
+            "meta_data": [
+                {
+                    "id": 6810361,
+                    "key": "_billing_documento",
+                    "value": "boleta"
+                },
+                {
+                    "id": 6810362,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6810363,
+                    "key": "_billing_rut",
+                    "value": "18587983-6"
+                },
+                {
+                    "id": 6810364,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "1720"
+                },
+                {
+                    "id": 6810365,
+                    "key": "_billing_Numero_dpto",
+                    "value": "306 torre 2"
+                },
+                {
+                    "id": 6810366,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "1720"
+                },
+                {
+                    "id": 6810367,
+                    "key": "_shipping_Numero_dpto",
+                    "value": "306TORRE2"
+                },
+                {
+                    "id": 6810368,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6810369,
+                    "key": "RUT",
+                    "value": "18587983-6"
+                },
+                {
+                    "id": 6810376,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6810378,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6810379,
+                    "key": "buyOrder",
+                    "value": "173261"
+                },
+                {
+                    "id": 6810380,
+                    "key": "authorizationCode",
+                    "value": "005307"
+                },
+                {
+                    "id": 6810381,
+                    "key": "cardNumber",
+                    "value": "9348"
+                },
+                {
+                    "id": 6810382,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Deb&iacute;to"
+                },
+                {
+                    "id": 6810383,
+                    "key": "amount",
+                    "value": "581814"
+                },
+                {
+                    "id": 6810384,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6810385,
+                    "key": "transactionDate",
+                    "value": "23-01-2023 / 17:38:10"
+                },
+                {
+                    "id": 6810386,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811110,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183400,
+                    "name": "Wafflera eléctrica 2 platos VWE2S",
+                    "product_id": 111293,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "198990",
+                    "subtotal_tax": "0",
+                    "total": "198990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585590,
+                            "key": "_regular_price",
+                            "value": "198990",
+                            "display_key": "_regular_price",
+                            "display_value": "198990"
+                        },
+                        {
+                            "id": 1585608,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "103012200094",
+                    "price": 198990,
+                    "image": {
+                        "id": "148832",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2022/03/VWE2S_2.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                },
+                {
+                    "id": 183401,
+                    "name": "Visicooler 260lts LG260",
+                    "product_id": 53158,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "339990",
+                    "subtotal_tax": "0",
+                    "total": "339990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585600,
+                            "key": "_regular_price",
+                            "value": "370990",
+                            "display_key": "_regular_price",
+                            "display_value": "370990"
+                        },
+                        {
+                            "id": 1585609,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "101013600041",
+                    "price": 339990,
+                    "image": {
+                        "id": "55814",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2020/03/Visicooler-260lts-LG-260.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183402,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "42834",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585606,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585607,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173261/?pay_for_order=true&key=wc_order_8M4ndh5ljpHDu",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-23T20:38:05",
+            "date_modified_gmt": "2023-02-08T15:00:08",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T20:40:02",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173261"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ],
+                "customer": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/customers/18690"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173263,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T18:20:56",
+            "date_modified": "2023-02-08T12:00:12",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "2958",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "45748",
+            "total_tax": "0",
+            "customer_id": 18691,
+            "order_key": "wc_order_rZKm9SFYJYz3a",
+            "billing": {
+                "first_name": "josefina",
+                "last_name": "pino",
+                "company": "",
+                "address_1": "los clarines",
+                "address_2": "",
+                "city": "O'HIGGINS",
+                "state": "82",
+                "postcode": "",
+                "country": "CL",
+                "email": "egonzalezpino@yahoo.es",
+                "phone": "950038438"
+            },
+            "shipping": {
+                "first_name": "josefina",
+                "last_name": "pino",
+                "company": "",
+                "address_1": "los clarines",
+                "address_2": "",
+                "city": "O'HIGGINS",
+                "state": "82",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "woo-mercado-pago-custom",
+            "payment_method_title": "Paga con tarjetas de débito y crédito",
+            "transaction_id": "",
+            "customer_ip_address": "201.215.91.148",
+            "customer_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "",
+            "date_completed": null,
+            "date_paid": "2023-01-23T18:21:26",
+            "cart_hash": "80ce190b92b9e5898e64094c3acc5bbc",
+            "number": "173263",
+            "meta_data": [
+                {
+                    "id": 6810437,
+                    "key": "_billing_documento",
+                    "value": "boleta"
+                },
+                {
+                    "id": 6810438,
+                    "key": "_billing_fijo",
+                    "value": "950038438"
+                },
+                {
+                    "id": 6810439,
+                    "key": "_billing_rut",
+                    "value": "7467706-1"
+                },
+                {
+                    "id": 6810440,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "1434"
+                },
+                {
+                    "id": 6810441,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810442,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "1434"
+                },
+                {
+                    "id": 6810443,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810444,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6810445,
+                    "key": "RUT",
+                    "value": "7467706-1"
+                },
+                {
+                    "id": 6810446,
+                    "key": "is_production_mode",
+                    "value": "yes"
+                },
+                {
+                    "id": 6810447,
+                    "key": "_used_gateway",
+                    "value": "WC_WooMercadoPago_Notification_Webhook"
+                },
+                {
+                    "id": 6810448,
+                    "key": "Email del comprador",
+                    "value": "egonzalezpino@yahoo.es"
+                },
+                {
+                    "id": 6810449,
+                    "key": "Tipo de método de pago",
+                    "value": "debit_card"
+                },
+                {
+                    "id": 6810450,
+                    "key": "Método de pago",
+                    "value": "debvisa"
+                },
+                {
+                    "id": 6810451,
+                    "key": "Mercado Pago - Payment 53939897547",
+                    "value": "[Date 2023-01-23 21:21:22]/[Amount 45748]/[Paid 45748]/[Coupon 0]/[Refund 0]"
+                },
+                {
+                    "id": 6810452,
+                    "key": "_Mercado_Pago_Payment_IDs",
+                    "value": "53939897547"
+                },
+                {
+                    "id": 6810459,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6810461,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811111,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183403,
+                    "name": "Picadora de papas y cebollas corte de 10mm VPPC10",
+                    "product_id": 67569,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "42790",
+                    "subtotal_tax": "0",
+                    "total": "42790",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585619,
+                            "key": "_regular_price",
+                            "value": "42790",
+                            "display_key": "_regular_price",
+                            "display_value": "42790"
+                        },
+                        {
+                            "id": 1585627,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "102012200111",
+                    "price": 42790,
+                    "image": {
+                        "id": "103489",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2021/05/Picadora-de-papas-y-cebollas-corte-de-10mm-VPPC-10_0003_VPPC-10_03.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183404,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "2958",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585625,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585626,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173263/?pay_for_order=true&key=wc_order_rZKm9SFYJYz3a",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-23T21:20:56",
+            "date_modified_gmt": "2023-02-08T15:00:12",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-23T21:21:26",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173263"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ],
+                "customer": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/customers/18691"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173270,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T21:55:38",
+            "date_modified": "2023-02-08T12:00:14",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "3139",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "45929",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_gsksPXK1jN35j",
+            "billing": {
+                "first_name": "Juan Antonio",
+                "last_name": "Gonzalez lobos",
+                "company": "",
+                "address_1": "Gertrudis blanco",
+                "address_2": "",
+                "city": "MAULE",
+                "state": "205",
+                "postcode": "",
+                "country": "CL",
+                "email": "gonzalez_lobos@live.com",
+                "phone": "962499222"
+            },
+            "shipping": {
+                "first_name": "Juan Antonio",
+                "last_name": "Gonzalez lobos",
+                "company": "",
+                "address_1": "Gertrudis blanco",
+                "address_2": "",
+                "city": "MAULE",
+                "state": "205",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "168.205.207.23",
+            "customer_user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Mobile/15E148 Safari/604.1",
+            "created_via": "checkout",
+            "customer_note": "Lado sur del estadio municipal de Villa Alegre",
+            "date_completed": null,
+            "date_paid": "2023-01-23T22:00:22",
+            "cart_hash": "05aee4a22e94c5410be42890e1eb37bb",
+            "number": "173270",
+            "meta_data": [
+                {
+                    "id": 6810651,
+                    "key": "_billing_documento",
+                    "value": "boleta"
+                },
+                {
+                    "id": 6810652,
+                    "key": "_billing_fijo",
+                    "value": "966577428"
+                },
+                {
+                    "id": 6810653,
+                    "key": "_billing_rut",
+                    "value": "14021224-5"
+                },
+                {
+                    "id": 6810654,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "676"
+                },
+                {
+                    "id": 6810655,
+                    "key": "_billing_Numero_dpto",
+                    "value": "676"
+                },
+                {
+                    "id": 6810656,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "676"
+                },
+                {
+                    "id": 6810657,
+                    "key": "_shipping_Numero_dpto",
+                    "value": "676"
+                },
+                {
+                    "id": 6810658,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6810659,
+                    "key": "RUT",
+                    "value": "14021224-5"
+                },
+                {
+                    "id": 6810667,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6810669,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6810670,
+                    "key": "buyOrder",
+                    "value": "173270"
+                },
+                {
+                    "id": 6810671,
+                    "key": "authorizationCode",
+                    "value": "016051"
+                },
+                {
+                    "id": 6810672,
+                    "key": "cardNumber",
+                    "value": "9032"
+                },
+                {
+                    "id": 6810673,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Deb&iacute;to"
+                },
+                {
+                    "id": 6810674,
+                    "key": "amount",
+                    "value": "45929"
+                },
+                {
+                    "id": 6810675,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6810676,
+                    "key": "transactionDate",
+                    "value": "23-01-2023 / 21:55:42"
+                },
+                {
+                    "id": 6810677,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811114,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837818,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183407,
+                    "name": "Picadora de papas y cebollas corte de 10mm VPPC10",
+                    "product_id": 67569,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "42790",
+                    "subtotal_tax": "0",
+                    "total": "42790",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585654,
+                            "key": "_regular_price",
+                            "value": "42790",
+                            "display_key": "_regular_price",
+                            "display_value": "42790"
+                        },
+                        {
+                            "id": 1585662,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "102012200111",
+                    "price": 42790,
+                    "image": {
+                        "id": "103489",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2021/05/Picadora-de-papas-y-cebollas-corte-de-10mm-VPPC-10_0003_VPPC-10_03.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183408,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "3139",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585660,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585661,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173270/?pay_for_order=true&key=wc_order_gsksPXK1jN35j",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-24T00:55:38",
+            "date_modified_gmt": "2023-02-08T15:00:14",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-24T01:00:22",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173270"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173272,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-23T22:41:06",
+            "date_modified": "2023-02-08T12:00:17",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "9644",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "69634",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_sg3urwhNAmgob",
+            "billing": {
+                "first_name": "Pierre",
+                "last_name": "Bravo Saavedra",
+                "company": "",
+                "address_1": "Ohiggins",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "358",
+                "postcode": "",
+                "country": "CL",
+                "email": "torredebabelchiloe@gmail.com",
+                "phone": "966681016"
+            },
+            "shipping": {
+                "first_name": "Pierre",
+                "last_name": "Bravo Saavedra",
+                "company": "",
+                "address_1": "Ohiggins",
+                "address_2": "",
+                "city": "LOS LAGOS",
+                "state": "358",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "181.226.58.198",
+            "customer_user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1",
+            "created_via": "checkout",
+            "customer_note": "",
+            "date_completed": null,
+            "date_paid": "2023-01-23T22:43:05",
+            "cart_hash": "2837a582592698eb30b2883ab459a6d1",
+            "number": "173272",
+            "meta_data": [
+                {
+                    "id": 6810774,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6810775,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6810776,
+                    "key": "_billing_rut",
+                    "value": "17862131-9"
+                },
+                {
+                    "id": 6810777,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "10663678-8"
+                },
+                {
+                    "id": 6810778,
+                    "key": "_billing_giro",
+                    "value": "Hospedaje hostal y servicios turísticos/banqueteros"
+                },
+                {
+                    "id": 6810779,
+                    "key": "_billing_razon_social",
+                    "value": "Luis armando bravo Contreras"
+                },
+                {
+                    "id": 6810780,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "Hostal Torre de Babel"
+                },
+                {
+                    "id": 6810781,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "965"
+                },
+                {
+                    "id": 6810782,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810783,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "965"
+                },
+                {
+                    "id": 6810784,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6810785,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6810786,
+                    "key": "RUT",
+                    "value": "17862131-9"
+                },
+                {
+                    "id": 6810794,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6810796,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6810797,
+                    "key": "buyOrder",
+                    "value": "173272"
+                },
+                {
+                    "id": 6810798,
+                    "key": "authorizationCode",
+                    "value": "425239"
+                },
+                {
+                    "id": 6810799,
+                    "key": "cardNumber",
+                    "value": "2052"
+                },
+                {
+                    "id": 6810800,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Deb&iacute;to"
+                },
+                {
+                    "id": 6810801,
+                    "key": "amount",
+                    "value": "69634"
+                },
+                {
+                    "id": 6810802,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6810803,
+                    "key": "transactionDate",
+                    "value": "23-01-2023 / 22:41:11"
+                },
+                {
+                    "id": 6810804,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811117,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837820,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183412,
+                    "name": "Hervidor de Agua 10,1 Litros VHA10",
+                    "product_id": 31858,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "59990",
+                    "subtotal_tax": "0",
+                    "total": "59990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585701,
+                            "key": "_regular_price",
+                            "value": "59990",
+                            "display_key": "_regular_price",
+                            "display_value": "59990"
+                        },
+                        {
+                            "id": 1585709,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "103011500001",
+                    "price": 59990,
+                    "image": {
+                        "id": "49942",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2018/03/Hervidor-de-Agua-10-Litros-VHA-10-Ventus.png"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183413,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "9644",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585707,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585708,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173272/?pay_for_order=true&key=wc_order_sg3urwhNAmgob",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-24T01:41:06",
+            "date_modified_gmt": "2023-02-08T15:00:17",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-24T01:43:05",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173272"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173290,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-24T12:17:12",
+            "date_modified": "2023-02-08T12:00:21",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "35476",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "505466",
+            "total_tax": "0",
+            "customer_id": 3349,
+            "order_key": "wc_order_eJOd1uJZA6PM2",
+            "billing": {
+                "first_name": "Rogers",
+                "last_name": "Andrade",
+                "company": "",
+                "address_1": "Gral. baquedano",
+                "address_2": "",
+                "city": "VALPARAÍSO",
+                "state": "122",
+                "postcode": "",
+                "country": "CL",
+                "email": "r.andradeg45@gmail.com",
+                "phone": "964244813"
+            },
+            "shipping": {
+                "first_name": "Rogers",
+                "last_name": "Andrade",
+                "company": "",
+                "address_1": "Gral. baquedano",
+                "address_2": "",
+                "city": "VALPARAÍSO",
+                "state": "122",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "woo-mercado-pago-custom",
+            "payment_method_title": "Paga con tarjetas de débito y crédito",
+            "transaction_id": "",
+            "customer_ip_address": "186.11.120.123",
+            "customer_user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1",
+            "created_via": "checkout",
+            "customer_note": "Recepciones maccarena andrade en oficina.",
+            "date_completed": null,
+            "date_paid": "2023-01-24T12:17:53",
+            "cart_hash": "7ab6455d9c036bf3b4c14c59dc2a4b83",
+            "number": "173290",
+            "meta_data": [
+                {
+                    "id": 6811235,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6811236,
+                    "key": "_billing_fijo",
+                    "value": "322932375"
+                },
+                {
+                    "id": 6811237,
+                    "key": "_billing_rut",
+                    "value": "18300454-9"
+                },
+                {
+                    "id": 6811238,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "77094750-2"
+                },
+                {
+                    "id": 6811239,
+                    "key": "_billing_giro",
+                    "value": "Pesquera"
+                },
+                {
+                    "id": 6811240,
+                    "key": "_billing_razon_social",
+                    "value": "Sociedad pesquera Marlimar limitada"
+                },
+                {
+                    "id": 6811241,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "Pesquera Marlimar"
+                },
+                {
+                    "id": 6811242,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "775"
+                },
+                {
+                    "id": 6811243,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6811244,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "775"
+                },
+                {
+                    "id": 6811245,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6811246,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6811247,
+                    "key": "RUT",
+                    "value": "18300454-9"
+                },
+                {
+                    "id": 6811248,
+                    "key": "is_production_mode",
+                    "value": "yes"
+                },
+                {
+                    "id": 6811249,
+                    "key": "_used_gateway",
+                    "value": "WC_WooMercadoPago_Notification_Webhook"
+                },
+                {
+                    "id": 6811254,
+                    "key": "Email del comprador",
+                    "value": "r.andradeg45@gmail.com"
+                },
+                {
+                    "id": 6811255,
+                    "key": "Tipo de método de pago",
+                    "value": "credit_card"
+                },
+                {
+                    "id": 6811256,
+                    "key": "Método de pago",
+                    "value": "visa"
+                },
+                {
+                    "id": 6811257,
+                    "key": "Mercado Pago - Payment 53960262590",
+                    "value": "[Date 2023-01-24 15:17:46]/[Amount 505466]/[Paid 505466]/[Coupon 0]/[Refund 0]"
+                },
+                {
+                    "id": 6811258,
+                    "key": "_Mercado_Pago_Payment_IDs",
+                    "value": "53960262590"
+                },
+                {
+                    "id": 6811265,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6811267,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6811270,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183420,
+                    "name": "Conservadora Triple Función Tapa de Vidrio Curvo CTV320QE",
+                    "product_id": 149735,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "469990",
+                    "subtotal_tax": "0",
+                    "total": "469990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585770,
+                            "key": "_regular_price",
+                            "value": "501990",
+                            "display_key": "_regular_price",
+                            "display_value": "501990"
+                        },
+                        {
+                            "id": 1585778,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "101012900047",
+                    "price": 469990,
+                    "image": {
+                        "id": "149739",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2022/04/CTV-320QE_1.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183421,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "35476",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585776,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585777,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173290/?pay_for_order=true&key=wc_order_eJOd1uJZA6PM2",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-24T15:17:12",
+            "date_modified_gmt": "2023-02-08T15:00:21",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-24T15:17:53",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173290"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ],
+                "customer": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/customers/3349"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173309,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-24T16:49:41",
+            "date_modified": "2023-02-08T12:00:24",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "40906",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "510896",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_bcCpU3Q0CGyCB",
+            "billing": {
+                "first_name": "Giovanni Fernando",
+                "last_name": "Bravo",
+                "company": "",
+                "address_1": "Salto del laja",
+                "address_2": "",
+                "city": "BIOBÍO",
+                "state": "232",
+                "postcode": "",
+                "country": "CL",
+                "email": "g.gacitua.bravo@gmail.com",
+                "phone": "967860978"
+            },
+            "shipping": {
+                "first_name": "Giovanni Fernando",
+                "last_name": "Bravo",
+                "company": "",
+                "address_1": "Salto del laja",
+                "address_2": "",
+                "city": "BIOBÍO",
+                "state": "232",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "181.160.243.49",
+            "customer_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "Salto del Laja 148, villa retiro sur, comuna los angeles",
+            "date_completed": null,
+            "date_paid": "2023-01-24T16:50:58",
+            "cart_hash": "57b956d4d78a9b1a18abdf3ce9e3e5d8",
+            "number": "173309",
+            "meta_data": [
+                {
+                    "id": 6811865,
+                    "key": "_billing_documento",
+                    "value": "boleta"
+                },
+                {
+                    "id": 6811866,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6811867,
+                    "key": "_billing_rut",
+                    "value": "18096399-5"
+                },
+                {
+                    "id": 6811868,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "148"
+                },
+                {
+                    "id": 6811869,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6811870,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "148"
+                },
+                {
+                    "id": 6811871,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6811872,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6811873,
+                    "key": "RUT",
+                    "value": "18096399-5"
+                },
+                {
+                    "id": 6811881,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6811883,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6811884,
+                    "key": "buyOrder",
+                    "value": "173309"
+                },
+                {
+                    "id": 6811885,
+                    "key": "authorizationCode",
+                    "value": "505374"
+                },
+                {
+                    "id": 6811886,
+                    "key": "cardNumber",
+                    "value": "0078"
+                },
+                {
+                    "id": 6811887,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Deb&iacute;to"
+                },
+                {
+                    "id": 6811888,
+                    "key": "amount",
+                    "value": "510896"
+                },
+                {
+                    "id": 6811889,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6811890,
+                    "key": "transactionDate",
+                    "value": "24-01-2023 / 16:49:44"
+                },
+                {
+                    "id": 6811891,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6812504,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837823,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183439,
+                    "name": "Conservadora Triple Función Tapa de Vidrio Curvo CTV320Q",
+                    "product_id": 32019,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "469990",
+                    "subtotal_tax": "0",
+                    "total": "469990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585936,
+                            "key": "_regular_price",
+                            "value": "517990",
+                            "display_key": "_regular_price",
+                            "display_value": "517990"
+                        },
+                        {
+                            "id": 1585944,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "101012900017",
+                    "price": 469990,
+                    "image": {
+                        "id": "55654",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2020/02/Conservadora-Tapa-de-Vidrio-Triple-Función-CTV-320Q.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183440,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "40906",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585942,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1585943,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173309/?pay_for_order=true&key=wc_order_bcCpU3Q0CGyCB",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-24T19:49:41",
+            "date_modified_gmt": "2023-02-08T15:00:24",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-24T19:50:58",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173309"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173312,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-24T17:22:37",
+            "date_modified": "2023-02-08T12:00:28",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "35672",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "415662",
+            "total_tax": "0",
+            "customer_id": 14341,
+            "order_key": "wc_order_oVnikr1Uhg3dU",
+            "billing": {
+                "first_name": "ERHARD",
+                "last_name": "WENZEL YUNGE",
+                "company": "",
+                "address_1": "JUAN VERDAGUER",
+                "address_2": "",
+                "city": "VALPARAÍSO",
+                "state": "115",
+                "postcode": "",
+                "country": "CL",
+                "email": "erhard.wenzel@eckart.cl",
+                "phone": "985484298"
+            },
+            "shipping": {
+                "first_name": "ERHARD",
+                "last_name": "WENZEL YUNGE",
+                "company": "",
+                "address_1": "JUAN VERDAGUER",
+                "address_2": "",
+                "city": "VALPARAÍSO",
+                "state": "115",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "transbank",
+            "payment_method_title": "Transbank Webpay",
+            "transaction_id": "",
+            "customer_ip_address": "201.236.140.195",
+            "customer_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "Retiro en local",
+            "date_completed": null,
+            "date_paid": "2023-01-24T17:25:50",
+            "cart_hash": "d8960204bda187236b7d2fb6158d9cd8",
+            "number": "173312",
+            "meta_data": [
+                {
+                    "id": 6811971,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6811972,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6811973,
+                    "key": "_billing_rut",
+                    "value": "15830227-6"
+                },
+                {
+                    "id": 6811974,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "88390200-9"
+                },
+                {
+                    "id": 6811975,
+                    "key": "_billing_giro",
+                    "value": "FABRICACION DE ALIMENTOS"
+                },
+                {
+                    "id": 6811976,
+                    "key": "_billing_razon_social",
+                    "value": "ECKART ALIMENTOS SPA"
+                },
+                {
+                    "id": 6811977,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "ECKART ALIMENTOS SPA"
+                },
+                {
+                    "id": 6811978,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "351"
+                },
+                {
+                    "id": 6811979,
+                    "key": "_billing_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6811980,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "351"
+                },
+                {
+                    "id": 6811981,
+                    "key": "_shipping_Numero_dpto",
+                    "value": ""
+                },
+                {
+                    "id": 6811983,
+                    "key": "RUT",
+                    "value": "15830227-6"
+                },
+                {
+                    "id": 6811984,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6811991,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6811993,
+                    "key": "transactionResponse",
+                    "value": "Transacción Aprobada"
+                },
+                {
+                    "id": 6811994,
+                    "key": "buyOrder",
+                    "value": "173312"
+                },
+                {
+                    "id": 6811995,
+                    "key": "authorizationCode",
+                    "value": "254136"
+                },
+                {
+                    "id": 6811996,
+                    "key": "cardNumber",
+                    "value": "7234"
+                },
+                {
+                    "id": 6811997,
+                    "key": "paymentCodeResult",
+                    "value": "Venta Normal"
+                },
+                {
+                    "id": 6811998,
+                    "key": "amount",
+                    "value": "415662"
+                },
+                {
+                    "id": 6811999,
+                    "key": "cuotas",
+                    "value": "0"
+                },
+                {
+                    "id": 6812000,
+                    "key": "transactionDate",
+                    "value": "24-01-2023 / 17:23:43"
+                },
+                {
+                    "id": 6812001,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6812506,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183446,
+                    "name": "Visicooler LG290LED",
+                    "product_id": 31908,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "379990",
+                    "subtotal_tax": "0",
+                    "total": "379990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1585998,
+                            "key": "_regular_price",
+                            "value": "406990",
+                            "display_key": "_regular_price",
+                            "display_value": "406990"
+                        },
+                        {
+                            "id": 1586006,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "101013600005",
+                    "price": 379990,
+                    "image": {
+                        "id": "55818",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2020/03/Visicooler-Luz-LED-LG-290LED.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183447,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "35672",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1586004,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1586005,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173312/?pay_for_order=true&key=wc_order_oVnikr1Uhg3dU",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-24T20:22:37",
+            "date_modified_gmt": "2023-02-08T15:00:28",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-24T20:25:50",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173312"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ],
+                "customer": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/customers/14341"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 173314,
+            "parent_id": 0,
+            "status": "invoiced",
+            "currency": "CLP",
+            "version": "7.3.0",
+            "prices_include_tax": false,
+            "date_created": "2023-01-24T18:53:12",
+            "date_modified": "2023-02-08T12:00:31",
+            "discount_total": "0",
+            "discount_tax": "0",
+            "shipping_total": "36160",
+            "shipping_tax": "0",
+            "cart_tax": "0",
+            "total": "376150",
+            "total_tax": "0",
+            "customer_id": 0,
+            "order_key": "wc_order_H13UHunHaHYbu",
+            "billing": {
+                "first_name": "Cesar",
+                "last_name": "Cartes Cifuentes",
+                "company": "",
+                "address_1": "Poblacion OHiggins 5 de abril",
+                "address_2": "",
+                "city": "ÑUBLE",
+                "state": "216",
+                "postcode": "",
+                "country": "CL",
+                "email": "c.cartes1988@gmail.com",
+                "phone": "966351877"
+            },
+            "shipping": {
+                "first_name": "Cesar",
+                "last_name": "Cartes Cifuentes",
+                "company": "",
+                "address_1": "Poblacion OHiggins 5 de abril",
+                "address_2": "",
+                "city": "ÑUBLE",
+                "state": "216",
+                "postcode": "",
+                "country": "CL",
+                "phone": ""
+            },
+            "payment_method": "woo-mercado-pago-custom",
+            "payment_method_title": "Paga con tarjetas de débito y crédito",
+            "transaction_id": "",
+            "customer_ip_address": "186.189.71.143",
+            "customer_user_agent": "Mozilla/5.0 (Linux; Android 12; M2004J19C) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36",
+            "created_via": "checkout",
+            "customer_note": "",
+            "date_completed": null,
+            "date_paid": "2023-01-24T18:54:28",
+            "cart_hash": "97fb0db6839238696326ead87dab819f",
+            "number": "173314",
+            "meta_data": [
+                {
+                    "id": 6812079,
+                    "key": "_billing_documento",
+                    "value": "factura"
+                },
+                {
+                    "id": 6812080,
+                    "key": "_billing_fijo",
+                    "value": ""
+                },
+                {
+                    "id": 6812081,
+                    "key": "_billing_rut",
+                    "value": "16738075-1"
+                },
+                {
+                    "id": 6812082,
+                    "key": "_billing_RUT_Empresa",
+                    "value": "7839924-4"
+                },
+                {
+                    "id": 6812083,
+                    "key": "_billing_giro",
+                    "value": "Juegos electrónicos supermercado artículos de regalo"
+                },
+                {
+                    "id": 6812084,
+                    "key": "_billing_razon_social",
+                    "value": "Don kiko"
+                },
+                {
+                    "id": 6812085,
+                    "key": "_billing_Nombre_de_fantasia",
+                    "value": "Don kiko"
+                },
+                {
+                    "id": 6812086,
+                    "key": "_billing_Numero_Direccion",
+                    "value": "#125"
+                },
+                {
+                    "id": 6812087,
+                    "key": "_billing_Numero_dpto",
+                    "value": "#125"
+                },
+                {
+                    "id": 6812088,
+                    "key": "_shipping_Numero_Direccion",
+                    "value": "#125"
+                },
+                {
+                    "id": 6812089,
+                    "key": "_shipping_Numero_dpto",
+                    "value": "#125"
+                },
+                {
+                    "id": 6812090,
+                    "key": "is_vat_exempt",
+                    "value": "no"
+                },
+                {
+                    "id": 6812091,
+                    "key": "RUT",
+                    "value": "16738075-1"
+                },
+                {
+                    "id": 6812092,
+                    "key": "is_production_mode",
+                    "value": "yes"
+                },
+                {
+                    "id": 6812093,
+                    "key": "_used_gateway",
+                    "value": "WC_WooMercadoPago_Notification_Webhook"
+                },
+                {
+                    "id": 6812095,
+                    "key": "mp_installments",
+                    "value": "12"
+                },
+                {
+                    "id": 6812096,
+                    "key": "mp_transaction_details",
+                    "value": "31345.83"
+                },
+                {
+                    "id": 6812097,
+                    "key": "mp_transaction_amount",
+                    "value": "376150"
+                },
+                {
+                    "id": 6812098,
+                    "key": "mp_total_paid_amount",
+                    "value": "376150"
+                },
+                {
+                    "id": 6812099,
+                    "key": "Tipo de método de pago",
+                    "value": "credit_card"
+                },
+                {
+                    "id": 6812100,
+                    "key": "Método de pago",
+                    "value": "master"
+                },
+                {
+                    "id": 6812101,
+                    "key": "Mercado Pago - Payment 53973860668",
+                    "value": "[Date 2023-01-24 21:53:13]/[Amount 376150]/[Paid 376150]/[Coupon 0]/[Refund 0]"
+                },
+                {
+                    "id": 6812102,
+                    "key": "_Mercado_Pago_Payment_IDs",
+                    "value": "53973931413"
+                },
+                {
+                    "id": 6812103,
+                    "key": "mp_installments",
+                    "value": "12"
+                },
+                {
+                    "id": 6812104,
+                    "key": "mp_transaction_details",
+                    "value": "31345.83"
+                },
+                {
+                    "id": 6812105,
+                    "key": "mp_transaction_amount",
+                    "value": "376150"
+                },
+                {
+                    "id": 6812106,
+                    "key": "mp_total_paid_amount",
+                    "value": "376150"
+                },
+                {
+                    "id": 6812108,
+                    "key": "Email del comprador",
+                    "value": "c.cartes1988@gmail.com"
+                },
+                {
+                    "id": 6812109,
+                    "key": "Mercado Pago - Payment 53973931413",
+                    "value": "[Date 2023-01-24 21:54:22]/[Amount 376150]/[Paid 376150]/[Coupon 0]/[Refund 0]"
+                },
+                {
+                    "id": 6812115,
+                    "key": "_sincronizada_gs",
+                    "value": "1"
+                },
+                {
+                    "id": 6812116,
+                    "key": "_ga_tracked",
+                    "value": "1"
+                },
+                {
+                    "id": 6812507,
+                    "key": "_estado_pedido_integracion",
+                    "value": "N"
+                },
+                {
+                    "id": 6837826,
+                    "key": "hubwoo_pro_guest_order",
+                    "value": "yes"
+                }
+            ],
+            "line_items": [
+                {
+                    "id": 183448,
+                    "name": "Visicooler 260lts LG260",
+                    "product_id": 53158,
+                    "variation_id": 0,
+                    "quantity": 1,
+                    "tax_class": "",
+                    "subtotal": "339990",
+                    "subtotal_tax": "0",
+                    "total": "339990",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1586016,
+                            "key": "_regular_price",
+                            "value": "370990",
+                            "display_key": "_regular_price",
+                            "display_value": "370990"
+                        },
+                        {
+                            "id": 1586024,
+                            "key": "_reduced_stock",
+                            "value": "1",
+                            "display_key": "_reduced_stock",
+                            "display_value": "1"
+                        }
+                    ],
+                    "sku": "101013600041",
+                    "price": 339990,
+                    "image": {
+                        "id": "55814",
+                        "src": "https://ventuscorp.cl/wp-content/uploads/2020/03/Visicooler-260lts-LG-260.jpg"
+                    },
+                    "parent_name": null,
+                    "composite_parent": "",
+                    "composite_children": [],
+                    "bundled_by": "",
+                    "bundled_item_title": "",
+                    "bundled_items": []
+                }
+            ],
+            "tax_lines": [],
+            "shipping_lines": [
+                {
+                    "id": 183449,
+                    "method_title": "Envío por FedEx",
+                    "method_id": "fedex_integracion",
+                    "instance_id": "26",
+                    "total": "36160",
+                    "total_tax": "0",
+                    "taxes": [],
+                    "meta_data": [
+                        {
+                            "id": 1586022,
+                            "key": "diasEntrega",
+                            "value": "5 a 15",
+                            "display_key": "diasEntrega",
+                            "display_value": "5 a 15"
+                        },
+                        {
+                            "id": 1586023,
+                            "key": "tipoServicio",
+                            "value": "Express",
+                            "display_key": "tipoServicio",
+                            "display_value": "Express"
+                        }
+                    ]
+                }
+            ],
+            "fee_lines": [],
+            "coupon_lines": [],
+            "refunds": [],
+            "payment_url": "https://ventuscorp.cl/procesar-compra/order-pay/173314/?pay_for_order=true&key=wc_order_H13UHunHaHYbu",
+            "is_editable": false,
+            "needs_payment": false,
+            "needs_processing": true,
+            "date_created_gmt": "2023-01-24T21:53:12",
+            "date_modified_gmt": "2023-02-08T15:00:31",
+            "date_completed_gmt": null,
+            "date_paid_gmt": "2023-01-24T21:54:28",
+            "currency_symbol": "$",
+            "_links": {
+                "self": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders/173314"
+                    }
+                ],
+                "collection": [
+                    {
+                        "href": "https://ventuscorp.cl/wp-json/wc/v3/orders"
+                    }
+                ]
+            }
+        }
+    ]
+}
