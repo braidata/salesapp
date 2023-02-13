@@ -21,7 +21,7 @@ $border-radius: 4px;
 
   h1 {
     font-size: 2rem;
-    color: $text-color;
+    // color: $text-color;
     margin-bottom: 2rem;
   }
 
@@ -55,12 +55,12 @@ $border-radius: 4px;
   }
 
   button:not(.back) {
-    color: $color-white;
+    // color: $color-white;
     width: 100%;
     font-size: 1.4rem;
     /*background: $primary-color;*/
-    border-radius: $border-radius;
-    border: none;
+     border-radius: $border-radius;
+    // border: none;
     cursor: pointer;
     padding: 0.8rem 1.2rem;
     margin-top: 0.5rem;

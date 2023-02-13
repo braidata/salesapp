@@ -36,8 +36,8 @@ const OrderTable = ({ data }) => {
 
   return (
 
-    <div className="mt-10 overflow-x-auto relative shadow-md sm:rounded-lg">
-      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <div className="flex flex-col mt-10 overflow-x-auto relative shadow-md sm:rounded-lg">
+      <table className="w-96 sm:w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th scope="col" className="py-3 px-3">
@@ -81,7 +81,7 @@ const OrderTable = ({ data }) => {
 
                   )}
                 </td>
-                <td className="py-4 px-3 w-full text-sm dark:text-gray-400">
+                <td className="py-4 px-3 w-24 sm:w-full text-sm dark:text-gray-400">
                 {/* <p className="py-4 px-3 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-green-400 rounded shadow
                 hover:bg-green-100 hover:text-green-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-green-700/20 dark:hover:text-green-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out 
                 ">
@@ -111,10 +111,8 @@ const OrderTable = ({ data }) => {
                 <td className="py-4 px-3 text-sm dark:text-gray-400">
                   {item.billing_company_name}
                 </td>
-                <td className="py-4 px-3 text-sm dark:text-gray-400">
-                  <button className="border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 bg-white text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow
-       hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out 
-       " onClick={() => handleModalOpen(item)}>
+                <td className="w-96 sm:w-full py-4 px-3 text-sm dark:text-gray-400">
+                  <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full" onClick={() => handleModalOpen(item)}>
                     Ver
                   </button>
                 </td>
@@ -141,7 +139,7 @@ const OrderTable = ({ data }) => {
               ">Detalles del pedido</p>
               <button
               title="Cerrar"
-                className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-500 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
+                className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
                 "
                 aria-label="close"
                 onClick={handleModalClose}

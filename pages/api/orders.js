@@ -3,49 +3,20 @@
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 
 const ordenes = [
-  172291,
-,172280
-,172257
-,172251
-,172231
-,172223
-,172222
-,172219
-,172211
-,172168
-,172156
-,172155
-,172140
-,172139
-,172363
-,172115
-,173060
-,173079
-,173093
-,173094
-,173088
-,173106
-,173107
-,173115
-,173116
-,173119
-,173120
-,173123
-,173132
-,173133
-,173137
-,173095
-,173117
-,172773
-,173135
-,173148
-,173147
-,172249
-,173026
-,172884
-,173225
-,173182
-,173162
+
+  173321,
+  173865,
+  173704,
+  173772,
+  173685,
+  173866,
+  173803,
+  
+
+  
+
+  
+  
 
 ];
 
@@ -65,7 +36,14 @@ export default async (req, res) => {
         status: "invoiced",
       })),
     });
-    res.status(200).json(data);
+    res.status(200).json(data.update.map((order, index) => order.id + " " + order.billing.phone + " " +order.meta_data.map(
+      (meta) => meta.key === "_fedex_integracion" ? meta.value
+      : null
+    )) );
+    // console.log(data.update.map((order, index) => order.id + " " + order.billing.phone + " " +order.meta_data.map(
+    //   (meta) => meta.key === "_fedex_integracion" ? meta.value
+    //   : null
+    // )) );
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

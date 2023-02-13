@@ -103,7 +103,7 @@ export default function PageWithJSbasedForm3({session}) {
 
     console.log("el negocios es ", context);
 
-    await stateChanger(event, parseInt(idD));
+    // await stateChanger(event, parseInt(idD));
     //setIsDisabled(true);
 
     setIsLoading(false);
@@ -384,29 +384,29 @@ const idOwners = async (event, id) => {
 
 
   //dealInfo
-  const stateChanger = async (event, id) => {
-    event.preventDefault();
-    try {
-      const data = {
-        id: id,
-      };
-      const JSONdata = JSON.stringify(data);
-      const endpoint = "/api/dealStage";
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSONdata,
-      };
-      let response = await fetch(endpoint, options);
-      let result = await response.json();
+  // const stateChanger = async (event, id) => {
+  //   event.preventDefault();
+  //   try {
+  //     const data = {
+  //       id: id,
+  //     };
+  //     const JSONdata = JSON.stringify(data);
+  //     const endpoint = "/api/dealStage";
+  //     const options = {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSONdata,
+  //     };
+  //     let response = await fetch(endpoint, options);
+  //     let result = await response.json();
 
-      console.log("estados", result);
-    } catch {
-      console.log("No cambio de estado");
-    }
-  };
+  //     console.log("estados", result);
+  //   } catch {
+  //     console.log("No cambio de estado");
+  //   }
+  // };
 
   const stateSetter = (s) => {
     setIsDisabled(s);
@@ -436,7 +436,7 @@ const idOwners = async (event, id) => {
         />
 
         <button
-          className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-400/50 dark:to-sky-600/50 border-2 dark:drop-shadow-[0_5px_5px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full"
           type="submit"
         >
           Buscar datos en HubSpot{" "}
@@ -452,7 +452,7 @@ const idOwners = async (event, id) => {
               Debes completar los datos de Empresa en HubSpot para continuar.
             </h4>
             <button
-              className="mt-2 mb-5 bg-orange-800/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-orange-700/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_10px_10px_rgba(0,155,177,0.75)]  border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-400/50 dark:to-orange-600/50 border-2 dark:drop-shadow-[0_10px_10px_rgba(0,255,255,0.25)]  dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full"
               type="submit"
             >
               Cargar Datos{" "}
@@ -486,7 +486,7 @@ const idOwners = async (event, id) => {
               <CardDeal
                 name={deal.dealname}
                 id={deal.hs_object_id}
-                stage={deal.dealstage === "50940199" ? "Pagado" : "por pagar"}
+                stage={deal.dealstage === "50940199" ? "Pagado Enviar a SAP" : "por pagar"}
                 amount={deal.amount}
                 editFunction={editData}
                 sendFunction={sendData}

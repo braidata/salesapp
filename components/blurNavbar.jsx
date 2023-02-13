@@ -64,17 +64,17 @@ const BlurNavbar = () => {
       </div>
 
       <div className="flex flex-row justify-center items-center ml-auto">
-        <Link href="/">
+        {/* <Link href="/">
           <p className="hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Inicio</p>
-        </Link>
+        </Link> */}
         {/* <Link href="/forms">
           <p className="hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Crear Orden</p>
         </Link> */}
-                <Link href="/neoForm2">
+                {/* <Link href="/neoForm2">
           <p className="hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Negocios Hubspot</p>
@@ -83,7 +83,7 @@ const BlurNavbar = () => {
           <p className="hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Crear Pedido Manual</p>
-        </Link>
+        </Link> */}
         <Link href="/dashboard">
           <p className="hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
@@ -94,11 +94,11 @@ const BlurNavbar = () => {
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">API HubSpot</p>
         </Link> */}
-        <Link href="/toolsSQL">
+        {/* <Link href="/toolsSQL">
           <p className="hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Productos</p>
-        </Link>
+        </Link> */}
         {/* login */}
         {/* <Link href="/api/auth/signin">
           <p className="hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 

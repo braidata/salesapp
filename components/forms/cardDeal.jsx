@@ -56,14 +56,16 @@ export default function DealCard({
   return (
     <div
       key={id}
-      className="flex flex-col items-center justify-center w-full h-full"
-    >
-      <div className="flex flex-col items-center justify-center w-full h-full">
-        {/* deal card */}
-        <table className="rounded-lg mt-1 w-full h-full">
-          <thead className="w-full rounded-lg text-gray-800 dark:text-gray-300 text-sm font-semibold">
-            <tr className="w-full rounded-lg bg-gray-300 dark:bg-gray-800">
-              <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">
+      className="flex flex-col items-center justify-center w-full h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5"
+    >       {/* deal card cristal glow transparent*/}
+      <div className="flex flex-col items-center justify-center w-full h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5 
+      ">
+        {/* deal card cristal glow transparent*/}
+        <table className="rounded-lg mt-1 w-full h-full px-2 py-2">
+          <thead className="px-2 py-2 w-full rounded-lg text-gray-800 dark:text-gray-300 text-sm font-semibold text-center border-b border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800">
+         
+            <tr className="px-2 py-2 w-full rounded-lg bg-gray-300 dark:bg-gray-700">
+              <th className="text-center mr-4 text-md text-bold rounded-sm px-4 py-3">
                 Nombre
               </th>
               <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">
@@ -78,11 +80,11 @@ export default function DealCard({
             </tr>
           </thead>
           <tbody>
-            <tr className="w-full rounded-lg mb-8 bg-gray-200 dark:bg-gray-700">
-              <td className="text-center mr-4 mt-4 text-sm">{name} </td>
+            <tr className="px-2 py-2 w-full rounded-lg mb-8 bg-gray-200 dark:bg-gray-700">
+              <td className="px-2 py-2 text-center mr-4 mt-4 text-sm">{name} </td>
 
               <td
-                className="text-center mr-4 mt-4 text-sm"
+                className="px-2 py-2 text-center mr-4 mt-4 text-sm"
                 key={id}
                 value={id}
                 ref={refE2}
@@ -90,9 +92,9 @@ export default function DealCard({
                 {id}
               </td>
 
-              <td className="text-center mr-4 mt-4 text-sm">{stage}</td>
+              <td className="px-2 py-2 text-center mr-4 mt-4 text-sm">{stage}</td>
 
-              <td className="text-center mr-4 mt-4 text-sm">{amount}</td>
+              <td className="px-2 py-2 text-center mr-4 mt-4 text-sm">{amount}</td>
             </tr>
           </tbody>
         </table>
@@ -111,7 +113,9 @@ export default function DealCard({
               type="submit"
               onClick={handleClick}
               disabled={status}
-              className={`bg-blue-900/90  text-gray-800 font-bold py-2 px-2 mt-12 rounded-sm w-1 h-14 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:text-gray-800 ${
+              className={`mt-2 mb-5 text-gray-800 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50  dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full
+               
+               ${
                 status
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-blue-800/90"

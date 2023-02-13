@@ -10,7 +10,7 @@ export default function RefreshButton ({functions})  {
             
             <button
         onClick={functions}
-        className="mt-2 mb-5 bg-green-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-green-700/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-green-600/20 dark:hover:bg-green-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_10px_10px_rgba(0,155,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-200/40 dark:to-green-400/40 border-2 dark:drop-shadow-[0_10px_10px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4"
         type="submit"
         title="Cuidado, refrescarás todo el sitio y perderás los datos ingresados"
       >
