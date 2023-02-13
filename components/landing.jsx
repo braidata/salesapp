@@ -12,10 +12,13 @@ const Landing = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center mt-40">
+    <div className="flex flex-col justify-center items-center mt-24 mx-4
+    ">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-6xl font-bold text-gray-900 dark:text-gray-300 mb-5">
-          Ventus Sales
+        <h1 className="text-6xl font-bold text-gray-900 dark:text-gray-300 mb-24 dark:text-gray-300 font-bold py-4 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+      bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+      border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
+          Ventus Sales App
         </h1>
         <p className="text-2xl text-gray-700 dark:text-gray-400">
           Portal WEB para Creación de Pedidos en SAP
@@ -24,10 +27,22 @@ const Landing = () => {
 
       <div className="flex flex-col justify-center items-center"></div>
       <Text
-        title="Objetivos"
-        description="Desarrollar un portal para capturar todos los datos necesarios para la creación de un pedido en SAP, para los canales de Distribución y Venta Directa."
+        title="¿Cómo hacer un Pedido?"
+        description="Si usas HubSpot elige Buscar Negocio; si necesitas generar un pedido manual elige Crear Pedido Manual."
       />
+     {/* crea dos tarjetas como botones que dirijan a la pagina neoForm y neoForm2, neoForm2 debe ser naranja y transparente, la otra azul y transparente */}
+     
+     <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+      <a className="mt-2 w-96 text-2xl text-center mb-5 text-gray-800 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-orange-600/50  dark:bg-gradient-to-r dark:from-orange-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-lg" href="/neoForm2">
+        Buscar Negocio en HubSpot
+      </a>
+      <a className="mt-2 w-96 text-2xl text-center mb-5 text-gray-800 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50  dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-lg" href="/neoForm">
+        Crear Pedido Manual
+      </a>
+      </div>
 
+
+{/* 
       <Text title="Modulos y Flujo" />
 
       <GridCards />
@@ -63,10 +78,10 @@ const Landing = () => {
       <Text
         title="Desarrollo: Plazos y Encargados"
         description="Canales Digitales se encargará del desarrollo general del portal, las integraciones con HubSpot y Auth0, el diseño de la UI/UX, el modulo de Productos (cuando trabajemos con stock unificado) y el deploy en Vercel. El modulo de Logística será desarrollado por el equipo de desarrollo externo (que ya ha trabajado creando estas calculadoras de costos). El proyecto será entregado en producción en 2 semanas. A partir de esta etapa Claudio Valdebenito utilizará esta información para crear los pedidos en SAP."
-      />
+      />*/}
 
-      {/* <FlowChart /> */}
-    </div>
+     
+    </div> 
   );
 };
 

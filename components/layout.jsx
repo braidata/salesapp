@@ -14,8 +14,8 @@ const Layout = ({children }) => {
       </Head>
       <Navbar  />
 
-      <div className="min-h-screen mx-auto  flex lg:flex-row sm:max-w-2xl flex-col">
-        <main className="flex-grow container mx-auto px-4 sm:px-6">
+      <div className="min-h-screen -mx-8 sm:mx-auto  flex lg:flex-row sm:max-w-2xl flex-col">
+        <main className="flex-grow container mx-8 sm:mx-auto px-2 sm:px-6">
           {children}
         </main>
       </div>
