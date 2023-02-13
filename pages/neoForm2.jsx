@@ -51,9 +51,10 @@ const App = () => {
   //console.log("la session", session ? session.token.token.user.permissions : "No conectado")  session.token.token.user.permissions !== "hubspot"
   if (status === "loading") {
     return (
-      <div>
-        <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-white-900 dark:to-purple-700/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
-      mt-48 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+      <>
+      <div className=" mt-48 mb-5">
+        <h1 className=" mt-48 mb-5  dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-white-900 dark:to-purple-700/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+     bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
       border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
           ENVÍA TU NEGOCIO A SAP
         </h1>
@@ -61,6 +62,8 @@ const App = () => {
           Identificate con tu cuenta de Hubspot para acceder a los Negocios de HubSpot o solicita un acceso con los permisos necesarios a tu administrador de Ventus Sales y HubSpot.
         </p>
       </div>
+
+      </>
     );
   }
 
