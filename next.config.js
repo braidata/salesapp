@@ -18,6 +18,13 @@ module.exports = {
     ],
   },
 
+  webpack: (
+    config, options
+  ) => {
+    config.module.noParse = [require.resolve("typescript/lib/typescript.js")]
+    return config
+  },
+
   typescript: {
     // !! WARN !!
     // Dangerously allow production builds to successfully complete even if
