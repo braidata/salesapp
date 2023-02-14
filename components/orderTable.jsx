@@ -172,7 +172,7 @@ const OrderTable = ({ data }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg
+                  <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg
                   ">
                     <td className="py-3 px-2 rounded-bl-lg">{modalData.id}</td>
                     <td className="py-3 px-2">{modalData.customer_name}</td>
@@ -198,18 +198,22 @@ const OrderTable = ({ data }) => {
                       <th scope="col" className="py-3 px-2">
                         Cantidad
                       </th>
-                      <th scope="col" className="py-3 px-2 rounded-tr-lg">
+                      <th scope="col" className="py-3 px-2 ">
                         SKU
+                      </th>
+                      <th scope="col" className="py-3 px-2 rounded-tr-lg">
+                        Totales
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="">
                     {modalData.order_items.map((item, i) => (
-                      <tr className="w-full py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-md" key={i}>
-                        <td className="py-3 px-2 rounded-l-lg">{item.name}</td>
-                        <td className="py-3 px-2">{item.price}</td>
-                        <td className="py-3 px-2">{item.quantity}</td>
-                        <td className="py-3 px-2 rounded-r-lg">{item.sku}</td>
+                      <tr className= {`text-center -mt-${(i+4)*2} max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg z-${i+2}0`} key={i}>
+                        <td className="py-3  px-2 ">{item.name}</td>
+                        <td className="py-3  px-2">{item.price}</td>
+                        <td className="py-3  px-2">{item.quantity}</td>
+                        <td className="py-3  px-2 ">{item.sku}</td>
+                        <td className="-py-8  px-2">{item.price*item.quantity}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -240,12 +244,12 @@ const OrderTable = ({ data }) => {
                   </thead>
                   <tbody>
                     {modalData.payments.map((item, i) => ( 
-                    <tr className="w-full py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-md" >
-                      <td className="py-3 px-2 rounded-bl-lg">{item.method}</td>
-                      <td className="py-3 px-2">{item.payment_count}</td>
-                      <td className="py-3 px-2">{item.payment_amount}</td>
-                      <td className="py-3 px-2">{item.rut_pagador}</td>
-                      <td className="py-3 px-2 rounded-br-lg">{item.payment_date}</td>
+                    <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
+                      <td className="py-3  px-2 rounded-bl-lg">{item.method}</td>
+                      <td className="py-3  px-2">{item.payment_count}</td>
+                      <td className="py-3  px-2">{item.payment_amount}</td>
+                      <td className="py-3  px-2">{item.rut_pagador}</td>
+                      <td className="py-3  px-2 rounded-br-lg">{item.payment_date}</td>
                     </tr>
                     ))}
                   </tbody>

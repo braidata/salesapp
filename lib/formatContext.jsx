@@ -470,10 +470,53 @@ export default function FormatContext({ context, componente }) {
           }
         },
       }),
+      //valida que el array productos tenga al menos un producto
 
-      order_items: yup.array().required("Productos es requerido"),
+      order_items: yup.array().of(
+        yup.object().shape({
+
+          product_id: yup.string().nullable(
+            "Producto es requerido"
+          ).test({
+            name: "Producto",
+            message: "Ingresa un Producto en HubSpot",
+            test: (value) => {
+
+              if (value === null) {
+                return false;
+              } else {
+                return true;
+              }
+            },
+          }),
+          quantity: yup.string().nullable(
+            "Cantidad es requerido"
+          ).test({
+            name: "Cantidad",
+            message: "Ingresa una Cantidad en HubSpot",
+            test: (value) => {
+
+              if (value === null) {
+                return false;
+              } else {
+                return true;
+              }
+            },
+          })}),
+
+      ).min(1, "Debes agregar al menos un producto").test({
+        name: "Productos",
+        message: "Ingresa al menos un Producto en HubSpot",
+        test: (value) => {
+
+          if (value.length === 0) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+      }),
     });
-
 
 
 
