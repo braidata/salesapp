@@ -158,6 +158,16 @@ const BlurNavbar = () => {
       </div>
 
       <div className="flex flex-row justify-center items-center ml-auto">
+      <Link href="/neoForm2">
+          <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
+        active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
+        font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Pedido HubSpot</p>
+        </Link>
+        <Link href="/neoForm">
+          <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
+        active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
+        font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Pedido Manual</p>
+        </Link>
         <Link href="/dashboard">
           <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
