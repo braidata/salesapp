@@ -56,35 +56,35 @@ export default function DealCard({
   return (
     <div
       key={id}
-      className="flex flex-col items-center justify-center w-full h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5"
+      className="flex flex-col items-center justify-center w-96 h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5"
     >       {/* deal card cristal glow transparent*/}
-      <div className="flex flex-col items-center justify-center w-full h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5 
+      <div className="flex flex-col items-center justify-center h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5 
       ">
         {/* deal card cristal glow transparent*/}
-        <table className="rounded-lg mt-1 w-full h-full px-2 py-2">
-          <thead className="px-2 py-2 w-full rounded-lg text-gray-800 dark:text-gray-300 text-sm font-semibold text-center border-b border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800">
+        <table className="rounded-lg mt-1 max-w-min h-full px-2 py-2 z-40 shadow-lg">
+          <thead className="px-2 py-2 rounded-lg text-gray-800 dark:text-gray-200 text-sm font-semibold text-center border-b border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800">
          
-            <tr className="px-2 py-2 w-full rounded-lg bg-gray-300 dark:bg-gray-700">
-              <th className="text-center mr-4 text-md text-bold rounded-sm px-4 py-3">
+            <tr className="px-2 py-2  rounded-lg bg-gray-300  dark:bg-gray-700">
+              <th className="flex flex-col text-center max-w-min  mr-1 text-sm text-bold  px-2 py-2 rounded-tl-lg">
                 Nombre
               </th>
-              <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">
+              <th className=" text-center mr-2 text-md text-bold  px-4 py-3">
                 ID
               </th>
-              <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">
+              <th className="hidden lg:block text-center mr-2 text-md text-bold  px-4 py-3">
                 Etapa
               </th>
-              <th className=" text-center mr-4 text-md text-bold rounded-sm px-4 py-3">
+              <th className=" text-center mr-2 text-md text-bold  px-4 py-3 rounded-tr-lg">
                 Monto
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr className="px-2 py-2 w-full rounded-lg mb-8 bg-gray-200 dark:bg-gray-700">
-              <td className="px-2 py-2 text-center mr-4 mt-4 text-sm">{name} </td>
+            <tr className="max-w-screen-sm rounded-lg mb-8 bg-gray-200 dark:bg-gray-800 opacity-60 text-gray-900 dark:text-white text-sm">
+              <td className="px-2 py-2 text-justify mr-2 mt-2  rounded-bl-lg">{name} </td>
 
               <td
-                className="px-2 py-2 text-center mr-4 mt-4 text-sm"
+                className="px-2 py-2 text-center mr-2 mt-4 "
                 key={id}
                 value={id}
                 ref={refE2}
@@ -92,9 +92,9 @@ export default function DealCard({
                 {id}
               </td>
 
-              <td className="px-2 py-2 text-center mr-4 mt-4 text-sm">{stage}</td>
+              <td className="hidden lg:block px-2 py-2 text-center mr-2 mt-4 ">{stage}</td>
 
-              <td className="px-2 py-2 text-center mr-4 mt-4 text-sm">{amount}</td>
+              <td className="px-2 py-2 text-center mr-2 mt-4  rounded-br-lg">{amount}</td>
             </tr>
           </tbody>
         </table>
@@ -113,11 +113,11 @@ export default function DealCard({
               type="submit"
               onClick={handleClick}
               disabled={status}
-              className={`mt-2 mb-5 text-gray-800 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50  dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full
+              className={`mt-2 mb-5 text-gray-800 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50  dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center
                
                ${
                 status
-                  ? "invisible"
+                  ? "hidden"
                   : "hover:bg-blue-800/90"
               }`}
             >

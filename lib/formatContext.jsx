@@ -618,7 +618,7 @@ export default function FormatContext({ context, componente }) {
           className={` ${statusQ
             ? "hidden"
             : "hover:bg-blue-800/90"
-            } mt-2 mb-5 text-gray-800 bg-gradient-to-r from-indigo-600/40 to-indigo-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-indigo-800 hover:bg-indigo-600/50  dark:bg-gradient-to-r dark:from-indigo-500/40 dark:to-indigo-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full `}
+            } mt-2 mb-5 text-gray-800 bg-gradient-to-r from-indigo-600/40 to-indigo-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-indigo-800 hover:bg-indigo-600/50  dark:bg-gradient-to-r dark:from-indigo-500/40 dark:to-indigo-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center `}
           onClick={orderSender}>Enviar Orden a SAP</button>
 
         {errorStatus ? <div className="mt-5 mb-5 bg-orange-700/90 border border-gray-300 text-center text-gray-900 text-md rounded-lg hover:bg-orange-600/90 focus:ring-blue-500 focus:border-blue-500 block w-96 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -652,14 +652,14 @@ export default function FormatContext({ context, componente }) {
                 <td className="border px-2 py-2 flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">{error[1]}
                   {/* link for go to hubspot deal según el dealId en datas.dealId*/}
                   {/* style with hubspot colors */}
-                  {/* {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="mt-2 mb-2 mx-2 text-gray-800 bg-gradient-to-r from-yellow-600/40 to-orange-800/40 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full"
+                  {/* {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="mt-2 mb-2 mx-2 text-gray-800 bg-gradient-to-r from-yellow-600/40 to-orange-800/40 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center"
                   >Ir a HubSpot</Link>} */}
                 </td>
 
                 <td className="border px-2 py-2 flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">
                   {/* link for go to hubspot deal según el dealId en datas.dealId*/}
                   {/* style with hubspot colors */}
-                  {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="w-48 mt-2 mb-2 text-center  text-gray-800 bg-gradient-to-r from-yellow-600/60 to-orange-800/80 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200  dark:hover:bg-orange-600/50 dark:text-gray-200 font-bold py-2 px-2 rounded-full"
+                  {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="w-48 mt-2 mb-2 text-center  text-gray-800 bg-gradient-to-r from-yellow-600/60 to-orange-800/80 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200  dark:hover:bg-orange-600/50 dark:text-gray-200 font-bold py-2 px-2 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center"
                   >Ir a HubSpot</Link>}
                 </td>
 
