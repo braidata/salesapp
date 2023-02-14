@@ -56,16 +56,16 @@ export default function DealCard({
   return (
     <div
       key={id}
-      className="flex flex-col items-center justify-center w-96 h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5"
+      className="flex flex-col items-center justify-center w-full h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5"
     >       {/* deal card cristal glow transparent*/}
       <div className="flex flex-col items-center justify-center h-full rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg p-2.5 
       ">
         {/* deal card cristal glow transparent*/}
-        <table className="rounded-lg mt-1 max-w-min h-full px-2 py-2 z-40 shadow-lg">
-          <thead className="px-2 py-2 rounded-lg text-gray-800 dark:text-gray-200 text-sm font-semibold text-center border-b border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800">
+        <table className=" mt-1 max-w-min h-full px-2 py-2 z-40 shadow-lg">
+          <thead className="px-2 py-2  text-gray-800 dark:text-gray-200 text-sm font-semibold text-center border-b border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800">
          
-            <tr className="px-2 py-2  rounded-lg bg-gray-300  dark:bg-gray-700">
-              <th className="flex flex-col text-center max-w-min  mr-1 text-sm text-bold  px-2 py-2 rounded-tl-lg">
+            <tr className="px-2 py-2  bg-gray-300  dark:bg-gray-700 rounded-tl-lg">
+              <th className="px-2 py-2 rounded-tl-lg flex flex-col text-center max-w-min  mr-1 text-sm text-bold  ">
                 Nombre
               </th>
               <th className=" text-center mr-2 text-md text-bold  px-4 py-3">
@@ -74,13 +74,13 @@ export default function DealCard({
               <th className="hidden lg:block text-center mr-2 text-md text-bold  px-4 py-3">
                 Etapa
               </th>
-              <th className=" text-center mr-2 text-md text-bold  px-4 py-3 rounded-tr-lg">
+              <th className=" text-center mr-2 text-md text-bold  px-4 py-3 ">
                 Monto
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr className="max-w-screen-sm rounded-lg mb-8 bg-gray-200 dark:bg-gray-800 opacity-60 text-gray-900 dark:text-white text-sm">
+            <tr className="max-w-screen-sm  mb-8 bg-gray-200 dark:bg-gray-800 opacity-60 text-gray-900 dark:text-white text-sm">
               <td className="px-2 py-2 text-justify mr-2 mt-2  rounded-bl-lg">{name} </td>
 
               <td
