@@ -21,7 +21,7 @@ const Landing = () => {
       border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
           Ventus Sales App
         </h1>
-        <p className="text-2xl text-gray-700 dark:text-gray-400">
+        <p className="text-lg text-gray-700 dark:text-gray-400">
           Portal WEB para Creación de Pedidos en SAP
         </p>
       </div>

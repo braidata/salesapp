@@ -36,23 +36,23 @@ const OrderTable = ({ data }) => {
 
   return (
 
-    <div className="flex flex-col mt-10 overflow-x-auto relative shadow-md sm:rounded-lg">
-      <table className="w-96 sm:w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <div className="w-96 sm:w-full flex flex-col mt-10 overflow-x-auto relative shadow-md sm:rounded-lg">
+      <table className="text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th scope="col" className="py-3 px-3">
+            <th scope="col" className="py-2 px-2">
               Cliente
             </th>
-            <th scope="col" className="py-3 px-3">
+            <th scope="col" className="hidden lg:flex lg:flex-col py-2 px-2">
               Productos
             </th>
-            <th scope="col" className="py-3 px-3">
+            <th scope="col" className="py-2 px-2">
               Estado
             </th>
-            <th scope="col" className="py-3 px-3">
+            <th scope="col" className="py-2 px-2">
               Empresa
             </th>
-            <th scope="col" className="py-3 px-3">
+            <th scope="col" className="py-2 px-2">
               Acción
             </th>
           </tr>
@@ -66,41 +66,41 @@ const OrderTable = ({ data }) => {
                 <th
 
                   scope="row"
-                  className="py-4 px-3 font-medium text-gray-900 whitespace-nowrap dark:text-white dark:hover:text-gray-300 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out"
+                  className="py-4 px-2 font-medium text-gray-900 whitespace-nowrap dark:text-white dark:hover:text-gray-300 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out"
                 >
                   {item.customer_name} {item.customer_lastname}
                 </th>
-                <td className="py-4 px-3 w-full text-sm dark:text-gray-400">
+                <td className="hidden lg:flex lg:flex-col py-4 px-2 w-full text-sm dark:text-gray-400">
                   {item.order_items.map(
                     (item, i) => (
                       console.log("itita4", item),
-                      <p className="py-4 px-3 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-gray-400 rounded shadow
+                      <p className="py-4 px-2 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-gray-400 rounded shadow
                       hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700/20 dark:hover:text-gray-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out 
                       ">{item.name}</p>
                     )
 
                   )}
                 </td>
-                <td className="py-4 px-3 w-24 sm:w-full text-sm dark:text-gray-400">
-                {/* <p className="py-4 px-3 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-green-400 rounded shadow
+                <td className="py-4 px-2 w-24 sm:w-24 text-sm dark:text-gray-400">
+                {/* <p className="py-4 px-2 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-green-400 rounded shadow
                 hover:bg-green-100 hover:text-green-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-green-700/20 dark:hover:text-green-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out 
                 ">
                     {item.statusSAP}</p> */}
                   {item.statusSAP === "Procesando" ? (
-                    <p className="py-2 px-3 mt-2 mb-2 rounded-md border dark:border-yellow-300/80 dark:hover:border-yellow-200/80 border border-yellow-700 rounded shadow
+                    <p className="py-2 px-2 mt-2 mb-2 sm:w-24 text-center rounded-md border dark:border-yellow-300/80 dark:hover:border-yellow-200/80 border border-yellow-700 rounded shadow
                     hover:bg-yellow-100/20 hover:text-yellow-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-yellow-700/20 dark:hover:text-yellow-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
                     ">{item.statusSAP}</p>
                   ) : item.statusSAP === "Facturado" ? (
-                    <p className="py-2 px-3 mt-2 mb-2 rounded-md border dark:border-green-300/80 dark:hover:border-green-200/80 border border-green-600 rounded shadow
+                    <p className="py-2 px-2 mt-2 mb-2 sm:w-24 text-center rounded-md border dark:border-green-300/80 dark:hover:border-green-200/80 border border-green-600 rounded shadow
                     hover:bg-green-200/20 hover:text-green-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-green-700/20 dark:hover:text-green-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
                     ">{item.statusSAP}</p>
                   ) : item.statusSAP === "Error SAP" ? (
-                    <p className="py-2 px-3 mt-2 mb-2 rounded-md border dark:border-red-300/80 dark:hover:border-red-200/80 border border-red-800 rounded shadow
+                    <p className="py-2 px-2 mt-2 mb-2 sm:w-24 text-center rounded-md border dark:border-red-300/80 dark:hover:border-red-200/80 border border-red-800 rounded shadow
                     hover:bg-red-100/20 hover:text-red-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-red-700/20 dark:hover:text-red-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
                     ">{item.statusSAP}</p>
 
                   ) : (
-                    <p className="py-2 px-3 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-blue-700 rounded shadow
+                    <p className="py-2 px-2 mt-2 mb-2 sm:w-24 text-center rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-blue-700 rounded shadow
                     hover:bg-blue-100/20 hover:text-blue-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-blue-700/20 dark:hover:text-blue-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
                     ">{item.statusSAP}</p>
                   )}
@@ -108,10 +108,10 @@ const OrderTable = ({ data }) => {
 
                   
                 </td>
-                <td className="py-4 px-3 text-sm dark:text-gray-400">
+                <td className="py-4 px-2 text-sm dark:text-gray-400">
                   {item.billing_company_name}
                 </td>
-                <td className="w-96 sm:w-full py-4 px-3 text-sm dark:text-gray-400">
+                <td className="w-full sm:w-24 py-4 px-2 text-sm dark:text-gray-400">
                   <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full" onClick={() => handleModalOpen(item)}>
                     Ver
                   </button>
@@ -147,69 +147,69 @@ const OrderTable = ({ data }) => {
             </header>
             {/* modal-card-body */}
             <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg"> 
-                <table className="py-3 px-3  w-full text-sm dark:text-gray-400 rounded-lg">
+                <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
-                    <tr className="w-full py-3 px-3 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
-                      <th scope="col" className="py-3 px-3 rounded-tl-lg">
+                    <tr className="w-full py-3 px-2 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
+                      <th scope="col" className="py-3 px-2 rounded-tl-lg">
                       ID
                     </th>
-                    <th scope="col" className="py-3 px-3">
+                    <th scope="col" className="py-3 px-2">
                       Cliente
                     </th>
-                    <th scope="col" className="py-3 px-3">
+                    <th scope="col" className="py-3 px-2">
                       Correo
                     </th>
-                    <th scope="col" className="py-3 px-3">
+                    {/* <th scope="col" className="py-3 px-2 hidden lg:flex lg:flex-row">
                       Teléfono
                     </th>
-                    <th scope="col" className="py-3 px-3">
+                    <th scope="col" className="py-3 px-2 hidden lg:flex lg:flex-row">
                       Rut
-                    </th>
-                    <th scope="col" className="py-3 px-3 rounded-tr-lg">
+                    </th> */}
+                    <th scope="col" className="py-3 px-2 rounded-tr-lg ">
                       Estado
                     </th>
 
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className=" w-full py-3 px-3 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg
+                  <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg
                   ">
-                    <td className="py-3 px-3 rounded-bl-lg">{modalData.id}</td>
-                    <td className="py-3 px-3">{modalData.customer_name}</td>
-                    <td className="py-3 px-3">{modalData.customer_email}</td>
-                    <td className="py-3 px-3">{modalData.customer_phone}</td>
-                    <td className="py-3 px-3">{modalData.customer_rut}</td>
-                    <td className="py-3 px-3 rounded-br-lg">{modalData.statusSAP}</td>
+                    <td className="py-3 px-2 rounded-bl-lg">{modalData.id}</td>
+                    <td className="py-3 px-2">{modalData.customer_name}</td>
+                    <td className="py-3 px-2">{modalData.customer_email}</td>
+                    {/* <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_phone}</td>
+                    <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_rut}</td> */}
+                    <td className="py-3 px-2 rounded-br-lg">{modalData.statusSAP}</td>
                   </tr>
                 </tbody>
               </table>
               </section>
               {modalData.order_items && (
                 <section className=" p-2 dark:text-gray-300 mt-2"> 
-                <table className="py-3 px-3  w-full text-sm dark:text-gray-400 rounded-lg">
+                <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
-                    <tr className="w-full py-3 px-3 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
-                      <th scope="col" className="py-3 px-3 rounded-tl-lg">
+                    <tr className="w-full max-w-sm py-3 px-2 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
+                      <th scope="col" className="py-3 px-2 rounded-tl-lg">
                         Producto
                       </th>
-                      <th scope="col" className="py-3 px-3">
+                      <th scope="col" className="py-3 px-2">
                         Precio
                       </th>
-                      <th scope="col" className="py-3 px-3">
+                      <th scope="col" className="py-3 px-2">
                         Cantidad
                       </th>
-                      <th scope="col" className="py-3 px-3 rounded-tr-lg">
+                      <th scope="col" className="py-3 px-2 rounded-tr-lg">
                         SKU
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {modalData.order_items.map((item, i) => (
-                      <tr className="w-full py-3 px-3 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-md" key={i}>
-                        <td className="py-3 px-3 rounded-l-lg">{item.name}</td>
-                        <td className="py-3 px-3">{item.price}</td>
-                        <td className="py-3 px-3">{item.quantity}</td>
-                        <td className="py-3 px-3 rounded-r-lg">{item.sku}</td>
+                      <tr className="w-full py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-md" key={i}>
+                        <td className="py-3 px-2 rounded-l-lg">{item.name}</td>
+                        <td className="py-3 px-2">{item.price}</td>
+                        <td className="py-3 px-2">{item.quantity}</td>
+                        <td className="py-3 px-2 rounded-r-lg">{item.sku}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -218,34 +218,34 @@ const OrderTable = ({ data }) => {
               )}
               {modalData.payments && (
                 <section className=" p-2 dark:text-gray-300 mt-2">
-                <table className="py-3 px-3  w-full text-sm dark:text-gray-400 rounded-lg">
+                <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
-                    <tr className="w-full py-3 px-3 text-gray-700 bg-gray-300/80 border-t border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md" >
-                      <th scope="col" className="py-3 px-3 rounded-tl-lg">
-                        Metodo de Pago 
+                    <tr className="w-full max-w-sm py-3 px-2 text-gray-700 bg-gray-300/80 border-t border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md" >
+                      <th scope="col" className="py-3 px-2 rounded-tl-lg">
+                        Método de Pago 
                       </th>
-                      <th scope="col" className="py-3 px-3">
+                      <th scope="col" className="py-3 px-2">
                         Total
                       </th>
-                      <th scope="col" className="py-3 px-3">
-                        Fecha
+                      <th scope="col" className="py-3 px-2">
+                        Monto
                       </th>
-                      <th scope="col" className="py-3 px-3">
-                        Código de Autorización
+                      <th scope="col" className="py-3 px-2">
+                        Rut Pagador
                       </th>
-                      <th scope="col" className="py-3 px-3 rounded-tr-lg">
+                      <th scope="col" className="py-3 px-2 rounded-tr-lg">
                         Fecha de Pago
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {modalData.payments.map((item, i) => ( 
-                    <tr className="w-full py-3 px-3 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-md" >
-                      <td className="py-3 px-3 rounded-bl-lg">{item.method}</td>
-                      <td className="py-3 px-3">{item.payment_count}</td>
-                      <td className="py-3 px-3">{item.payment_amount}</td>
-                      <td className="py-3 px-3">{item.authorization_code}</td>
-                      <td className="py-3 px-3 rounded-br-lg">{item.payment_date}</td>
+                    <tr className="w-full py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-green-200/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-md" >
+                      <td className="py-3 px-2 rounded-bl-lg">{item.method}</td>
+                      <td className="py-3 px-2">{item.payment_count}</td>
+                      <td className="py-3 px-2">{item.payment_amount}</td>
+                      <td className="py-3 px-2">{item.rut_pagador}</td>
+                      <td className="py-3 px-2 rounded-br-lg">{item.payment_date}</td>
                     </tr>
                     ))}
                   </tbody>

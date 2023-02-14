@@ -418,7 +418,7 @@ const idOwners = async (event, id) => {
   };
 
   return (
-    <div className="mt-10">
+    <div className="mt-10 w-96 sm:w-full">
       {/* <SessionInfo /> */}
       <form onSubmit={contactoAsociado}>
         <label
@@ -452,7 +452,7 @@ const idOwners = async (event, id) => {
               Debes completar los datos de Empresa en HubSpot para continuar.
             </h4>
             <button
-              className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_10px_10px_rgba(0,155,177,0.75)]  border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-400/50 dark:to-orange-600/50 border-2 dark:drop-shadow-[0_10px_10px_rgba(0,255,255,0.25)]  dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full"
+              className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_10px_10px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-400/50 dark:to-orange-600/50 border-2 dark:drop-shadow-[0_10px_10px_rgba(255,200,0,0.25)]  dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full"
               type="submit"
             >
               Cargar Datos{" "}

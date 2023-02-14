@@ -11,6 +11,7 @@ import { PrismaClient } from "@prisma/client";
 import data from "./data";
 import styles from "../styles/styles.module.scss";
 import { isLabeledStatement } from "typescript";
+import Link from "next/link";
 
 
 
@@ -403,7 +404,7 @@ export default function FormatContext({ context, componente }) {
         },
       }),
 
-      rut_pagador: yup.string().test({
+      rut_pagador: yup.string().nullable("Rut Pagador es Requerido").test({
         name: "Rut de Pagador Válido",
         message: "Ingresa un Rut de Pagador válido en HubSpot",
         test: (value) => {
@@ -571,10 +572,10 @@ export default function FormatContext({ context, componente }) {
         {/* <div ref={divRef}  >{errorH ? errorH.map((error) => error) : "AÚN NO HAY ERRORES"}</div> */}
 
         <button
-          className={`mt-2 mb-5 text-gray-800 bg-gradient-to-r from-indigo-600/40 to-indigo-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-indigo-800 hover:bg-indigo-600/50  dark:bg-gradient-to-r dark:from-indigo-500/40 dark:to-indigo-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full ${statusQ
-            ? "opacity-50 cursor-not-allowed"
+          className={` ${statusQ
+            ? "hidden"
             : "hover:bg-blue-800/90"
-            }`}
+            } mt-2 mb-5 text-gray-800 bg-gradient-to-r from-indigo-600/40 to-indigo-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-indigo-800 hover:bg-indigo-600/50  dark:bg-gradient-to-r dark:from-indigo-500/40 dark:to-indigo-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full `}
           onClick={orderSender}>Enviar Orden a SAP</button>
 
         {errorStatus ? <div className="mt-5 mb-5 bg-orange-700/90 border border-gray-300 text-center text-gray-900 text-md rounded-lg hover:bg-orange-600/90 focus:ring-blue-500 focus:border-blue-500 block w-96 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -591,11 +592,13 @@ export default function FormatContext({ context, componente }) {
       {/* {errorH && <p className={styles.errorText}>{errorH ? Object.entries(errorH).map((error) => error[1]) : "AÚN NO HAY ERRORES"}</p>} */}
 
       {
-        errorH && <table className="table-auto">
+        errorH && <table className="flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">
+       
           <thead>
             <tr>
               {/* <th className="px-2 py-2">Campo</th> */}
-              <th className="px-2 py-2">Error</th>
+              <th className="px-2 py-2">Datos Faltantes En HubSpot:</th>
+              {/* <th className="px-2 py-2">Acción</th> */}
             </tr>
           </thead>
           <tbody>
@@ -603,11 +606,18 @@ export default function FormatContext({ context, componente }) {
               <tr className="
               ">
                 {/* <td className="border px-2 py-2">{error[0]}</td> */}
-                <td className="border px-2 py-2">{error[1]}
+                <td className="border px-2 py-2 flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">{error[1]}
                   {/* link for go to hubspot deal según el dealId en datas.dealId*/}
                   {/* style with hubspot colors */}
-                  {datos && <a href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="bg-orange-700/90 border border-gray-300 text-center text-gray-900 text-md rounded-lg hover:bg-orange-600/90 focus:ring-blue-500 focus:border-blue-500 block w-24 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >Ir a HubSpot</a>}
+                  {/* {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="mt-2 mb-2 mx-2 text-gray-800 bg-gradient-to-r from-yellow-600/40 to-orange-800/40 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full"
+                  >Ir a HubSpot</Link>} */}
+                </td>
+
+                <td className="border px-2 py-2 flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">
+                  {/* link for go to hubspot deal según el dealId en datas.dealId*/}
+                  {/* style with hubspot colors */}
+                  {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="w-48 mt-2 mb-2 text-center  text-gray-800 bg-gradient-to-r from-yellow-600/60 to-orange-800/80 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200  dark:hover:bg-orange-600/50 dark:text-gray-200 font-bold py-2 px-2 rounded-full"
+                  >Ir a HubSpot</Link>}
                 </td>
 
               </tr>

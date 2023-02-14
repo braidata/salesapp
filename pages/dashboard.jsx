@@ -37,7 +37,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+    <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
       <Text
         title="Dashboard"
         classe="dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110

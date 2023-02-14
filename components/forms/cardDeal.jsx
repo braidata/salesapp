@@ -117,7 +117,7 @@ export default function DealCard({
                
                ${
                 status
-                  ? "opacity-50 cursor-not-allowed"
+                  ? "invisible"
                   : "hover:bg-blue-800/90"
               }`}
             >
