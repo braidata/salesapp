@@ -59,7 +59,7 @@ const App = () => {
           ENVÍA TU NEGOCIO A SAP
         </h1>
         <p className="mt-10 bg-gray-100 text-sm  border border-gray-300 text-gray-600 text-xl text-center rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-400 dark:border-gray-200 dark:placeholder-gray-400 dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
-          Identificate con tu cuenta de Hubspot para acceder a los Negocios de HubSpot o solicita un acceso con los permisos necesarios a tu administrador de Ventus Sales y HubSpot.
+          Identificate con tu cuenta para acceder a los Negocios de HubSpot o solicita un acceso con los permisos necesarios a tu administrador de Ventus Sales y HubSpot.
         </p>
       </div>
 
