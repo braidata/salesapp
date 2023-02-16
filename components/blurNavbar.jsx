@@ -110,6 +110,20 @@ const BlurNavbar = () => {
                     </Link>
                   </div>
                 </section>
+                <section className="opacity-50 bg-gray-300/90 flex flex-col items-center justify-center p-5 border-b border-gray-300 dark:border-gray-600 dark:bg-gray-800
+            ">
+                  <div className="flex flex-col justify-center items-center">
+                    <Link href="/tools">
+                      <h1
+                        className="text-lg sm:text-3x1 hover:backdrop-blur w-96 text-center rounded hover:bg-blue-300/20
+        active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
+        font-bold dark:text-white text-cyan-900 dark:hover:bg-white/20" onClick={handleModalClose}
+                      >
+                        Herramientas
+                      </h1>
+                    </Link>
+                  </div>
+                </section>
 
                 <section className="opacity-50 bg-gray-300/90 flex flex-col items-center justify-center p-5 border-b border-gray-300 dark:border-gray-600 dark:bg-gray-800
             ">
@@ -172,6 +186,11 @@ const BlurNavbar = () => {
           <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Dashboard</p>
+        </Link>
+        <Link href="/dashboard">
+          <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
+        active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
+        font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Herramientas</p>
         </Link>
         <LoginButton />
         {renderThemeChanger()}

@@ -120,9 +120,9 @@ export default function PaymentForm() {
         payment_amount: "",
         payment_date: "",
       });
-      alert("Payment created successfully");
+      alert("El Pago fue creado con éxito");
     } else {
-      alert("Error creating payment");
+      alert("Error al crear el Pago");
     }
   };
 
@@ -132,53 +132,59 @@ export default function PaymentForm() {
   };
 
   return (
+    <>
+    <h1 className="w-96 sm:w-full text-6xl font-bold text-gray-900 dark:text-gray-300 mt-24 mb-24 dark:text-gray-300 font-bold py-4 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+    bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+    border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
+      INGRESA EL PAGO DE TU PEDIDO
+    </h1>
     <form onSubmit={handleSubmit} className="bg-gray-800 bg-opacity-75 rounded-lg px-8 pt-6 pb-8 mb-4">
       <div className="mb-4">
-        <label className="block text-gray-300 font-bold mb-2" htmlFor="order_id">
+        <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300 " htmlFor="order_id">
           Order ID:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="order_id" value={paymentData.order_id} onChange={handleChange} required />
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="text" name="order_id" value={paymentData.order_id} onChange={handleChange} required />
       </div>
       <div className="mb-4">
-        <label className="block text-gray-300 font-bold mb-2" htmlFor="method">
-          Method:
+        <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300" htmlFor="method">
+          Método de Pago:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="method" value={paymentData.method} onChange={handleChange} required />
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="text" name="method" value={paymentData.method} onChange={handleChange} required />
       </div>
       <div
       className="mb-4">
-        <label className="block text-gray-300 font-bold mb-2" htmlFor="rut_pagador">
+        <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300" htmlFor="rut_pagador">
             Rut pagador:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="rut_pagador" value={paymentData.rut_pagador} onChange={handleChange} required />
-        <label className="block text-gray-300 font-bold mb-2" htmlFor="authorization_code">
-          Authorization code:
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="text" name="rut_pagador" value={paymentData.rut_pagador} onChange={handleChange} required />
+        <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300" htmlFor="authorization_code">
+          Código de Autorización:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="authorization_code" value={paymentData.authorization_code} onChange={handleChange} required />
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="text" name="authorization_code" value={paymentData.authorization_code} onChange={handleChange} required />
       </div>
       <div className="mb-4">
-        <label className="block text-gray-300 font-bold mb-2" htmlFor="payment_count">
-          Payment count:
+        <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300" htmlFor="payment_count">
+          Cantidad de pagos:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="payment_count" value={paymentData.payment_count} onChange={handleChange} required />
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="text" name="payment_count" value={paymentData.payment_count} onChange={handleChange} required />
       </div>
       <div className="mb-4">
-        <label className="block text-gray-300 font-bold mb-2" htmlFor="payment_amount">
-          Payment amount:
+        <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300" htmlFor="payment_amount">
+          Monto total:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="payment_amount" value={paymentData.payment_amount} onChange={handleChange} required />
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="text" name="payment_amount" value={paymentData.payment_amount} onChange={handleChange} required />
         </div>
         <div className="mb-4">
-        <label className="block text-gray-300 font-bold mb-2" htmlFor="payment_date">
-            Payment date:
+        <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300" htmlFor="payment_date">
+            Fecha de Pago:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="payment_date" value={paymentData.payment_date} onChange={handleChange} required />  
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="text" name="payment_date" value={paymentData.payment_date} onChange={handleChange} required />  
         </div>
         <div className="flex items-center justify-between">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-            Create payment
+        <button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" type="submit">
+            Crear Pago
         </button>
         </div>
-    </form>
+    </form></>
     );
 }
