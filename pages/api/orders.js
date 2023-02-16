@@ -4,13 +4,11 @@ import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 
 const ordenes = [
 
-  173321,
-  173865,
-  173704,
-  173772,
-  173685,
-  173866,
-  173803,
+  172316,
+172675,
+174044,
+174059,
+
   
 
   

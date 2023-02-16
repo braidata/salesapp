@@ -28,11 +28,12 @@ const payment = await prisma.payments.findMany({where:{
 //generate a payment with order_id as an optional value to find in the where clause
 // const payment = await prisma.payments.create({
 //    data: {
-//        order_id: oId,
-//        rut_pagador: data.rut_pagador,
-//        auth_code: data.auth_code,
-//        monto: data.monto,
-//        fecha_pago: data.fecha_pago,
+//        order_id,
+//        rut_pagador,
+//        payment_amount,
+//        payment_date,
+//        payment_count,
+//        authorization_code,
 //        }
 //    });
 
