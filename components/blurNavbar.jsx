@@ -187,7 +187,7 @@ const BlurNavbar = () => {
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Dashboard</p>
         </Link>
-        <Link href="/dashboard">
+        <Link href="/tools">
           <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Herramientas</p>
