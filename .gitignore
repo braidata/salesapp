@@ -42,3 +42,7 @@ next-env.d.ts
 # Local Netlify folder
 .netlify
 .env
+.env.save
+.env.swp
+
+
