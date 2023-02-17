@@ -73,6 +73,9 @@ model payments {
   payment_amount     String  @db.VarChar(255)
   payment_date       String  @db.VarChar(255)
   rut_pagador        String? @db.VarChar(255)
+  status             String? @db.VarChar(255)
+  observation        String? @db.VarChar(255)
+  validation_date    String? @db.VarChar(255)
   orders             orders?  @relation(fields: [order_id], references: [id])
 
   @@index([order_id])
