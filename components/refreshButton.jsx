@@ -6,7 +6,7 @@ export default function RefreshButton ({functions})  {
     return (
         
         //refresh button+icon
-        <div className="flex flex-col justify-center items-center w-96 mt-24 sm:w-full">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-24">
             
             <button
         onClick={functions}
