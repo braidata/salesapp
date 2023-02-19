@@ -283,27 +283,27 @@ const LlamadorPagos = () => {
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                         <div className=" bg-white/30 dark:bg-gray-800/80 flex flex-col align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:-my-2 max-h-sm sm:align-middle sm:max-w-lg sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                       
-                            <div className="bg-white/30 dark:bg-gray-900/80 px-2 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div className="  flex flex-row gap-12 sm:flex ">
+                            <div className="flex flex-row gap-12 text-center bg-white/30 dark:bg-gray-900/80 px-2 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div className="  flex flex-row gap-12 text-center  ">
                                     <div className="mt-3 flex flex-col text-center sm:mt-0 sm:ml-4 sm:text-left">
                                         <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-200" id="modal-headline">
                                             Validación de pagos
                                         </h3>
                                         
-                                        <div className="mt-2">
+                                        <div className="mt-2 ml-24">
                                             <p className="text-sm leading-5 text-gray-500 dark:text-gray-200">
                                                 Válida o rechaza los pagos ingresando un comentario.
                                             </p>
                                         </div>
                                         
                                     </div>
-                                    <div
+                                    <p
               title="Cerrar"
-                className="ml-24  -mt-24 m-48 rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
+                className=" rounded-full  text-gray-600/20 dark:text-gray-300/10 text-sm font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-70/100 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] z-50
                 transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
                 aria-label="close"
                 onClick={handleModalClose}
-              >X</div>
+              >X</p>
                                 </div>
                             </div>
                             <div className="flex flex-col justify-center items-center
@@ -366,7 +366,7 @@ const LlamadorPagos = () => {
                                     </div>
                                     <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
 
-                                        <button type="submit" className="rounded-full bg-gray-500/60 p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
+                                        <button type="submit" className="rounded-full bg-gray-500/80 p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
                 transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
                                         >
                                             Enviar
