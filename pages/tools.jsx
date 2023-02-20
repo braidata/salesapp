@@ -1,12 +1,12 @@
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import styles from "../styles/styles.module.scss";
 import LlamadorPagos from "../lib/llamadorPagos";
 import CreadorPagos from "../lib/creadorPagos";
 import RefreshButton from "../components/refreshButton";
-import { useSession, getSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+
 
 
 
@@ -24,32 +24,33 @@ const App = () => {
   const [llamadorPagosVisible, setLlamadorPagosVisible] = useState(false);
   const router = useRouter();
   const [refresh, setRefresh] = useState(false);
-  const [sessionInfo, setSessionInfo] = useState()
   const refreshPage = () => {
     setRefresh(true);
     router.reload();
   };
+
+  const [sessionInfo, setSessionInfo] = useState([])
   //fetch user data from prisma and mysqlPerm API
-  const permisos = async () => {
-    const res = await fetch("/api/mysqlPerm", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: session ? session.session.user.email : null,
-      }),
-    });
-    const data = await res.json();
-    console.log("el permiso: ", data);
-    setSessionInfo(data)
-  };
-  //funcion que llama a mysqlPerm y devuelve un array con los permisos y roles del usuario vía prisma
-
-  //const permisoDato = session ? session.user.permissions : "No conectado";
-  //const permiso = permis.some((el) => permisoDato.includes(el));
-  console.log("el permiso: ", session ? session.session.user.email : "No conectado");
-
+ // const permisos = async () => {
+    //const [sessionInfo, setSessionInfo] = useState([])
+    //fetch user data from prisma and mysqlPerm API
+    const permisos = async () => {
+      const res = await fetch("/api/mysqlPerm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session ? session.session.user.email : null,
+        }),
+      });
+      const data = await res.json();
+      //console.log("el permisos: ", data.user[0].rol);
+      const userRol = data ? data.user[0].rol : "No conectado";
+      //const userPerm = data ? data.user[0].permissions : "No conectado";
+      setSessionInfo([userRol])
+    };
+  
 
   //console.log("la session", session ? session.token.token.user.permissions : "No conectado")  session.token.token.user.permissions !== "hubspot"
   if (status === "loading") {
@@ -85,7 +86,7 @@ const App = () => {
     const userRol = data ? data.user[0].rol : "No conectado";
 
     if (userRol.includes("tester") || userRol.includes("user") || userRol.includes("superadmin") || userRol.includes("admin")) {
-      setCreadorPagosVisible(true);
+      setCreadorPagosVisible(!creadorPagosVisible);
     } else {
       alert(
         "No tienes permisos para acceder a esta herramienta. Contacta a tu administrador de Ventus Sales y HubSpot para que te otorgue los permisos necesarios."
@@ -109,7 +110,7 @@ const App = () => {
     const userRol = data ? data.user[0].rol : "No conectado";
 
     if (userRol.includes("tester") || userRol.includes("validator")) {
-      setLlamadorPagosVisible(true);
+      setLlamadorPagosVisible(!llamadorPagosVisible);
     } else {
       alert(
         "No tienes permisos para acceder a esta herramienta. Contacta a tu administrador de Ventus Sales y HubSpot para que te otorgue los permisos necesarios."
@@ -120,16 +121,9 @@ const App = () => {
 
 
   const toggleCreadorPagos = () => {
-    //run permisos and evaluate if the user has the validator 
-    permisos()
 
-    //usa los valores que trae persmisos para evaluar si el usuario tiene permisos para acceder a la herramienta
-    //si tiene permisos, se muestra el formulario, si no, se muestra un mensaje de error
-    if (sessionInfo && sessionInfo[0].permissions.includes("all")) {
       setCreadorPagosVisible(!creadorPagosVisible);
-    } else {
-      alert("No tienes permisos para acceder a esta herramienta. Contacta a tu administrador de Ventus Sales y HubSpot para que te otorgue los permisos necesarios.")
-    }
+    
 
   };
 
@@ -159,7 +153,10 @@ const App = () => {
 
         {creadorPagosVisible && <CreadorPagos />}
         {llamadorPagosVisible && <LlamadorPagos session={session} />}
-        {console.log("LA GRAN SESSION", session)}
+        {/* <div className="mt-10">
+          <button onClick={permisos}>PROBA</button>
+          </div> */}
+        {console.log("LA GRAN SESSION", session, sessionInfo)}
 
 
 

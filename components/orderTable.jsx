@@ -82,7 +82,7 @@ const OrderTable = ({ data }) => {
                   )}
                 </td>
                 <td className="py-4 px-2 w-24 sm:w-24 text-sm dark:text-gray-400">
-                {/* <p className="py-4 px-2 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-green-400 rounded shadow
+                  {/* <p className="py-4 px-2 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-green-400 rounded shadow
                 hover:bg-green-100 hover:text-green-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-green-700/20 dark:hover:text-green-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out 
                 ">
                     {item.statusSAP}</p> */}
@@ -106,7 +106,7 @@ const OrderTable = ({ data }) => {
                   )}
 
 
-                  
+
                 </td>
                 <td className="py-4 px-2 text-sm dark:text-gray-400">
                   {item.billing_company_name}
@@ -131,14 +131,14 @@ const OrderTable = ({ data }) => {
           {/* modal-card */}
           <div className=" bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
           ">
-             {/* modal-card-head*/}
+            {/* modal-card-head*/}
             <header className="bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800 
-            "> 
-            {/* modal-card-title */}
+            ">
+              {/* modal-card-title */}
               <p className="text-gray-600  text-xl font-semibold dark:text-gray-300 
               ">Detalles del pedido</p>
               <button
-              title="Cerrar"
+                title="Cerrar"
                 className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
                 transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
                 aria-label="close"
@@ -146,11 +146,11 @@ const OrderTable = ({ data }) => {
               >X</button>
             </header>
             {/* modal-card-body */}
-            <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg"> 
-                <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
-                  <thead>
-                    <tr className="w-full py-3 px-2 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
-                      <th scope="col" className="py-3 px-2 rounded-tl-lg">
+            <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg">
+              <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
+                <thead>
+                  <tr className="w-full py-3 px-2 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
+                    <th scope="col" className="py-3 px-2 rounded-tl-lg">
                       ID
                     </th>
                     <th scope="col" className="py-3 px-2">
@@ -183,9 +183,9 @@ const OrderTable = ({ data }) => {
                   </tr>
                 </tbody>
               </table>
-              </section>
-              {modalData.order_items && (
-                <section className=" p-2 dark:text-gray-300 mt-2"> 
+            </section>
+            {modalData.order_items && (
+              <section className=" p-2 dark:text-gray-300 mt-2">
                 <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
                     <tr className="w-full max-w-sm py-3 px-2 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
@@ -208,25 +208,25 @@ const OrderTable = ({ data }) => {
                   </thead>
                   <tbody className="">
                     {modalData.order_items.map((item, i) => (
-                      <tr className= {`text-center -mt-${(i+4)*2} max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg z-${i+2}0`} key={i}>
+                      <tr className={`text-center -mt-${(i + 4) * 2} max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg z-${i + 2}0`} key={i}>
                         <td className="py-3  px-2 ">{item.name}</td>
                         <td className="py-3  px-2">{item.price}</td>
                         <td className="py-3  px-2">{item.quantity}</td>
                         <td className="py-3  px-2 ">{item.sku}</td>
-                        <td className="-py-8  px-2">{item.price*item.quantity}</td>
+                        <td className="-py-8  px-2">{item.price * item.quantity}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-                </section>
-              )}
-              {modalData.payments && (
-                <section className=" p-2 dark:text-gray-300 mt-2">
+              </section>
+            )}
+            {modalData.payments && (
+              <section className=" p-2 dark:text-gray-300 mt-2">
                 <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
                     <tr className="w-full max-w-sm py-3 px-2 text-gray-700 bg-gray-300/80 border-t border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md" >
                       <th scope="col" className="py-3 px-2 rounded-tl-lg">
-                        Método de Pago 
+                        Método de Pago
                       </th>
                       <th scope="col" className="py-3 px-2">
                         Total
@@ -243,23 +243,23 @@ const OrderTable = ({ data }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {modalData.payments.map((item, i) => ( 
-                    <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
-                      <td className="py-3  px-2 rounded-bl-lg">{item.method}</td>
-                      <td className="py-3  px-2">{item.payment_count}</td>
-                      <td className="py-3  px-2">{item.payment_amount}</td>
-                      <td className="py-3  px-2">{item.rut_pagador}</td>
-                      <td className="py-3  px-2 rounded-br-lg">{item.payment_date}</td>
-                    </tr>
+                    {modalData.payments.map((item, i) => (
+                      <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
+                        <td className="py-3  px-2 rounded-bl-lg">{item.method}</td>
+                        <td className="py-3  px-2">{item.payment_count}</td>
+                        <td className="py-3  px-2">{item.payment_amount}</td>
+                        <td className="py-3  px-2">{item.rut_pagador}</td>
+                        <td className="py-3  px-2 rounded-br-lg">{item.payment_date}</td>
+                      </tr>
                     ))}
                   </tbody>
                 </table>
-                </section>
+              </section>
 
 
 
-              )}
-            
+            )}
+
             {/* glass mini footer */}
             <footer className=" flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80  
             ">
