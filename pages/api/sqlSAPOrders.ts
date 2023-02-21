@@ -29,9 +29,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         await pool.connect()
         const result = await pool.request()
-            .query(`SELECT idsap, CodigoExterno, respuesta_sap, RESULTADO_SAP, RUTA FROM VISTA_INTEGRACION_SAP WHERE ecommerce='VENTUS'  AND ts > '2023-02-15T00:00:00.000Z'`)
+            .query(`SELECT idsap, CodigoExterno, respuesta_sap, RESULTADO_SAP, RUTA, sku_sap FROM VISTA_INTEGRACION_SAP WHERE CodigoExterno='${id}' `)
             // query to see all the columns names
-            //.query(`SELECT * FROM IMEGADB.dbo.Stock Stock WHERE Stock.Cod_Producto='${sku}' AND CodigoExterno='${id}' AND Stock.Almacen='${alm}' AND Stock.Año='2022' AND Stock.Mes='11'`)
+            //.query(`SELECT * FROM IMEGADB.dbo.Stock Stock WHERE Stock.Cod_Producto='${sku}' AND CodigoExterno='${id}' ecommerce='VENTUS' AND CodigoExterno='${id}' AND ts > '2023-02-15T00:00:00.000Z' AND Stock.Almacen='${alm}' AND Stock.Año='2022' AND Stock.Mes='11'`)
         //console.log(result.recordset)
 
             res.status(200).json(result.recordset)

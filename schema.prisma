@@ -77,6 +77,9 @@ model payments {
   status             String? @db.VarChar(255)
   validation_date    String? @db.VarChar(255)
   type               String? @db.VarChar(255)
+  banco_destino      String? @db.VarChar(255)
+  imagenUrl          String? @db.VarChar(255)
+  rut_cliente        String? @db.VarChar(255)
   orders             orders? @relation(fields: [order_id], references: [id])
 
   @@index([order_id])
