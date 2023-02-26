@@ -9,7 +9,7 @@ export default async function handler(
 ) {
   if (req.method === 'POST') {
     try {
-      const { order_id, method, rut_pagador, authorization_code, payment_count, payment_amount, payment_date } = req.body;
+      const { order_id, method, rut_pagador, authorization_code, payment_count, payment_amount, payment_date, rut_cliente, banco_destino, imagenUrl } = req.body;
       const newPayment = await prisma.payments.create({
         data: {
           order_id: parseInt(order_id),
@@ -19,6 +19,9 @@ export default async function handler(
           payment_count,
           payment_amount,
           payment_date,
+          rut_cliente,
+          banco_destino,
+          imagenUrl,
           },
       });
       res.status(201).json(newPayment);
