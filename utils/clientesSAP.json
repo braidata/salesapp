@@ -1,0 +1,99 @@
+[
+    {
+        "Data": {
+            "APELLIDO_MATERNO": "--",
+            "APELLIDO_PATERNO": "--",
+            "NOMBRE": "CRISTIAN AMARO PÃ‰REZ DE CASTRO",
+            "RUT": "12345891-5",
+            "SEXO": "",
+            "CELULAR": "",
+            "EMAIL": "",
+            "TELEFONO": "",
+            "CALLE": "SAN JOSAFAT 3038-3038-ALT PARADERO 19 AV LA FLORIDA . CALLES ENTRE ENRIQ",
+            "NUMERO": "",
+            "CIUDAD": "SANTIAGO",
+            "COMUNA": "LA FLORIDA",
+            "REGION": "RM"
+        }
+    },
+    {
+        "Cabecera": {
+            "DOC_TYPE": "ZECB",
+            "SALES_ORG": "IM01",
+            "DISTR_CHAN": "26",
+            "DIVISION": "00",
+            "REQ_DATE_H": "20230223",
+            "PURCH_NO_C": "2000005166360332",
+            "PMNTTRMS": "P000",
+            "PYMT_METH": "M",
+            "PO_METHOD": "ZECO",
+            "SHIP_COND": "01",
+            "REF_1": ""
+        },
+        "Posicion": [
+            {
+                "ITM_NUMBER": "10",
+                "MATERIAL": "000000000000100720",
+                "PLANT": "1100",
+                "STORE_LOC": "1016",
+                "TARGET_QTY": "1",
+                "TARGET_QU": "UN"
+            },
+            {
+                "ITM_NUMBER": "20",
+                "MATERIAL": "000000000000600004",
+                "PLANT": "1100",
+                "STORE_LOC": "",
+                "TARGET_QTY": "1",
+                "TARGET_QU": "UN"
+            }
+        ],
+        "Precios": [
+            {
+                "ITM_NUMBER": "10",
+                "COND_TYPE": "ZP02",
+                "COND_VALUE": "319319.32773109",
+                "CURRENCY": "CLP"
+            },
+            {
+                "ITM_NUMBER": "20",
+                "COND_TYPE": "ZP02",
+                "COND_VALUE": "10084.033613445",
+                "CURRENCY": "CLP"
+            }
+        ],
+        "Partner": [
+            {
+                "PARTN_ROLE": "WE",
+                "PARTN_NUMB": "0123458915",
+                "NAME": "CRISTIAN AMARO PÃ‰REZ DE CASTRO",
+                "NAME_3": "",
+                "STREET": "SAN JOSAFAT 3038-3038-ALT PARADERO 19 AV LA FLORIDA . CALLES ENTRE ENRIQ",
+                "COUNTRY": "CL",
+                "CITY": "LA FLORIDA",
+                "DISTRICT": "SANTIAGO",
+                "TELEPHONE": "",
+                "TRANSPZONE": "IM00000001"
+            }
+        ],
+        "Reparto": [
+            {
+                "ITM_NUMBER": "10",
+                "REQ_DATE": "20230223",
+                "REQ_QTY": "1"
+            },
+            {
+                "ITM_NUMBER": "20",
+                "REQ_DATE": "20230223",
+                "REQ_QTY": "1"
+            }
+        ],
+        "Textos": [
+            {
+                "TEXT_ID": "Z001",
+                "LANGU": "ES",
+                "TEXT_LINE": "-"
+            }
+        ]
+    }
+]

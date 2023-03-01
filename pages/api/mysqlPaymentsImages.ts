@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Método no permitido' });
   }
 
-  const paymentId = req.body.paymentId;
+  const paymentId = req.body.order_id;
   const imagen = req.body.imagen;
 
   if (!paymentId || !imagen) {
@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const nombreArchivo = `payment_${paymentId}.webp`;
-  const rutaArchivo = path.join(process.cwd(), 'public', 'uploads', nombreArchivo);
+  const rutaArchivo = path.join(process.cwd(), 'uploads', nombreArchivo);
 
   // Comprime y ajusta el tamaño de la imagen a un ancho máximo de 800 píxeles y la guarda en formato WebP
   await sharp(imagen.buffer)
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Actualiza la URL de la imagen en la base de datos del pago
   const payment = await prisma.payments.update({
-    where: { id: paymentId },
+    where: { order_id: paymentId },
     data: { imagenUrl: `/uploads/${nombreArchivo}` },
   });
 

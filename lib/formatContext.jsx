@@ -144,44 +144,44 @@ export default function FormatContext({ context, componente }) {
 
     //validate datas with yup
     const schema = yup.object().shape({
-      customer_name: yup.string("Nombre es requerido").nullable(
-        "Nombre es requerido"
-      ).test({
-        name: "Nombre",
-        message: "Ingresa un Nombre en HubSpot",
-        test: (value) => {
+      // customer_name: yup.string("Nombre es requerido").nullable(
+      //   "Nombre es requerido"
+      // ).test({
+      //   name: "Nombre",
+      //   message: "Ingresa un Nombre en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
-      customer_last_name: yup.string().nullable(
-        "Apellido es requerido"
-      ).test({
-        name: "Apellido",
-        message: "Ingresa un Apellido en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
+      // customer_last_name: yup.string().nullable(
+      //   "Apellido es requerido"
+      // ).test({
+      //   name: "Apellido",
+      //   message: "Ingresa un Apellido en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        }
-      }),
-      customer_rut: yup.string().test({
-        name: "Rut Cliente",
-        message: "Ingresa un Rut Cliente válido en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   }
+      // }),
+      // customer_rut: yup.string().test({
+      //   name: "Rut Cliente",
+      //   message: "Ingresa un Rut Cliente válido en HubSpot",
+      //   test: (value) => {
 
-          if (value) {
-            return validateRUT(value);
-          }
-        }
-      }),
+      //     if (value) {
+      //       return validateRUT(value);
+      //     }
+      //   }
+      // }),
       customer_email: yup.string().nullable(
         "Email es requerido"
       ).test({
@@ -196,20 +196,20 @@ export default function FormatContext({ context, componente }) {
           }
         }
       }),
-      customer_phone: yup.string().nullable(
-        "Teléfono es requerido"
-      ).test({
-        name: "Teléfono",
-        message: "Ingresa un Teléfono en HubSpot",
-        test: (value) => {
+      // customer_phone: yup.string().nullable(
+      //   "Teléfono es requerido"
+      // ).test({
+      //   name: "Teléfono",
+      //   message: "Ingresa un Teléfono en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        }
-      }),
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   }
+      // }),
       billing_street: yup.string().nullable(
         "Calle es requerido"
       ).test({
@@ -347,129 +347,129 @@ export default function FormatContext({ context, componente }) {
           }
         }
       }),
-      Shipping_Tipo_de_Despacho: yup.string().nullable(
-        "Tipo de Despacho es requerido"
-      ).test({
-        name: "Tipo de Despacho",
-        message: "Ingresa un Tipo de Despacho en HubSpot",
-        test: (value) => {
+      // Shipping_Tipo_de_Despacho: yup.string().nullable(
+      //   "Tipo de Despacho es requerido"
+      // ).test({
+      //   name: "Tipo de Despacho",
+      //   message: "Ingresa un Tipo de Despacho en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        }
-      }),
-      Shipping_Fecha_de_Despacho_o_Retiro: yup.string().nullable(
-        "Fecha de Despacho es requerido"
-      ).test({
-        name: "Fecha de Despacho",
-        message: "Ingresa una Fecha de Despacho en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   }
+      // }),
+      // Shipping_Fecha_de_Despacho_o_Retiro: yup.string().nullable(
+      //   "Fecha de Despacho es requerido"
+      // ).test({
+      //   name: "Fecha de Despacho",
+      //   message: "Ingresa una Fecha de Despacho en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
-      Shipping_Observacion: yup.string().nullable(
-        "Observación es requerido"
-      ).test({
-        name: "Observación",
-        message: "Ingresa una Observación en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
+      // Shipping_Observacion: yup.string().nullable(
+      //   "Observación es requerido"
+      // ).test({
+      //   name: "Observación",
+      //   message: "Ingresa una Observación en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
-      Shipping_flete: yup.string().nullable(
-        "Flete es requerido"
-      ).test({
-        name: "Flete",
-        message: "Ingresa un Flete en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
+      // Shipping_flete: yup.string().nullable(
+      //   "Flete es requerido"
+      // ).test({
+      //   name: "Flete",
+      //   message: "Ingresa un Flete en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
 
-      rut_pagador: yup.string().nullable("Rut Pagador es Requerido").test({
-        name: "Rut de Pagador Válido",
-        message: "Ingresa un Rut de Pagador válido en HubSpot",
-        test: (value) => {
+      // rut_pagador: yup.string().nullable("Rut Pagador es Requerido").test({
+      //   name: "Rut de Pagador Válido",
+      //   message: "Ingresa un Rut de Pagador válido en HubSpot",
+      //   test: (value) => {
 
-          if (value) {
-            return validateRUT(value);
-          }
-        }
-      }),
-      authorization_code: yup.string().nullable(
-        "Codígo de Pago es requerido"
-      ).test({
-        name: "Codígo de Pago",
-        message: "Ingresa el Codígo de Pago en HubSpot",
-        test: (value) => {
+      //     if (value) {
+      //       return validateRUT(value);
+      //     }
+      //   }
+      // }),
+      // authorization_code: yup.string().nullable(
+      //   "Codígo de Pago es requerido"
+      // ).test({
+      //   name: "Codígo de Pago",
+      //   message: "Ingresa el Codígo de Pago en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
-      payment_count: yup.string().nullable(
-        "Cantidad de Pagos es requerido"
-      ).test({
-        name: "Cantidad de Pagos",
-        message: "Ingresa la Cantidad de Pagos en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
+      // payment_count: yup.string().nullable(
+      //   "Cantidad de Pagos es requerido"
+      // ).test({
+      //   name: "Cantidad de Pagos",
+      //   message: "Ingresa la Cantidad de Pagos en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
-      payment_amount: yup.string().nullable(
-        "Monto es requerido"
-      ).test({
-        name: "Monto",
-        message: "Ingresa un Monto en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
+      // payment_amount: yup.string().nullable(
+      //   "Monto es requerido"
+      // ).test({
+      //   name: "Monto",
+      //   message: "Ingresa un Monto en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
-      payment_date: yup.string().nullable(
-        "Fecha de Pago es requerido"
-      ).test({
-        name: "Fecha de Pago",
-        message: "Ingresa una Fecha de Pago en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
+      // payment_date: yup.string().nullable(
+      //   "Fecha de Pago es requerido"
+      // ).test({
+      //   name: "Fecha de Pago",
+      //   message: "Ingresa una Fecha de Pago en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   },
+      // }),
       //valida que el array productos tenga al menos un producto
 
       order_items: yup.array().of(

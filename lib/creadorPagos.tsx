@@ -109,17 +109,15 @@ export default function PaymentForm() {
  //call mysqlPaymentsImages API with the image and the order_id
   //then call mysqlPaymentsCreator with the image url and the rest of the data
 
-  const handleImage = (event: { target: { files: any; }; }) => {
-    const image = event.target.files[0];
+  const handleImage = (event: { target: { image: any; }; }) => {
+    const image = event.target.image;
     const order_id = paymentData.order_id;
 
-    const formData = new FormData();
-    formData.append("image", image);
-    formData.append("order_id", order_id);
 
     fetch("/api/mysqlPaymentsImages", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify( {image, order_id} )
+        ,
     })
       .then((res) => res.json())
       .then((data) => {
@@ -129,7 +127,7 @@ export default function PaymentForm() {
         });
       }
       );
-      
+
   };
 
 
@@ -239,13 +237,18 @@ export default function PaymentForm() {
         <label className="block text-gray-300 font-bold mb-2 dark:text-gray-300" htmlFor="image">
             Imagen:
         </label>
-        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="file" name="image" onChange={handleImage} required />
+        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-300 dark:bg-gray-800 text-gray-900 dark:text-gray-200" type="file" name="image" onChange={handleChange} required />
         </div>
         <div className="flex items-center justify-between">
-        <button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" type="submit">
+        <button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"  type="submit">
             Crear Pago
         </button>
         </div>
-    </form></>
+      
+      {/*  boton para llamar la función handleImage */}
+      
+    </form>
+    
+    </>
     );
 }
