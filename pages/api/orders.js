@@ -2,45 +2,7 @@
 
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 
-const ordenes = [
 
-  173565,
-  173655,
-  173916,
-  174643,
-  174557,
-  174559,
-  174566,
-  174584,
-  174555,
-  174549,
-  174587,
-  174606,
-  174608,
-  174634,
-  174646,
-  174342,
-  174577,
-  174576,
-  174552,
-  173157,
-  172140,
-  172766,
-  
-  
-  
-
-  
-  
-
-  
-
-  
-
-  
-  
-
-];
 
 const api = new WooCommerceRestApi({
   url: process.env.URL_STORE_DATA,
@@ -51,6 +13,33 @@ const api = new WooCommerceRestApi({
 
 //change status of order for each order in the order array
 export default async (req, res) => {
+
+  const ordenes = req.body ? req.body.order_ids : [
+
+    173565,
+    173655,
+    173916,
+    174643,
+    174557,
+    174559,
+    174566,
+    174584,
+    174555,
+    174549,
+    174587,
+    174606,
+    174608,
+    174634,
+    174646,
+    174342,
+    174577,
+    174576,
+    174552,
+    173157,
+    172140,
+    172766,
+   ];
+   console.log("ordenadno" , ordenes);
   try {
     const { data } = await api.put("orders/batch", {
       update: ordenes.map((id) => ({
@@ -58,10 +47,12 @@ export default async (req, res) => {
         status: "invoiced",
       })),
     });
-    res.status(200).json(data.update.map((order, index) => order.id + " " + order.billing.phone + " " +order.meta_data.map(
-      (meta) => meta.key === "_fedex_integracion" ? meta.value
-      : null
-    )) );
+    // 
+    res.status(200).json(data.update.map((order, index) => ({
+      id: order.id,
+      phone: order.billing.phone,
+      meta_data: order.meta_data.filter((meta) => meta.key === "_fedex_integracion").map((meta) => meta.value)
+    })));
     // console.log(data.update.map((order, index) => order.id + " " + order.billing.phone + " " +order.meta_data.map(
     //   (meta) => meta.key === "_fedex_integracion" ? meta.value
     //   : null

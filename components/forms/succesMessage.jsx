@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
 
@@ -20,6 +21,8 @@ const SuccessMessage = () => {
       mt-48 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
       border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
                     <h1 className="text-xl text-center font-semibold text-gray-700 dark:text-gray-200">Orden Enviada</h1>
+                    {/* pequeño boton de estilo compatible para ir a la page  dashboard */}
+                    <Link href="/dashboard" className="text-center font-semibold text-gray-700 dark:text-gray-200">Ver Dashboard</Link>
                     <p className="mt-2 text-center text-gray-600 dark:text-gray-400">La orden se ha enviado correctamente.</p>
                 </div>
             </div>

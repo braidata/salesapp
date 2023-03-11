@@ -55,7 +55,7 @@ model orders {
   order_date                          DateTime?     @default(now())
   ownerId                             Int?
   sapID                               String?       @db.VarChar(255)
-  statusSAP                           String?       @db.VarChar(255)
+  statusSAP                           String?       @default("Procesando") @db.VarChar(255)
   dateSAP                             String?       @db.VarChar(255)
   ownerIdM                            String?
   team                                String?       @db.VarChar(255)

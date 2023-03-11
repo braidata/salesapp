@@ -1,46 +1,64 @@
-import Head from "next/head";
-import Image from "next/image";
-import OrderTable from "../components/orderTable";
-import { useSession } from "next-auth/react";
-import Text from "../components/text";
 import { useState } from "react";
-import SapO from "../components/sapO";
+import { useSession } from "next-auth/react";
+import Head from "next/head";
+import OrderTable from "../components/orderTable";
+import Puntos from "../utils/puntos";
 import SapO2 from "../components/sapO2";
+import Tarjetita from "../components/tarjetita";
+import Text from "../components/text";
+
+interface Owner {
+  id: number;
+  name: string;
+  email: string;
+  imageUrl: string;
+  token: {
+    name: string;
+    email: string;
+    sub: string;
+  };
+}
+
+//interface for Session
+
 
 const Dashboard2 = () => {
-  const {data: session} = useSession()
-  const [data, setData] = useState();
-  const userSender = async (event: any) => {
-    //event.preventDefault();
+  const { data: session } = useSession();
+  const [data, setData] = useState<Owner[]>();
+
+  const userSender = async () => {
     try {
-      let data: any = {
-        name: session.token.name,//contexts.owners.success[1] ,
-        email: session.token.email,//contexts.owners.success[0],
+      if (!session) {
+        return;
+      }
+  
+      const data = {
+        name: session.token.name,
+        email: session.token.email,
         id: parseInt(session.token.sub)
       };
       const JSONdata = JSON.stringify(data);
-      const endpoint = "/api/mysqlConsulta";
       const options = {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSONdata,
+        body: JSONdata
       };
-      const response = await fetch(endpoint, options);
-      const result = response;
-      const resDB = await result.json();
-      data = setData(resDB); 
-      console.log("base", resDB);
-    } catch {
-      console.log("No hay datos DB");
+      const response = await fetch("/api/mysqlConsulta", options);
+      const result = await response.json();
+      setData(result);
+      console.log("base", result);
+    } catch (error) {
+      console.log("No hay datos DB", error);
     }
   };
 
-
   return (
     <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
-        <SapO2/>
+        {/* <SapO2/> */}
+        <Puntos/>
+        {/* <Tarjetita imageUrl="https://images.unhttps://edgestatic-ehf9gbe6gfdfdec4.z01.azurefd.ne…hared-images/27c0ebe4a6b9466f940de28f0e9c100a.pngsplash.com/photo-1617888903275-6d1b6a5c6f7b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" buttonText="vamos" /> */}
       <Text
         title="Dashboard2"
         classe="dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110

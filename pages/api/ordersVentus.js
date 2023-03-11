@@ -14,30 +14,44 @@ const api = new WooCommerceRestApi({
 //change status of order for each order in the order array
 export default async (req, res) => {
 
-    const orden = req.query ? req.query.id :  null
-    const mode = req.query ? req.query.mode :  "get"
+  const orden = req.query ? req.query.id : null
+  const rut = req.query ? req.query.rut : null
+  const mode = req.query ? req.query.mode : "get"
   try {
-    
-    if(mode === "get"){
-    //GET ORDER BY ID
-    const { data } = await api.get(`orders/${orden}`);
 
-    console.log("la data", data)
+    if (mode === "get") {
+      //GET ORDER BY ID
+      const { data } = await api.get(`orders/${orden}`);
 
-    res.status(200).json(data);}
-    else if(mode === "put"){
-        const { data } = await api.put(`orders/${orden}`
+      console.log("la data", data)
+
+      res.status(200).json(data);
+    }
+    else if (mode === "put") {
+      const { data } = await api.put(`orders/${orden}`
         ,
         {
-            meta_data: [
-                {
-                    key: "_shipping_Numero_dpto",
-                    value: "88"
-                    }
-                    ]
-                    }
-                    );
-        res.status(200).json(data);
+          meta_data: [
+            {
+              key: "_billing_rut",
+              value: rut
+            },
+            {
+              key: "_billing_RUT_Empresa",
+              value: rut
+            },
+            {
+              key: "RUT",
+              value: rut
+
+
+            }
+
+
+          ]
+        }
+      );
+      res.status(200).json(data);
     }
 
 

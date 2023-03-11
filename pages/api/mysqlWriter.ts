@@ -48,6 +48,7 @@ export default async function handler(
   const payment_amount = req.body.payment_amount;
   const payment_date = req.body.payment_date;
   const rut_pagador = req.body.rut_pagador;
+  const statusSAP = req.body.statusSAP;
   const OC = req.body.OC;
   const order_items = req.body.order_items;
 
@@ -117,6 +118,7 @@ export default async function handler(
         dealId,
         ownerId,
         ownerIdM,
+        statusSAP,
         OC,
         payments: {
           create: {

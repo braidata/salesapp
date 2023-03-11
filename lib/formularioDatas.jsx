@@ -92,6 +92,7 @@ export default function FormatContext({ context, componente }) {
         payment_amount: contexts.payment.Monto_de_Pagos,
         payment_date: contexts.payment.Fecha_de_Pago,
         dealId: contexts.contact.DealId,
+        statusSAP: "Procesando",
         ownerId: parseInt(session.token.sub),
         ownerIdM: session.token.email,//parseInt(Math.random(10,200)*10),
         order_items: [],
