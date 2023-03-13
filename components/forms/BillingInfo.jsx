@@ -15,7 +15,9 @@ const billingInfo = [];
 
 const schema = yup.object().shape({
   billingAddress: yup.object().shape({
-    Código_Postal: yup.string().required("Ingresa un Código Postal válido"),
+    Código_Postal: yup.string()
+    //.required("Ingresa un Código Postal válido")
+    ,
     Calle: yup
       .string()
       .matches(/^[a-zA-Z0-9\s]+$/, "Ingresa una Calle válida")
@@ -23,10 +25,10 @@ const schema = yup.object().shape({
       .required("Calle es obligatoria"),
     Departamento: yup
       .string()
-      //solo caracteres alfanumericos
-      .matches(/^[a-zA-Z0-9\s]+$/, "Ingresa un Número de Casa o depto válido")
-      .min(1, "Ingresa un Número de Casa o depto válido")
-      .required("Casa o depto es obligatorio"),
+      //solo caracteres alfanumericos O NULO
+      //.matches(/^[a-zA-Z0-9\s]+$/, "Ingresa un Número de Casa o depto válido")
+      //.min(1, "Ingresa un Número de Casa o depto válido")
+      // .required("Casa o depto es obligatorio"),
     // Ciudad: yup
     //   .string()
     //   .min(3, "Ingresa una Ciudad válida")
@@ -38,7 +40,8 @@ const schema = yup.object().shape({
     // Región: yup
     //   .string()
     //   .min(1, "Ingresa una Región válida")
-    //   .required("Región es obligatoria"),
+    //   .required("Región es obligatoria")
+    ,
       Comunas: yup
       .string()
       .min(1, "Ingresa una Comuna válida")

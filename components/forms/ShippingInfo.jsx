@@ -20,11 +20,13 @@ const schema = yup.object().shape({
     Tipo_de_Despacho: yup
       .string()
       .min(1, "Ingresa un  Tipo_de_Despacho válido")
-      .required("Tipo_de_Despacho es obligatorio"),
+      // .required("Tipo_de_Despacho es obligatorio")
+      ,
     Fecha_de_Despacho_o_Retiro: yup
       .string()
       .min(3, "Ingresa una Fecha_de_Despacho_o_Retiro válida")
-      .required("Fecha_de_Despacho_o_Retiro es obligatoria"),
+      // .required("Fecha_de_Despacho_o_Retiro es obligatoria")
+      ,
     Nombre_Retira: yup
       .string()
       .min(3, "Ingresa un Nombre_Retira válido"),
@@ -37,7 +39,8 @@ const schema = yup.object().shape({
     Observación: yup
       .string()
       .min(1, "Ingresa una Observación válida")
-      .required("Observación es obligatoria"),
+      // .required("Observación es obligatoria")
+      ,
   }),
 });
 

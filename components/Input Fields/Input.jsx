@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useField } from "@unform/core";
 import styles from "../../styles/styles.module.scss";
+import { ValueWithTimestamp } from "@hubspot/api-client/lib/codegen/crm/deals";
 
 const Input = ({ name, label, valua, ...rest }) => {
   const inputRef = useRef();
@@ -24,7 +25,11 @@ const Input = ({ name, label, valua, ...rest }) => {
       className="mb-2 bg-gray-300 border lg:w-full border-gray-100 text-gray-900 text-md sm:w-2 sm:text-lg sm:text-gray-200 text-right rounded-sm hover:rounded-md focus:rounded-lg  focus:ring-blue-800 focus:border-blue-700 block w-full  dark:bg-gray-900 dark:border-gray-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-800 dark:focus:border-gray-900"
         id={fieldName}
         ref={inputRef}
-        defaultValue={valua}
+        //agrear propiedades según condición
+        defaultValue={valua.startsWith("0.") ? valua : ""}
+        placeholder={valua}
+     
+
         {...rest}
       />
 

@@ -13,41 +13,41 @@ const contactInfo = [];
 const schema = yup.object().shape({
   //array
   contact: yup.object().shape({
-    Email: yup.string().email().required("Email is required"),
-    Nombre: yup
-      .string()
-      //omitir caracteres especiales
-      .matches(/^[a-zA-Z ]*$/, "Ingresa un Nombre sin carácteres especiales")
-      .min(2, "Ingresa un Nombre válido")
-      .required("Nombre es obligatorio"),
+    Email: yup.string().email().required("El Email es Obligatorio"),
+    // Nombre: yup
+    //   .string()
+    //   //omitir caracteres especiales
+    //   .matches(/^[a-zA-Z ]*$/, "Ingresa un Nombre sin carácteres especiales")
+    //   .min(2, "Ingresa un Nombre válido")
+    //   .required("Nombre es obligatorio"),
       DealId: yup
       .string()
       .min(2, "Ingresa un Nombre válido")
       .required("Nombre es obligatorio"),
-    Apellido: yup
-      .string()
-      .matches(/^[a-zA-Z ]*$/, "Ingresa un Apellido sin carácteres especiales")
-      .min(2, "Ingresa un apellido válida")
-      .required("Apellido es obligatorio"),
-    Rut: yup
-      .string()
-      //omitir caracteres especiales y ser alfanumerico
-      .matches(/^[a-zA-Z0-9 ]*$/, "Ingresa un Rut sin puntos ni guión")
-      .test({
-        name: "Rut",
-        message: "Rut no válido",
-        test: (value) => {
-          return validateRUT(value);
-        },
-      })
-      .min(9, "Ingresa un rut válido")
-      .required("Rut es obligatorio"),
-    Telefono: yup
-      .string()
-      //omitir caracteres que no sean para telefonos
-      .matches(/^[0-9 ]*$/, "Ingresa un teléfono válido")
-      .min(9, "Ingresa un teléfono válido")
-      .required("Teléfono es obligatorio"),
+    // Apellido: yup
+    //   .string()
+    //   .matches(/^[a-zA-Z ]*$/, "Ingresa un Apellido sin carácteres especiales")
+    //   .min(2, "Ingresa un apellido válida")
+    //   .required("Apellido es obligatorio"),
+    // Rut: yup
+    //   .string()
+    //   //omitir caracteres especiales y ser alfanumerico
+    //   .matches(/^[a-zA-Z0-9 ]*$/, "Ingresa un Rut sin puntos ni guión")
+    //   .test({
+    //     name: "Rut",
+    //     message: "Rut no válido",
+    //     test: (value) => {
+    //       return validateRUT(value);
+    //     },
+    //   })
+    //   .min(9, "Ingresa un rut válido")
+    //   .required("Rut es obligatorio"),
+    // Telefono: yup
+    //   .string()
+    //   //omitir caracteres que no sean para telefonos
+    //   .matches(/^[0-9 ]*$/, "Ingresa un teléfono válido")
+    //   .min(9, "Ingresa un teléfono válido")
+    //   .required("Teléfono es obligatorio"),
   }),
 });
 

@@ -37,25 +37,25 @@ const campos2 = [
   {
     campo: "billing.Razón_Social",
     type: "text",
-    detalle: "Ingresa la Razón Social",
+    detalle: "Ingresa la Razón Social * ",
     valua: "INDUSTRIAS DE ALIMENTOS TRENDY S.A.",
   },
   {
     campo: "billing.Rut_Empresa",
     type: "text",
-    detalle: "Ingresa tu Rut de Empresa",
+    detalle: "Ingresa tu Rut de Empresa * ",
     valua: "781094706",
   },
   {
     campo: "billing.Giro",
     type: "text",
-    detalle: "Ingresa tu Giro",
+    detalle: "Ingresa tu Giro * ",
     valua: "HELADOS",
   },
 ];
 const campos1 = [
   // { campo: "contact.user", type: "text", detalle: "Id del Usuario", valua: `${0}` },
-  { campo: "contact.DealId", type: "text", detalle: "Id del Negocio", valua: `${id}` },
+  { campo: "contact.DealId", type: "text", detalle: "Id del Negocio * ", valua: `${id}` },
   { campo: "contact.Rut", type: "text", detalle: "Rut del cliente", valua: `${rut}` },
   {
     campo: "contact.Nombre",
@@ -72,7 +72,7 @@ const campos1 = [
   {
     campo: "contact.Email",
     type: "email",
-    detalle: "Email del cliente",
+    detalle: "Email del cliente * ",
     valua: "elloropablo@gmail.com",
   },
   {
@@ -89,13 +89,13 @@ const dirFac1 = [
   {
     campo: "billingAddress.Calle",
     type: "street",
-    detalle: "Calle de Facturación",
-    valua: "LO ZAÑARTU",
+    detalle: "Calle de Facturación * ",
+    valua: "LO ZANARTU",
   },
   {
     campo: "billingAddress.Número",
     type: "text",
-    detalle: "Número de Dirección Facturación",
+    detalle: "Número de Dirección Facturación * ",
     valua: "11",
   },
   {
@@ -144,11 +144,11 @@ const dirEnv1 = [
   },
 ];
 const products1 = [
-  { campo: "products.SKU", type: "text", detalle: "SKU", valua: "100021" },
+  { campo: "products.SKU", type: "text", detalle: "SKU * ", valua: "100021" },
   { campo: "products.Nombre_Producto", type: "text", detalle: "Nombre", valua: "LAVAPLATOS 2 TAZAS SECADOR VENELP-160SD" },
-  { campo: "products.Precio", type: "text", detalle: "Precio", valua: "150000" },
-  { campo: "products.Cantidad", type: "text", detalle: "Cantidad", valua: "5" },
-  { campo: "products.Flete", type: "text", detalle: "Flete", valua: "0" },
+  { campo: "products.Precio", type: "text", detalle: "Precio * ", valua: "150000" },
+  { campo: "products.Cantidad", type: "text", detalle: "Cantidad * ", valua: "5" },
+  { campo: "products.Flete", type: "text", detalle: "Flete", valua: "1" },
 ];
 const pago1 = [
   {
