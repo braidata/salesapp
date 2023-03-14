@@ -6,6 +6,7 @@ import Puntos from "../utils/puntos";
 import SapO2 from "../components/sapO2";
 import Tarjetita from "../components/tarjetita";
 import Text from "../components/text";
+//import Titere from "../components/titere";
 
 interface Owner {
   id: number;
@@ -57,7 +58,8 @@ const Dashboard2 = () => {
   return (
     <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
         {/* <SapO2/> */}
-        <Puntos/>
+        {/* <Puntos/> */}
+        {/* <Titere/> */}
         {/* <Tarjetita imageUrl="https://images.unhttps://edgestatic-ehf9gbe6gfdfdec4.z01.azurefd.ne…hared-images/27c0ebe4a6b9466f940de28f0e9c100a.pngsplash.com/photo-1617888903275-6d1b6a5c6f7b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" buttonText="vamos" /> */}
       <Text
         title="Dashboard2"
