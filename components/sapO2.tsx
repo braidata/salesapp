@@ -49,6 +49,37 @@ const Pedidos: React.FC = () => {
     }
   };
 
+  // const extractSapInfo = (resp: any) => {
+  //   if (Array.isArray(resp)) {
+  //     return {
+  //       TEXT: resp[0]?.TEXT,
+  //       COD_SAP: resp[0]?.COD_SAP,
+  //     };
+  //   } else {
+  //     return {
+  //       TEXT: resp?.TEXT,
+  //       COD_SAP: resp?.COD_SAP,
+  //     };
+  //   }
+  // };
+
+  const extractSapInfo = (resp: any) => {
+    let TEXT, COD_SAP;
+  
+    if (Array.isArray(resp)) {
+      TEXT = resp[0]?.TEXT || 'No se encontró la respuesta del pedido';
+      COD_SAP = resp[0]?.COD_SAP || 'No se encontró el código SAP del pedido';
+    } else {
+      TEXT = resp?.TEXT || 'No se encontró la respuesta del pedido';
+      COD_SAP = resp?.COD_SAP || 'No se encontró el código SAP del pedido';
+    }
+  
+    return {
+      TEXT,
+      COD_SAP,
+    };
+  };
+
   return (
     <div className="p-4 mt-8">
                 <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
@@ -78,30 +109,25 @@ const Pedidos: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {pedidos.map((pedido, index) => (
-            <tr key={index}>
-              <td className="border px-4 py-2">
-                <div className="flex flex-col">
-                  <div className="flex">
-                    <th className="font-bold">ID SAP: </th>
-                    <td>
-                      {pedido.respuesta_sap.RESP[0]
-                        ? pedido.respuesta_sap.RESP[0].COD_SAP
-                        : pedido.respuesta_sap.RESP.COD_SAP}
-                    </td>
+          {pedidos.map((pedido, index) => {
+            const { TEXT, COD_SAP } = extractSapInfo(pedido.respuesta_sap.RESP);
+            return (
+              <tr key={index}>
+                <td className="border px-4 py-2">
+                  <div className="flex flex-col">
+                    <div className="flex">
+                      <th className="font-bold">ID SAP: </th>
+                      <td>{COD_SAP}</td>
+                    </div>
+                    <div className="flex">
+                      <th className="font-bold">Respuesta: </th>
+                      <td>{TEXT}</td>
+                    </div>
                   </div>
-                  <div className="flex">
-                    <th className="font-bold">Respuesta: </th>
-                    <td>
-                      {pedido.respuesta_sap.RESP[0]
-                        ? pedido.respuesta_sap.RESP[0].TEXT
-                        : pedido.respuesta_sap.RESP.TEXT}
-                    </td>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -109,3 +135,8 @@ const Pedidos: React.FC = () => {
 };
 
 export default Pedidos;
+
+
+
+
+
