@@ -67,11 +67,17 @@ const Pedidos: React.FC = () => {
     let TEXT, COD_SAP;
   
     if (Array.isArray(resp)) {
-      TEXT = resp[0]?.TEXT || 'No se encontró la respuesta del pedido';
-      COD_SAP = resp[0]?.COD_SAP || 'No se encontró el código SAP del pedido';
+      if (resp[0]) {
+        TEXT = resp[0].TEXT;
+        COD_SAP = resp[0].COD_SAP;
+      }
     } else {
-      TEXT = resp?.TEXT || 'No se encontró la respuesta del pedido';
-      COD_SAP = resp?.COD_SAP || 'No se encontró el código SAP del pedido';
+      TEXT = resp.TEXT;
+      COD_SAP = resp.COD_SAP;
+    }
+  
+    if (!TEXT && !COD_SAP) {
+      TEXT = COD_SAP = 'No se encontró el pedido ni su respuesta ni el código SAP';
     }
   
     return {
