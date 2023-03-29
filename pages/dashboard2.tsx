@@ -6,7 +6,7 @@ import Puntos from "../utils/puntos";
 import SapO2 from "../components/sapO2";
 import Tarjetita from "../components/tarjetita";
 import Text from "../components/text";
-//import Titere from "../components/titere";
+import Titere from "../components/titere";
 
 interface Owner {
   id: number;

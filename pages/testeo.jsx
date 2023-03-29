@@ -4,6 +4,8 @@ import Puntos from "../utils/puntos";
 import SapO2 from "../components/sapO2";
 import FedEx from "../components/fedEx";
 import { useRouter } from "next/router";
+import OrdersVentusComp from "../components/ordersVentusComp";
+import Febos from "../components/febos";
 
 
 
@@ -79,7 +81,8 @@ const Testeo = () => {
     <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
         <SapO2/>
         <FedEx />
-        {/* <Puntos/> */}
+        <OrdersVentusComp />
+        {/* <Febos/> */}
     </div>
   );
 };
