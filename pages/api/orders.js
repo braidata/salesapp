@@ -51,7 +51,11 @@ export default async (req, res) => {
     res.status(200).json(data.update.map((order, index) => ({
       id: order.id,
       phone: order.billing.phone,
-      meta_data: order.meta_data.filter((meta) => meta.key === "_fedex_integracion").map((meta) => meta.value)
+      city: order.shipping.city,
+      meta_data: order.meta_data.filter((meta) => meta.key === "_fedex_integracion").map((meta) => meta.value),
+      //meta_data2: order.meta_data.filter((meta) => meta.key === "_shipping_comuna").map((meta) => meta.value),
+      method: order.shipping_lines[0].method_title,
+      
     })));
     // console.log(data.update.map((order, index) => order.id + " " + order.billing.phone + " " +order.meta_data.map(
     //   (meta) => meta.key === "_fedex_integracion" ? meta.value
