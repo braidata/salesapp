@@ -5,6 +5,9 @@ interface Order {
   id: number;
   meta_data: string;
   phone: string;
+  city: string;
+  meta_data2: string;
+  method: string;
 }
 
 const Orders: React.FC = () => {
@@ -26,6 +29,20 @@ const Orders: React.FC = () => {
       console.error(error);
     }
   };
+
+  function formatPhoneNumber(phoneNumber: string) {
+    const formattedNumber = phoneNumber.startsWith("+") ? phoneNumber.slice(1) : phoneNumber;
+  
+    if (formattedNumber.startsWith("56")) {
+      if (formattedNumber.length === 8) {
+        return "+569" + formattedNumber.slice(2);
+      } else {
+        return "+" + formattedNumber;
+      }
+    } else {
+      return "+56" + phoneNumber;
+    }
+  }
 
   return (
     <div className="p-4 mt-8">
@@ -55,6 +72,9 @@ const Orders: React.FC = () => {
             <th className="border px-4 py-2">ID de orden</th>
             <th className="border px-4 py-2">OT Fedex</th>
             <th className="border px-4 py-2">Celular</th>
+            <th className="border px-4 py-2">Tipo de Envío</th>
+            <th className="border px-4 py-2">Ciudad</th>
+            {/* <th className="border px-4 py-2">Comuna</th> */}
           </tr>
         </thead>
         <tbody>
@@ -63,7 +83,10 @@ const Orders: React.FC = () => {
             <tr key={index}>
               <td className="border px-4 py-2">{order.id}</td>
               <td className="border px-4 py-2">{order.meta_data}</td>
-              <td className="border px-4 py-2">+56{order.phone}</td>
+              <td className="border px-4 py-2">{formatPhoneNumber(order.phone)}</td>
+              <td className="border px-4 py-2">{order.method}</td>
+              <td className="border px-4 py-2">{order.city}</td>
+              {/* <td className="border px-4 py-2">{order.meta_data2}</td> */}
             </tr>
           ))}
         </tbody>

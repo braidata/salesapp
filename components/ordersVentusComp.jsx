@@ -339,27 +339,24 @@
 import { useState } from "react";
 //import set lodash
 import set from 'lodash/set';
+import { useSession } from "next-auth/react";
 
 const SelectComponent = () => {
   const [metadata, setMetadata] = useState(false);
   const [selectedKey, setSelectedKey] = useState("");
   const [placeholder, setPlaceholder] = useState("");
   const [mode, setMode] = useState("get");
+  const [store, setStore] = useState("Ventus");
   const [orderData, setOrderData] = useState(null);
   const [showTable, setShowTable] = useState(false);
   const [filteredOrderData, setFilteredOrderData] = useState(null);
+  const { data: session } = useSession();
   let keys = []
 
   const toggleTable = () => {
     setShowTable((prev) => !prev);
   };
 
-  // const filteredOrderData = Object.keys(orderData)
-  // .filter((key) => keys.some((k) => k.key === key))
-  // .reduce((obj, key) => {
-  //   obj[key] = orderData[key];
-  //   return obj;
-  // }, {});
 
   keys = [
     {
@@ -469,27 +466,60 @@ const SelectComponent = () => {
     {
       key: "meta_data._retiro_local_date",
       placeholder: "Ejemplo: 24-03-2023"
+    },
+    {
+      key: "shipping_lines.method_title",
+      placeholder: "Ejemplo: Retiro en Local"
     }
   ];
+
+  const [sessionInfo, setSessionInfo] = useState([])
+  //fetch user data from prisma and mysqlPerm API
+ // const permisos = async () => {
+    //const [sessionInfo, setSessionInfo] = useState([])
+    //fetch user data from prisma and mysqlPerm API
+    const permisos = async () => {
+      const res = await fetch("/api/mysqlPerm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session ? session.session.user.email : null,
+        }),
+      });
+      const data = await res.json();
+      console.log("el permisos: ", data.user[0].rol);
+      const userRol = data ? data.user[0].rol : "No conectado";
+      //const userPerm = data ? data.user[0].permissions : "No conectado";
+      setSessionInfo([userRol])
+    };
+
+    
 
   function getNestedValue(obj, key) {
     if (key.startsWith("meta_data.")) {
       const metaDataKey = key.slice(10);
       const metaData = obj.meta_data.find((item) => item.key === metaDataKey);
       return metaData ? metaData.value : null;
+    } else if (key.startsWith("shipping_lines.")) {
+      const shippingLinesKey = key.slice(15);
+      const shippingLines = obj.shipping_lines[0];
+      return shippingLines ? shippingLines[shippingLinesKey] : null;
     } else {
       return key.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), obj);
-    } 
-    //return key.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), obj);
+    }
   }
-
+  
   function cleanNestedKeys(data, key) {
     let cleanedKey = key;
   
-    // cut the meta_data part of the key
+    // cut the meta_data or shipping_lines part of the key
     if (cleanedKey.startsWith("meta_data.")) {
       cleanedKey = cleanedKey.slice(10);
-    } 
+    } else if (cleanedKey.startsWith("shipping_lines.")) {
+      cleanedKey = cleanedKey.slice(15);
+    }
   
     // cut the prefix before the first dot
     if (cleanedKey.indexOf(".") > -1) {
@@ -523,6 +553,11 @@ const SelectComponent = () => {
     } else {
       setPlaceholder(selected?.placeholder || "");
     }
+  };
+
+  const handleStoreChange = (e) => {
+    setStore(e.target.value);
+    console.log("TIENDA: ", store);
   };
 
   const handleModeChange = (e) => {
@@ -575,7 +610,7 @@ const SelectComponent = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id, updatedData, mode }),
+        body: JSON.stringify({ id, updatedData, mode, store }),
       });
 
       const data = await response.json();
@@ -607,6 +642,7 @@ const SelectComponent = () => {
 
 
     return (
+      permisos() === "admin" ? (
       <div className="max-w-sm p-2 mt-8 ml-4">
   <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
     Editor de Pedidos Woocommerce
@@ -621,7 +657,19 @@ const SelectComponent = () => {
       name="id"
       placeholder="ID"
     />
- 
+
+<label htmlFor="store" className="sr-only">Tienda</label>
+    <select
+      className="border rounded p-2 w-full"
+      name="store"
+      value={store}
+      onChange={handleStoreChange}
+    >
+      <option value="Ventus">VENTUS</option>
+      <option value="BLK">BLANIK</option>
+      <option value="BBQ">BBQGRILL</option>
+    </select>
+ {sessionInfo ? console.log("el gran gato: ", sessionInfo)  : null}
     <label htmlFor="mode" className="sr-only">Modo</label>
     <select
       className="border rounded p-2 w-full"
@@ -654,6 +702,8 @@ const SelectComponent = () => {
   <input
       className="border rounded p-2 w-full"
       type="text" name="value"  placeholder="Valor" />
+    
+       
     <button
       className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"    
       type="submit"
@@ -708,7 +758,15 @@ const SelectComponent = () => {
 
 </div>
 
-    );
+    ) : (
+      <div className="max-w-sm p-2 mt-8 ml-4">
+
+        <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
+          Editor de Pedidos Woocommerce
+        </h1>
+        </div>
+    )
+  );
 
 }
 
