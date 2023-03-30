@@ -473,29 +473,34 @@ const SelectComponent = () => {
     }
   ];
 
-  const [sessionInfo, setSessionInfo] = useState([])
+  const [sessionInfo, setSessionInfo] = useState()
   //fetch user data from prisma and mysqlPerm API
- // const permisos = async () => {
-    //const [sessionInfo, setSessionInfo] = useState([])
-    //fetch user data from prisma and mysqlPerm API
-    const permisos = async () => {
-      const res = await fetch("/api/mysqlPerm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: session ? session.session.user.email : null,
-        }),
-      });
-      const data = await res.json();
-      console.log("el permisos: ", data.user[0].rol);
-      const userRol = data ? data.user[0].rol : "No conectado";
-      //const userPerm = data ? data.user[0].permissions : "No conectado";
-      setSessionInfo([userRol])
-    };
+  // const permisos = async () => {
+  //const [sessionInfo, setSessionInfo] = useState([])
+  //fetch user data from prisma and mysqlPerm API
+  const permisos = async () => {
+    const res = await fetch("/api/mysqlPerm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: session ? session.session.user.email : null,
+      }),
+    });
+    const data = await res.json();
+    console.log("el permisos: ", data.user[0].rol);
+    const userRol = data ? data.user[0].permissions : "No conectado";
+    console.log("el permisos2: ", data.user[0].permissions);
+    //const userPerm = data ? data.user[0].permissions : "No conectado";
+    setSessionInfo(userRol)
 
-    
+    return sessionInfo
+  };
+
+
+
+
 
   function getNestedValue(obj, key) {
     if (key.startsWith("meta_data.")) {
@@ -510,24 +515,24 @@ const SelectComponent = () => {
       return key.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), obj);
     }
   }
-  
+
   function cleanNestedKeys(data, key) {
     let cleanedKey = key;
-  
+
     // cut the meta_data or shipping_lines part of the key
     if (cleanedKey.startsWith("meta_data.")) {
       cleanedKey = cleanedKey.slice(10);
     } else if (cleanedKey.startsWith("shipping_lines.")) {
       cleanedKey = cleanedKey.slice(15);
     }
-  
+
     // cut the prefix before the first dot
     if (cleanedKey.indexOf(".") > -1) {
       const parts = cleanedKey.split(".");
       parts.shift();
       cleanedKey = parts.join(".");
     }
-  
+
     // check if the key is nested and get the corresponding value
     const keys = cleanedKey.split(".");
     let value = data;
@@ -539,7 +544,7 @@ const SelectComponent = () => {
         break;
       }
     }
-  
+
     return value;
   }
 
@@ -568,8 +573,8 @@ const SelectComponent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const id = e.target.id.value;
-    const key = e.target.key.value;
-    const value = e.target.value.value;
+    const key = e.target.key ? e.target.key.value : selectedKey;
+    const value = e.target.value ? e.target.value.value : null;
 
     // Extraer la parte relevante de la clave si comienza con "meta_data."
     const metaDataKey = key.startsWith("meta_data.") ? key.slice(10) : key;
@@ -620,12 +625,12 @@ const SelectComponent = () => {
       // Handle success or errors here
       //setOrderData(data);
       const objeto = keys
-      .filter((k) => getNestedValue(data, k.key) !== null)
-      .reduce((obj, k) => {
-        obj[k.key] = getNestedValue(data, k.key);
-        return obj;
-      }, {});
-      
+        .filter((k) => getNestedValue(data, k.key) !== null)
+        .reduce((obj, k) => {
+          obj[k.key] = getNestedValue(data, k.key);
+          return obj;
+        }, {});
+
       setFilteredOrderData(objeto)
       console.log("OBJETO: ", filteredOrderData);
 
@@ -641,134 +646,221 @@ const SelectComponent = () => {
   };
 
 
-    return (
-      permisos() === "admin" ? (
+
+
+  return (
+    permisos(),
+    sessionInfo === "ecommerce" || sessionInfo === "all" ? (
       <div className="max-w-sm p-2 mt-8 ml-4">
-  <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
-    Editor de Pedidos Woocommerce
-  </h1>
-
-  <form onSubmit={handleSubmit} >
-  <div className="w-full  flex flex-col justify-center gap-4">
-    <label htmlFor="id" className="sr-only">ID</label>
-    <input
-      className="border rounded p-2 w-full"
-      type="text"
-      name="id"
-      placeholder="ID"
-    />
-
-<label htmlFor="store" className="sr-only">Tienda</label>
-    <select
-      className="border rounded p-2 w-full"
-      name="store"
-      value={store}
-      onChange={handleStoreChange}
-    >
-      <option value="Ventus">VENTUS</option>
-      <option value="BLK">BLANIK</option>
-      <option value="BBQ">BBQGRILL</option>
-    </select>
- {sessionInfo ? console.log("el gran gato: ", sessionInfo)  : null}
-    <label htmlFor="mode" className="sr-only">Modo</label>
-    <select
-      className="border rounded p-2 w-full"
-      name="mode"
-      value={mode}
-      onChange={handleModeChange}
-    >
-      <option value="put">EDITAR</option>
-      <option value="get">VER</option>
-    </select>
- 
-    <label htmlFor="key" className="sr-only">Seleccionar clave</label>
-    <select
-      className="border rounded p-2 w-full"
-      name="key"
-      value={selectedKey}
-      onChange={handleKeyChange}
-    >
-      <option value="">Seleccionar clave</option>
-      {keys.map((key) => (
-        <option key={key.key} value={key.key}>
-          {key.key}
-        </option>
-      ))}
-    </select>
- 
-    <label htmlFor="value" className="sr-only">Valor</label>
-    
-   
-  <input
-      className="border rounded p-2 w-full"
-      type="text" name="value"  placeholder="Valor" />
-    
-       
-    <button
-      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"    
-      type="submit"
-    >
-      Enviar
-    </button>
-  </div>
-  </form>
-
-
-  {showTable && (
-    <>
-  
-    <h1 className="max-w-sm dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">Información del pedido:</h1>
-
-      <table className="max-w-lg bg-gray-300 dark:bg-gray-800 -ml-12 sm:-ml-24 ">
-        <thead className="">
-          <tr className=" ">
-            <th className="border   ">Clave</th>
-            <th className="border   ">Valor</th>
-          </tr>
-        </thead>
-        <tbody className=" ">
-          {/*  use getNestedValue for clean the keys */}
-
-          {keys
-  .filter((k) => cleanNestedKeys(orderData, k.key) !== null)
-  .map((k) => (
-    <tr className=" " key={k.key}>
-      <td className="border  text-gray-800 dark:text-white break-words
-      ">{k.key}</td>
-      <td className="border  text-gray-800 dark:text-white break-words
-       ">{JSON.stringify(cleanNestedKeys(orderData, k.key))}</td>
-    </tr>
-  ))
-}
-          {Object.entries(filteredOrderData).map(([key, value]) => (
-            <tr className=" "  key={key}>
-              <td className="border  text-gray-800 dark:text-white truncate truncate text-sm sm:text-base md:text-lg lg:text-xl ">{key}</td>
-              <td className="border  text-gray-800 dark:text-white truncate truncate text-sm sm:text-base md:text-lg lg:text-xl ">{JSON.stringify(value)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-   
-    <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md" onClick={toggleTable}>
-      Cerrar tabla
-    </button>
-    </>
- 
-)}
-
-</div>
-
-    ) : (
-      <div className="max-w-sm p-2 mt-8 ml-4">
-
         <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
           Editor de Pedidos Woocommerce
         </h1>
-        </div>
-    )
-  );
 
+        <form onSubmit={handleSubmit} >
+          <div className="w-full  flex flex-col justify-center gap-4">
+            <label htmlFor="id" className="sr-only">ID</label>
+            <input
+              className="border rounded p-2 w-full"
+              type="text"
+              name="id"
+              placeholder="ID"
+            />
+
+            <label htmlFor="store" className="sr-only">Tienda</label>
+            <select
+              className="border rounded p-2 w-full"
+              name="store"
+              value={store}
+              onChange={handleStoreChange}
+            >
+              <option value="Ventus">VENTUS</option>
+              <option value="BLK">BLANIK</option>
+              <option value="BBQ">BBQGRILL</option>
+            </select>
+
+            <label htmlFor="mode" className="sr-only">Modo</label>
+            <select
+              className="border rounded p-2 w-full"
+              name="mode"
+              value={mode}
+              onChange={handleModeChange}
+            >
+              <option value="put">EDITAR</option>
+              <option value="get">VER</option>
+            </select>
+
+            <label htmlFor="key" className="sr-only">Seleccionar clave</label>
+            <select
+              className="border rounded p-2 w-full"
+              name="key"
+              value={selectedKey}
+              onChange={handleKeyChange}
+            >
+              <option value="">Seleccionar clave</option>
+              {keys.map((key) => (
+                <option key={key.key} value={key.key}>
+                  {key.key}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="value" className="sr-only">Valor</label>
+
+
+            <input
+              className="border rounded p-2 w-full"
+              type="text" name="value" placeholder="Valor" />
+
+
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              type="submit"
+            >
+              Enviar
+            </button>
+          </div>
+        </form>
+
+
+        {showTable && (
+          <>
+
+            <h1 className="max-w-sm dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">Información del pedido:</h1>
+
+            <table className="max-w-lg bg-gray-300 dark:bg-gray-800 -ml-12 sm:-ml-24 ">
+              <thead className="">
+                <tr className=" ">
+                  <th className="border   ">Clave</th>
+                  <th className="border   ">Valor</th>
+                </tr>
+              </thead>
+              <tbody className=" ">
+                {/*  use getNestedValue for clean the keys */}
+
+                {keys
+                  .filter((k) => cleanNestedKeys(orderData, k.key) !== null)
+                  .map((k) => (
+                    <tr className=" " key={k.key}>
+                      <td className="border  text-gray-800 dark:text-white break-words
+      ">{k.key}</td>
+                      <td className="border  text-gray-800 dark:text-white break-words
+       ">{JSON.stringify(cleanNestedKeys(orderData, k.key))}</td>
+                    </tr>
+                  ))
+                }
+                {Object.entries(filteredOrderData).map(([key, value]) => (
+                  <tr className=" " key={key}>
+                    <td className="border  text-gray-800 dark:text-white truncate truncate text-sm sm:text-base md:text-lg lg:text-xl ">{key}</td>
+                    <td className="border  text-gray-800 dark:text-white truncate truncate text-sm sm:text-base md:text-lg lg:text-xl ">{JSON.stringify(value)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md" onClick={toggleTable}>
+              Cerrar tabla
+            </button>
+          </>
+
+        )}
+
+      </div>
+
+    ) : (
+
+
+      <div className="max-w-sm p-2 mt-8 ml-4">
+        <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
+          Editor de Pedidos Woocommerce
+        </h1>
+
+        <form onSubmit={handleSubmit} >
+          <div className="w-full  flex flex-col justify-center gap-4">
+            <label htmlFor="id" className="sr-only">ID</label>
+            <input
+              className="border rounded p-2 w-full"
+              type="text"
+              name="id"
+              placeholder="ID"
+            />
+
+            <label htmlFor="store" className="sr-only">Tienda</label>
+            <select
+              className="border rounded p-2 w-full"
+              name="store"
+              value={store}
+              onChange={handleStoreChange}
+            >
+              <option value="Ventus">VENTUS</option>
+              <option value="BLK">BLANIK</option>
+              <option value="BBQ">BBQGRILL</option>
+            </select>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              type="submit"
+            >
+              Enviar
+            </button>
+          </div>
+        </form>
+        {showTable && (
+          <>
+
+            <h1 className="max-w-sm dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">Información del pedido:</h1>
+
+            <table className="max-w-lg bg-gray-300 dark:bg-gray-800 -ml-12 sm:-ml-24 ">
+              <thead className="">
+                <tr className=" ">
+                  <th className="border   ">Clave</th>
+                  <th className="border   ">Valor</th>
+                </tr>
+              </thead>
+              <tbody className=" ">
+                {/*  use getNestedValue for clean the keys */}
+
+                {keys
+                  .filter((k) => cleanNestedKeys(orderData, k.key) !== null)
+                  .map((k) => (
+                    <tr className=" " key={k.key}>
+                      <td className="border  text-gray-800 dark:text-white break-words
+      ">{k.key}</td>
+                      <td className="border  text-gray-800 dark:text-white break-words
+       ">{JSON.stringify(cleanNestedKeys(orderData, k.key))}</td>
+                    </tr>
+                  ))
+                }
+                {Object.entries(filteredOrderData).map(([key, value]) => (
+                  <tr className=" " key={key}>
+                    <td className="border  text-gray-800 dark:text-white truncate truncate text-sm sm:text-base md:text-lg lg:text-xl ">{key}</td>
+                    <td className="border  text-gray-800 dark:text-white truncate truncate text-sm sm:text-base md:text-lg lg:text-xl ">{JSON.stringify(value)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md" onClick={toggleTable}>
+              Cerrar tabla
+            </button>
+          </>
+
+        )}
+
+      </div>
+
+    )
+
+  )
 }
+
+
+
+
+
+
+
+
+
+
 
 export default SelectComponent;
 
