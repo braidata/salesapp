@@ -2,6 +2,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Puntos from "../utils/puntos";
 import SapO2 from "../components/sapO2";
+import SapO3 from "../components/sapO3";
 import FedEx from "../components/fedEx";
 import { useRouter } from "next/router";
 import OrdersVentusComp from "../components/ordersVentusComp";
@@ -80,6 +81,7 @@ const Testeo = () => {
   return (
     <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
         <SapO2/>
+        <SapO3/>
         <FedEx />
         <OrdersVentusComp />
         {/* <Febos/> */}
