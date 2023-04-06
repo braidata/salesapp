@@ -60,6 +60,10 @@ model orders {
   ownerIdM                            String?
   team                                String?       @db.VarChar(255)
   OC                                  String?       @db.VarChar(255)
+  channel                             String?       @db.VarChar(255)
+  order_class                         String?       @db.VarChar(255)
+  centro                              String?       @db.VarChar(255)
+  almacen                             String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
