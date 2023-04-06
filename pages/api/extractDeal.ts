@@ -43,6 +43,12 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
           "codigos_de_autorizacion",
           "fecha_de_validacion_de_pagos",
           "metodo_pago",
+          "metodo_de_pago",
+          "tipo_pago_sap",
+          "clase",
+          "canal",
+          "almacen",
+          "centro",
         ],
         filterGroups: [
           {
