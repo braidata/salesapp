@@ -1,2 +1,3 @@
 [template.environment]
-DATABASE_URL = "mysql://r84y4pyecyko23eh7tui:pscale_pw_PGQYXqlFrSo5tMtnMvT8tmKcesetjC94DH6A4oEnhl0@aws-sa-east-1.connect.psdb.cloud/ventus_sales_orders?sslaccept=strict"
+DATABASE_URL = process.env.DATABASE_URL
+```
