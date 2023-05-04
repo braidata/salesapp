@@ -86,6 +86,11 @@ const Shipping_city = req.body.Shipping_city ? req.body.Shipping_city : 'ver com
 const Shipping_commune = req.body.Shipping_commune ? req.body.Shipping_commune : 'sin comuna de envío';
 const Shipping_zip_code = req.body.Shipping_zip_code ? req.body.Shipping_zip_code : 'sin código postal de envío';
 const method = req.body.method ? req.body.method : 'sin método de pago';
+const type = req.body.type ? req.body.type : 'sin tipo de pago';
+const centro = req.body.centro ? req.body.centro : 'sin centro';
+const almacen = req.body.almacen ? req.body.almacen : 'sin almacén';
+const channel = req.body.canal ? req.body.canal : 'sin canal';
+const order_class = req.body.clase ? req.body.clase : 'sin clase';
 const authorization_code = req.body.authorization_code ? req.body.authorization_code : 'sin código de autorización';
 const payment_count = req.body.payment_count ? req.body.payment_count : 'sin conteo de pagos';
 const payment_amount = req.body.payment_amount ? req.body.payment_amount : 'sin cantidad de pagos';
@@ -158,6 +163,10 @@ const order_items = req.body.order_items
         Shipping_zip_code,
         user,
         team,
+        centro,
+        almacen,
+        channel,
+        order_class,
         dealId,
         ownerId,
         statusSAP,
@@ -165,6 +174,7 @@ const order_items = req.body.order_items
         payments: {
           create: {
             method,
+            type,
             rut_pagador,
             authorization_code,
             payment_count,

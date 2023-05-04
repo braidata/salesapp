@@ -14,27 +14,12 @@ const api = new WooCommerceRestApi({
 //change status of order for each order in the order array
 export default async (req, res) => {
 
-    const orden = req.query ? req.query.id :  174051
+    const orden = req.query ? req.query.orden :  177081
   try {
     // 
     //GET ORDER BY ID
 
-    const { data } = await api.put(`orders/${orden}`
-    ,
-    {
-        meta_data: [
-            {
-                key: "_billing_rut",
-                value: "26294716-5"
-                },
-                {
-                key: "RUT",
-                value: "26294716-5"}
-                ]
-                }
-                );
-
-
+    const { data } = await api.get(`orders/${orden}`);
 
 
     // const { data } = await api.get(`orders/${orden}`);

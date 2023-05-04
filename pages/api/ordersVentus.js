@@ -32,6 +32,8 @@ export default async (req, res) => {
   const mode = req.body.mode ? req.body.mode : req.query.mode;
   const updatedData = req.body.updatedData ? req.body.updatedData : req.query.updatedData;
   console.log(req.body);
+
+  // example url: https://test-ventus-sales.ventuscorp.cl/api/
    // Accede a los valores enviados en el cuerpo de la solicitud
 
   try {

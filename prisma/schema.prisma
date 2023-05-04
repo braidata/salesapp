@@ -1,7 +1,7 @@
 generator client {
   provider = "prisma-client-js"
 }
-// datos de conexion a la base de datos NUEVOS
+
 datasource db {
   provider     = "mysql"
   url          = env("DATABASE_URL")
@@ -60,6 +60,10 @@ model orders {
   ownerIdM                            String?
   team                                String?       @db.VarChar(255)
   OC                                  String?       @db.VarChar(255)
+  almacen                             String?       @db.VarChar(255)
+  centro                              String?       @db.VarChar(255)
+  channel                             String?       @db.VarChar(255)
+  order_class                         String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
@@ -67,19 +71,19 @@ model orders {
 model payments {
   id                 Int     @id @default(autoincrement())
   order_id           Int     @unique
-  type               String? @default("sin pago") @db.VarChar(255)
   method             String? @default("sin pago") @db.VarChar(255)
   authorization_code String? @default("sin pago") @db.VarChar(255)
   payment_count      String? @default("sin pago") @db.VarChar(255)
   payment_amount     String? @default("sin pago") @db.VarChar(255)
   payment_date       String? @default("sin pago") @db.VarChar(255)
   rut_pagador        String? @default("sin pago") @db.VarChar(255)
-  rut_cliente        String? @default("sin pago") @db.VarChar(255)
-  banco_destino      String? @default("sin pago") @db.VarChar(255)
-  status             String? @default("sin pago") @db.VarChar(255)
   observation        String? @default("sin pago") @db.VarChar(255)
+  status             String? @default("sin pago") @db.VarChar(255)
   validation_date    String? @default("sin pago") @db.VarChar(255)
+  type               String? @default("sin pago") @db.VarChar(255)
+  banco_destino      String? @default("sin pago") @db.VarChar(255)
   imagenUrl          String? @default("sin pago") @db.VarChar(255)
+  rut_cliente        String? @default("sin pago") @db.VarChar(255)
   orders             orders? @relation(fields: [order_id], references: [id])
 
   @@index([order_id])
@@ -95,4 +99,19 @@ model users {
   permissions String? @db.VarChar(255)
   rol         String? @db.VarChar(255)
   team        String? @db.VarChar(255)
+  rut         String? @db.VarChar(255)
+}
+
+model f4448_97d4_540c_8c8b_9d9efd28db53_20230427190148_vrepl {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  email       String  @unique(map: "users_email_key") @db.VarChar(255)
+  ownerId     Int     @unique(map: "users_ownerId_key")
+  password    String? @db.VarChar(255)
+  image       String?
+  permissions String? @db.VarChar(255)
+  rol         String? @db.VarChar(255)
+  team        String? @db.VarChar(255)
+
+  @@map("_128f4448_97d4_540c_8c8b_9d9efd28db53_20230427190148_vrepl")
 }
