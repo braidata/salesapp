@@ -69,7 +69,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
         ],
       },
     });
-
+    console.log("DEALAZO: ", response.data.results);
     res.status(200).json({ success: true, data: response.data.results });
   } catch (error) {
     return res.status(500).json({ success: false });
