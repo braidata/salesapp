@@ -286,34 +286,34 @@ export default function FormatContext({ context, componente }) {
           }
         }
       }),
-      billing_department: yup.string().nullable(
-        "Nro. de Depto es requerido"
-      ).test({
-        name: "Nro. de Depto",
-        message: "Ingresa un Nro. de Depto en HubSpot",
-        test: (value) => {
+      // billing_department: yup.string().nullable(
+      //   "Nro. de Depto es requerido"
+      // ).test({
+      //   name: "Nro. de Depto",
+      //   message: "Ingresa un Nro. de Depto en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        }
-      }),
-      billing_zip_code: yup.string().nullable(
-        "Código Postal es requerido"
-      ).test({
-        name: "Código Postal",
-        message: "Ingresa un Código Postal en HubSpot",
-        test: (value) => {
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   }
+      // }),
+      // billing_zip_code: yup.string().nullable(
+      //   "Código Postal es requerido"
+      // ).test({
+      //   name: "Código Postal",
+      //   message: "Ingresa un Código Postal en HubSpot",
+      //   test: (value) => {
 
-          if (value === null) {
-            return false;
-          } else {
-            return true;
-          }
-        }
-      }),
+      //     if (value === null) {
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   }
+      // }),
       billing_company_name: yup.string().nullable(
         "Razón Social es requerido"
       ).test({
