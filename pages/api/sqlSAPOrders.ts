@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         await pool.connect()
         const result = await pool.request()
-            .query(`SELECT TOP 1 idsap, CodigoExterno, respuesta_sap, RESULTADO_SAP, RUTA 
+            .query(`SELECT TOP 1000 idsap, CodigoExterno, respuesta_sap, RESULTADO_SAP, RUTA 
             FROM VISTA_INTEGRACION_SAP 
             WHERE CodigoExterno='${id}' 
             ORDER BY idsap DESC`)
