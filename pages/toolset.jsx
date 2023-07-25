@@ -4,6 +4,9 @@ import Puntos from "../utils/puntos";
 import SapO2 from "../components/sapO2";
 import SapO3 from "../components/sapO3";
 import FedEx from "../components/fedEx";
+import MeliTools from "../components/meli_tools";
+import MeliTable from "../components/meli_table";
+import SyncFramer from "../components/syncFramer";
 import { useRouter } from "next/router";
 import OrdersVentusComp from "../components/ordersVentusComp";
 import Febos from "../components/febos";
@@ -81,9 +84,12 @@ const Testeo = () => {
   return (
     <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
         <SapO2/>
+        <MeliTools />
+        <MeliTable />
         <SapO3/>
         <FedEx />
         <OrdersVentusComp />
+        <SyncFramer />
         {/* <Febos/> */}
     </div>
   );
