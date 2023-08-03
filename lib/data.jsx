@@ -1,6 +1,6 @@
 // import SelectLocalidades from "../components/forms/selectLocalidades";
 
-let rut = "231579893";
+let rut = "781094706";
 const id = Math.random(10,200).toString(36)
 const date = '1988-12-22';
 
@@ -14,7 +14,7 @@ const campos3 = [
     detalle: "Código Postal de Envío",
     valua: "120123"
   },
-  { campo: "shipping.Tipo_de_Despacho", type: "text", detalle: "Tipo de Despacho", valua: "Envío Región FedEx" },
+  { campo: "shipping.Tipo_de_Despacho", type: "text", detalle: "Tipo de Despacho", valua: "Envío Región FedEx", options: ["Envío Gratis Santiago","Envío Fedex Regiones", "Retira en Local", "Envío Santiago Pago"] },
   { campo: "shipping.Fecha_de_Despacho_o_Retiro", type: "date", detalle: "Fecha de Retiro o Despacho", valua: `${date}` },
   { campo: "shipping.Nombre_Retira", type: "text", detalle: "Nombre de Retira", valua: "Carlos Espinoza" },
   { campo: "shipping.Rut_Retira", type: "text", detalle: "Rut de Retira", valua: "15020576k" },
@@ -37,25 +37,25 @@ const campos2 = [
   {
     campo: "billing.Razón_Social",
     type: "text",
-    detalle: "Ingresa la Razón Social",
-    valua: "Fabrica de Chivitos",
+    detalle: "Ingresa la Razón Social * ",
+    valua: "INDUSTRIAS DE ALIMENTOS TRENDY S.A.",
   },
   {
     campo: "billing.Rut_Empresa",
     type: "text",
-    detalle: "Ingresa tu Rut de Empresa",
-    valua: "966848502",
+    detalle: "Ingresa tu Rut de Empresa * ",
+    valua: "781094706",
   },
   {
     campo: "billing.Giro",
     type: "text",
-    detalle: "Ingresa tu Giro",
-    valua: "Sanguchería",
+    detalle: "Ingresa tu Giro * ",
+    valua: "HELADOS",
   },
 ];
 const campos1 = [
   // { campo: "contact.user", type: "text", detalle: "Id del Usuario", valua: `${0}` },
-  { campo: "contact.DealId", type: "text", detalle: "Id del Negocio", valua: `${id}` },
+  { campo: "contact.DealId", type: "text", detalle: "Id del Negocio * ", valua: `${id}` },
   { campo: "contact.Rut", type: "text", detalle: "Rut del cliente", valua: `${rut}` },
   {
     campo: "contact.Nombre",
@@ -72,7 +72,7 @@ const campos1 = [
   {
     campo: "contact.Email",
     type: "email",
-    detalle: "Email del cliente",
+    detalle: "Email del cliente * ",
     valua: "elloropablo@gmail.com",
   },
   {
@@ -89,14 +89,14 @@ const dirFac1 = [
   {
     campo: "billingAddress.Calle",
     type: "street",
-    detalle: "Calle de Facturación",
-    valua: "El Sultan de Berlin",
+    detalle: "Calle de Facturación * ",
+    valua: "LO ZANARTU",
   },
   {
     campo: "billingAddress.Número",
     type: "text",
-    detalle: "Número de Dirección Facturación",
-    valua: "7666",
+    detalle: "Número de Dirección Facturación * ",
+    valua: "11",
   },
   {
     campo: "billingAddress.Departamento",
@@ -130,7 +130,7 @@ const dirFac1 = [
   },
 ];
 const dirEnv1 = [
-  { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "El Gato Campestre" },
+  { campo: "shippingAddress.Calle", type: "street", detalle: "Calle de Envío", valua: "Calle Manuel Rodriguez" },
   { campo: "shippingAddress.Numero", type: "text", detalle: "Numero de Envío", valua: "15487" },
   { campo: "shippingAddress.Casa_o_depto", type: "text", detalle: "Casa o depto de Envío", valua: "1100" },
   { campo: "shippingAddress.Comuna", type: "town", detalle: "Comuna de Envío", valua: "Antofagasta" },
@@ -144,24 +144,25 @@ const dirEnv1 = [
   },
 ];
 const products1 = [
-  { campo: "products.SKU", type: "text", detalle: "SKU", valua: "103011100044" },
-  { campo: "products.Nombre_Producto", type: "text", detalle: "Nombre", valua: "HORNO VHG DE 1 CÁMARA GAS" },
-  { campo: "products.Precio", type: "text", detalle: "Precio", valua: "299990" },
-  { campo: "products.Cantidad", type: "text", detalle: "Cantidad", valua: "15" },
-  { campo: "products.Flete", type: "text", detalle: "Flete", valua: "15990" },
+  { campo: "products.SKU", type: "text", detalle: "SKU * ", valua: "100021" },
+  { campo: "products.Nombre_Producto", type: "text", detalle: "Nombre", valua: "LAVAPLATOS 2 TAZAS SECADOR VENELP-160SD" },
+  { campo: "products.Precio", type: "text", detalle: "Precio * ", valua: "150000" },
+  { campo: "products.Cantidad", type: "text", detalle: "Cantidad * ", valua: "5" },
+  { campo: "products.Flete", type: "text", detalle: "Flete", valua: "1" },
 ];
 const pago1 = [
   {
     campo: "payment.Metodo_de_Pago",
     type: "text",
     detalle: "Metodo de Pago",
-  valua: "Transbank"
+  valua: "",
+  options: [ "Pago con Tarjeta de Crédito", "Pago con Tarjeta de Débito", "Efectivo", "Transferencia Bancaría", "Depósito"]
   },
   {
     campo: "payment.rut_pagador",
     type: "text",
     detalle: "Rut del Pagador",
-  valua: "15020576k"
+  valua: "77261280K"
   },
   {
     campo: "payment.orden_de_compra",

@@ -10,6 +10,7 @@ import CreatedAtomForm from "../createdAtomForm";
 import ButtonToAddComponent from "../buttonToAddComponent";
 //import SelectLocalidades from "./SelectLocalidades";
 import dynamic from "next/dynamic";
+import Select from "../Input Fields/Select";
 
 
 const datosShipping = [];
@@ -19,11 +20,13 @@ const schema = yup.object().shape({
     Tipo_de_Despacho: yup
       .string()
       .min(1, "Ingresa un  Tipo_de_Despacho válido")
-      .required("Tipo_de_Despacho es obligatorio"),
+      // .required("Tipo_de_Despacho es obligatorio")
+      ,
     Fecha_de_Despacho_o_Retiro: yup
       .string()
       .min(3, "Ingresa una Fecha_de_Despacho_o_Retiro válida")
-      .required("Fecha_de_Despacho_o_Retiro es obligatoria"),
+      // .required("Fecha_de_Despacho_o_Retiro es obligatoria")
+      ,
     Nombre_Retira: yup
       .string()
       .min(3, "Ingresa un Nombre_Retira válido"),
@@ -36,7 +39,8 @@ const schema = yup.object().shape({
     Observación: yup
       .string()
       .min(1, "Ingresa una Observación válida")
-      .required("Observación es obligatoria"),
+      // .required("Observación es obligatoria")
+      ,
   }),
 });
 
@@ -102,13 +106,23 @@ export default function shippingInfos({ formStep, nextFormStep }) {
               // console.log("Esto es la data de shipping: ", data),
               (
                 // call internal api
-                <Input
-                  key={index}
-                  name={data.campo}
-                  label={data.detalle}
-                  type={data.type}
-                  valua={data.valua}
-                />
+                data.campo != "shipping.Tipo_de_Despacho" ?
+
+           <Input
+              key={index}
+              name={data.campo}
+              label={data.detalle}
+              type={data.type}
+              valua={data.valua}
+            /> :
+              <Select
+              key={index}
+              name={data.campo}
+              label={data.detalle}
+              type={data.type}
+              valua={data.valua}
+              options={data.options}
+            />
               )
             )
           )}
@@ -118,7 +132,7 @@ export default function shippingInfos({ formStep, nextFormStep }) {
             dataSelect={2}
             children={<CreatedAtomForm />}
           /> */}
-          <button className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="submit">Siguiente</button>
+          <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-600 hover:text-gray-300 dark:bg-gradient-to-r dark:from-sky-400/50 dark:to-sky-600/50 border-2 dark:drop-shadow-[0_5px_5px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full" type="submit">Siguiente</button>
           {datosShipping.map(
             (datos, Bill) => (
               shippingInfo.push(datos),

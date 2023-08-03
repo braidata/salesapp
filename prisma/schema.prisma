@@ -1,90 +1,117 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider     = "mysql"
-    url          = env("DATABASE_URL")
-    relationMode = "prisma"
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model order_items {
-    id       Int    @id @default(autoincrement())
-    order_id Int
-    sku      String @db.VarChar(255)
-    name     String @db.VarChar(255)
-    price    String @db.VarChar(255)
-    quantity String @db.VarChar(255)
-    orders   orders @relation(fields: [order_id], references: [id])
+  id       Int     @id @default(autoincrement())
+  order_id Int
+  sku      String  @db.VarChar(255)
+  name     String? @db.VarChar(255)
+  price    String  @db.VarChar(255)
+  quantity String  @db.VarChar(255)
+  discount String? @db.VarChar(255)
+  orders   orders  @relation(fields: [order_id], references: [id])
 
-    @@index([order_id])
+  @@index([order_id])
 }
 
 model orders {
-    id                                  Int           @id @default(autoincrement())
-    customer_name                       String        @db.VarChar(255)
-    customer_rut                        String        @db.VarChar(255)
-    customer_email                      String        @db.VarChar(255)
-    customer_phone                      String        @db.VarChar(255)
-    billing_street                      String        @db.VarChar(255)
-    billing_number                      String        @db.VarChar(255)
-    billing_department                  String        @db.VarChar(255)
-    billing_region                      String        @db.VarChar(255)
-    billing_city                        String        @db.VarChar(255)
-    billing_commune                     String        @db.VarChar(255)
-    billing_zip_code                    String        @db.VarChar(255)
-    billing_company_name                String        @db.VarChar(255)
-    billing_company_rut                 String        @db.VarChar(255)
-    billing_company_business            String        @db.VarChar(255)
-    Shipping_Tipo_de_Despacho           String        @db.VarChar(255)
-    Shipping_Fecha_de_Despacho_o_Retiro String        @db.VarChar(255)
-    Shipping_Rut_Retira                 String?       @db.VarChar(255)
-    Shipping_Nombre_Retira              String?       @db.VarChar(255)
-    Shipping_Observacion                String?       @db.VarChar(255)
-    Shipping_flete                      String        @db.VarChar(255)
-    customer_last_name                  String        @db.VarChar(255)
-    user                                String        @db.VarChar(255)
-    team                                String?        @db.VarChar(255)
-    dealId                              String        @unique @db.VarChar(255)
-    Shipping_city                       String?       @default("sin envio") @db.VarChar(255)
-    Shipping_commune                    String?       @default("sin envio") @db.VarChar(255)
-    Shipping_department                 String?       @default("sin envio") @db.VarChar(255)
-    Shipping_number                     String?       @default("sin envio") @db.VarChar(255)
-    Shipping_region                     String?       @default("sin envio") @db.VarChar(255)
-    Shipping_street                     String?       @default("sin envio") @db.VarChar(255)
-    Shipping_zip_code                   String?       @default("sin envio") @db.VarChar(255)
-    order_date                          DateTime?     @default(now())
-    ownerId                             Int?
-    sapID                               String?       @db.VarChar(255)
-    statusSAP                           String?       @db.VarChar(255)
-    dateSAP                             String?       @db.VarChar(255)
-    ownerIdM                            String?
-    OC                                  String?
-    payments                            payments[]
-    order_items                         order_items[]
+  id                                  Int           @id @default(autoincrement())
+  customer_name                       String?       @default("sin detalle contacto") @db.VarChar(255)
+  customer_rut                        String?       @default("sin detalle contacto") @db.VarChar(255)
+  customer_email                      String?       @default("sin detalle contacto") @db.VarChar(255)
+  customer_phone                      String?       @default("sin detalle contacto") @db.VarChar(255)
+  billing_street                      String        @db.VarChar(255)
+  billing_number                      String        @db.VarChar(255)
+  billing_department                  String?       @default("sin n depto") @db.VarChar(255)
+  billing_region                      String        @db.VarChar(255)
+  billing_city                        String        @db.VarChar(255)
+  billing_commune                     String        @db.VarChar(255)
+  billing_zip_code                    String?       @default("sin zip code") @db.VarChar(255)
+  billing_company_name                String        @db.VarChar(255)
+  billing_company_rut                 String        @db.VarChar(255)
+  billing_company_business            String        @db.VarChar(255)
+  Shipping_Tipo_de_Despacho           String?       @default("sin envio") @db.VarChar(255)
+  Shipping_Fecha_de_Despacho_o_Retiro String?       @default("sin envio") @db.VarChar(255)
+  Shipping_Rut_Retira                 String?       @default("sin envio") @db.VarChar(255)
+  Shipping_Nombre_Retira              String?       @default("sin envio") @db.VarChar(255)
+  Shipping_Observacion                String?       @default("sin envio") @db.VarChar(255)
+  Shipping_flete                      String?       @default("sin envio") @db.VarChar(255)
+  customer_last_name                  String?       @default("sin datos de contacto") @db.VarChar(255)
+  user                                String        @db.VarChar(255)
+  dealId                              String        @unique @db.VarChar(255)
+  Shipping_city                       String?       @default("sin envio") @db.VarChar(255)
+  Shipping_commune                    String?       @default("sin envio") @db.VarChar(255)
+  Shipping_department                 String?       @default("sin envio") @db.VarChar(255)
+  Shipping_number                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_region                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_street                     String?       @default("sin envio") @db.VarChar(255)
+  Shipping_zip_code                   String?       @default("sin envio") @db.VarChar(255)
+  order_date                          DateTime?     @default(now())
+  ownerId                             Int?
+  sapID                               String?       @db.VarChar(255)
+  statusSAP                           String?       @default("Procesando") @db.VarChar(255)
+  dateSAP                             String?       @db.VarChar(255)
+  ownerIdM                            String?
+  team                                String?       @db.VarChar(255)
+  OC                                  String?       @db.VarChar(255)
+  almacen                             String?       @db.VarChar(255)
+  centro                              String?       @db.VarChar(255)
+  channel                             String?       @db.VarChar(255)
+  order_class                         String?       @db.VarChar(255)
+  respuestaSAP                        String?       @db.VarChar(512)
+  payments                            payments[]
+  order_items                         order_items[]
 }
 
 model payments {
-    id                 Int    @id @default(autoincrement())
-    order_id           Int
-    method             String @db.VarChar(255)
-    rut_pagador        String? @db.VarChar(255)
-    authorization_code String? @db.VarChar(255)
-    payment_count      String @db.VarChar(255)
-    payment_amount     String @db.VarChar(255)
-    payment_date       String @db.VarChar(255)
-    orders             orders @relation(fields: [order_id], references: [id])
+  id                 Int     @id @default(autoincrement())
+  order_id           Int     @unique
+  method             String? @default("sin pago") @db.VarChar(255)
+  authorization_code String? @default("sin pago") @db.VarChar(255)
+  payment_count      String? @default("sin pago") @db.VarChar(255)
+  payment_amount     String? @default("sin pago") @db.VarChar(255)
+  payment_date       String? @default("sin pago") @db.VarChar(255)
+  rut_pagador        String? @default("sin pago") @db.VarChar(255)
+  observation        String? @default("sin pago") @db.VarChar(255)
+  status             String? @default("sin pago") @db.VarChar(255)
+  validation_date    String? @default("sin pago") @db.VarChar(255)
+  type               String? @default("sin pago") @db.VarChar(255)
+  banco_destino      String? @default("sin pago") @db.VarChar(255)
+  imagenUrl          String? @default("sin pago") @db.VarChar(255)
+  rut_cliente        String? @default("sin pago") @db.VarChar(255)
+  orders             orders? @relation(fields: [order_id], references: [id])
 
-    @@index([order_id])
+  @@index([order_id])
 }
 
 model users {
-    id          Int     @id @default(autoincrement())
-    name        String  @db.VarChar(255)
-    email       String  @unique @db.VarChar(255)
-    image       String?
-    rol         String? @db.VarChar(255)
-    permissions String? @db.VarChar(255)
-    ownerId     Int     @unique
-    password    String? @db.VarChar(255)
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  email       String  @unique @db.VarChar(255)
+  ownerId     Int     @unique
+  password    String? @db.VarChar(255)
+  image       String?
+  permissions String? @db.VarChar(255)
+  rol         String? @db.VarChar(255)
+  team        String? @db.VarChar(255)
+  rut         String? @db.VarChar(255)
+}
+
+model aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl {
+  id       Int     @id @default(autoincrement())
+  order_id Int
+  sku      String  @db.VarChar(255)
+  name     String? @db.VarChar(255)
+  price    String  @db.VarChar(255)
+  quantity String  @db.VarChar(255)
+
+  @@index([order_id], map: "order_items_order_id_idx")
+  @@map("_69aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl")
 }

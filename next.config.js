@@ -8,6 +8,7 @@ module.exports = {
     DB_HOST: process.env.DB_HOST,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -16,6 +17,13 @@ module.exports = {
         // pathname: '/account123/**',
       },
     ],
+  },
+
+  webpack: (
+    config, options
+  ) => {
+    config.module.noParse = [require.resolve("typescript/lib/typescript.js")]
+    return config
   },
 
   typescript: {

@@ -66,10 +66,10 @@ export default function ConfirmPurchase({ formStep, nextFormStep }) {
       <Form ref={formRef} onSubmit={handleSubmit}>
         <div className="mt-5 mb-5">
           <div className={styles.formRow}>
-            <CheckBox name="checkbox" label="Revisaste los datos?" />
+            <CheckBox name="checkbox" value={false} label="Revisaste los datos?" />
           </div>
         </div>
-        <button className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="submit">Enviar Pedido</button>
+        <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-600 hover:text-gray-300 dark:bg-gradient-to-r dark:from-sky-400/50 dark:to-sky-600/50 border-2 dark:drop-shadow-[0_5px_5px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full" type="submit">Enviar Pedido</button>
       </Form>
     </div>
   );

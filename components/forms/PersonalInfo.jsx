@@ -13,41 +13,41 @@ const contactInfo = [];
 const schema = yup.object().shape({
   //array
   contact: yup.object().shape({
-    Email: yup.string().email().required("Email is required"),
-    Nombre: yup
-      .string()
-      //omitir caracteres especiales
-      .matches(/^[a-zA-Z ]*$/, "Ingresa un Nombre sin carácteres especiales")
-      .min(2, "Ingresa un Nombre válido")
-      .required("Nombre es obligatorio"),
+    Email: yup.string().email().required("El Email es Obligatorio"),
+    // Nombre: yup
+    //   .string()
+    //   //omitir caracteres especiales
+    //   .matches(/^[a-zA-Z ]*$/, "Ingresa un Nombre sin carácteres especiales")
+    //   .min(2, "Ingresa un Nombre válido")
+    //   .required("Nombre es obligatorio"),
       DealId: yup
       .string()
       .min(2, "Ingresa un Nombre válido")
       .required("Nombre es obligatorio"),
-    Apellido: yup
-      .string()
-      .matches(/^[a-zA-Z ]*$/, "Ingresa un Apellido sin carácteres especiales")
-      .min(2, "Ingresa un apellido válida")
-      .required("Apellido es obligatorio"),
-    Rut: yup
-      .string()
-      //omitir caracteres especiales y ser alfanumerico
-      .matches(/^[a-zA-Z0-9 ]*$/, "Ingresa un Rut sin puntos ni guión")
-      .test({
-        name: "Rut",
-        message: "Rut no válido",
-        test: (value) => {
-          return validateRUT(value);
-        },
-      })
-      .min(9, "Ingresa un rut válido")
-      .required("Rut es obligatorio"),
-    Telefono: yup
-      .string()
-      //omitir caracteres que no sean para telefonos
-      .matches(/^[0-9 ]*$/, "Ingresa un teléfono válido")
-      .min(9, "Ingresa un teléfono válido")
-      .required("Teléfono es obligatorio"),
+    // Apellido: yup
+    //   .string()
+    //   .matches(/^[a-zA-Z ]*$/, "Ingresa un Apellido sin carácteres especiales")
+    //   .min(2, "Ingresa un apellido válida")
+    //   .required("Apellido es obligatorio"),
+    // Rut: yup
+    //   .string()
+    //   //omitir caracteres especiales y ser alfanumerico
+    //   .matches(/^[a-zA-Z0-9 ]*$/, "Ingresa un Rut sin puntos ni guión")
+    //   .test({
+    //     name: "Rut",
+    //     message: "Rut no válido",
+    //     test: (value) => {
+    //       return validateRUT(value);
+    //     },
+    //   })
+    //   .min(9, "Ingresa un rut válido")
+    //   .required("Rut es obligatorio"),
+    // Telefono: yup
+    //   .string()
+    //   //omitir caracteres que no sean para telefonos
+    //   .matches(/^[0-9 ]*$/, "Ingresa un teléfono válido")
+    //   .min(9, "Ingresa un teléfono válido")
+    //   .required("Teléfono es obligatorio"),
   }),
 });
 
@@ -98,7 +98,7 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
           : "No Data"} */}
       </div>
 
-      <h2 className="mt-2 border rounded-md border-gray-500 bg-gray-200 dark:bg-gray-700 p-2.5 text-gray-200 text-center text-xl dark:text-gray-100">
+      <h2 className="mt-2 border rounded-md border-gray-500 bg-gray-200 dark:bg-gray-700 p-2.5  text-center text-xl dark:text-gray-100">
         INFORMACIÓN DEL CONTACTO
       </h2>
 
@@ -125,7 +125,7 @@ export default function PersonalInfo({ formStep, nextFormStep }) {
                 />
               ))
             : "no data"}
-          <button className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="submit">Siguiente</button>
+          <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 hover:text-gray-100 dark:bg-gradient-to-r dark:from-sky-400/50 dark:to-sky-600/50 border-2 dark:drop-shadow-[0_5px_5px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full" type="submit">Siguiente</button>
         </div>
       </Form>
     </div>

@@ -8,6 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const name = req.body.name ? req.body.name : null
     const email = req.body.email ? req.body.email : null
     const id = req.body.id ? req.body.id : null
+    
 
     const prisma = new PrismaClient();
 
@@ -30,7 +31,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     id: id,
                     name: name,
                     email: email
-                }
+                },
+
+                
             }
 
         );
@@ -53,6 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 select: {
                     "id": true,
+                    "order_date": true,
                     "customer_name": true,
                     "customer_last_name": true,
                     "customer_email": true,
@@ -63,11 +67,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     "user": true,
                     "statusSAP": true,
                     "billing_company_name": true,
+                    "respuestaSAP": true,
 
                 },
                 where: {
                     user: email,
-                }
+                },
+
+                orderBy: {
+                    order_date: 'desc',  // Ordena las órdenes por fecha en orden descendente
+                },
             }
         );
         //const order_items = await prisma.order_items.findMany();

@@ -103,7 +103,7 @@ export default function PageWithJSbasedForm3({session}) {
 
     console.log("el negocios es ", context);
 
-    await stateChanger(event, parseInt(idD));
+    // await stateChanger(event, parseInt(idD));
     //setIsDisabled(true);
 
     setIsLoading(false);
@@ -384,29 +384,29 @@ const idOwners = async (event, id) => {
 
 
   //dealInfo
-  const stateChanger = async (event, id) => {
-    event.preventDefault();
-    try {
-      const data = {
-        id: id,
-      };
-      const JSONdata = JSON.stringify(data);
-      const endpoint = "/api/dealStage";
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSONdata,
-      };
-      let response = await fetch(endpoint, options);
-      let result = await response.json();
+  // const stateChanger = async (event, id) => {
+  //   event.preventDefault();
+  //   try {
+  //     const data = {
+  //       id: id,
+  //     };
+  //     const JSONdata = JSON.stringify(data);
+  //     const endpoint = "/api/dealStage";
+  //     const options = {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSONdata,
+  //     };
+  //     let response = await fetch(endpoint, options);
+  //     let result = await response.json();
 
-      console.log("estados", result);
-    } catch {
-      console.log("No cambio de estado");
-    }
-  };
+  //     console.log("estados", result);
+  //   } catch {
+  //     console.log("No cambio de estado");
+  //   }
+  // };
 
   const stateSetter = (s) => {
     setIsDisabled(s);
@@ -418,7 +418,7 @@ const idOwners = async (event, id) => {
   };
 
   return (
-    <div className="mt-10">
+    <div className="mt-10 w-96 sm:w-full">
       {/* <SessionInfo /> */}
       <form onSubmit={contactoAsociado}>
         <label
@@ -436,7 +436,7 @@ const idOwners = async (event, id) => {
         />
 
         <button
-          className="mt-2 mb-5 bg-blue-900/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-blue-800/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-blue-600/20 dark:hover:bg-blue-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_5px_5px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-400/50 dark:to-sky-600/50 border-2 dark:drop-shadow-[0_5px_5px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center"
           type="submit"
         >
           Buscar datos en HubSpot{" "}
@@ -452,7 +452,7 @@ const idOwners = async (event, id) => {
               Debes completar los datos de Empresa en HubSpot para continuar.
             </h4>
             <button
-              className="mt-2 mb-5 bg-orange-800/90 border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-orange-700/90 focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-orange-600/20 dark:hover:bg-orange-400/20 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_10px_10px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-400/50 dark:to-orange-600/50 border-2 dark:drop-shadow-[0_10px_10px_rgba(255,200,0,0.25)]  dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center"
               type="submit"
             >
               Cargar Datos{" "}
@@ -486,7 +486,7 @@ const idOwners = async (event, id) => {
               <CardDeal
                 name={deal.dealname}
                 id={deal.hs_object_id}
-                stage={deal.dealstage === "50940199" ? "Pagado" : "por pagar"}
+                stage={deal.dealstage === "50940199" ? "Pagado Enviar a SAP" : "por pagar"}
                 amount={deal.amount}
                 editFunction={editData}
                 sendFunction={sendData}
@@ -507,3 +507,155 @@ const idOwners = async (event, id) => {
     </div>
   );
 }
+
+
+// import { useState, useEffect, useRef } from "react";
+// import dynamic from "next/dynamic";
+// import { useDataData } from "../../context/data";
+// import SpinnerButton from "../spinnerButton";
+// import CardDeal from "../forms/cardDeal";
+// import SuccessMessage from "../forms/succesMessage";
+// import { useSession } from "next-auth/react";
+// import SessionInfo from "../forms/sessionInfo";
+// import axios from "axios";
+
+// export default function PageWithJSbasedForm3({ session }) {
+//   const [contacts, setContacts] = useState([]);
+//   const [companies, setCompanies] = useState([]);
+//   const [billing, setBilling] = useState([]);
+//   const [deals, setDeals] = useState([]);
+//   const [deale, setDeal] = useState([]);
+//   const [lines, setLine] = useState([]);
+//   const [products, setProducts] = useState(new Set());
+//   const [id, setId] = useState([]);
+//   const [owner, setOwner] = useState([]);
+//   const [owners, setOwners] = useState([]);
+//   const { setDataValues } = useDataData();
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [isDisabled, setIsDisabled] = useState(false);
+
+//   const tdRef = useRef(null);
+//   const [user, setUser] = useState(session ? session.token.email : null);
+//   const [team, setTeam] = useState(session ? session.token.sub : null);
+
+//   // Crear contexto para objetos
+//   const context = {
+//     contacts,
+//     companies,
+//     billing,
+//     deals,
+//     deale: deale.filter(
+//       (thing, index, self) => index === self.findIndex((t) => t.id === thing.id)
+//     ),
+//     lines,
+//     products: Array.from(products),
+//     user,
+//     team,
+//     owner,
+//     owners,
+//     id,
+//   };
+
+//   // Setear datos del contexto
+//   // useEffect(() => {
+//   //   setDataValues(context);
+//   // }, [context]);
+
+//   // Manejar cambio en el email
+//   const handleEmailChange = async (event) => {
+//     event.preventDefault();
+//     const email = event.target.email.value;
+
+//     //spinner();
+
+//     try {
+//       // Obtener ID del primer negocio asociado al email
+//       const dealResponse = await axios.post("/api/apihubspotdeals", { email });
+//       const dealId = dealResponse.data.data[0].id;
+//       console.log("vamos",dealResponse);
+//       //obtener id de negocio
+//       const dealResponses = await axios.post("/api/apiHubspot", { id: dealId });
+//       const dealIds = dealResponses.data.data;
+//       console.log("vamos",dealIds);
+//       // Obtener información del negocio}
+//       //mapea dealIds para entregar cada id como argumento
+//       dealIds.map(async (dealId) => {
+        
+//         console.log("vamos",dealId.toObjectId);
+//         const dealResponseData = await axios.post("/api/extractDeal", { id: dealId.toObjectId });
+//         const dealData = dealResponseData.data.data[0].properties;})
+
+//       //const dealResponseData = await axios.post("/api/extractDeal", { id: dealIds });
+//       // console.log("vamos",dealResponseData);
+//       // const dealData = dealResponseData.data.data[0].properties;
+
+//       // Obtener ID de la empresa asociada al negocio
+//       //const companyId = dealData.associatedcompanyid.value;
+
+//       // Obtener información de la empresa
+//       const companyResponse = await axios.post("/api/apiBillingIDS", { id: dealId });
+//       const companyData = companyResponse.data.data[0].toObjectId;
+//       console.log("vamos",companyData);
+
+//       // Obtener información de los productos asociados al negocio
+//       const lineResponse = await axios.post("/api/apihubspotline", { id: dealData });
+//       const lineData = lineResponse.data.data;
+//       console.log("vamos",lineData);
+
+//       const productsData = await Promise.all(
+//         lineData.map(async (line) => {
+//           const response = await axios.post("/api/apihubspotproduct1", { id: line.toObjectId });
+//           console.log("vamos",response);
+//           return response.data.data;
+//         })
+//       );
+
+//       // Obtener información del dueño del negocio
+//       const ownerDataResponse = await axios.post("/api/getHubspotOwners", { id: dealData.hubspot_owner_id });
+//       const ownerData = ownerDataResponse.data;
+
+//       // Setear los estados
+//       setDeals(dealData);
+//       setCompanies(companyData);
+//       setLine(lineData);
+//       setProducts(productsData);
+//       setOwner(ownerData);
+//       setId(dealId);
+//       setIsLoading(false);
+//       setDataValues(context);
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+
+
+
+//   return (
+//     <div className="flex flex-col items-center justify-center min-h-screen py-2">
+//       <div className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+//         <h1 className="text-4xl font-bold">Formulario de negocios</h1>
+//         <div className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+//           <form onSubmit={handleEmailChange}>
+//             <label htmlFor="email">Email</label>
+//             <input type="email" name="email" id="email" />
+//             <button type="submit">Buscar
+//             </button>
+//           </form>
+//           {/* <form onSubmit={handleIdChange}>
+//             <label htmlFor="id">ID</label>
+//             <input type="text" name="id" id="id" />
+//             <button type="submit">Buscar
+//             <SpinnerButton
+
+//               isLoading={isLoading}
+//               isDisabled={isDisabled}
+//               text="Buscar"
+//             /></button>
+//           </form> */}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
