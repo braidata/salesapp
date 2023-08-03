@@ -20,7 +20,7 @@ export default async function handler(
         Authorization: `Bearer ${process.env.HUBSPOT_TOKEN}`,
       },
       data: {
-        properties: ["name", "amount", "quantity", "hs_sku", "hs_object_id"],
+        properties: ["name", "amount", "quantity", "hs_sku", "hs_object_id", "hs_discount_percentage"],
         filterGroups: [
           {
             filters: [

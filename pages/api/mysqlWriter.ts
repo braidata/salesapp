@@ -161,7 +161,8 @@ const order_items = req.body.order_items;
             t.name === thing.name &&
             t.price !== undefined &&
             t.quantity !== undefined &&
-            t.sku !== undefined
+            t.sku !== undefined &&
+            t.discount !== undefined
         )
     )
     .map((item: any) => ({
@@ -169,6 +170,7 @@ const order_items = req.body.order_items;
       price: item.price,
       quantity: item.quantity,
       sku: item.sku,
+      discount: item.discount,
     }));
 
   const prisma = new PrismaClient();
