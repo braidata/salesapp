@@ -28,7 +28,7 @@ function App() {
     return (
         <div className="p-4 mt-8">
             <h1 className="font-bold py-2 px-4 rounded-lg text-center mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-gray-900 dark:text-gray-300 border-2 border-gray-400 hover:bg-gray-600/50 hover:text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 transition duration-500 ease-in-out">
-                Sincornizador de Pedidos
+                Sincronizador de Pedidos
             </h1>
             <select value={selectedChannel} onChange={handleSelectChange} className="border p-2 mr-2">
                 {channels.map((channel) => (

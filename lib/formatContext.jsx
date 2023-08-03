@@ -143,6 +143,10 @@ export default function FormatContext({ context, componente }) {
             index < product.length
               ? product[index].properties.sku
               : product[0].properties.hs_sku,
+          discount:
+            index < product.length
+              ? product[index].properties.discount
+              : product[0].properties.hs_discount_percentage,
         });
     });
     setDatos(contexts.deale[0].hs_object_id);
