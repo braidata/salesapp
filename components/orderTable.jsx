@@ -62,7 +62,7 @@ const OrderTable = ({ data }) => {
                   messages.push(responses[0].TEXT);
                 } else {
                   status = "En SAP"
-                  messages.push(responses.TEXT);
+                  messages.push(responses?.TEXT);
                 }
               }
 
