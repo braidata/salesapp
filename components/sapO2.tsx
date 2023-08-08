@@ -72,8 +72,8 @@ const Pedidos: React.FC = () => {
         COD_SAP = resp[0].COD_SAP;
       }
     } else {
-      TEXT = resp.TEXT;
-      COD_SAP = resp.COD_SAP;
+      TEXT = resp?.TEXT;
+      COD_SAP = resp?.COD_SAP;
     }
   
     if (!TEXT && !COD_SAP) {
