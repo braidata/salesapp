@@ -432,6 +432,10 @@ const SelectComponent = () => {
       placeholder: "Ejemplo: 12345667891"
     },
     {
+      key: "meta_data._billing_comuna",
+      placeholder: "SANTIAGO CENTRO"
+    },
+    {
       key: "meta_data._billing_documento",
       placeholder: "Ejemplo: factura"
     },
