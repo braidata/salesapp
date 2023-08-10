@@ -62,12 +62,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     "customer_email": true,
                     "customer_phone": true,
                     "customer_rut": true,
+                    "Shipping_Fecha_de_Despacho_o_Retiro": true,
                     "payments": true,
                     "order_items": true,
                     "user": true,
                     "statusSAP": true,
                     "billing_company_name": true,
                     "respuestaSAP": true,
+                    "dealId": true,
 
                 },
                 where: {
