@@ -7,7 +7,7 @@ type Response = {
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
-  const ownerID = req.body.id ? req.body.id : req.query.id;
+  const ownerID = req.body.id;
   try {
     const url = `https://api.hubapi.com/owners/v2/owners/${ownerID}`;
     const token = process.env.HUBSPOT_TOKEN;

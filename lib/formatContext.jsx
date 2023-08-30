@@ -2,7 +2,7 @@
 // import yup
 import * as yup from "yup";
 //import rut validator
-import { validateRUT, getCheckDigit, generateRandomRUT } from "validar-rut";
+//import { validateRUT, getCheckDigit, generateRandomRUT } from "validar-rut";
 import React, { useState, useEffect, useRef } from "react";
 import { useDataData } from "../context/data";
 import ProductTable from "../components/productTable";
@@ -29,6 +29,25 @@ export default function FormatContext({ context, componente }) {
   const [datos, setDatos] = useState(null);
 
   console.log("los data values son:  ", JSON.stringify(contexts));
+
+  const validateRUT = async (rut) => {
+    try {
+      const response = await fetch(`https://api.libreapi.cl/rut/validate?rut=${rut}`);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      return data.data.valid; // Devolviendo directamente la propiedad "valid".
+  
+    } catch (error) {
+      console.error('Error fetching and parsing data:', error);
+      throw error;
+    }
+  }
+  
+  
 
   // console.log("la data es", datas)
 
@@ -335,11 +354,22 @@ export default function FormatContext({ context, componente }) {
       billing_company_rut: yup.string().test({
         name: "Rut Empresa",
         message: "Ingresa un Rut Empresa válido en HubSpot",
-        test: (value) => {
-
+        test: async function(value) {
           if (value) {
-            return validateRUT(value);
+            try {
+              return await validateRUT(value);
+            } catch (error) {
+              // Aquí puedes decidir qué hacer si hay un error. 
+              // Puedes retornar false o configurar un mensaje de error personalizado.
+              this.createError({
+                path: this.path,
+                message: 'Error al validar el RUT. Por favor, inténtalo de nuevo.'
+              });
+            }
           }
+          // Si value no está presente o es falsy (por ejemplo, una cadena vacía), puedes decidir si eso es válido o no.
+          // Si decides que no es válido cuando no hay valor, simplemente retornar false.
+          return false; 
         }
       }),
 

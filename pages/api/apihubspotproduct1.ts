@@ -11,7 +11,7 @@ export default async function handler(
   res: NextApiResponse<Response>
 ) {
   try {
-    const id = req.body.id;
+    const id = req.body.id ? req.body.id : req.query.id;
     const url = `https://api.hubapi.com/crm/v3/objects/line_item/search/`;
     const response = await axios({
       method: "POST",
