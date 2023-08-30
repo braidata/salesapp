@@ -11,7 +11,7 @@ export default async function handler(
   res: NextApiResponse<Response>
 ) {
   try {
-    const email = req.body.email ? req.body.email : req.query.email;
+    const email = req.body.email;
     const token = process.env.HUBSPOT_TOKEN; // reemplazar con el token válido
     // Realizar una solicitud de API de HubSpot con el token de acceso
     const url = `https://api.hubapi.com/crm/v3/objects/contact/search/`;

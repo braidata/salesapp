@@ -8,7 +8,7 @@ type Response = {
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   try {
-    const id = req.body.id ? req.body.id : req.query.id;
+    const id = req.body.id;
     const url = `https://api.hubapi.com/crm/v3/objects/deal/search/`;
     const response = await axios({
       method: "POST",
