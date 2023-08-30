@@ -137,6 +137,7 @@ export default function PageWithJSbasedForm3({session}) {
       const ids = result.data[0].id;
       idNegocio(event, ids);
       setContacts(result.data);
+      setIsLoading(false);
     } catch {
       console.log("No se encontró el contacto");
     }
