@@ -83,7 +83,8 @@ export default function PageWithJSbasedForm3({session}) {
 
   const liniera = (event, idD) => {
     event.preventDefault();
-    idDeals(event, idD);
+    //idDeals(event, idD);
+    idCompanies(event, deale[0].hs_object_id);
     //setId(idD);
     idLinea(event, idD);
     lines.map((line) => idProducts(event, line));
@@ -134,9 +135,7 @@ export default function PageWithJSbasedForm3({session}) {
       const response = await fetch(endpoint, options);
       let result = await response.json();
       const ids = result.data[0].id;
-      //idDeals(event, ids);
       idNegocio(event, ids);
-      idCompanies(event, ids);
       setContacts(result.data);
     } catch {
       console.log("No se encontró el contacto");
@@ -145,7 +144,6 @@ export default function PageWithJSbasedForm3({session}) {
 
   const idCompanies = async (event, id) => {
     //event.preventDefault();
-
     try {
       const data = {
         id: id,
@@ -168,38 +166,6 @@ export default function PageWithJSbasedForm3({session}) {
       console.log("No se encontró La Empresa");
       setIsLoading(false);
     }
-  };
-
-  //ejecutadora de funciones
-  const ejecutadora0 = async (event) => {
-    contactoAsociado(event);
-
-    // //wait for 2 seconds
-    // setTimeout(() => {
-    //   //your code to be executed after 2 seconds
-    //   contactoAsociado(event);
-
-    // }, 5000);
-  };
-
-  const ejecutadora = async (event) => {
-    sendData(event);
-
-    // //wait for 2 seconds
-    // setTimeout(() => {
-    //   //your code to be executed after 2 seconds
-    //   sendData(event);
-    // }, 1000);
-
-    setTimeout(() => {
-      //your code to be executed after 2 seconds
-      sendData(event);
-    }, 5000);
-
-    setTimeout(() => {
-      //your code to be executed after 2 seconds
-      sendData(event);
-    }, 5000);
   };
 
   //indica los números de negocios asociados al contacto
@@ -378,41 +344,6 @@ const idOwners = async (event, id) => {
   };
 
 
-
-
-
-
-
-  //dealInfo
-  // const stateChanger = async (event, id) => {
-  //   event.preventDefault();
-  //   try {
-  //     const data = {
-  //       id: id,
-  //     };
-  //     const JSONdata = JSON.stringify(data);
-  //     const endpoint = "/api/dealStage";
-  //     const options = {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSONdata,
-  //     };
-  //     let response = await fetch(endpoint, options);
-  //     let result = await response.json();
-
-  //     console.log("estados", result);
-  //   } catch {
-  //     console.log("No cambio de estado");
-  //   }
-  // };
-
-  const stateSetter = (s) => {
-    setIsDisabled(s);
-    return isDisabled;
-  };
-
   const spinner = () => {
     setIsLoading(true);
   };
@@ -461,14 +392,6 @@ const idOwners = async (event, id) => {
         ) : null}
       </form>
 
-      {/* {context.companies.length < 1 ? (
-        <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
-          Debes completar los datos de Empresa en HubSpot para continuar
-        </h4>
-      ) : null} */}
-
-      {/* {context.companies.length < 1 ? stateSetter(false) : "hola" } */}
-
       {context.deale.length > 0 ? (
         context.deale.map((deal, index) => (
           //grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6
@@ -509,153 +432,5 @@ const idOwners = async (event, id) => {
 }
 
 
-// import { useState, useEffect, useRef } from "react";
-// import dynamic from "next/dynamic";
-// import { useDataData } from "../../context/data";
-// import SpinnerButton from "../spinnerButton";
-// import CardDeal from "../forms/cardDeal";
-// import SuccessMessage from "../forms/succesMessage";
-// import { useSession } from "next-auth/react";
-// import SessionInfo from "../forms/sessionInfo";
-// import axios from "axios";
-
-// export default function PageWithJSbasedForm3({ session }) {
-//   const [contacts, setContacts] = useState([]);
-//   const [companies, setCompanies] = useState([]);
-//   const [billing, setBilling] = useState([]);
-//   const [deals, setDeals] = useState([]);
-//   const [deale, setDeal] = useState([]);
-//   const [lines, setLine] = useState([]);
-//   const [products, setProducts] = useState(new Set());
-//   const [id, setId] = useState([]);
-//   const [owner, setOwner] = useState([]);
-//   const [owners, setOwners] = useState([]);
-//   const { setDataValues } = useDataData();
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isDisabled, setIsDisabled] = useState(false);
-
-//   const tdRef = useRef(null);
-//   const [user, setUser] = useState(session ? session.token.email : null);
-//   const [team, setTeam] = useState(session ? session.token.sub : null);
-
-//   // Crear contexto para objetos
-//   const context = {
-//     contacts,
-//     companies,
-//     billing,
-//     deals,
-//     deale: deale.filter(
-//       (thing, index, self) => index === self.findIndex((t) => t.id === thing.id)
-//     ),
-//     lines,
-//     products: Array.from(products),
-//     user,
-//     team,
-//     owner,
-//     owners,
-//     id,
-//   };
-
-//   // Setear datos del contexto
-//   // useEffect(() => {
-//   //   setDataValues(context);
-//   // }, [context]);
-
-//   // Manejar cambio en el email
-//   const handleEmailChange = async (event) => {
-//     event.preventDefault();
-//     const email = event.target.email.value;
-
-//     //spinner();
-
-//     try {
-//       // Obtener ID del primer negocio asociado al email
-//       const dealResponse = await axios.post("/api/apihubspotdeals", { email });
-//       const dealId = dealResponse.data.data[0].id;
-//       console.log("vamos",dealResponse);
-//       //obtener id de negocio
-//       const dealResponses = await axios.post("/api/apiHubspot", { id: dealId });
-//       const dealIds = dealResponses.data.data;
-//       console.log("vamos",dealIds);
-//       // Obtener información del negocio}
-//       //mapea dealIds para entregar cada id como argumento
-//       dealIds.map(async (dealId) => {
-        
-//         console.log("vamos",dealId.toObjectId);
-//         const dealResponseData = await axios.post("/api/extractDeal", { id: dealId.toObjectId });
-//         const dealData = dealResponseData.data.data[0].properties;})
-
-//       //const dealResponseData = await axios.post("/api/extractDeal", { id: dealIds });
-//       // console.log("vamos",dealResponseData);
-//       // const dealData = dealResponseData.data.data[0].properties;
-
-//       // Obtener ID de la empresa asociada al negocio
-//       //const companyId = dealData.associatedcompanyid.value;
-
-//       // Obtener información de la empresa
-//       const companyResponse = await axios.post("/api/apiBillingIDS", { id: dealId });
-//       const companyData = companyResponse.data.data[0].toObjectId;
-//       console.log("vamos",companyData);
-
-//       // Obtener información de los productos asociados al negocio
-//       const lineResponse = await axios.post("/api/apihubspotline", { id: dealData });
-//       const lineData = lineResponse.data.data;
-//       console.log("vamos",lineData);
-
-//       const productsData = await Promise.all(
-//         lineData.map(async (line) => {
-//           const response = await axios.post("/api/apihubspotproduct1", { id: line.toObjectId });
-//           console.log("vamos",response);
-//           return response.data.data;
-//         })
-//       );
-
-//       // Obtener información del dueño del negocio
-//       const ownerDataResponse = await axios.post("/api/getHubspotOwners", { id: dealData.hubspot_owner_id });
-//       const ownerData = ownerDataResponse.data;
-
-//       // Setear los estados
-//       setDeals(dealData);
-//       setCompanies(companyData);
-//       setLine(lineData);
-//       setProducts(productsData);
-//       setOwner(ownerData);
-//       setId(dealId);
-//       setIsLoading(false);
-//       setDataValues(context);
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-
-
-
-//   return (
-//     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-//       <div className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-//         <h1 className="text-4xl font-bold">Formulario de negocios</h1>
-//         <div className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-//           <form onSubmit={handleEmailChange}>
-//             <label htmlFor="email">Email</label>
-//             <input type="email" name="email" id="email" />
-//             <button type="submit">Buscar
-//             </button>
-//           </form>
-//           {/* <form onSubmit={handleIdChange}>
-//             <label htmlFor="id">ID</label>
-//             <input type="text" name="id" id="id" />
-//             <button type="submit">Buscar
-//             <SpinnerButton
-
-//               isLoading={isLoading}
-//               isDisabled={isDisabled}
-//               text="Buscar"
-//             /></button>
-//           </form> */}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 

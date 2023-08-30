@@ -8,7 +8,7 @@ type Response = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Response>) {
   try {
-    const id = req.body.id;
+    const id = req.body.id || req.query.id;
     const url = `https://api.hubapi.com/crm/v4/objects/deals/${id}/associations/line_items/`;
     const response = await axios({
       method: "GET",
