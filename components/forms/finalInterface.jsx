@@ -52,7 +52,7 @@ export default function PageWithJSbasedForm3({session}) {
     deale: deale,
 
     lines: lines,
-    products: new Set(products),
+    products: products,
     user: user,
     team: team,
     owner: owner,
@@ -79,29 +79,45 @@ export default function PageWithJSbasedForm3({session}) {
       owners: owners,
       id: id,
     });
-  }, [contacts, companies, billing, deals, deale, lines, products, id]);
+  }, [contacts, companies, billing, deals, deale, lines, products]);
 
-  const liniera = (event, idD) => {
-    event.preventDefault();
+  const liniera = async (idD) => {
+    
     //idDeals(event, idD);
-    idCompanies(event, deale[0].hs_object_id);
+    idCompanies(idD);
     //setId(idD);
-    idLinea(event, idD);
-    lines.map((line) => idProducts(event, line));
-    // lines ? lines.map((line) => idProducts(event, line)) : null;
-    //owner ? setOwners(owner) : null;
-    setIsDisabled(true);
-  };
+    idLinea(idD);
+
+    // Divide el array 'lines' en chunks de 3
+    const chunkedLines = [];
+    for (let i = 0; i < lines.length; i += 3) {
+        chunkedLines.push(lines.slice(i, i + 3));
+    }
+
+    // Por cada chunk, llama a idProducts y espera 15 segundos
+    for (const chunk of chunkedLines) {
+        setIsLoading(true);
+
+        for (let line of chunk) {
+             idProducts(line);
+        }
+
+        setIsLoading(false);
+
+        // Si no es el último chunk, espera 15 segundos antes de continuar
+        if (chunk !== chunkedLines[chunkedLines.length - 1]) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+    }
+};
+
 
   const sendData = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-    const prob = await event.target.children[0].htmlFor;
-    // console.log("tdRef:", prob);
-    const idD = prob;
-
-    liniera(event, idD);
-
+    const idD = await event.target.children[0].htmlFor;
+    console.log("tdRef:", idD);
+    liniera(idD);
     console.log("el negocios es ", context);
 
     // await stateChanger(event, parseInt(idD));
@@ -135,7 +151,7 @@ export default function PageWithJSbasedForm3({session}) {
       const response = await fetch(endpoint, options);
       let result = await response.json();
       const ids = result.data[0].id;
-      idNegocio(event, ids);
+      idNegocio(ids);
       setContacts(result.data);
       setIsLoading(false);
     } catch {
@@ -143,7 +159,7 @@ export default function PageWithJSbasedForm3({session}) {
     }
   };
 
-  const idCompanies = async (event, id) => {
+  const idCompanies = async (id) => {
     //event.preventDefault();
     try {
       const data = {
@@ -161,7 +177,7 @@ export default function PageWithJSbasedForm3({session}) {
       const response = await fetch(endpoint, options);
       let result = await response.json();
       const ids = result.data[0].toObjectId;
-      idEmpresa(event, ids);
+      idEmpresa(ids);
       setCompanies(ids);
     } catch {
       console.log("No se encontró La Empresa");
@@ -170,8 +186,8 @@ export default function PageWithJSbasedForm3({session}) {
   };
 
   //indica los números de negocios asociados al contacto
-  const idNegocio = async (event, id) => {
-    event.preventDefault();
+  const idNegocio = async (id) => {
+    
 
     try {
       const data = {
@@ -193,14 +209,14 @@ export default function PageWithJSbasedForm3({session}) {
       setDeals(DealNS);
       let idL = result.data.map((deal) => DealNS.push(deal.toObjectId));
 
-      DealNS.map((deal) => idDeals(event, deal));
+      DealNS.map((deal) => idDeals(deal));
     } catch {
       console.log("No hay negocios asociados");
     }
   };
 
   //id line items hubspot
-  const idLinea = async (event, id) => {
+  const idLinea = async (id) => {
     //event.preventDefault();
 
     const data = {
@@ -221,14 +237,14 @@ export default function PageWithJSbasedForm3({session}) {
       let LineNS = [];
       let idP = result.data.map((Line) => LineNS.push(Line.toObjectId));
       setLine(LineNS);
-      //   lines.map((line) => idProducts(event, line))
+      //   lines.map((line) => idProducts(line))
       //console.log(context);
     } catch {
       console.log("No hay linea"), (<h1>No hay linea</h1>);
     }
   };
   //info de empresa
-  const idEmpresa = async (event, id) => {
+  const idEmpresa = async (id) => {
     //event.preventDefault();
 
     const data = {
@@ -254,13 +270,17 @@ export default function PageWithJSbasedForm3({session}) {
     }
   };
 
-  const idProducts = async (event, id) => {
+  const idProducts = async (id) => {
     //event.preventDefault();
-    try {
-      const data = {
-        id: id,
-      };
-      const JSONdata = JSON.stringify(data);
+    console.log("id", id);
+    const data = {
+      id: id,
+    };
+    console.log("data", data);
+    const JSONdata = JSON.stringify(data);
+    console.log("JSONdata", JSONdata);
+    
+
       const endpoint = "/api/apihubspotproduct1";
       const options = {
         method: "POST",
@@ -269,9 +289,14 @@ export default function PageWithJSbasedForm3({session}) {
         },
         body: JSONdata,
       };
+   
+      console.log("options", options);
+      try {
       const response = await fetch(endpoint, options);
+      console.log("response", response);
       let result = await response.json();
-
+      //console log de todo: 
+      console.log("result", result.data);
       result.data ? productsA.push(result.data) : "NO HAY DATOS";
       //filter remove duplicates
       const unique = [...new Set(Object.values(productsA))];
@@ -282,8 +307,8 @@ export default function PageWithJSbasedForm3({session}) {
     }
   };
   //dealInfo
-  const idDeals = async (event, id) => {
-    event.preventDefault();
+  const idDeals = async (id) => {
+    
     try {
       const data = {
         id: id,
@@ -305,7 +330,7 @@ export default function PageWithJSbasedForm3({session}) {
       negoci = negocios.length > 0 ? negocios[0].hs_object_id : "No hay linea";
       console.log("ID OWNER DEAL ", negocios[0].hubspot_owner_id);
       setOwner(negocios[0].hubspot_owner_id);
-      owner ? idOwners(event, owner) : "No hay owner";
+      owner ? idOwners(owner) : "No hay owner";
       setDeal(negocios);
       //setDataValues(context);
       //console.log("negocios", context)
@@ -315,8 +340,8 @@ export default function PageWithJSbasedForm3({session}) {
   };
 
 //ownerInfo
-const idOwners = async (event, id) => {
-    event.preventDefault();
+const idOwners = async (id) => {
+    
     try {
       const data = {
         id: id,

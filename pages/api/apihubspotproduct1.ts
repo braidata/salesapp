@@ -11,7 +11,7 @@ export default async function handler(
   res: NextApiResponse<Response>
 ) {
   try {
-    const id = req.body.id || req.query.id;
+    const id = req.body.id;
     const url = `https://api.hubapi.com/crm/v3/objects/line_item/search/`;
     const response = await axios({
       method: "POST",
@@ -27,17 +27,17 @@ export default async function handler(
               {
                 propertyName: "hs_object_id",
                 operator: "EQ",
-                value: id,
+                value: id ,
               },
             ],
           },
         ],
-        sorts: [
-          {
-            propertyName: "createdate",
-            direction: "DESCENDING",
-          },
-        ],
+        // sorts: [
+        //   {
+        //     propertyName: "createdate",
+        //     direction: "DESCENDING",
+        //   },
+        // ],
       },
     });
     res.status(200).json({ success: true, data: response.data.results });
