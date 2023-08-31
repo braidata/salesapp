@@ -52,7 +52,7 @@ export default function PageWithJSbasedForm3({session}) {
     deale: deale,
 
     lines: lines,
-    products: new Set(products),
+    products: products,
     user: user,
     team: team,
     owner: owner,
@@ -79,28 +79,45 @@ export default function PageWithJSbasedForm3({session}) {
       owners: owners,
       id: id,
     });
-  }, [contacts, companies, billing, deals, deale, lines, products, id]);
+  }, [contacts, companies, billing, deals, deale, lines, products]);
 
-  const liniera = (event, idD) => {
-    event.preventDefault();
-    idDeals(event, idD);
+  const liniera = async (idD) => {
+    
+    //idDeals(event, idD);
+    idCompanies(idD);
     //setId(idD);
-    idLinea(event, idD);
-    lines.map((line) => idProducts(event, line));
-    // lines ? lines.map((line) => idProducts(event, line)) : null;
-    //owner ? setOwners(owner) : null;
-    setIsDisabled(true);
-  };
+    idLinea(idD);
+
+    // Divide el array 'lines' en chunks de 3
+    const chunkedLines = [];
+    for (let i = 0; i < lines.length; i += 3) {
+        chunkedLines.push(lines.slice(i, i + 3));
+    }
+
+    // Por cada chunk, llama a idProducts y espera 15 segundos
+    for (const chunk of chunkedLines) {
+        spinner();
+        setIsDisabled(true);
+        for (let line of chunk) {
+             idProducts(line);
+        }
+        setIsDisabled(false);
+        setIsLoading(false);
+
+        // Si no es el último chunk, espera 15 segundos antes de continuar
+        if (chunk !== chunkedLines[chunkedLines.length - 1]) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+    }
+};
+
 
   const sendData = async (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     setIsLoading(true);
-    const prob = await event.target.children[0].htmlFor;
-    // console.log("tdRef:", prob);
-    const idD = prob;
-
-    liniera(event, idD);
-
+    const idD = deale[0].hs_object_id;
+    console.log("tdRef:", idD);
+    liniera(idD);
     console.log("el negocios es ", context);
 
     // await stateChanger(event, parseInt(idD));
@@ -134,18 +151,16 @@ export default function PageWithJSbasedForm3({session}) {
       const response = await fetch(endpoint, options);
       let result = await response.json();
       const ids = result.data[0].id;
-      //idDeals(event, ids);
-      idNegocio(event, ids);
-      idCompanies(event, ids);
+      idNegocio(ids);
       setContacts(result.data);
+      setIsLoading(false);
     } catch {
       console.log("No se encontró el contacto");
     }
   };
 
-  const idCompanies = async (event, id) => {
+  const idCompanies = async (id) => {
     //event.preventDefault();
-
     try {
       const data = {
         id: id,
@@ -162,7 +177,7 @@ export default function PageWithJSbasedForm3({session}) {
       const response = await fetch(endpoint, options);
       let result = await response.json();
       const ids = result.data[0].toObjectId;
-      idEmpresa(event, ids);
+      idEmpresa(ids);
       setCompanies(ids);
     } catch {
       console.log("No se encontró La Empresa");
@@ -170,41 +185,9 @@ export default function PageWithJSbasedForm3({session}) {
     }
   };
 
-  //ejecutadora de funciones
-  const ejecutadora0 = async (event) => {
-    contactoAsociado(event);
-
-    // //wait for 2 seconds
-    // setTimeout(() => {
-    //   //your code to be executed after 2 seconds
-    //   contactoAsociado(event);
-
-    // }, 5000);
-  };
-
-  const ejecutadora = async (event) => {
-    sendData(event);
-
-    // //wait for 2 seconds
-    // setTimeout(() => {
-    //   //your code to be executed after 2 seconds
-    //   sendData(event);
-    // }, 1000);
-
-    setTimeout(() => {
-      //your code to be executed after 2 seconds
-      sendData(event);
-    }, 5000);
-
-    setTimeout(() => {
-      //your code to be executed after 2 seconds
-      sendData(event);
-    }, 5000);
-  };
-
   //indica los números de negocios asociados al contacto
-  const idNegocio = async (event, id) => {
-    event.preventDefault();
+  const idNegocio = async (id) => {
+    
 
     try {
       const data = {
@@ -226,14 +209,14 @@ export default function PageWithJSbasedForm3({session}) {
       setDeals(DealNS);
       let idL = result.data.map((deal) => DealNS.push(deal.toObjectId));
 
-      DealNS.map((deal) => idDeals(event, deal));
+      DealNS.map((deal) => idDeals(deal));
     } catch {
       console.log("No hay negocios asociados");
     }
   };
 
   //id line items hubspot
-  const idLinea = async (event, id) => {
+  const idLinea = async (id) => {
     //event.preventDefault();
 
     const data = {
@@ -254,14 +237,14 @@ export default function PageWithJSbasedForm3({session}) {
       let LineNS = [];
       let idP = result.data.map((Line) => LineNS.push(Line.toObjectId));
       setLine(LineNS);
-      //   lines.map((line) => idProducts(event, line))
+      //   lines.map((line) => idProducts(line))
       //console.log(context);
     } catch {
       console.log("No hay linea"), (<h1>No hay linea</h1>);
     }
   };
   //info de empresa
-  const idEmpresa = async (event, id) => {
+  const idEmpresa = async (id) => {
     //event.preventDefault();
 
     const data = {
@@ -287,13 +270,17 @@ export default function PageWithJSbasedForm3({session}) {
     }
   };
 
-  const idProducts = async (event, id) => {
+  const idProducts = async (id) => {
     //event.preventDefault();
-    try {
-      const data = {
-        id: id,
-      };
-      const JSONdata = JSON.stringify(data);
+    console.log("id", id);
+    const data = {
+      id: id,
+    };
+    console.log("data", data);
+    const JSONdata = JSON.stringify(data);
+    console.log("JSONdata", JSONdata);
+    
+
       const endpoint = "/api/apihubspotproduct1";
       const options = {
         method: "POST",
@@ -302,9 +289,14 @@ export default function PageWithJSbasedForm3({session}) {
         },
         body: JSONdata,
       };
+   
+      console.log("options", options);
+      try {
       const response = await fetch(endpoint, options);
+      console.log("response", response);
       let result = await response.json();
-
+      //console log de todo: 
+      console.log("result", result.data);
       result.data ? productsA.push(result.data) : "NO HAY DATOS";
       //filter remove duplicates
       const unique = [...new Set(Object.values(productsA))];
@@ -315,8 +307,8 @@ export default function PageWithJSbasedForm3({session}) {
     }
   };
   //dealInfo
-  const idDeals = async (event, id) => {
-    event.preventDefault();
+  const idDeals = async (id) => {
+    
     try {
       const data = {
         id: id,
@@ -338,7 +330,7 @@ export default function PageWithJSbasedForm3({session}) {
       negoci = negocios.length > 0 ? negocios[0].hs_object_id : "No hay linea";
       console.log("ID OWNER DEAL ", negocios[0].hubspot_owner_id);
       setOwner(negocios[0].hubspot_owner_id);
-      owner ? idOwners(event, owner) : "No hay owner";
+      owner ? idOwners(owner) : "No hay owner";
       setDeal(negocios);
       //setDataValues(context);
       //console.log("negocios", context)
@@ -348,8 +340,8 @@ export default function PageWithJSbasedForm3({session}) {
   };
 
 //ownerInfo
-const idOwners = async (event, id) => {
-    event.preventDefault();
+const idOwners = async (id) => {
+    
     try {
       const data = {
         id: id,
@@ -377,41 +369,6 @@ const idOwners = async (event, id) => {
     }
   };
 
-
-
-
-
-
-
-  //dealInfo
-  // const stateChanger = async (event, id) => {
-  //   event.preventDefault();
-  //   try {
-  //     const data = {
-  //       id: id,
-  //     };
-  //     const JSONdata = JSON.stringify(data);
-  //     const endpoint = "/api/dealStage";
-  //     const options = {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSONdata,
-  //     };
-  //     let response = await fetch(endpoint, options);
-  //     let result = await response.json();
-
-  //     console.log("estados", result);
-  //   } catch {
-  //     console.log("No cambio de estado");
-  //   }
-  // };
-
-  const stateSetter = (s) => {
-    setIsDisabled(s);
-    return isDisabled;
-  };
 
   const spinner = () => {
     setIsLoading(true);
@@ -461,14 +418,6 @@ const idOwners = async (event, id) => {
         ) : null}
       </form>
 
-      {/* {context.companies.length < 1 ? (
-        <h4 className="bg-white bg-opacity-25 dark:bg-gray-800 dark:bg-opacity-25 backdrop-filter  rounded-lg shadow-lg p-6 text-center text-gray-800 dark:text-gray-100">
-          Debes completar los datos de Empresa en HubSpot para continuar
-        </h4>
-      ) : null} */}
-
-      {/* {context.companies.length < 1 ? stateSetter(false) : "hola" } */}
-
       {context.deale.length > 0 ? (
         context.deale.map((deal, index) => (
           //grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6
@@ -509,153 +458,5 @@ const idOwners = async (event, id) => {
 }
 
 
-// import { useState, useEffect, useRef } from "react";
-// import dynamic from "next/dynamic";
-// import { useDataData } from "../../context/data";
-// import SpinnerButton from "../spinnerButton";
-// import CardDeal from "../forms/cardDeal";
-// import SuccessMessage from "../forms/succesMessage";
-// import { useSession } from "next-auth/react";
-// import SessionInfo from "../forms/sessionInfo";
-// import axios from "axios";
-
-// export default function PageWithJSbasedForm3({ session }) {
-//   const [contacts, setContacts] = useState([]);
-//   const [companies, setCompanies] = useState([]);
-//   const [billing, setBilling] = useState([]);
-//   const [deals, setDeals] = useState([]);
-//   const [deale, setDeal] = useState([]);
-//   const [lines, setLine] = useState([]);
-//   const [products, setProducts] = useState(new Set());
-//   const [id, setId] = useState([]);
-//   const [owner, setOwner] = useState([]);
-//   const [owners, setOwners] = useState([]);
-//   const { setDataValues } = useDataData();
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isDisabled, setIsDisabled] = useState(false);
-
-//   const tdRef = useRef(null);
-//   const [user, setUser] = useState(session ? session.token.email : null);
-//   const [team, setTeam] = useState(session ? session.token.sub : null);
-
-//   // Crear contexto para objetos
-//   const context = {
-//     contacts,
-//     companies,
-//     billing,
-//     deals,
-//     deale: deale.filter(
-//       (thing, index, self) => index === self.findIndex((t) => t.id === thing.id)
-//     ),
-//     lines,
-//     products: Array.from(products),
-//     user,
-//     team,
-//     owner,
-//     owners,
-//     id,
-//   };
-
-//   // Setear datos del contexto
-//   // useEffect(() => {
-//   //   setDataValues(context);
-//   // }, [context]);
-
-//   // Manejar cambio en el email
-//   const handleEmailChange = async (event) => {
-//     event.preventDefault();
-//     const email = event.target.email.value;
-
-//     //spinner();
-
-//     try {
-//       // Obtener ID del primer negocio asociado al email
-//       const dealResponse = await axios.post("/api/apihubspotdeals", { email });
-//       const dealId = dealResponse.data.data[0].id;
-//       console.log("vamos",dealResponse);
-//       //obtener id de negocio
-//       const dealResponses = await axios.post("/api/apiHubspot", { id: dealId });
-//       const dealIds = dealResponses.data.data;
-//       console.log("vamos",dealIds);
-//       // Obtener información del negocio}
-//       //mapea dealIds para entregar cada id como argumento
-//       dealIds.map(async (dealId) => {
-        
-//         console.log("vamos",dealId.toObjectId);
-//         const dealResponseData = await axios.post("/api/extractDeal", { id: dealId.toObjectId });
-//         const dealData = dealResponseData.data.data[0].properties;})
-
-//       //const dealResponseData = await axios.post("/api/extractDeal", { id: dealIds });
-//       // console.log("vamos",dealResponseData);
-//       // const dealData = dealResponseData.data.data[0].properties;
-
-//       // Obtener ID de la empresa asociada al negocio
-//       //const companyId = dealData.associatedcompanyid.value;
-
-//       // Obtener información de la empresa
-//       const companyResponse = await axios.post("/api/apiBillingIDS", { id: dealId });
-//       const companyData = companyResponse.data.data[0].toObjectId;
-//       console.log("vamos",companyData);
-
-//       // Obtener información de los productos asociados al negocio
-//       const lineResponse = await axios.post("/api/apihubspotline", { id: dealData });
-//       const lineData = lineResponse.data.data;
-//       console.log("vamos",lineData);
-
-//       const productsData = await Promise.all(
-//         lineData.map(async (line) => {
-//           const response = await axios.post("/api/apihubspotproduct1", { id: line.toObjectId });
-//           console.log("vamos",response);
-//           return response.data.data;
-//         })
-//       );
-
-//       // Obtener información del dueño del negocio
-//       const ownerDataResponse = await axios.post("/api/getHubspotOwners", { id: dealData.hubspot_owner_id });
-//       const ownerData = ownerDataResponse.data;
-
-//       // Setear los estados
-//       setDeals(dealData);
-//       setCompanies(companyData);
-//       setLine(lineData);
-//       setProducts(productsData);
-//       setOwner(ownerData);
-//       setId(dealId);
-//       setIsLoading(false);
-//       setDataValues(context);
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-
-
-
-//   return (
-//     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-//       <div className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-//         <h1 className="text-4xl font-bold">Formulario de negocios</h1>
-//         <div className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-//           <form onSubmit={handleEmailChange}>
-//             <label htmlFor="email">Email</label>
-//             <input type="email" name="email" id="email" />
-//             <button type="submit">Buscar
-//             </button>
-//           </form>
-//           {/* <form onSubmit={handleIdChange}>
-//             <label htmlFor="id">ID</label>
-//             <input type="text" name="id" id="id" />
-//             <button type="submit">Buscar
-//             <SpinnerButton
-
-//               isLoading={isLoading}
-//               isDisabled={isDisabled}
-//               text="Buscar"
-//             /></button>
-//           </form> */}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 

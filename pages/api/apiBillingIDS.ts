@@ -11,6 +11,9 @@ export default async function handler(
   res: NextApiResponse<Response>
 ) {
   try {
+    const id = req.body.id || req.query.id;
+    
+    const url = `https://api.hubapi.com/crm/v4/objects/deals/${id}/associations/companies/`;
     const id = req.body.id;
     const url = `https://api.hubapi.com/crm/v4/objects/contacts/${id}/associations/companies/`;
     const token = process.env.HUBSPOT_TOKEN; // Reemplaza con el token válido
