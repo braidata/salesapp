@@ -96,12 +96,12 @@ export default function PageWithJSbasedForm3({session}) {
 
     // Por cada chunk, llama a idProducts y espera 15 segundos
     for (const chunk of chunkedLines) {
-        setIsLoading(true);
-
+        spinner();
+        setIsDisabled(true);
         for (let line of chunk) {
              idProducts(line);
         }
-
+        setIsDisabled(false);
         setIsLoading(false);
 
         // Si no es el último chunk, espera 15 segundos antes de continuar
@@ -113,9 +113,9 @@ export default function PageWithJSbasedForm3({session}) {
 
 
   const sendData = async (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     setIsLoading(true);
-    const idD = await event.target.children[0].htmlFor;
+    const idD = deale[0].hs_object_id;
     console.log("tdRef:", idD);
     liniera(idD);
     console.log("el negocios es ", context);
