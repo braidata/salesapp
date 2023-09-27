@@ -23,7 +23,7 @@ const schema = yup.object().shape({
         // .required("Precio es obligatorio"),
         Cantidad: yup.string().min(1, "Ingresa una Cantidad válida"),
         // .required("Cantidad es obligatorio"),
-        Flete: yup.string().min(3, "Ingresa un Flete válido"),
+        Descuento: yup.string().min(3, "Ingresa un Descuento válido"),
         // .required("Flete es obligatorio"),
     })
 });

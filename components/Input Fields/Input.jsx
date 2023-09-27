@@ -25,9 +25,9 @@ const Input = ({ name, label, valua, ...rest }) => {
       className="mb-2 bg-gray-300 border lg:w-full border-gray-100 text-gray-900 text-md sm:w-2 sm:text-lg sm:text-gray-200 text-right rounded-sm hover:rounded-md focus:rounded-lg  focus:ring-blue-800 focus:border-blue-700 block w-full  dark:bg-gray-900 dark:border-gray-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-800 dark:focus:border-gray-900"
         id={fieldName}
         ref={inputRef}
-        //agrear propiedades según condición
-        defaultValue={valua.startsWith("0.") ? valua : ""}
-        placeholder={valua}
+        //agrear propiedades según condición .startsWith("0.") ? valua : ""
+        defaultValue={valua}
+        //placeholder={valua}
      
 
         {...rest}
