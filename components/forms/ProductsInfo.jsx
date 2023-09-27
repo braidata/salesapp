@@ -8,6 +8,8 @@ import Datas from "../../lib/data";
 import CreatedAtomForm from "../../components/createdAtomForm";
 import ButtonToAddComponent from "../../components/buttonToAddComponent";
 import { useDataData } from "../../context/data";
+import SelectProductos from "./selectProducts";
+import dynamic from "next/dynamic";
 
 const datosProducts = [];
 const productsInfo = [];
@@ -29,6 +31,9 @@ const schema = yup.object().shape({
 });
 
 export default function ProductsInfo({ formStep, nextFormStep }) {
+  // const SelectProducts = dynamic(() => import("./selectProducts"), {
+  //   ssr: false,
+  // });
   const Data = Datas;
   const { setFormValues } = useFormData();
   const formRef = useRef();
@@ -41,9 +46,10 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
   // const productsP = products ? products[0].properties : "no data";
 
   async function handleSubmit(data) {
+    console.log("Form Data:", data);
     try {
       formRef.current.setErrors({});
-
+      console.log("ref f:", formRef.current);
       await schema.validate(data, {
         abortEarly: false,
       });
@@ -79,7 +85,7 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
           <div className="invisible text-gray-100 dark:text-gray-400 max-h-8 max-w-0">
            
           </div>{" "}
-         
+          <SelectProductos />
           {Data.Datas[3].map((data, index) => (
             // call internal api
             <Input
@@ -91,6 +97,7 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
             />
 
           ))}
+         
           <ButtonToAddComponent
             nombre={"Producto"}
             dataSelect={3}
