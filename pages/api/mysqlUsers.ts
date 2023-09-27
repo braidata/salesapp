@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const password: string = req.body.password ? req.body.password : null
-    const email: string = req.body.useremail ? req.body.useremail : "nsalgado@imega.cl"
+    const email: string = req.body.useremail ? req.body.useremail : "ibraida@ventuscorp.cl"
 
 const prisma = new PrismaClient();
 
