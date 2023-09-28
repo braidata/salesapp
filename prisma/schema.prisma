@@ -13,7 +13,7 @@ model order_items {
   order_id Int
   sku      String  @db.VarChar(255)
   name     String? @db.VarChar(255)
-  price    String  @db.VarChar(255)
+  price    String?  @db.VarChar(255)
   quantity String  @db.VarChar(255)
   discount String? @db.VarChar(255)
   orders   orders  @relation(fields: [order_id], references: [id])
@@ -109,7 +109,7 @@ model aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl {
   order_id Int
   sku      String  @db.VarChar(255)
   name     String? @db.VarChar(255)
-  price    String  @db.VarChar(255)
+  price    String?  @db.VarChar(255)
   quantity String  @db.VarChar(255)
 
   @@index([order_id], map: "order_items_order_id_idx")
