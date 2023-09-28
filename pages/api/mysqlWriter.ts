@@ -61,27 +61,44 @@ const order_items = req.body.order_items;
 
 
 
-  const productos = order_items
-    .filter(
-      //filtrar repetido
+function tresDecimales(numero: any) {
+  if (typeof numero === "string") {
+      numero = numero.replace(",", ".");
+  }
+  numero = parseFloat(numero);
+  let redondeado = Math.round(numero * 1000) / 1000;
+  let str = redondeado.toString();
+  let partes = str.split('.');
+  if (partes.length === 1) {
+      return str + '.000';
+  }
+  while (partes[1].length < 3) {
+      partes[1] += '0';
+  }
+  return partes.join('.');
+}
+
+// Aplicar la función al campo discount de cada ítem
+const productos = order_items
+  .filter(
       (thing: any, index: any, self: any) =>
-        index ===
-        self.findIndex(
-          (t: any) =>
-            t.name === thing.name &&
-            t.price !== undefined &&
-            t.quantity !== undefined &&
-            t.sku !== undefined &&
-            t.discount !== undefined
-        )
-    )
-    .map((item: any) => ({
+          index ===
+          self.findIndex(
+              (t: any) =>
+                  t.name === thing.name &&
+                  t.price !== undefined &&
+                  t.quantity !== undefined &&
+                  t.sku !== undefined &&
+                  t.discount !== undefined
+          )
+  )
+  .map((item: any) => ({
       name: item.name,
       price: item.price,
       quantity: item.quantity,
       sku: item.sku,
-      discount: item.discount,
-    }));
+      discount: tresDecimales(item.discount),  // Aplicar la función aquí
+  }));
 
   const prisma = new PrismaClient();
   //data types
