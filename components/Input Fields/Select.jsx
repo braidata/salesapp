@@ -35,7 +35,8 @@ const Select = ({ name, label, valua, options, ...rest }) => {
                 console.log("optione", option, index),
             // tratar option para cambiar las mayusculas por minusculas, sacar los tildes y los espacios por guiones bajos
            optionD = option.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "_"),
-                <option key={index} value={optionD}>
+                console.log("optionD", optionD),
+                <option key={index} value={valua}>
                     {option}
                 </option>
             ))
