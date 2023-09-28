@@ -3,7 +3,7 @@ import { useField } from "@unform/core";
 import styles from "../../styles/styles.module.scss";
 import { ValueWithTimestamp } from "@hubspot/api-client/lib/codegen/crm/deals";
 
-const Input = ({ name, label, valua, ...rest }) => {
+const Input = ({ name, label, valua, ref, ...rest }) => {
   const inputRef = useRef();
 
   const { fieldName, defaultValue, registerField, error } = useField(name);
@@ -26,7 +26,8 @@ const Input = ({ name, label, valua, ...rest }) => {
         id={fieldName}
         ref={inputRef}
         //agrear propiedades según condición .startsWith("0.") ? valua : ""
-        defaultValue={valua}
+        //const id = Math.random(10,200).toString(36)
+        defaultValue={valua.startsWith("0.") ? Math.random(10,200).toString(36) :  valua}
         //placeholder={valua}
      
 

@@ -2,6 +2,7 @@
 import React, { useRef } from "react";
 import { Form, Scope } from "@unform/web";
 import Input from  "../components/Input Fields/Input";
+import SelectProductos from "../components/forms/selectProducts";
 import { useFormData } from "../context";
 import * as yup from "yup";
 import Datas from "../lib/data";
@@ -62,19 +63,20 @@ export default function ProductsInfo({ formStep, nextFormStep, cuenta, dataSelec
         }
     }
 
-    return (
+    return (<>
         
         <div className="w-100">
-            
+            <SelectProductos cuenta={cuentaI} />
             {Data.Datas[dataSelectI].map((data, index) => (
                 
                 console.log(data, cuentaI),
-                
+                <>
                 <Input  key={index} name={data.campo + "-" + cuentaI} label={data.detalle} type={data.type} valua={data.valua} /> 
-                
+                </>
        
         ))}
                 
         </div>
+        </>
     );
 }
