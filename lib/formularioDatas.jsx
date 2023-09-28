@@ -11,32 +11,32 @@ export default function FormatContext({ context, componente }) {
 
   function transformProductsToObjectArray(products) {
     let productArray = [];
-  
+
     // Obtener todas las claves que comienzan con "SKU"
     const skuKeys = Object.keys(products).filter(key => key.startsWith('SKU'));
-  
+
     // Iterar sobre las claves para construir los productos
     for (const skuKey of skuKeys) {
       const suffix = skuKey.replace('SKU', '');
 
       productArray.push({
-          sku: products[`SKU${suffix}`],
-          name: products[`Nombre_Producto${suffix}`],
-          price: products[`Precio${suffix}`],
-          quantity: products[`Cantidad${suffix}`],
-          discount: products[`Descuento${suffix}`] || 0
+        sku: products[`SKU${suffix}`],
+        name: products[`Nombre_Producto${suffix}`],
+        price: products[`Precio${suffix}`],
+        quantity: products[`Cantidad${suffix}`],
+        discount: products[`Descuento${suffix}`] || 0
       });
     }
 
     console.log("los data productos es", productArray)
     return productArray;
-}
+  }
 
 
 
 
-  
-  
+
+
 
   const orderSender = async (event) => {
     event.preventDefault();

@@ -62,7 +62,7 @@ const SelectProductos = ({ cuenta }) => {
                 ref={skuRef}
             >
                 <option className="mb-2 bg-gray-200 border lg:w-full border-gray-100 text-gray-900 text-md sm:w-2 sm:text-lg text-right rounded-sm hover:rounded-md focus:rounded-lg  focus:ring-blue-800 focus:border-blue-700 block w-full  dark:bg-gray-900 dark:border-gray-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-800 dark:focus:border-gray-900"
-                value="">Selecciona un Producto</option>
+                    value="">Selecciona un Producto</option>
                 {productosFiltrados.map(producto => (
                     <option key={producto.SKU} value={producto.SKU} className="mb-2 bg-gray-300/30 border lg:w-full border-gray-100 text-gray-900 text-md sm:w-2 sm:text-lg text-right rounded-sm hover:rounded-md focus:rounded-lg  focus:ring-blue-800 focus:border-blue-700 block w-full  dark:bg-gray-900 dark:border-gray-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-800 dark:focus:border-gray-900">
                         {producto.Nombre}
@@ -73,11 +73,11 @@ const SelectProductos = ({ cuenta }) => {
             {selectedSKU && (
                 <>
                     {/*  use input component */}
-                    <Input key={selectedSKU} name={index >= 0 ? `products.SKU-${index}` : "products.SKU"} label="SKU" type="text" valua={selectedSKU}/>
+                    <Input key={selectedSKU} name={index >= 0 ? `products.SKU-${index}` : "products.SKU"} label="SKU" type="text" valua={selectedSKU} />
                     {/*  use input component */}
-                    <Input  name={index >= 0 ? `products.Nombre_Producto-${index}` : "products.Nombre_Producto"} label="Nombre" type="text" valua={selectedName} />
+                    <Input name={index >= 0 ? `products.Nombre_Producto-${index}` : "products.Nombre_Producto"} label="Nombre" type="text" valua={selectedName} />
                     {/*  use input component */}
-                    <Input  name={index >= 0 ? `products.Precio-${index}` : "products.Precio"} label="Precio" type="text" valua={precioEditable} />
+                    <Input name={index >= 0 ? `products.Precio-${index}` : "products.Precio"} label="Precio" type="text" valua={precioEditable} />
                 </>
             )}
         </>

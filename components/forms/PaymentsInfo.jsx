@@ -17,18 +17,39 @@ const schema = yup.object().shape({
       .string()
       .min(1, "Ingresa un Método de Pago válido")
       .required("Método de Pago es obligatorio"),
-      
+
     orden_de_compra: yup
       .string(),
-      // .min(2, "Ingresa un Código de Autorización válido")
-      // .required("Código de Autorización es obligatorio")
-      
+    // .min(2, "Ingresa un Código de Autorización válido")
+    // .required("Código de Autorización es obligatorio")
+
     Tipo_de_Pago: yup
       .string()
       .min(1, "Ingresa un Tipo de Pago válido")
       .required("Tipo de Pago es obligatorio")
-      ,
-    
+    ,
+    centro: yup
+      .string()
+      .min(1, "Ingresa un centro válido")
+      .required("El Centro es obligatorio")
+    ,
+    canal: yup
+      .string()
+      .min(1, "Ingresa un canal válido")
+      .required("El Canal es obligatorio")
+    ,
+    clase_de_pedido: yup
+      .string()
+      .min(1, "Ingresa una clase de pedido válida")
+      .required("La Clase de Pedido es obligatoria")
+    ,
+
+    almacen: yup
+      .string()
+      .min(1, "Ingresa un almacén válido")
+      .required("El almacén es obligatorio")
+    ,
+
   }),
 });
 
@@ -72,22 +93,22 @@ export default function PaymentsInfo({ formStep, nextFormStep }) {
 
             data.campo === "payment.orden_de_compra" ?
 
-           <Input
-              key={index}
-              name={data.campo}
-              label={data.detalle}
-              type={data.type}
-              valua={data.valua}
-            /> :
+              <Input
+                key={index}
+                name={data.campo}
+                label={data.detalle}
+                type={data.type}
+                valua={data.valua}
+              /> :
               <Select
-              key={index}
-              name={data.campo}
-              label={data.detalle}
-              type={data.type}
-              valua={data.valua}
-              options={data.options}
-            />
-            
+                key={index}
+                name={data.campo}
+                label={data.detalle}
+                type={data.type}
+                valua={data.valua}
+                options={data.options}
+              />
+
 
 
           ))}
