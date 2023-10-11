@@ -1,77 +1,17 @@
-// Path: pages\index.jsx
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import axios from "axios";
 
-export default function ProductsW() {
-  const [products, setProducts] = useState([]);
-  const val = 102100600007;
+import Products from "../components/buscaProduct";
+import EditaProducts from "../components/buscaEditaProducts";
 
-  useEffect(() => {
-    axios.get("/api/products").then((res) => {
-      setProducts(res.data);
-    });
-  }, []);
 
-  const enviarProductos = async () => {
-    let url = `api/products`;
-    axios
-      .post(url, { first: first })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    window.location = "/";
-  };
+const ProductsW = () => {
 
   return (
-    <div className="mt-24">
-      <form action={enviarProductos} method="POST">
-        <input type="text" id="first" name="first" required />
-        <input type="text" name="last" />
-        <button type="submit">Buscar</button>
-      </form>
-
-      {/* Table */}
-      {products.map(
-        (product) => (
-          product.sku == val ? console.log(product.id) : console.log("no"),
-          (
-            <table className="table-auto mt-24">
-              <caption className=" ">{product.name}</caption>
-              <thead>
-                <tr>
-                  <th className="px-4 py-2">SKU</th>
-                  <th className="px-4 py-2">Nombre</th>
-                  <th className="px-4 py-2">Precio</th>
-                  <th className="px-4 py-2">Descripción</th>
-                  <th className="px-4 py-2">Sizes</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border px-4 py-2"> {product.sku}</td>
-                  <td className="border px-4 py-2">{product.name}</td>
-                  <td className="border px-5 py-2">${product.price}</td>
-                  <td
-                    className="border px-4 py-2"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                  ></td>
-                  <Image src={product.images[0].src} width={500} height={500} />
-                </tr>
-              </tbody>
-            </table>
-          )
-        )
-      )}
-
-      {/* //value finder form */}
-      <form action="/api/products" method="POST">
-        <input type="text" name="first" />
-        <buttom type="submit" value="Submit" />
-      </form>
-    </div>
-  );
+    <>
+  <Products />
+  <EditaProducts />
+  </>
+  )
+  
 }
+
+export default ProductsW;

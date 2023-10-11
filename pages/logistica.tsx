@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 import OrdersVentusComp from "../components/ordersVentusComp";
 import Febos from "../components/febos";
 import SimpliRoute from "../components/simpliRoute";
+import CotizadorStarken from "../components/CotizadorStarken";
+import CotizadorStarken2 from "../components/CotizadorStarken2";
 
 
 
@@ -15,7 +17,7 @@ import SimpliRoute from "../components/simpliRoute";
 
 
 const Logistica = () => {
-  const {data: session} = useSession()
+  const { data: session } = useSession()
   const [data, setData] = useState();
   const userSender = async (event) => {
     event.preventDefault();
@@ -37,14 +39,14 @@ const Logistica = () => {
       const response = await fetch(endpoint, options);
       const result = response;
       const resDB = await result.json();
-      data = setData(resDB); 
-      
+      data = setData(resDB);
+
       console.log("base", resDB);
     } catch {
       console.log("No hay datos DB");
     }
   };
-  
+
   const { status } = useSession({
     required: true,
     onUnauthenticated() {
@@ -81,16 +83,25 @@ const Logistica = () => {
   }
 
   return (
-    <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
+    <>
+      
+      <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
+      <h1 className="mt-24">Comparador Starken</h1>
+      <div className="flex flex-row gap-4 mt-24">
+        
+        <CotizadorStarken2 />
+        <CotizadorStarken />
+      </div>
+
         <SimpliRoute />
         {/*  
         <SapO2/>
         <SapO3/>
         <FedEx />
-        <OrdersVentusComp />
+        
         <Febos/> 
         */}
-    </div>
+      </div></>
   );
 };
 

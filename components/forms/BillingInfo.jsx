@@ -142,5 +142,9 @@ export default function BillingInfo({ formStep, nextFormStep }) {
 // campo valor flete en negocio
 //datos de shipping en negocio
 //crear todo esto en Hubspot
-
 //sobre clientes en SAP
+
+//crear subidor a hubspot
+//crear modulo captura de stock
+//modulo de pagos
+//reportería

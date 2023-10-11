@@ -1,5 +1,3 @@
-//products from woocommerce
-
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 
 const api = new WooCommerceRestApi({
@@ -9,24 +7,38 @@ const api = new WooCommerceRestApi({
     version: "wc/v3",
 });
 
-//const { perPage, page } = useState(10, 1);
-
 export default async (req, res) => {
-    console.log(req.body.first)
-    const sku = req.body.first
-    
+    const skuToIdMap = {};
+    const perPage = 100;
+    let currentPage = 1;
+    let productsExist = true;
+
     try {
-        const { data } = await api.get("products",
-{
-                    per_page: 100,
-                    page:  5,
-                    status: "publish",
-                    orderby: "date",
-                    order: "desc",
-                    });
-    res.status(200).json(data);
-} catch (error) {
-    res.status(500).json({ error: error.message });
-}
+        while (productsExist) {
+            const { data } = await api.get("products", {
+                per_page: perPage,
+                page: currentPage,
+                status: "publish",
+                orderby: "date",
+                order: "desc",
+            });
+
+            if (data.length) {
+                data.forEach(product => {
+                    skuToIdMap[product.sku] = product.id;
+                });
+                currentPage++;
+            } else {
+                productsExist = false;
+            }
+        }
+
+        res.status(200).json(skuToIdMap);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
+
+
+
 
