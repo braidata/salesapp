@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const TarifasComponent = () => {
     const [values, setValues] = useState({
@@ -10,6 +11,26 @@ const TarifasComponent = () => {
         kilos: '',
     });
 
+    const [ciudadesOrigen, setCiudadesOrigen] = useState([]);
+    const [ciudadesDestino, setCiudadesDestino] = useState([]);
+    const [results, setResults] = useState(null);
+
+    useEffect(() => {
+        const obtenerCiudades = async () => {
+            try {
+                const { data: { listaCiudadesOrigen = [] } = {} } = await axios.get('/api/starkenComunas');
+                const { data: { listaCiudadesDestino = [] } = {} } = await axios.get('/api/starkenComunaD');
+    
+                setCiudadesOrigen(listaCiudadesOrigen);
+                setCiudadesDestino(listaCiudadesDestino);
+            } catch (error) {
+                console.error('Error al obtener ciudades:', error);
+            }
+        };
+    
+        obtenerCiudades();
+    }, []);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setValues({
@@ -17,8 +38,6 @@ const TarifasComponent = () => {
             [name]: value,
         });
     };
-
-    const [results, setResults] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,25 +67,37 @@ const TarifasComponent = () => {
 
     return (
         <div className="bg-gray-300 w-full text-gray-900 dark:bg-gray-900 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2">
-            <h1 className=" flex flex-col justify-center mx-4 my-2 text-xl font-semibold">Tarifas Ahora</h1>
+            <h1 className="flex flex-col justify-center mx-4 my-2 text-xl font-semibold">Tarifas Ahora</h1>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label className="flex flex-col justify-center mx-4 my-2 ">Código Ciudad Origen:</label>
-                    <input
+                    <label className="flex flex-col justify-center mx-4 my-2">Código Ciudad Origen:</label>
+                    <select
                         className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
-                        type="text"
                         name="codigoCiudadOrigen"
                         value={values.codigoCiudadOrigen}
                         onChange={handleInputChange}
-                    />
+                    >
+                        <option value="">Seleccione una ciudad de origen</option>
+                        {ciudadesOrigen.map((ciudad) => (
+                            <option key={ciudad.codigoCiudad} value={ciudad.codigoCiudad}>
+                                {ciudad.nombreCiudad}
+                            </option>
+                        ))}
+                    </select>
                     <label className="flex flex-col justify-center mx-4 my-2">Código Ciudad Destino:</label>
-                    <input
+                    <select
                         className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
-                        type="text"
                         name="codigoCiudadDestino"
                         value={values.codigoCiudadDestino}
                         onChange={handleInputChange}
-                    />
+                    >
+                        <option value="">Seleccione una ciudad de destino</option>
+                        {ciudadesDestino.map((ciudad) => (
+                            <option key={ciudad.codigoCiudad} value={ciudad.codigoCiudad}>
+                                {ciudad.nombreCiudad}
+                            </option>
+                        ))}
+                    </select>
                     <label className="flex flex-col justify-center mx-4 my-2">Alto:</label>
                     <input
                         className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
@@ -99,7 +130,6 @@ const TarifasComponent = () => {
                         value={values.kilos}
                         onChange={handleInputChange}
                     />
-
                 </div>
                 <div className="mt-4">
                     <button
@@ -110,6 +140,7 @@ const TarifasComponent = () => {
                     </button>
                 </div>
             </form>
+
             {results && (
                 <div className="mt-4">
                     <h2 className="text-lg font-semibold">Resultados:</h2>
@@ -134,6 +165,7 @@ const TarifasComponent = () => {
                             ))}
                         </tbody>
                     </table>
+
                 </div>
             )}
         </div>
@@ -141,4 +173,5 @@ const TarifasComponent = () => {
 };
 
 export default TarifasComponent;
+
 
