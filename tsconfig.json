@@ -16,6 +16,6 @@
     "incremental": true,
     "downlevelIteration": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/auth/[...nextauth].js", "pages/api/products.js", "components/creator.jsx", "pages/forms.jsx", "components/uploader.jsx", "pages/api/uploader.ts", "pages/api/apihubspotdeals.ts", "pages/api/starkenCotiza.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/auth/[...nextauth].js", "pages/api/products.js", "components/creator.jsx", "pages/forms.jsx", "components/uploader.jsx", "pages/api/uploader.ts", "pages/api/apihubspotdeals.ts", "pages/api/starkenCotiza.js", "pages/api/apiSAPStock.js"],
   "exclude": ["node_modules"]
 }

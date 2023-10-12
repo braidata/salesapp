@@ -8,6 +8,7 @@ import CardDeal from "../forms/cardDeal";
 import SuccessMessage from "../forms/succesMessage";
 import { useSession } from "next-auth/react";
 import SessionInfo from "../forms/sessionInfo";
+import ModalStock from "../../components/modalStock";
 
 let negocios = [];
 let negoci;
@@ -376,6 +377,7 @@ const idOwners = async (id) => {
 
   return (
     <div className="mt-10 w-96 sm:w-full">
+      <ModalStock />
       {/* <SessionInfo /> */}
       <form onSubmit={contactoAsociado}>
         <label
