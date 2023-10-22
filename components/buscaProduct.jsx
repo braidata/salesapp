@@ -73,9 +73,11 @@ export default function Products() {
 
 // agregar opción de descuento en $$$ monto fijo. 
 // probar caso de productos que no están en SAP
-
 // UIUX agregar divisor visual entre productos y reducir tamaño de campos y padding
 // validación de tipo de despacho
 // sumatoria de totales de productos
 // busqueda de pedidos por rut o nombre de cliente o mail
+// agregar todos los campos
+// agregar boton de volver atras
+// dashboard como factura
 

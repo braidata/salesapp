@@ -50,7 +50,7 @@ const schema = yup.object().shape({
   Precio: yup.string().matches(
     /^[0-9]+$/,
     "Ingresa un Número de Precio válido").min(4, "Ingresa un Precio válido"),
-  Cantidad: yup.string().min(1, "Ingresa una Cantidad válida").checkStock(),
+  Cantidad: yup.string().min(1, "Ingresa una Cantidad válida"),
   // Flete: yup.string().min(3, "Ingresa un Flete válido"),
 });
 

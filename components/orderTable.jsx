@@ -11,7 +11,44 @@ const OrderTable = ({ data }) => {
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [modalData2, setModalData2] = useState({});
   const [modalStatus2, setModalStatus2] = useState("Procesando");
-  
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteModalData, setDeleteModalData] = useState({});
+
+  // Función para manejar la presentación del formulario de edición.
+  const handleEditSubmit = (event) => {
+    event.preventDefault();
+    // Aquí puedes enviar los datos actualizados (modalData) a tu backend para actualizar el pedido.
+    // Luego de la actualización exitosa, puedes cerrar el modal y actualizar la lista de pedidos si es necesario.
+  };
+
+  // Función para manejar los cambios en los campos del formulario.
+  const handleInputChange = (key, value) => {
+    setModalData(prevData => ({ ...prevData, [key]: value }));
+  };
+
+  // Función para manejar el evento de borrado.
+  const handleDelete = () => {
+    // Aquí puedes enviar una solicitud a tu backend para eliminar el pedido.
+    // Luego de la eliminación exitosa, puedes cerrar el modal y actualizar la lista de pedidos si es necesario.
+  };
+
+  // Funciones para cerrar los modales.
+  const handleEditModalClose = () => setShowEditModal(false);
+  const handleDeleteModalClose = () => setShowDeleteModal(false);
+
+  // Función para abrir el modal de edición y establecer los datos actuales del pedido.
+  const handleEditModalOpen = (item) => {
+    setModalData(item);
+    setShowEditModal(true);
+  };
+
+  // Función para abrir el modal de confirmación de borrado y establecer los datos actuales del pedido.
+  const handleDeleteModalOpen = (item) => {
+    setDeleteModalData(item);
+    setShowDeleteModal(true);
+  };
+
 
   // Estado para manejar los estados de la orden
 
@@ -149,9 +186,27 @@ const OrderTable = ({ data }) => {
                     <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen(item, status)}>
                       Ver +
                     </button>
-                  
+
                     <button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen2(item, status)}>
                       Envio
+                    </button>
+                  </td>
+
+                  <td className="py-2 px-2 w-16 sm:w-16 text-sm">
+                    <button
+                      className="text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400"
+                      onClick={() => handleEditModalOpen(item)}
+                    >
+                      ✏️
+                    </button>
+                  </td>
+
+                  <td className="py-2 px-2 w-16 sm:w-16 text-sm">
+                    <button
+                      className="text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+                      onClick={() => handleDeleteModalOpen(item)}
+                    >
+                      🗑️
                     </button>
                   </td>
                 </tr>
@@ -318,7 +373,7 @@ const OrderTable = ({ data }) => {
         </div>
       )}
 
-{modalIsOpen2 && (
+      {modalIsOpen2 && (
         <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto 
          
         " id="modal">
@@ -344,14 +399,14 @@ const OrderTable = ({ data }) => {
             </header>
             {/* modal-card-body */}
             <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg">
-              
+
               <ShippingModal order={modalData2} onClose={handleModalClose2} />
-            
+
             </section>
 
 
 
-           
+
 
             {/* glass mini footer */}
             <footer className=" flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80  
@@ -363,7 +418,83 @@ const OrderTable = ({ data }) => {
           </div>
         </div>
       )}
+
+      {showEditModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity">
+
+              <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                               <button
+                    title="Cerrar"
+                    className="mt-4 rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
+                transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                    aria-label="close"
+                    onClick={handleEditModalClose}
+                  >X</button>
+                </div>
+                <div className="mt-3 text-center sm:mt-5">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                    Editar Pedido
+                  </h3>
+
+                  <form onSubmit={handleEditSubmit}>
+                    {Object.entries(modalData).map(([key, value]) => (
+                      <div key={key} className="mb-4">
+
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={key}>
+                          {key}
+                        </label>
+                        <input
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          id={key}
+                          type="text"
+                          value={value}
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                      Actualizar
+                    </button>
+                  </form>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+              <div>
+                <div className="mt-3 text-center sm:mt-5">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                    ¿Estás seguro de que deseas borrar este pedido?
+                  </h3>
+                  <div className="mt-5">
+                    <button onClick={handleDelete} className="text-red-600">
+                      Borrar
+                    </button>
+                    <button onClick={handleDeleteModalClose} className="ml-4 text-gray-600">
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 
@@ -371,3 +502,5 @@ const OrderTable = ({ data }) => {
 
 
 export default OrderTable;
+
+
