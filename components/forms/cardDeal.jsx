@@ -30,15 +30,23 @@ export default function DealCard({
       setName("Validar");
     } else if (clicks === 2) {
       setIsLoading(true);
-      setTimeout(() => {setIsLoading(false)}, 10000)
+      setTimeout(() => {setIsLoading(false)}, 6000)
+
       setName("Cargar");
+
+
+
     } else if (clicks === 3) {
+      setIsLoading(true);
+      setTimeout(() => {setIsLoading(false)}, 6000)
+
       setName("Siguiente");
-      setIsLoading(false);
+
     } else if (clicks === 4) {
       setIsDisabled(true);
-      setIsLoading(false);
-      setShow(true);
+      setIsLoading(true);
+      setTimeout(() => {setIsLoading(false),setShow(true);}, 6000)
+      
     }
   };
 
