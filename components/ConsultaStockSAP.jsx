@@ -19,7 +19,7 @@ const ConsultaStockComponent = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         const queryParams = new URLSearchParams(values).toString();
 
         try {
@@ -49,7 +49,7 @@ const ConsultaStockComponent = () => {
                         value={values.Material}
                         onChange={handleInputChange}
                     />
-                    
+
                     {/* Agregamos los otros dos campos que espera la API */}
                     <label className="flex flex-col justify-center mx-4 my-2 text-gray-900 dark:text-gray-200">Centro:</label>
                     <input
@@ -85,29 +85,28 @@ const ConsultaStockComponent = () => {
                     <table className="table-auto w-full">
                         <thead>
                             <tr>
-                                {/* Ajustamos para mostrar los encabezados que corresponden a los datos devueltos por la API */}
-                                <th className="px-4 py-2">Material</th>
-                                <th className="px-4 py-2">Centro</th>
+                                <th className="px-4 py-2 hidden md:block">Material</th>
+                                <th className='px-4 py-2'>Nombre</th>
+                                <th className="px-4 py-2 hidden md:block">Centro</th>
                                 <th className="px-4 py-2">Almacen</th>
-                                <th className="px-4 py-2">Stock Total</th>
+                                <th className="px-4 py-2 hidden md:block">Stock Total</th>
                                 <th className='px-4 py-2'>Stock Disp.</th>
-                                <th className="px-4 py-2">Stock Comp.</th>
-                                
+                                <th className="px-4 py-2 hidden md:block">Stock Comp.</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Asumimos que la respuesta es un objeto único, no un arreglo. */}
                             <tr>
-                                <td className="border px-4 py-2">{results.Material}</td>
-                                <td className="border px-4 py-2">{results.werks}</td>
+                                <td className="border px-4 py-2 hidden md:block">{results.Material}</td>
+                                <td className="border px-4 py-2">{results.MaterialName}</td>
+                                <td className="border px-4 py-2 hidden md:block">{results.werks}</td>
                                 <td className="border px-4 py-2">{results.lgort}</td>
-                                <td className="border px-4 py-2">{results.labst}</td>
+                                <td className="border px-4 py-2 hidden md:block">{results.labst}</td>
                                 <td className="border px-4 py-2">{results.stock_disp}</td>
-                                <td className="border px-4 py-2">{results.stock_Comp}</td>
-                                
+                                <td className="border px-4 py-2 hidden md:block">{results.stock_Comp}</td>
                             </tr>
                         </tbody>
                     </table>
+
                 </div>
             )}
         </div>
