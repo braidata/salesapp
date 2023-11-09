@@ -49,36 +49,89 @@ export default function FormatContext({ context, componente }) {
 
 
   async function checkStockAvailable(sku, quantityRequested, werks, lgort) {
+    console.log('Verificando SKU:', sku);
+  
+    // Inicializar un objeto de resultado con todas las propiedades necesarias
+    const result = {
+      sku: sku,
+      checkSkipped: false,
+      stockAvailable: null,
+      message: ''
+    };
+  
+    // Verificar si el SKU es "600003" o "600001" y saltar la verificación de stock si es necesario
+    if (sku === "600003" || sku === "600001") {
+      console.log(`SKU ${sku} contiene "60000", saltando la verificación de stock.`);
+      result.checkSkipped = true;
+      result.message = `No stock check required for SKU: ${sku}.`;
+      return result;
+    }
+  
     try {
       const response = await fetch(`/api/apiSAPStock?Material=${sku}&werks=${werks}&lgort=${lgort}`);
       if (response.ok) {
         const data = await response.json();
+        result.stockAvailable = data.stock_disp;
+        
         if (data.stock_disp < quantityRequested) {
-          return { sku, stockAvailable: data.stock_disp }; // Devuelve el SKU y el stock disponible
+          console.log('Stock insuficiente para el SKU:', sku);
+          result.message = 'Stock insuficiente';
+        } else {
+          console.log('Stock suficiente para el SKU:', sku);
+          return true; // Aquí podríamos simplemente devolver result si queremos mantener la estructura consistente
         }
-        return true; // Hay suficiente stock
+      } else {
+        console.log('Respuesta no OK para el SKU:', sku);
+        result.message = 'Respuesta no OK al verificar stock';
       }
     } catch (error) {
-      console.error("Error al comprobar stock", error);
+      console.error("Error al comprobar stock para el SKU:", sku, error);
+      result.message = 'Error al verificar stock';
     }
-    return false; // Algo salió mal
+    return result;
   }
-
-
-
-  // Agregamos el método a yup
+  
+  
+  
+  
   yup.addMethod(yup.object, "checkStock", function (werks, lgort) {
     return this.test('check-stock', '', async function (value) {
       const { sku, quantity } = value;
       const result = await checkStockAvailable(sku, quantity, werks, lgort);
-      if (result !== true) {
+  
+      // Verifica si la comprobación se ha saltado primero.
+      if (result.checkSkipped) {
+        console.log(`Stock check skipped for SKU: ${sku}.`);
+        return true; // No hay necesidad de comprobar el stock, devolver true inmediatamente.
+      }
+  
+      // Si el resultado es true, hay suficiente stock.
+      if (result === true) {
+        return true;
+      }
+  
+      // Si el resultado tiene una propiedad stockAvailable que es null o undefined, asumir que hubo un error.
+      if (result.stockAvailable == null) {
         return this.createError({
-          message: `No hay suficiente stock para el producto con SKU: ${sku}. Stock disponible: ${Math.floor(result.stockAvailable)}`
+          message: result.message // Usa el mensaje de error del resultado
         });
       }
-      return true; // Todo está bien
+  
+      // Si el resultado es un objeto con la propiedad stockAvailable, significa que no hay suficiente stock.
+      if (typeof result.stockAvailable === 'number') {
+        const stockAvailable = Math.floor(result.stockAvailable);
+        return this.createError({
+          message: `No hay suficiente stock para el producto con SKU: ${sku}. Stock disponible: ${stockAvailable}`
+        });
+      }
     });
   });
+  
+  
+
+
+
+  
 
 
 
@@ -365,6 +418,10 @@ export default function FormatContext({ context, componente }) {
                   const parentData = this.parent;
                   const sku = parentData.sku || parentData.product_id;
                   console.log("DATAZOS",this.parent,"sku", sku, "value", value, "centro", contexts.deale[0].centro, "almacen", contexts.deale[0].almacen)
+                  if (sku === "600003" || sku === "600001") {
+                    console.log(`SKU ${sku} es un flete, saltando la verificación de stock.`);
+                    return true;
+                  }
                   const result = await checkStockAvailable(
                     sku,
                     value,
