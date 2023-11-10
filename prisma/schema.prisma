@@ -65,6 +65,7 @@ model orders {
   centro                              String?       @db.VarChar(255)
   channel                             String?       @db.VarChar(255)
   order_class                         String?       @db.VarChar(255)
+  status                              String?       @default("1") @db.VarChar(255)
   respuestaSAP                        String?       @db.Text
   payments                            payments[]
   order_items                         order_items[]
