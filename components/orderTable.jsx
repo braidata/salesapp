@@ -28,10 +28,28 @@ const OrderTable = ({ data }) => {
   };
 
   // Función para manejar el evento de borrado.
-  const handleDelete = () => {
-    // Aquí puedes enviar una solicitud a tu backend para eliminar el pedido.
-    // Luego de la eliminación exitosa, puedes cerrar el modal y actualizar la lista de pedidos si es necesario.
-  };
+  const handleDelete =  async (id) => {
+      try {
+          const response = await fetch('/api/mysqlDeleter', {
+              method: 'DELETE',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ id }),
+          });
+          
+          if (response.ok) {
+              const data = await response.json();
+              console.log(data.message);
+              // Manejar la respuesta
+          } else {
+              // Manejar errores
+              console.error('Error al eliminar');
+          }
+      } catch (error) {
+          console.error('Hubo un error', error);
+      }
+  };  
 
   // Funciones para cerrar los modales.
   const handleEditModalClose = () => setShowEditModal(false);
