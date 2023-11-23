@@ -9,12 +9,12 @@ export default async (req, res) => {
     const {
       codigoCiudadOrigen = 1,
       codigoCiudadDestino = 1,
-      alto = 88,
-      ancho = 88,
-      largo = 88,
-      kilos = 163,
-      cuentaCorriente = '776220',
-      cuentaCorrienteDV = '8',
+      alto = 50,
+      ancho = 70,
+      largo = 80,
+      kilos = 50,
+      cuentaCorriente = '44651',
+      cuentaCorrienteDV = '3',
       rutCliente = '',
     } = req.body;
 
@@ -37,7 +37,7 @@ export default async (req, res) => {
       Rut,
       Clave,
       'Content-Type': 'application/json',
-      Cookie: 'serviciosdls=1308955820.54811.0000',
+      Cookie: 'serviciosdls=3204715692.56091.0000',
     };
 
     const response = await axios.post(
