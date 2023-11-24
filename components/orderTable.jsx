@@ -53,6 +53,23 @@ const OrderTable = ({ data, functionS }) => {
     }
   };
 
+  const handleStatus = async (id) => {
+    try {
+      const response = await fetch(`/api/mysqlStatus?id=${id.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+      });
+
+      if (response.ok) {
+        const data = await response.json();}
+} catch (error) {
+      console.error('Hubo un error', error);
+    }
+  };
+
   // Funciones para cerrar los modales.
   const handleEditModalClose = () => setShowEditModal(false);
   const handleDeleteModalClose = () => setShowDeleteModal(false);
@@ -134,7 +151,7 @@ const OrderTable = ({ data, functionS }) => {
                 //   messages = responses.map(response => response.TEXT);
                 if (Array.isArray(responses)) {
                   // Solo guarda el primer mensaje
-                  status = "Error SAP";
+                  status = () => handleStatus(item);
                   messages.push(responses[0].TEXT);
                 } else {
                   status = "En SAP"
