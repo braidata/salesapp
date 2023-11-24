@@ -30,8 +30,8 @@ const OrderTable = ({ data }) => {
   // Función para manejar el evento de borrado.
   const handleDelete =  async (id) => {
       try {
-          const response = await fetch('/api/mysqlDeleter', {
-              method: 'DELETE',
+          const response = await fetch('/api/mysqlUpdater?id=${item.id}', {
+              method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
               },
