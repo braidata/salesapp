@@ -23,7 +23,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             where: { id: parseInt(id) },
             data: {
                 status: "0",
-                dealId: existingOrder.dealId + "DELETE", // Concatenando "delete" al dealId existente
+                statusSAP: "Borrado",
+                //verifica que el dealId no tenga " ELIMINADO" al final
+                dealId: existingOrder.dealId.includes(" ELIMINADO") ? existingOrder.dealId :
+                existingOrder.dealId + " ELIMINADO", // Concatenando "delete" al dealId existente
+                
             },
         });
 
