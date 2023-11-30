@@ -2,7 +2,6 @@ import React from "react";
 import Products from "../../lib/base_productos";
 import { useState, useEffect, useRef } from "react";
 import { useField } from "@unform/core";
-// import input from "../Input Fields/Input";
 import Input from "../Input Fields/Input";
 
 const SelectProductos = ({ cuenta }) => {
