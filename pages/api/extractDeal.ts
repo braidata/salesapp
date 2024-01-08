@@ -8,7 +8,7 @@ type Response = {
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   try {
-    const id = req.body.id;
+    const id = req.body.id || req.query.id;
     const url = `https://api.hubapi.com/crm/v3/objects/deal/search/`;
     const response = await axios({
       method: "POST",
@@ -58,6 +58,11 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
                 operator: "EQ",
                 value: id,
               },
+              {
+                propertyName: "dealstage",
+                operator: "EQ",
+                value: "50940199",
+              },
             ],
           },
         ],
@@ -69,8 +74,9 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
         ],
       },
     });
-    console.log("DEALAZO: ", response.data.results);
-    res.status(200).json({ success: true, data: response.data.results });
+    if(response.data.results.length >= 0)
+{    console.log("DEALAZO: ", response.data.results, "ID: ", id, "size: ", response.data.results.length);
+    res.status(200).json({ success: true, data: response.data.results });}
   } catch (error) {
     return res.status(500).json({ success: false });
   }

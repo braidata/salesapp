@@ -9,7 +9,7 @@ import Datas from "../../lib/data";
 import CreatedAtomForm from "../../components/createdAtomForm";
 import ButtonToAddComponent from "../../components/buttonToAddComponent";
 import { validateRUT, getCheckDigit, generateRandomRUT } from "validar-rut";
-import Select from "../Input Fields/Select";
+import Select from "../Input Fields/SelectV";
 
 const schema = yup.object().shape({
   payment: yup.object().shape({
@@ -17,29 +17,39 @@ const schema = yup.object().shape({
       .string()
       .min(1, "Ingresa un Método de Pago válido")
       .required("Método de Pago es obligatorio"),
-    rut_pagador: yup
+
+    orden_de_compra: yup
+      .string(),
+    // .min(2, "Ingresa un Código de Autorización válido")
+    // .required("Código de Autorización es obligatorio")
+
+    Tipo_de_Pago: yup
       .string()
-      .test({
-        name: "Rut",
-        message: "Rut no válido",
-        test: (value) => {
-          return validateRUT(value);
-        },
-      })
-      .min(9, "Ingresa un rut válido")
-      .required("Rut es obligatorio"),
-    Código_de_Autorización: yup
+      .min(1, "Ingresa un Tipo de Pago válido")
+      .required("Tipo de Pago es obligatorio")
+    ,
+    centro: yup
       .string()
-      .min(2, "Ingresa un Código de Autorización válido")
-      .required("Código de Autorización es obligatorio"),
-    Cantidad_de_Pagos: yup
+      .min(1, "Ingresa un centro válido")
+      .required("El Centro es obligatorio")
+    ,
+    canal: yup
       .string()
-      .min(1, "Ingresa una Cantidad de Pagos válida")
-      .required("Cantidad de Pagos es obligatoria"),
-    Fecha_de_Pago: yup
+      .min(1, "Ingresa un canal válido")
+      .required("El Canal es obligatorio")
+    ,
+    clase_de_pedido: yup
       .string()
-      .min(1, "Ingresa una Fecha de Pago válida")
-      .required("Fecha de Pago es obligatoria"),
+      .min(1, "Ingresa una clase de pedido válida")
+      .required("La Clase de Pedido es obligatoria")
+    ,
+
+    almacen: yup
+      .string()
+      .min(1, "Ingresa un almacén válido")
+      .required("El almacén es obligatorio")
+    ,
+
   }),
 });
 
@@ -81,24 +91,24 @@ export default function PaymentsInfo({ formStep, nextFormStep }) {
         <div className={styles.formRow}>
           {Data.Datas[4].map((data, index) => (
 
-            data.campo != "payment.Metodo_de_Pago" ?
+            data.campo === "payment.orden_de_compra" ?
 
-           <Input
-              key={index}
-              name={data.campo}
-              label={data.detalle}
-              type={data.type}
-              valua={data.valua}
-            /> :
+              <Input
+                key={index}
+                name={data.campo}
+                label={data.detalle}
+                type={data.type}
+                valua={data.valua}
+              /> :
               <Select
-              key={index}
-              name={data.campo}
-              label={data.detalle}
-              type={data.type}
-              valua={data.valua}
-              options={data.options}
-            />
-            
+                key={index}
+                name={data.campo}
+                label={data.detalle}
+                type={data.type}
+                valua={data.valua}
+                options={data.options}
+              />
+
 
 
           ))}

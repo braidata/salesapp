@@ -33,21 +33,111 @@ export default function FormatContext({ context, componente }) {
   const validateRUT = async (rut) => {
     try {
       const response = await fetch(`https://api.libreapi.cl/rut/validate?rut=${rut}`);
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       const data = await response.json();
       return data.data.valid; // Devolviendo directamente la propiedad "valid".
-  
+
     } catch (error) {
       console.error('Error fetching and parsing data:', error);
       throw error;
     }
   }
+
+
+  async function checkStockAvailable(sku, quantityRequested, werks, lgort) {
+    console.log('Verificando SKU:', sku);
+  
+    // Inicializar un objeto de resultado con todas las propiedades necesarias
+    const result = {
+      sku: sku,
+      checkSkipped: false,
+      stockAvailable: null,
+      message: ''
+    };
+  
+    // Verificar si el SKU es "600003" o "600001" y saltar la verificación de stock si es necesario
+    if (sku === "600003" || sku === "600001") {
+      console.log(`SKU ${sku} contiene "60000", saltando la verificación de stock.`);
+      result.checkSkipped = true;
+      result.message = `No stock check required for SKU: ${sku}.`;
+      return result;
+    }
+  
+    try {
+      const response = await fetch(`/api/apiSAPStock?Material=${sku}&werks=${werks}&lgort=${lgort}`);
+      if (response.ok) {
+        const data = await response.json();
+        result.stockAvailable = data.stock_disp;
+        
+        if (data.stock_disp < quantityRequested) {
+          console.log('Stock insuficiente para el SKU:', sku);
+          result.message = 'Stock insuficiente';
+        } else {
+          console.log('Stock suficiente para el SKU:', sku);
+          return true; // Aquí podríamos simplemente devolver result si queremos mantener la estructura consistente
+        }
+      } else {
+        console.log('Respuesta no OK para el SKU:', sku);
+        result.message = 'Respuesta no OK al verificar stock';
+      }
+    } catch (error) {
+      console.error("Error al comprobar stock para el SKU:", sku, error);
+      result.message = 'Error al verificar stock';
+    }
+    return result;
+  }
   
   
+  
+  
+  yup.addMethod(yup.object, "checkStock", function (werks, lgort) {
+    return this.test('check-stock', '', async function (value) {
+      const { sku, quantity } = value;
+      const result = await checkStockAvailable(sku, quantity, werks, lgort);
+  
+      // Verifica si la comprobación se ha saltado primero.
+      if (result.checkSkipped) {
+        console.log(`Stock check skipped for SKU: ${sku}.`);
+        return true; // No hay necesidad de comprobar el stock, devolver true inmediatamente.
+      }
+  
+      // Si el resultado es true, hay suficiente stock.
+      if (result === true) {
+        return true;
+      }
+  
+      // Si el resultado tiene una propiedad stockAvailable que es null o undefined, asumir que hubo un error.
+      if (result.stockAvailable == null) {
+        return this.createError({
+          message: result.message // Usa el mensaje de error del resultado
+        });
+      }
+  
+      // Si el resultado es un objeto con la propiedad stockAvailable, significa que no hay suficiente stock.
+      if (typeof result.stockAvailable === 'number') {
+        const stockAvailable = Math.floor(result.stockAvailable);
+        return this.createError({
+          message: `No hay suficiente stock para el producto con SKU: ${sku}. Stock disponible: ${stockAvailable}`
+        });
+      }
+    });
+  });
+  
+  
+
+
+
+  
+
+
+
+
+
+
 
   // console.log("la data es", datas)
 
@@ -133,84 +223,32 @@ export default function FormatContext({ context, componente }) {
       order_items: [],
     };
 
-
+    function esProductoUnico(producto, array) {
+      return !array.some(item => item.name === producto.name);
+    }
 
 
     contexts.products.map((product, index) => {
-
-      console.log(
-        "el producto es",
-        index < product.length
-          ? product[index].properties.name
-          : product[0].properties.name,
-        datas.order_items
-      ),
-        datas.order_items.push({
-          name:
-            index < product.length
-              ? product[index].properties.name
-              : product[0].properties.name,
-          price:
-            index < product.length
-              ? product[index].properties.price
-              : product[0].properties.amount,
-          quantity:
-            index < product.length
-              ? product[index].properties.quantity
-              : product[0].properties.quantity,
-          sku:
-            index < product.length
-              ? product[index].properties.sku
-              : product[0].properties.hs_sku,
-          discount:
-            index < product.length
-              ? product[index].properties.discount
-              : product[0].properties.hs_discount_percentage,
-        });
+      const producto = {
+        name: product[index]?.properties.name || product[0]?.properties.name,
+        price: product[index]?.properties.price || product[0]?.properties.amount,
+        quantity: product[index]?.properties.quantity || product[0]?.properties.quantity,
+        sku: product[index]?.properties.sku || product[0]?.properties.hs_sku,
+        discount: product[index]?.properties.discount || product[0]?.properties.hs_discount_percentage,
+      };
+      
+    
+      if (esProductoUnico(producto, datas.order_items)) {
+        datas.order_items.push(producto);
+        console.log("el producto es", producto.name, datas.order_items);
+      }
     });
     setDatos(contexts.deale[0].hs_object_id);
     console.log("la dato es", datos);
 
     //validate datas with yup
     const schema = yup.object().shape({
-      // customer_name: yup.string("Nombre es requerido").nullable(
-      //   "Nombre es requerido"
-      // ).test({
-      //   name: "Nombre",
-      //   message: "Ingresa un Nombre en HubSpot",
-      //   test: (value) => {
 
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
-      // customer_last_name: yup.string().nullable(
-      //   "Apellido es requerido"
-      // ).test({
-      //   name: "Apellido",
-      //   message: "Ingresa un Apellido en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   }
-      // }),
-      // customer_rut: yup.string().test({
-      //   name: "Rut Cliente",
-      //   message: "Ingresa un Rut Cliente válido en HubSpot",
-      //   test: (value) => {
-
-      //     if (value) {
-      //       return validateRUT(value);
-      //     }
-      //   }
-      // }),
       customer_email: yup.string().nullable(
         "Email es requerido"
       ).test({
@@ -225,20 +263,7 @@ export default function FormatContext({ context, componente }) {
           }
         }
       }),
-      // customer_phone: yup.string().nullable(
-      //   "Teléfono es requerido"
-      // ).test({
-      //   name: "Teléfono",
-      //   message: "Ingresa un Teléfono en HubSpot",
-      //   test: (value) => {
 
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   }
-      // }),
       billing_street: yup.string().nullable(
         "Calle es requerido"
       ).test({
@@ -309,34 +334,7 @@ export default function FormatContext({ context, componente }) {
           }
         }
       }),
-      // billing_department: yup.string().nullable(
-      //   "Nro. de Depto es requerido"
-      // ).test({
-      //   name: "Nro. de Depto",
-      //   message: "Ingresa un Nro. de Depto en HubSpot",
-      //   test: (value) => {
 
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   }
-      // }),
-      // billing_zip_code: yup.string().nullable(
-      //   "Código Postal es requerido"
-      // ).test({
-      //   name: "Código Postal",
-      //   message: "Ingresa un Código Postal en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   }
-      // }),
       billing_company_name: yup.string().nullable(
         "Razón Social es requerido"
       ).test({
@@ -351,10 +349,11 @@ export default function FormatContext({ context, componente }) {
           }
         }
       }),
+
       billing_company_rut: yup.string().test({
         name: "Rut Empresa",
         message: "Ingresa un Rut Empresa válido en HubSpot",
-        test: async function(value) {
+        test: async function (value) {
           if (value) {
             try {
               return await validateRUT(value);
@@ -369,7 +368,7 @@ export default function FormatContext({ context, componente }) {
           }
           // Si value no está presente o es falsy (por ejemplo, una cadena vacía), puedes decidir si eso es válido o no.
           // Si decides que no es válido cuando no hay valor, simplemente retornar false.
-          return false; 
+          return false;
         }
       }),
 
@@ -387,195 +386,83 @@ export default function FormatContext({ context, componente }) {
           }
         }
       }),
-      // Shipping_Tipo_de_Despacho: yup.string().nullable(
-      //   "Tipo de Despacho es requerido"
-      // ).test({
-      //   name: "Tipo de Despacho",
-      //   message: "Ingresa un Tipo de Despacho en HubSpot",
-      //   test: (value) => {
 
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   }
-      // }),
-      // Shipping_Fecha_de_Despacho_o_Retiro: yup.string().nullable(
-      //   "Fecha de Despacho es requerido"
-      // ).test({
-      //   name: "Fecha de Despacho",
-      //   message: "Ingresa una Fecha de Despacho en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
-      // Shipping_Observacion: yup.string().nullable(
-      //   "Observación es requerido"
-      // ).test({
-      //   name: "Observación",
-      //   message: "Ingresa una Observación en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
-      // Shipping_flete: yup.string().nullable(
-      //   "Flete es requerido"
-      // ).test({
-      //   name: "Flete",
-      //   message: "Ingresa un Flete en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
-
-      // rut_pagador: yup.string().nullable("Rut Pagador es Requerido").test({
-      //   name: "Rut de Pagador Válido",
-      //   message: "Ingresa un Rut de Pagador válido en HubSpot",
-      //   test: (value) => {
-
-      //     if (value) {
-      //       return validateRUT(value);
-      //     }
-      //   }
-      // }),
-      // authorization_code: yup.string().nullable(
-      //   "Codígo de Pago es requerido"
-      // ).test({
-      //   name: "Codígo de Pago",
-      //   message: "Ingresa el Codígo de Pago en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
-      // payment_count: yup.string().nullable(
-      //   "Cantidad de Pagos es requerido"
-      // ).test({
-      //   name: "Cantidad de Pagos",
-      //   message: "Ingresa la Cantidad de Pagos en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
-      // payment_amount: yup.string().nullable(
-      //   "Monto es requerido"
-      // ).test({
-      //   name: "Monto",
-      //   message: "Ingresa un Monto en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
-      // payment_date: yup.string().nullable(
-      //   "Fecha de Pago es requerido"
-      // ).test({
-      //   name: "Fecha de Pago",
-      //   message: "Ingresa una Fecha de Pago en HubSpot",
-      //   test: (value) => {
-
-      //     if (value === null) {
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   },
-      // }),
       //valida que el array productos tenga al menos un producto
 
-      order_items: yup.array().of(
-        yup.object().shape({
-
-          product_id: yup.string().nullable(
-            "Producto es requerido"
-          ).test({
-            name: "Producto",
-            message: "Ingresa un Producto en HubSpot",
-            test: (value) => {
-
-              if (value === null) {
-                return false;
-              } else {
-                return true;
-              }
-            },
-          }),
-          quantity: yup.string().nullable(
-            "Cantidad es requerido"
-          ).test({
-            name: "Cantidad",
-            message: "Ingresa una Cantidad en HubSpot",
-            test: (value) => {
-
-              if (value === null) {
-                return false;
-              } else {
-                return true;
-              }
-            },
-          })}),
-
-      ).min(1, "Debes agregar al menos un producto").test({
-        name: "Productos",
-        message: "Ingresa al menos un Producto en HubSpot",
-        test: (value) => {
-
-          if (value.length === 0) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-      }),
+      order_items: yup
+        .array()
+        .of(
+          yup.object().shape({
+            product_id: yup
+              .string()
+              .nullable("Producto es requerido")
+              .test({
+                name: "Producto",
+                message: "Ingresa un Producto en HubSpot",
+                test: (value) => {
+                  if (value === null) {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                },
+              }),
+            quantity: yup
+              .number()
+              .nullable()
+              .required("Cantidad es requerida")
+              .test(
+                "check-stock",
+                "No hay suficiente stock para el producto seleccionado",
+                async function (value) {
+                  const parentData = this.parent;
+                  const sku = parentData.sku || parentData.product_id;
+                  console.log("DATAZOS",this.parent,"sku", sku, "value", value, "centro", contexts.deale[0].centro, "almacen", contexts.deale[0].almacen)
+                  if (sku === "600003" || sku === "600001") {
+                    console.log(`SKU ${sku} es un flete, saltando la verificación de stock.`);
+                    return true;
+                  }
+                  const result = await checkStockAvailable(
+                    sku,
+                    value,
+                    contexts.deale[0].centro,
+                    contexts.deale[0].almacen
+                  );
+                  if (result !== true) {
+                    // Crear un error con un mensaje personalizado
+                    return this.createError({
+                      message: `No hay suficiente stock para el producto con SKU: ${sku}. Stock disponible: ${Math.floor(result.stockAvailable)}`,
+                      path: this.path, // 'quantity'
+                    });
+                  }
+                  return true;
+                }
+              ),
+            // ...otras validaciones para los campos del producto...
+          })
+        )
+        .min(1, "Debes agregar al menos un producto")
+        .test({
+          name: "Productos",
+          message: "Ingresa al menos un Producto en HubSpot",
+          test: (value) => {
+            if (value.length === 0) {
+              return false;
+            } else {
+              return true;
+            }
+          },
+        }),
     });
-
-
-
 
     try {
 
       //use schema to validate datas
       await schema.validate(datas, { abortEarly: false });
-
-
       //if validation is ok, send datas to mysql
       orderA(datas);
 
-
-
-
-
     } catch (err) {
-
 
       const errors = {};
       const messages = {};
@@ -651,9 +538,6 @@ export default function FormatContext({ context, componente }) {
   return (
     <>
       <div >
-        {/* {console.log("y los errores son 2", errorH ? errorH.map((error) => error) : "AÚN NO HAY ERRORES")} */}
-        {/* <div ref={divRef}  >{errorH ? errorH.map((error) => error) : "AÚN NO HAY ERRORES"}</div> */}
-
         <button
           className={` ${statusQ
             ? "hidden"
@@ -669,14 +553,10 @@ export default function FormatContext({ context, componente }) {
 
         {statusQ && !errorStatus && !errorStatus2 ? componente : null}
 
-        {/* <button onClick={userSender}>Guarda Ownera</button> */}
       </div>
-      {/* Create a glass transparent table based on this errorH && <p className={styles.errorText}>{errorH ? Object.entries(errorH).map((error) => error[1]) : "AÚN NO HAY ERRORES"}</p> */}
-      {/* {errorH && <p className={styles.errorText}>{errorH ? Object.entries(errorH).map((error) => error[1]) : "AÚN NO HAY ERRORES"}</p>} */}
-
       {
         errorH && <table className="flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">
-       
+
           <thead>
             <tr>
               {/* <th className="px-2 py-2">Campo</th> */}
@@ -690,15 +570,9 @@ export default function FormatContext({ context, componente }) {
               ">
                 {/* <td className="border px-2 py-2">{error[0]}</td> */}
                 <td className="border px-2 py-2 flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">{error[1]}
-                  {/* link for go to hubspot deal según el dealId en datas.dealId*/}
-                  {/* style with hubspot colors */}
-                  {/* {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="mt-2 mb-2 mx-2 text-gray-800 bg-gradient-to-r from-yellow-600/40 to-orange-800/40 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200 dark:border-opacity-50 dark:hover:bg-sky-600/50 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center"
-                  >Ir a HubSpot</Link>} */}
                 </td>
 
                 <td className="border px-2 py-2 flex flex-col items-center justify-center w-full bg-transparent border-collapse table-auto">
-                  {/* link for go to hubspot deal según el dealId en datas.dealId*/}
-                  {/* style with hubspot colors */}
                   {datos && <Link href={`https://app.hubspot.com/contacts/7811012/deal/${datos}`} target="_blank" rel="noreferrer" className="w-48 mt-2 mb-2 text-center  text-gray-800 bg-gradient-to-r from-yellow-600/60 to-orange-800/80 border-2 drop-shadow-[0_5px_5px_rgba(177,155,0,0.75)]  border-orange-800 hover:bg-yellow-600/50  dark:bg-gradient-to-r dark:from-yellow-500/40 dark:to-orange-800/60 border-4 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-orange-200  dark:hover:bg-orange-600/50 dark:text-gray-200 font-bold py-2 px-2 rounded-full transform perspective-1000 hover:rotate-0 hover:skew-x-0 hover:skew-y-0 hover:scale-105 focus:-rotate-0 focus:-skew-x-0 focus:-skew-y-0 focus:scale-90 transition duration-500 origin-center"
                   >Ir a HubSpot</Link>}
                 </td>
@@ -707,9 +581,6 @@ export default function FormatContext({ context, componente }) {
             ))}
           </tbody>
         </table>
-
-
-
       }
     </>
   );

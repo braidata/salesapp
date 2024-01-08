@@ -25,22 +25,7 @@ const schema = yup.object().shape({
       .required("Calle es obligatoria"),
     Departamento: yup
       .string()
-      //solo caracteres alfanumericos O NULO
-      //.matches(/^[a-zA-Z0-9\s]+$/, "Ingresa un Número de Casa o depto válido")
-      //.min(1, "Ingresa un Número de Casa o depto válido")
-      // .required("Casa o depto es obligatorio"),
-    // Ciudad: yup
-    //   .string()
-    //   .min(3, "Ingresa una Ciudad válida")
-    //   .required("Ciudad es obligatoria"),
-    // Comuna: yup
-    //   .string()
-    //   .min(3, "Ingresa una Comuna válida")
-    //   .required("Comuna es obligatoria"),
-    // Región: yup
-    //   .string()
-    //   .min(1, "Ingresa una Región válida")
-    //   .required("Región es obligatoria")
+
     ,
       Comunas: yup
       .string()
@@ -157,5 +142,9 @@ export default function BillingInfo({ formStep, nextFormStep }) {
 // campo valor flete en negocio
 //datos de shipping en negocio
 //crear todo esto en Hubspot
-
 //sobre clientes en SAP
+
+//crear subidor a hubspot
+//crear modulo captura de stock
+//modulo de pagos
+//reportería

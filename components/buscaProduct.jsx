@@ -1,59 +1,83 @@
-export default function PageWithJSbasedForm2() {
-    // Handles the submit event on form submit.
-    let resultos;
-    const handleSubmit = async (event) => {
-      // Stop the form from submitting and refreshing the page.
-      event.preventDefault()
-  
-      // Get data from the form.
-      const data = {
-        first: event.target.first.value,
-        last: event.target.last.value,
-      }
-  
-      // Send the data to the server in JSON format.
-      const JSONdata = JSON.stringify(data)
-  
-      // API endpoint where we send form data.
-      const endpoint = '/api/products'
-  
-      // Form the request for sending data to the server.
-      const options = {
-        // The method is POST because we are sending data.
+import React, { useState } from 'react';
+
+export default function Products() {
+  const [resultos, setResultos] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const data = {
+      sku: event.target.sku.value
+    }
+
+    try {
+      const response = await fetch('/api/products', {
         method: 'POST',
-        // Tell the server we're sending JSON.
         headers: {
           'Content-Type': 'application/json',
         },
-        // Body of the request is the JSON data we created above.
-        body: JSONdata,
-      }
-  
-      // Send the form data to our forms API on Vercel and get a response.
-      const response = await fetch(endpoint, options)
-  
-      // Get the response data from server as JSON.
-      // If server returns the name submitted, that means the form works.
-      let result = await response.json()
-      resultos = result.data
-      console.log(resultos)
-      
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      setResultos(result);
+    } catch (err) {
+      setError(err.message);
     }
-    return (
-        <div>
-       
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="first">First Name</label>
-        <input type="text" id="first" name="first" required />
-  
-        <label htmlFor="last">Last Name</label>
-        <input type="text" id="last" name="last" required />
-  
-        <button type="submit">Submit</button>
-        
-      </form>
-      <pre>{resultos}</pre>
-        </div>
-      
-    )
   }
+
+  return (
+    <>
+      <div className="bg-gray-800 min-h-screen text-white mt-24">
+        <div className="max-w-md mx-auto p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="sku" className="block text-sm font-medium">SKU</label>
+              <input type="text" id="sku" name="sku" required className="w-full px-3 py-2 border rounded-md bg-gray-700 text-white border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+
+              <button type="submit" className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg ">
+                Buscar
+              </button>
+            </div>
+          </form>
+
+          {resultos && (
+          <div className="mt-4">
+            <table className="min-w-full bg-white text-black">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">SKU</th>
+                  <th className="px-4 py-2">ID</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-700">
+                {Object.entries(resultos).map(([sku, id]) => (
+                  <tr key={sku}>
+                    <td className="border px-4 py-2">{sku}</td>
+                    <td className="border px-4 py-2">{id}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {error && <p className="mt-4 text-red-500">Error: {error}</p>}
+      </div>
+    </div>
+  </>
+)
+
+} 
+
+// agregar opción de descuento en $$$ monto fijo. 
+// probar caso de productos que no están en SAP
+// UIUX agregar divisor visual entre productos y reducir tamaño de campos y padding
+// validación de tipo de despacho
+// sumatoria de totales de productos
+// busqueda de pedidos por rut o nombre de cliente o mail
+// agregar todos los campos
+// agregar boton de volver atras
+// dashboard como factura
+

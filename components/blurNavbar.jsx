@@ -251,11 +251,21 @@ const BlurNavbar = () => {
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Pedido HubSpot</p>
             </Link>
+            <Link href="/neoForm">
+              <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
+        active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
+        font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Pedido Manual</p>
+            </Link>
               <Link href="/dashboard">
                 <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Dashboard</p>
-              </Link></> : null}
+              </Link>
+              <Link href="https://imega.atlassian.net/servicedesk/customer/portal/1" target="blank">
+              <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
+        active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
+        font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Soporte</p>
+            </Link></> : null}
             <Link href="/toolset">
               <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40

@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import styles from "../../styles/styles.module.scss";
-import { Form, Scope } from "@unform/web";
+import { Form } from "@unform/web";
 import Input from "../Input Fields/Input";
 import { useFormData } from "../../context";
 import * as yup from "yup";
@@ -8,27 +8,56 @@ import Datas from "../../lib/data";
 import CreatedAtomForm from "../../components/createdAtomForm";
 import ButtonToAddComponent from "../../components/buttonToAddComponent";
 import { useDataData } from "../../context/data";
+import SelectProductos from "./selectProducts";
 
 const datosProducts = [];
 const productsInfo = [];
 
+// Función para consultar stock
+async function checkStockAvailable(sku, quantityRequested) {
+    try {
+        const response = await fetch(`/api/apiSAPStock?Material=${sku}&werks=1100&lgort=1014`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.stock_disp >= quantityRequested) {
+                return true;
+            }
+        }
+    } catch (error) {
+        console.error("Error al comprobar stock", error);
+    }
+    return false;
+}
+
+// Agregamos el método a yup
+yup.addMethod(yup.string, "checkStock", function () {
+  return this.test('check-stock', 'Cuidado stock insuficiente de cierto material', async function (value) {
+      const { products } = this.parent;
+      const { SKU, Cantidad } = products;
+
+      // No es necesario registrar cada vez, pero lo mantendré aquí por si aún quieres verlo.
+      console.log("SKU:", SKU, "Cantidad:", Cantidad);
+
+      const isValid = await checkStockAvailable(SKU, Cantidad);
+      return isValid || this.createError({ message: 'Cuidado stock insuficiente de cierto material' });
+  });
+});
+
+
 const schema = yup.object().shape({
   SKU: yup.string().min(2, "Ingresa un SKU válido"),
-  // .required("SKU es obligatorio"),
   Nombre_Producto: yup.string().min(2, "Ingresa un Nombre de Producto válido"),
-  // .required("Nombre de Producto es obligatorio"),
   Precio: yup.string().matches(
-    //onli numbers
     /^[0-9]+$/,
-    "Ingresa un Número de Precio válido").min(4, "Ingresa un Precio válido"), 
-  // .required("Precio es obligatorio"),
+    "Ingresa un Número de Precio válido").min(4, "Ingresa un Precio válido"),
   Cantidad: yup.string().min(1, "Ingresa una Cantidad válida"),
-  // .required("Cantidad es obligatorio"),
   // Flete: yup.string().min(3, "Ingresa un Flete válido"),
-  // .required("Flete es obligatorio"),
 });
 
 export default function ProductsInfo({ formStep, nextFormStep }) {
+  // const SelectProducts = dynamic(() => import("./selectProducts"), {
+  //   ssr: false,
+  // });
   const Data = Datas;
   const { setFormValues } = useFormData();
   const formRef = useRef();
@@ -41,9 +70,10 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
   // const productsP = products ? products[0].properties : "no data";
 
   async function handleSubmit(data) {
+    console.log("Form Data:", data);
     try {
       formRef.current.setErrors({});
-
+      console.log("ref f:", formRef.current);
       await schema.validate(data, {
         abortEarly: false,
       });
@@ -79,7 +109,7 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
           <div className="invisible text-gray-100 dark:text-gray-400 max-h-8 max-w-0">
            
           </div>{" "}
-         
+          <SelectProductos />
           {Data.Datas[3].map((data, index) => (
             // call internal api
             <Input
@@ -91,6 +121,7 @@ export default function ProductsInfo({ formStep, nextFormStep }) {
             />
 
           ))}
+         
           <ButtonToAddComponent
             nombre={"Producto"}
             dataSelect={3}
