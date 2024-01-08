@@ -2,6 +2,8 @@ import NextAuth from "next-auth"
 import HubspotProvider from "next-auth/providers/hubspot"
 import CredentialsProvider from "next-auth/providers/credentials"
 
+export const runtime = 'edge';
+
 let user = null
 
 export default NextAuth({
