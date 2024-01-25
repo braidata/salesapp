@@ -1,15 +1,9 @@
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import Puntos from "../utils/puntos";
-import SapO2 from "../components/sapO2";
-import SapO3 from "../components/sapO3";
-import FedEx from "../components/fedEx";
 import { useRouter } from "next/router";
-import OrdersVentusComp from "../components/ordersVentusComp";
-import Febos from "../components/febos";
 import SimpliRoute from "../components/simpliRoute";
-import CotizadorStarken from "../components/CotizadorStarken";
-import CotizadorStarken2 from "../components/CotizadorStarken2";
+// import CotizadorStarken from "../components/CotizadorStarken";
+// import CotizadorStarken2 from "../components/CotizadorStarken2";
 
 
 
@@ -39,7 +33,7 @@ const Logistica = () => {
       const response = await fetch(endpoint, options);
       const result = response;
       const resDB = await result.json();
-      data = setData(resDB);
+      setData(resDB);
 
       console.log("base", resDB);
     } catch {
@@ -86,11 +80,8 @@ const Logistica = () => {
     <>
       
       <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
-      <h1 className="mt-24">Comparador Starken</h1>
+      {/* <h1 className="mt-24">Portal Logística</h1> */}
       <div className="flex flex-row gap-4 mt-24">
-        
-        <CotizadorStarken2 />
-        <CotizadorStarken />
       </div>
 
         <SimpliRoute />

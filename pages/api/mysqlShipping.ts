@@ -31,6 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     "Shipping_department": true,
                     "Shipping_Fecha_de_Despacho_o_Retiro": true,
                     "Shipping_Observacion": true,
+                    "respuestaSAP": true,
+                    
                 },
                 where: {
                     Shipping_Fecha_de_Despacho_o_Retiro: date,
