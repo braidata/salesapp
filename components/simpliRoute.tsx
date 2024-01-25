@@ -44,7 +44,7 @@ const ShippingOrderTable = () => {
         const workbook = XLSX.utils.table_to_book(table);
 
         // Escribe el archivo
-        XLSX.writeFile(workbook, 'nombreDeArchivo.xlsx');
+        XLSX.writeFile(workbook, 'CortePlanificacion.xlsx');
     };
 
 
@@ -158,7 +158,7 @@ const ShippingOrderTable = () => {
                                 Nombre Empresa
                             </th>
                             <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold  uppercase tracking-wider">
-                                ID del Pedido
+                                Tipo de Despacho
                             </th>
                             <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold  uppercase tracking-wider">
                                 Dirección
@@ -169,8 +169,11 @@ const ShippingOrderTable = () => {
                             <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold  uppercase tracking-wider">
                                 Observación
                             </th>
+                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold  uppercase tracking-wider">
+                                Fecha de Creación
+                            </th>
                             <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold  uppercase tracking-wider rounded-tr-lg">
-                                Fecha
+                                Fecha de Despacho
                             </th>
                         </tr>
                     </thead>
@@ -196,7 +199,7 @@ const ShippingOrderTable = () => {
                                         {item[1].billing_company_name}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
-                                        {item[1].id}
+                                        {item[1].Shipping_Tipo_de_Despacho}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
 
@@ -208,6 +211,9 @@ const ShippingOrderTable = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {item[1].customer_phone}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                        {item[1].order_date}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {item[1].Shipping_Fecha_de_Despacho_o_Retiro}

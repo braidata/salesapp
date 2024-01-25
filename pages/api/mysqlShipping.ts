@@ -30,7 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     "Shipping_number": true,
                     "Shipping_department": true,
                     "Shipping_Fecha_de_Despacho_o_Retiro": true,
+                    "Shipping_Tipo_de_Despacho": true,
                     "Shipping_Observacion": true,
+                    "order_date": true,
                     "respuestaSAP": true,
                     
                 },
