@@ -47,6 +47,20 @@ const ShippingOrderTable = () => {
         XLSX.writeFile(workbook, 'CortePlanificacion.xlsx');
     };
 
+    function adjustDateForTimezone(dateString: any): string {
+        const date = new Date(dateString);
+        const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
+        return adjustedDate.toLocaleDateString('es-CL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: 'numeric',
+            minute: 'numeric'
+        });
+    }
+
+
 
     const [dataS, setData] = useState();
     const getOrders = async (event: { target: { value: any; }; }) => {
@@ -201,7 +215,7 @@ const ShippingOrderTable = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {item[1].Shipping_Tipo_de_Despacho}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    <td className="px-6 py-4 whitespace-pre-line text-sm text-gray-500 dark:text-gray-200">
 
                                         {checkStartsWith(item[1].Shipping_street) === false ? `Dirección de Facturación:  ${item[1].billing_number} ${item[1].billing_street} ${item[1].billing_commune} Depto: ${item[1].billing_department}` :
                                             `Dirección de Despacho: ${item[1].Shipping_street} ${item[1].Shipping_number}, ${item[1].Shipping_commune} Depto: ${item[1].Shipping_department}`}
@@ -213,10 +227,10 @@ const ShippingOrderTable = () => {
                                         {item[1].customer_phone}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
-                                        {item[1].order_date}
+                                        {adjustDateForTimezone(item[1].order_date)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
-                                        {item[1].Shipping_Fecha_de_Despacho_o_Retiro}
+                                        {adjustDateForTimezone(item[1].Shipping_Fecha_de_Despacho_o_Retiro).toString()}
                                     </td>
                                     {/* <td className="w-full sm:w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
