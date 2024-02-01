@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Datas from "../lib/data";
+
+//Datas Comunas
+const Data = Datas.Datas[8];
 
 const TarifasComponent = () => {
+    //console.log('Data', Data);
     const [values, setValues] = useState({
         weight: '',
         from_place: 'Santiago', // Ejemplo de valor predeterminado, ajusta según sea necesario
@@ -18,6 +23,7 @@ const TarifasComponent = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setValues({ ...values, [name]: value });
+        console.log(value)
     };
 
     const handleSubmit = async (e) => {
@@ -33,7 +39,7 @@ const TarifasComponent = () => {
 
     return (
         <div className="bg-gray-300 w-full text-gray-900 dark:bg-gray-900 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2">
-            <h1 className="text-xl font-semibold mx-4 my-2">Consultar Tarifas</h1>
+            <h1 className="text-xl font-semibold mx-4 my-2">Consultar Tarifas Envíame</h1>
             <form onSubmit={handleSubmit}>
                 {/* Aquí van los inputs para los parámetros. Ejemplo: */}
                 <input
@@ -44,22 +50,51 @@ const TarifasComponent = () => {
                     value={values.weight}
                     onChange={handleInputChange}
                 />
-                <input
+                {/* <input
                     className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
                     type="text"
                     name="from_place"
                     placeholder="Desde"
                     value={values.from_place}
                     onChange={handleInputChange}
-                />
-                <input
+                /> */}
+                {/* create a searchable select for from_place with Data as values */}
+                <select
+                    className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
+                    name="from_place"
+                    value={values.from_place}
+                    onChange={handleInputChange}
+
+                >
+                    {Data.map((comuna, index) => (
+                        <option key={index} value={comuna.nombre}>
+                            {comuna.nombre}
+                        </option>
+                    ))}
+
+                </select>
+                {/* <input
                     className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
                     type="text"
                     name="to_place"
                     placeholder="Hacia"
                     value={values.to_place}
                     onChange={handleInputChange}
-                />
+                /> */}
+                                <select
+                    className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
+                    name="to_place"
+                    value={values.to_place}
+                    onChange={handleInputChange}
+
+                >
+                    {Data.map((comuna, index) => (
+                        <option key={index} value={comuna.nombre}>
+                            {comuna.nombre}
+                        </option>
+                    ))}
+
+                </select>
                 <input
                     className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
                     type="text"
