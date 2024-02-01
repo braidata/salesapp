@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import SimpliRoute from "../components/simpliRoute";
-// import CotizadorStarken from "../components/CotizadorStarken";
+import Cotizador from "../components/CotizadorEnviame";
 // import CotizadorStarken2 from "../components/CotizadorStarken2";
 
 
@@ -83,6 +83,9 @@ const Logistica = () => {
       {/* <h1 className="mt-24">Portal Logística</h1> */}
       <div className="flex flex-row gap-4 mt-24">
       </div>
+
+        <Cotizador />
+        
 
         <SimpliRoute />
         {/*  
