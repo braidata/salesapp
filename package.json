@@ -10,7 +10,7 @@
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^1.0.6",
     "@hubspot/api-client": "^7.1.2",
-    "@prisma/client": "^5.8.0",
+    "@prisma/client": "^4.16.2",
     "@unform/web": "^2.1.6",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "axios": "^1.1.3",
