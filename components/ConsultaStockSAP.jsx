@@ -28,7 +28,7 @@ const ConsultaStockComponent = () => {
             if (response.ok) {
                 let data = await response.json();
                 // Filtra los resultados para excluir filas donde 'stock_disp', 'stock_Comp', y 'labst' son 0
-                data = data.filter(row => row.stock_disp !== "0.000" && row.stock_Comp !== "0.000" && row.labst !== "0.000");
+                data = data.filter(row => row.labst !== "0.000");
                 // Ordena los resultados filtrados por 'stock_disp' de mayor a menor
                 data.sort((a, b) => b.stock_disp - a.stock_disp);
                 setResults(data);
