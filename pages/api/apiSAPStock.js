@@ -6,61 +6,33 @@ export default async (req, res) => {
   const SAP_USER = process.env.SAP_USER;
   const SAP_PASSWORD = process.env.SAP_PASSWORD;
 
-  const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO(Material='${Material}',werks='${werks}',lgort='${lgort}')`;
+  // Función para construir parte del filtro basada en múltiples valores
+  const buildFilterPart = (param, paramName) => {
+    if (!param) return '';
+    const values = param.split(','); // Asume que los valores vienen separados por comas
+    const filterParts = values.map(value => `${paramName} eq '${value.trim()}'`);
+    return `(${filterParts.join(' or ')})`;
+  };
+
+  const materialFilter = buildFilterPart(Material, 'Material');
+  const werksFilter = buildFilterPart(werks, 'werks');
+  const lgortFilter = buildFilterPart(lgort, 'lgort');
+
+  const filters = [materialFilter, werksFilter, lgortFilter].filter(Boolean).join(' and ');
+  const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}`;
 
   try {
     const response = await axios.get(SAP_URL, {
       auth: {
         username: SAP_USER,
-        password: SAP_PASSWORD
+        password: SAP_PASSWORD,
       },
     });
 
-    const data = response.data.d;
-
-    const result = {
-      Material: data.Material,
-      werks: data.werks,
-      lgort: data.lgort,
-      prdha: data.prdha,
-      nameprdha: data.nameprdha,
-      lgpbe: data.lgpbe,
-      MaterialName: data.MaterialName,
-      marcatext: data.marcatext,
-      PlantName: data.PlantName,
-      StorageLocationName: data.StorageLocationName,
-      prctr: data.prctr,
-      ktext: data.ktext,
-      ProductType: data.ProductType,
-      mtbez: data.mtbez,
-      STOCK_ENTREGA: data.STOCK_ENTREGA,
-      STOCK_PEDIDO: data.STOCK_PEDIDO,
-      MaterialBaseUnit: data.MaterialBaseUnit,
-      MATLWRHSSTKQTYINMATLBASEUNIT: data.MATLWRHSSTKQTYINMATLBASEUNIT,
-      MATLCNSMPNQTYINMATLBASEUNIT: data.MATLCNSMPNQTYINMATLBASEUNIT,
-      MATLSTKINCRQTYINMATLBASEUNIT: data.MATLSTKINCRQTYINMATLBASEUNIT,
-      MATLSTKDECRQTYINMATLBASEUNIT: data.MATLSTKDECRQTYINMATLBASEUNIT,
-      labst: data.labst,
-      sperr: data.sperr,
-      umlme: data.umlme,
-      insme: data.insme,
-      einme: data.einme,
-      speme: data.speme,
-      retme: data.retme,
-      WAERS: data.WAERS,
-      verpr: data.verpr,
-      BaseUnitSpecificProductLength: data.BaseUnitSpecificProductLength,
-      BaseUnitSpecificProductWidth: data.BaseUnitSpecificProductWidth,
-      BaseUnitSpecificProductHeight: data.BaseUnitSpecificProductHeight,
-      ProductMeasurementUnit: data.ProductMeasurementUnit,
-      stock_Comp: data.stock_Comp,
-      stock_disp: data.stock_disp,
-      PRICINGDATE: data.PRICINGDATE
-    };
-
-    return res.json(result);
+    const data = response.data.d.results;
+    return res.json(data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
