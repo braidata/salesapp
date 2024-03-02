@@ -63,8 +63,9 @@ const StockTable = ({ data }) => {
     return (
         <div>
 
-            <div className='flex flex-row gap-2 mt-2 mb-4'>
-                <button onClick={handleDownloadExcel} className="bg-purple-400 text-gray-900 dark:bg-purple-700 dark:text-gray-200 w-full p-4 rounded-lg shadow-md mx-2 my-2">Descargar Excel</button>
+            <div className='flex flex-col md:flex-row justify-end gap-2 mt-2 mb-4'>
+
+                {sortedData !== null && <button onClick={handleDownloadExcel} className="bg-purple-400 text-gray-900 dark:bg-purple-700 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2">Descargar Excel</button>}
                 {selectedRow !== null && (
                     <button onClick={handleCopyToClipboard} className="bg-purple-500 text-gray-900 dark:bg-purple-800 dark:text-gray-200 w-full p-4 rounded-lg shadow-md mx-2 my-2">Copiar Seleccionado</button>
                 )}
@@ -80,7 +81,7 @@ const StockTable = ({ data }) => {
                             <th onClick={() => requestSort('MaterialName')} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer">
                                 Nombre
                             </th>
-                            <th onClick={() => requestSort('werks')} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer">
+                            <th onClick={() => requestSort('werks')} className="hidden md:flex px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer">
                                 Centro
                             </th>
                             <th onClick={() => requestSort('lgort')} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer">
@@ -92,7 +93,7 @@ const StockTable = ({ data }) => {
                             <th onClick={() => requestSort('stock_disp')} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer">
                                 Stock Dispo.
                             </th>
-                            <th onClick={() => requestSort('stock_Comp')} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer rounded-tr-lg">
+                            <th onClick={() => requestSort('stock_Comp')} className="hidden md:flex px-6 py-3 text-right text-xs font-medium uppercase tracking-wider cursor-pointer rounded-tr-lg">
                                 Stock Comp.
                             </th>
                             {/* Añade más encabezados de columnas según tus datos */}
@@ -103,11 +104,11 @@ const StockTable = ({ data }) => {
                             <tr key={index} onClick={() => setSelectedRow(index)} className={selectedRow === index ? 'bg-gray-300 dark:bg-gray-800' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.Material)}</td>
                                 <td className="px-6 py-4 text-left whitespace-nowrap">{row.MaterialName}</td>
-                                <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.werks)}</td>
+                                <td className="hidden md:flex px-6 py-4 text-right whitespace-nowrap">{parseInt(row.werks)}</td>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.lgort)}</td>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.labst)}</td>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.stock_disp)}</td>
-                                <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.stock_Comp)}</td>
+                                <td className="hidden md:flex px-6 py-4 text-right whitespace-nowrap">{parseInt(row.stock_Comp)}</td>
 
                             </tr>
                         ))}

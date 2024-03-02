@@ -21,10 +21,10 @@ const ConsultaStockComponent = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const queryParams = new URLSearchParams(values).toString();
-    
+
         try {
             const response = await fetch(`/api/apiSAPStock?${queryParams}`);
-    
+
             if (response.ok) {
                 let data = await response.json();
                 // Filtra los resultados para excluir filas donde 'stock_disp', 'stock_Comp', y 'labst' son 0
@@ -39,56 +39,77 @@ const ConsultaStockComponent = () => {
             console.error('Error al enviar valores al servidor', error);
         }
     };
-    
+
 
     return (
-        <div style={{ maxHeight: '600px', overflowY: 'auto' }} className="bg-gray-300 w-full mt-4 text-gray-900 dark:bg-gray-900 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2 z-50">
-            <h1 className="flex flex-col justify-center mx-4 my-2 text-xl font-semibold">Consulta de Stock</h1>
+        <div className="backdrop-blur-sm z-20">
+        <div style={{ maxHeight: '600px', overflowY: 'auto' }} className="bg-gray-300 mt-4 text-gray-900 dark:bg-gray-900/50 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2 z-50 ">
+            <h1 className=" text-xl font-semibold">Consulta de Stock</h1>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label className="flex flex-col justify-center mx-4 my-2 text-gray-900 dark:text-gray-200">Material:</label>
+            <div class="flex flex-col md:flex-row justify-end">
+
+                    <div className="flex flex-col gap-2 "> 
+                    <label className=" text-gray-900 dark:text-gray-200">Material:</label>
                     <input
-                        className="bg-gray-300 text-gray-900 dark:text-gray-200 dark:bg-gray-700 w-full  p-4 rounded-lg shadow-md mx-2 my-2"
+                        className="bg-gray-300 text-gray-900 dark:text-gray-200 dark:bg-gray-700  p-4 rounded-lg shadow-md mx-2 my-2"
                         type="text"
                         name="Material"
                         value={values.Material}
                         onChange={handleInputChange}
                     />
+                    </div>
 
                     {/* Agregamos los otros dos campos que espera la API */}
-                    <label className="flex flex-col justify-center mx-4 my-2 text-gray-900 dark:text-gray-200">Centro:</label>
+                    <div className="flex flex-col gap-2 "> 
+                    <label className=" text-gray-900 dark:text-gray-200">Centro:</label>
                     <input
-                        className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
+                        className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
                         type="text"
                         name="werks"
                         value={values.werks}
                         onChange={handleInputChange}
                     />
+                    </div>
 
-                    <label className="flex flex-col justify-center mx-4 my-2 text-gray-900 dark:text-gray-200">Almacén:</label>
+                    <div className="flex flex-col gap-2 "> 
+                    <label className=" text-gray-900 dark:text-gray-200">Almacén:</label>
                     <input
-                        className="bg-gray-300 text-gray-900 dark:bg-gray-700 w-full dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
+                        className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2"
                         type="text"
                         name="lgort"
                         value={values.lgort}
                         onChange={handleInputChange}
                     />
-                </div>
-                <div className="mt-4">
-                    <button
+                    </div>
+
+<button
                         type="submit"
-                        className="bg-purple-300 text-gray-900 dark:bg-purple-900 dark:text-gray-200 w-full p-4 rounded-lg shadow-md mx-2 my-2"
+                        style={{ maxWidth: '200px' }}
+                        className="bg-purple-400 text-gray-900 dark:bg-purple-700 dark:text-gray-200 rounded-lg shadow-md max-h-16 ml-4 mx-2 my-2"
                     >
                         Consultar
                     </button>
+
+
+
                 </div>
+                
+                
+
+
+                    
+
+                
+
+                    
+
             </form>
 
             {results && results.length > 0 && ( // Verifica que 'results' sea un array y tenga elementos.
-                <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                    <h2 className="flex flex-col justify-center mx-4 my-2 text-gray-900 dark:text-gray-200">Resultados:</h2>
-                    <StockTable data={results}/>
-                    {/* <table className="min-w-full divide-y divide-gray-200">
+                <div >
+                    <h2 className=" text-gray-900 dark:text-gray-200">Resultados:</h2>
+                    <StockTable data={results} />
+                    {/* <table className="min divide-y divide-gray-200">
                         <thead>
                             <tr>
                                 <th>Material</th>
@@ -116,6 +137,7 @@ const ConsultaStockComponent = () => {
                     </table> */}
                 </div>
             )}
+        </div>
         </div>
     );
 };
