@@ -22,19 +22,20 @@ export default async (req, res) => {
   const filters = [materialFilter, werksFilter, lgortFilter].filter(Boolean).join(' and ');
 
   let allData = [];
-  
+
   let hasMoreData = true;
 
   const page = parseInt(req.query.page) || 1;
-const pageSize = parseInt(req.query.pageSize) || 2000; // Puedes ajustar el tamaño de la página
-let skip = (page - 1) * pageSize;
+  const pageSize = parseInt(req.query.pageSize) || 2000; // Puedes ajustar el tamaño de la página
+  let skip = (page - 1) * pageSize;
 
   // Continúa haciendo solicitudes hasta que no haya más datos
   while (hasMoreData) {
     // Solo obtén y devuelve una página de resultados a la vez
 
 
-const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$top=${pageSize}&$skip=${skip}`;
+    const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp&$top=${pageSize}&$skip=${skip}`;
+
 
     try {
       const response = await axios.get(SAP_URL, {
