@@ -104,11 +104,11 @@ const StockTable = ({ data }) => {
                             <tr key={index} onClick={() => setSelectedRow(index)} className={selectedRow === index ? 'bg-gray-300 dark:bg-gray-800' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.Material)}</td>
                                 <td className="px-6 py-4 text-left whitespace-nowrap">{row.MaterialName}</td>
-                                <td className="hidden md:flex px-6 py-4 text-right whitespace-nowrap">{parseInt(row.werks)}</td>
+                                <td className="hidden md:block px-6 py-4 text-right whitespace-nowrap">{parseInt(row.werks)}</td>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.lgort)}</td>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.labst)}</td>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">{parseInt(row.stock_disp)}</td>
-                                <td className="hidden md:flex px-6 py-4 text-right whitespace-nowrap">{parseInt(row.stock_Comp)}</td>
+                                <td className="hidden md:block px-6 py-4 text-right whitespace-nowrap">{parseInt(row.stock_Comp)}</td>
 
                             </tr>
                         ))}
