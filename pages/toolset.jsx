@@ -12,10 +12,6 @@ import OrdersVentusComp from "../components/ordersVentusComp";
 import Febos from "../components/febos";
 import ConsultaStockComponent from "../components/ConsultaStockSAPTable";
 
-
-
-
-
 const Testeo = () => {
   const {data: session} = useSession()
   const [data, setData] = useState();
@@ -86,8 +82,8 @@ const Testeo = () => {
     <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
         
         <SapO2/>
-        <MeliTools />
         <MeliTable />
+        <MeliTools />
         <SapO3/>
         <FedEx />
         <OrdersVentusComp />

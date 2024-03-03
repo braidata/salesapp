@@ -6,7 +6,7 @@ import axios from 'axios';
 async function fetchSAPDetails(sku) {
   const SAP_USER = process.env.SAP_USER;
   const SAP_PASSWORD = process.env.SAP_PASSWORD;
-  const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO(Material='${sku}',werks='1100',lgort='1015')`;
+  const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO(Material='${sku}',werks='1500',lgort='1520')`;
 
   const response = await axios.get(SAP_URL, {
     auth: {
@@ -15,7 +15,7 @@ async function fetchSAPDetails(sku) {
     }
   });
 
-  return { sku, name: response.data.d.MaterialName };
+  return { sku, name: response.data.d.MaterialName , werks: response.data.d.werks, almacen: response.data.d.lgort , stock: response.data.d.stock_disp};
 }
 
 // API Endpoint
