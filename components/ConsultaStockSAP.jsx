@@ -42,7 +42,7 @@ const ConsultaStockComponent = () => {
                     setShowNextButton(false)
                     return
                 }
-                console.log("tamaños", data.length)
+                
                 // Filtra los resultados para excluir filas donde 'stock_disp', 'stock_Comp', y 'labst' son 0
                 data = data.filter(row => row.labst !== "0.000");
                 // Ordena los resultados filtrados por 'stock_disp' de mayor a menor
@@ -63,11 +63,15 @@ const ConsultaStockComponent = () => {
     return (
         <div className="backdrop-blur-sm z-20">
             <div style={{ maxHeight: '600px', overflowY: 'auto' }} className="bg-gray-300 mt-4 text-gray-900 dark:bg-gray-900/50 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2 z-50 ">
-                <h1 className=" text-xl font-semibold">Consulta de Stock</h1>
+                
                 <form onSubmit={handleSubmit}>
-                    <div class="flex flex-col md:flex-row justify-end">
+                <h1 className=" text-xl font-semibold mx-4 my-4 p-2">Consulta de Stock</h1>
+                    <div className="flex flex-col md:flex-row justify-end rounded-md bg-gray-400/30   p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800/30  mt-8 mb-8
+            ">
+                    
 
-                        <div className="flex flex-col gap-2 ">
+                        <div className="flex flex-col gap-2  ">
+                            
                             <label className=" text-gray-900 dark:text-gray-200">Material:</label>
                             <input
                                 className="bg-gray-300 text-gray-900 dark:text-gray-200 dark:bg-gray-700  p-4 rounded-lg shadow-md mx-2 my-2"
@@ -99,12 +103,13 @@ const ConsultaStockComponent = () => {
                                 value={values.lgort}
                                 onChange={handleInputChange}
                             />
+                                                    
                         </div>
-
                         <button
                             type="submit"
                             style={{ maxWidth: '200px' }}
-                            className="bg-purple-400 text-gray-900 dark:bg-purple-700 dark:text-gray-200 rounded-lg shadow-md max-h-16 ml-4 mx-2 my-2"
+                            aria-label='search'
+                            className="mx-4 my-4 rounded-lg bg-gray-300/30 dark:bg-gray-800/30  text-gray-600 dark:text-green-100/80 font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-gray-700/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
                         >
                             Consultar
                         </button>
@@ -113,16 +118,19 @@ const ConsultaStockComponent = () => {
 
 
 
+
+
                     </div>
 
                     {results && results.length > 0 && ( // Verifica que 'results' sea un array y tenga elementos.
-                        console.log("tamaño", results.length),
+                        
                         <div  >
                             <h2 className=" text-gray-900 dark:text-gray-200">Resultados:</h2>
 
                             <StockTable data={results} />
-                            <div className="flex flex-row gap-2">
+                            <div className="flex flex-row max-h-16 gap-2">
                                 <button
+                                    className="rounded-lg bg-gray-200/30 dark:bg-gray-700/60 text-gray-600 dark:text-green-100/80 font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-gray-700/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
                                     onClick={() => {
                                         setPage((prevPage) => Math.max(prevPage - 1, 1));
                                     }}
@@ -131,12 +139,13 @@ const ConsultaStockComponent = () => {
                                 >
                                     Anterior
                                 </button>
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2 mx-4 my-4 rounded-lg bg-gray-300/30 dark:bg-gray-800/30  text-gray-600 dark:text-green-100/80 font-semibold leading-none  dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]">
                                     <span className="w-48 mx-2 my-2 p-2">Página {page}</span>
                                     {loading ? <span className="w-48 mx-2 my-2 p-2"> Cargando...</span> : null}
                                     {results.length > 0 ? <span className="w-48 mx-2 my-2 p-2"> Tamaño de Página: {results.length}</span> : null}
                                 </div>
                                 <button
+                                    className="rounded-lg bg-gray-200/30 dark:bg-gray-700/60 text-gray-600 dark:text-green-100/80 font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-gray-700/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
                                     onClick={() => { setPage((prevPage) => prevPage + 1), setLoading(true) }}
                                     disabled={!showNextButton}
                                     style={{ display: showNextButton ? "inline" : "none" }}

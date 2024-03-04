@@ -65,9 +65,9 @@ const StockTable = ({ data }) => {
 
             <div className='flex flex-col md:flex-row justify-end gap-2 mt-2 mb-4'>
 
-                {sortedData !== null && <button onClick={handleDownloadExcel} className="bg-purple-400 text-gray-900 dark:bg-purple-700 dark:text-gray-200 p-4 rounded-lg shadow-md mx-2 my-2">Descargar Excel</button>}
+                {sortedData !== null && <button onClick={handleDownloadExcel} className="rounded-lg bg-green-300/30 dark:bg-green-700/30 text-green-800 dark:text-green-100/80 font-semibold leading-none hover:text-green-200 hover:bg-green-300/50 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-green-400/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]">Descargar Excel</button>}
                 {selectedRow !== null && (
-                    <button onClick={handleCopyToClipboard} className="bg-purple-500 text-gray-900 dark:bg-purple-800 dark:text-gray-200 w-full p-4 rounded-lg shadow-md mx-2 my-2">Copiar Seleccionado</button>
+                    <button onClick={handleCopyToClipboard} aria-label="copy" className="rounded-lg bg-teal-300/30 dark:bg-teal-700/30 text-teal-800 dark:text-green-100/80 font-semibold leading-none hover:text-teal-200 hover:bg-teal-300/50 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-teal-400/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]">Copiar Seleccionado</button>
                 )}
             </div>
 
