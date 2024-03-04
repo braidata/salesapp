@@ -68,10 +68,11 @@ export default function FormatContext({ context, componente }) {
     }
   
     try {
-      const response = await fetch(`/api/apiSAPStock?Material=${sku}&werks=${werks}&lgort=${lgort}`);
+      const response = await fetch(`/api/apiSAPValidator?Material=${sku}&werks=${werks}&lgort=${lgort}`);
       if (response.ok) {
         const data = await response.json();
         result.stockAvailable = data.stock_disp;
+        //console.log("dispo", result.stockAvailable, data.stock_disp)
         
         if (data.stock_disp < quantityRequested) {
           console.log('Stock insuficiente para el SKU:', sku);
