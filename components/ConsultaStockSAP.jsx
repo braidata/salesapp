@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StockTable from './StockTable';
+import SpinnerButton from "./spinnerButton";
 
 const ConsultaStockComponent = () => {
     const [page, setPage] = useState(1);
@@ -141,7 +142,7 @@ const ConsultaStockComponent = () => {
                                 </button>
                                 <div className="flex flex-col gap-2 mx-4 my-4 rounded-lg bg-gray-300/30 dark:bg-gray-800/30  text-gray-600 dark:text-green-100/80 font-semibold leading-none  dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]">
                                     <span className="w-48 mx-2 my-2 p-2">Página {page}</span>
-                                    {loading ? <span className="w-48 mx-2 my-2 p-2"> Cargando...</span> : null}
+                                    {loading ? <SpinnerButton texto="Cargando..." /> : null}
                                     {results.length > 0 ? <span className="w-48 mx-2 my-2 p-2"> Tamaño de Página: {results.length}</span> : null}
                                 </div>
                                 <button
