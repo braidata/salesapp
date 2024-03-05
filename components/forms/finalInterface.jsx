@@ -323,7 +323,7 @@ export default function PageWithJSbasedForm3({session}) {
       negocios = negocios.filter((negocio) => negocio.dealstage === "50940199");
       setDeal(negocios);
       setOwner(negocios[0].hubspot_owner_id);
-      //owner ? idOwners(owner) : "No hay owner";
+      owner ? idOwners(owner) : "No hay owner";
     } catch {
       console.log("No hay negocios 0");
     }
