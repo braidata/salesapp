@@ -476,50 +476,31 @@ const OrderTable = ({ data, functionS }) => {
       )}
 
 {modalIsOpen3 && (
-        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto 
-         
-        " id="modal">
-          {/* modal-background gradient */}
-          <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
-          "></div>
-          {/* modal-card */}
-          <div className=" bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
-          ">
-            {/* modal-card-head*/}
-            <header className="bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800 
-            ">
-              {/* modal-card-title */}
-              <p className="text-gray-600  text-xl font-semibold dark:text-gray-300 
-              ">Detalles del Pedido en SAP</p>
-              <button
-                title="Cerrar"
-                className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
-                transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-                aria-label="close"
-                onClick={handleModalClose3}
-              >X</button>
-            </header>
-            {/* modal-card-body */}
-            <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg">
-
-              <SalesData salesOrder={modalData3}/>
-
-            </section>
-
-
-
-
-
-            {/* glass mini footer */}
-            <footer className=" flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80  
-            ">
-              {/* <button className="button is-success">Save changes</button> */}
-              {/* colocar boton en  */}
-
-            </footer>
-          </div>
-        </div>
-      )}
+  <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed inset-0 z-50 flex items-center justify-center overflow-auto">
+    {/* modal-background gradient */}
+    <div className="bg-gray-900 bg-opacity-30 absolute w-11/12 md:w-4/5 lg:w-3/5 xl:w-1/2 max-h-[90vh] overflow-hidden flex flex-col">
+    {/* modal-card */}
+    {/* <div className="bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-hidden"> */}
+      {/* modal-card-head */}
+      <header className="bg-gray-300/90 flex items-center justify-between p-4 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+        {/* modal-card-title */}
+        <p className="text-gray-600 text-xl font-semibold dark:text-gray-300">Detalles del Pedido en SAP</p>
+        <button
+          title="Cerrar"
+          className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+          aria-label="close"
+          onClick={handleModalClose3}
+        >
+          X
+        </button>
+      </header>
+      {/* modal-card-body */}
+      <section className="p-4 overflow-auto dark:text-gray-300 mt-2 rounded-lg">
+        <SalesData salesOrder={modalData3} />
+      </section>
+    </div>
+  </div>
+)}
 
       {showEditModal && (
         <div className="fixed z-10 inset-0 overflow-y-auto ">
