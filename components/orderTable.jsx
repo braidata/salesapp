@@ -502,7 +502,7 @@ const OrderTable = ({ data, functionS }) => {
             {/* modal-card-body */}
             <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg">
 
-              <SalesData salesOrder={modalData3}/>
+              {/* <SalesData salesOrder={modalData3}/> */}
 
             </section>
 
