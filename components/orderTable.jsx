@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import ShippingModal from "../components/simpliRouteDateEditor"
-import SalesData from "../components/sapSalesData"
+//import SalesData from "../components/sapSalesData"
 
 const OrderTable = ({ data, functionS }) => {
   // Estado para manejar la apertura y cierre del modal
@@ -123,9 +123,8 @@ const OrderTable = ({ data, functionS }) => {
   };
 
   const handleModalOpen3 = (data, status) => {
-    data = extractNumber(data)
-    console.log("rata", data)
-    setModalData3(data);
+    const datas = extractNumber(data)
+    setModalData3(datas);
     setModalStatus3(status);
     setModalIsOpen3(true);
   };
@@ -490,7 +489,7 @@ const OrderTable = ({ data, functionS }) => {
             ">
               {/* modal-card-title */}
               <p className="text-gray-600  text-xl font-semibold dark:text-gray-300 
-              ">Detalles del Pedido en SAP</p>
+              ">Pedido en SAP</p>
               <button
                 title="Cerrar"
                 className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
