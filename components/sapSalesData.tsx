@@ -109,59 +109,63 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-x-auto">
+      {/* <div className=" overflow-hidden"> */}
+      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-auto max-h-[50vh]">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
-                Material
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/4">
-                Descripción
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
-                Cantidad Solicitada
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
-                Cantidad Procesada
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
-                Precio Neto Único
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
-                Totales Facturado
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {salesData.map((item, index) => (
-              <tr key={index} className="bg-white dark:bg-gray-800">
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.Material}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.SalesOrderItemText || ''}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {item.OrderQuantity || ''} {item.OrderQuantityUnit || ''}
+          <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
+                  Material
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-2/5">
+                  Descripción
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
+                  Cant. Solicitada
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
+                  Cant. Procesada
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
+                  Precio Neto
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
+                  Totales
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {salesData.map((item, index) => (
+                <tr key={index} className="bg-white dark:bg-gray-800">
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.Material}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.SalesOrderItemText || ''}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+                    {item.OrderQuantity || ''} {item.OrderQuantityUnit || ''}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+                    {item.BillingQuantity || ''} {item.BillingQuantityUnit || ''}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.NetPriceAmount || ''}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+                    Neto: {item.ItemNetAmountOfBillingDoc} Bruto: {item.TOTAL}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-50 dark:bg-gray-700">
+                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-right font-bold">
+                  Totales:
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {item.BillingQuantity || ''} {item.BillingQuantityUnit || ''}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.NetPriceAmount || ''}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  Neto: {item.ItemNetAmountOfBillingDoc} Bruto: {item.TOTAL}
+                <td className="px-6 py-4 whitespace-nowrap font-bold">
+                  Neto: {totalNeto.toFixed(0)} Bruto: {totalBruto.toFixed(0)}
                 </td>
               </tr>
-            ))}
-            <tr className="bg-gray-50 dark:bg-gray-700">
-              <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-right font-bold">
-                Totales:
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap font-bold">
-                Neto: {totalNeto.toFixed(0)} Bruto: {totalBruto.toFixed(0)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            </tfoot>
+          </table>
+        </div>
       </div>
-    </div>
+    // </div>
   );
 };
 
