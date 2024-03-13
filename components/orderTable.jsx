@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import ShippingModal from "../components/simpliRouteDateEditor"
+import SalesData from "../components/sapSalesData"
 
 const OrderTable = ({ data, functionS }) => {
   // Estado para manejar la apertura y cierre del modal
@@ -11,9 +12,13 @@ const OrderTable = ({ data, functionS }) => {
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [modalData2, setModalData2] = useState({});
   const [modalStatus2, setModalStatus2] = useState("Procesando");
+  const [modalIsOpen3, setModalIsOpen3] = useState(false);
+  const [modalData3, setModalData3] = useState({});
+  const [modalStatus3, setModalStatus3] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteModalData, setDeleteModalData] = useState({});
+ 
 
 
   // Función para manejar la presentación del formulario de edición.
@@ -21,6 +26,13 @@ const OrderTable = ({ data, functionS }) => {
     event.preventDefault();
     // Aquí puedes enviar los datos actualizados (modalData) a tu backend para actualizar el pedido.
     // Luego de la actualización exitosa, puedes cerrar el modal y actualizar la lista de pedidos si es necesario.
+  };
+
+  const extractNumber = (text) => {
+    const regex = /\d+/; // Expresión regular para encontrar números
+    const match = text.match(regex);
+  
+    return match ? match[0] : '';
   };
 
   // Función para manejar los cambios en los campos del formulario.
@@ -108,6 +120,18 @@ const OrderTable = ({ data, functionS }) => {
 
   const handleModalClose2 = () => {
     setModalIsOpen2(false);
+  };
+
+  const handleModalOpen3 = (data, status) => {
+    data = extractNumber(data)
+    console.log("rata", data)
+    setModalData3(data);
+    setModalStatus3(status);
+    setModalIsOpen3(true);
+  };
+
+  const handleModalClose3 = () => {
+    setModalIsOpen3(false);
   };
 
   return (
@@ -212,10 +236,17 @@ const OrderTable = ({ data, functionS }) => {
                   <td>
                     {/* Muestra cada mensaje */}
                     {messages.map((message, index) => (
+                      extractNumber(message),
                       <div key={index}>
                         <p className="py-4 px-2 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-gray-400 rounded shadow
                         hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700/20 dark:hover:text-gray-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
-                        ">{message}</p></div>
+                        ">{message} </p>
+                        
+                        <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen3(message, status)}>
+                      Info SAP
+                    </button>
+                        
+                        </div>
                     ))}
                   </td>
 
@@ -234,28 +265,6 @@ const OrderTable = ({ data, functionS }) => {
                         </button></>}
 
                   </td>
-                  {/* 
-
-                                       <button className="mt-2 mb-5 bg-gradient-to-r from-teal-600/40 to-teal-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-teal-800 hover:bg-teal-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-teal-500/40 dark:to-teal-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,250,0.25)]  dark:border-teal-200 dark:hover:bg-teal-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleEditModalOpen(item)}>
-                      Editar
-                    </button> 
-                  <td className="py-2 px-2 w-16 sm:w-16 text-sm">
-                    <button
-                      className="text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400"
-                      onClick={() => handleEditModalOpen(item)}
-                    >
-                      ✏️
-                    </button>
-                  </td> */}
-
-                  {/* <td className="py-2 px-2 w-16 sm:w-16 text-sm">
-                    <button
-                      className="text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
-                      onClick={() => handleDeleteModalOpen(item)}
-                    >
-                      🗑️
-                    </button>
-                  </td> */}
                 </tr>
               )
             })
@@ -448,6 +457,52 @@ const OrderTable = ({ data, functionS }) => {
             <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg">
 
               <ShippingModal order={modalData2} onClose={handleModalClose2} />
+
+            </section>
+
+
+
+
+
+            {/* glass mini footer */}
+            <footer className=" flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80  
+            ">
+              {/* <button className="button is-success">Save changes</button> */}
+              {/* colocar boton en  */}
+
+            </footer>
+          </div>
+        </div>
+      )}
+
+{modalIsOpen3 && (
+        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto 
+         
+        " id="modal">
+          {/* modal-background gradient */}
+          <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
+          "></div>
+          {/* modal-card */}
+          <div className=" bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
+          ">
+            {/* modal-card-head*/}
+            <header className="bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800 
+            ">
+              {/* modal-card-title */}
+              <p className="text-gray-600  text-xl font-semibold dark:text-gray-300 
+              ">Detalles del Pedido en SAP</p>
+              <button
+                title="Cerrar"
+                className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]
+                transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                aria-label="close"
+                onClick={handleModalClose3}
+              >X</button>
+            </header>
+            {/* modal-card-body */}
+            <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg">
+
+              <SalesData salesOrder={modalData3}/>
 
             </section>
 

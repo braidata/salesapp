@@ -9,6 +9,10 @@ import DataProvider from "../context/data";
 
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+  
+  if (typeof window === "undefined") {
+    global.atob = (str) => Buffer.from(str, 'base64').toString('binary');
+  }
   return (
     <SessionProvider session={session}>
     <ThemeProvider enableSystem={true} attribute="class">
