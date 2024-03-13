@@ -1,6 +1,6 @@
 // Importa las APIs necesarias
 import getWooCommerceSkus from './productsTableWoo';
-import getSAPDetails from './apiSAPTable';
+import getSAPDetails from './apiSAPValidator';
 
 // Nueva API para obtener datos combinados de WooCommerce y SAP
 export default async (req, res) => {
