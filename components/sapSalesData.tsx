@@ -100,11 +100,11 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
         </div>
         <div className="mb-2 flex items-center">
           <span className="font-bold">Estado del Pedido:</span>
-          {globalData.SDProcessStatus === 'C' ? (
+          {/* {globalData.SDProcessStatus === 'C' ? (
             <FaCheckCircle className="text-green-500 ml-2" />
           ) : (
             <FaExclamationCircle className="text-yellow-500 ml-2" />
-          )}
+          )} */}
           <span className="ml-1">{globalData.SDProcessStatus_TEXT}</span>
         </div>
       </div>
