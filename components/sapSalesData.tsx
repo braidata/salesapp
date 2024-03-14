@@ -28,7 +28,8 @@ interface SAPSalesDataResult {
   BLART_TEXT: string;
   DocumentReferenceID: string;
   SDProcessStatus: string;
-  SDProcessStatus_TEXT: string;
+  SDPROCESSSTATUS_TEXT: string;
+  TVLST_TEXT: string;
 }
 
 interface SAPSalesData {
@@ -102,10 +103,14 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
           <span className="font-bold">Estado del Pedido:</span>
           {/* {globalData.SDProcessStatus === 'C' ? (
             <FaCheckCircle className="text-green-500 ml-2" />
-          ) : (
+          ) : ( TVLST_TEXT
             <FaExclamationCircle className="text-yellow-500 ml-2" />
           )} */}
-          <span className="ml-1">{globalData.SDProcessStatus_TEXT}</span>
+          <span className="ml-1">{globalData.SDPROCESSSTATUS_TEXT}</span>
+        </div>
+        <div className="mb-2 flex items-center">
+          <span className="font-bold">Bloqueos:</span>
+          <span className="ml-1">{globalData.TVLST_TEXT || "Sin Bloqueos"}</span>
         </div>
       </div>
 
@@ -140,7 +145,7 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.Material}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.SalesOrderItemText || ''}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                    {item.OrderQuantity || ''} {item.OrderQuantityUnit || ''}
+                    {item.OrderQuantity || ''} {item.BillingQuantityUnit || ''}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
                     {item.BillingQuantity || ''} {item.BillingQuantityUnit || ''}
