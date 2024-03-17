@@ -6,9 +6,9 @@ function printNestedObjects(obj: any, depth = 0) {
     } else if (typeof obj[key] === 'string' && obj[key].length > 1) {
       console.log(`${'  '.repeat(depth)}${key}: ${obj[key]}`);
     } 
-  }
+   else {
   console.log(`${obj}`);
-}
+}}}
 
 export default function handler(req: { method: string; body: any; query: { [x: string]: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { message: string; }): void; new(): any; }; send: { (arg0: any): void; new(): any; }; end: { (arg0: string): void; new(): any; }; }; setHeader: (arg0: string, arg1: string[]) => void; }) {
   if (req.method === 'POST') {
