@@ -15,7 +15,7 @@ export default async function handler(
     const token = process.env.HUBSPOT_TOKEN;
     let allResults: any[] = [];
     let after = null; // Iniciar sin cursor de paginación
-    const limit = 10; // Límite de objetos por solicitud
+    const limit = 100; // Límite de objetos por solicitud
     
     // Bucle para manejar la paginación automáticamente
     do {
@@ -33,7 +33,7 @@ export default async function handler(
       });
 
       // Añadir resultados de esta página a la lista total
-      allResults = allResults.concat(response.data.results).reverse().slice(0, 5);
+      allResults = allResults.concat(response.data.results).reverse().slice(0, 100);
       console.log("DEALMOTHER", allResults)
 
       // Actualizar el cursor para la próxima página, si existe
