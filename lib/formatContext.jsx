@@ -71,14 +71,14 @@ export default function FormatContext({ context, componente }) {
       const response = await fetch(`/api/apiSAPStock?Material=${sku}&werks=${werks}&lgort=${lgort}`);
       if (response.ok) {
         const data = await response.json();
-        result.stockAvailable = data.stock_disp;
-        //console.log("dispo", result.stockAvailable, data.stock_disp)
+        result.stockAvailable = data[0].stock_disp;
+        console.log("dispo suficiente", data[0].stock_disp)
         
-        if (data.stock_disp < quantityRequested) {
-          console.log('Stock insuficiente para el SKU:', sku);
+        if (data[0].stock_disp < quantityRequested) {
+          console.log('Stock insuficiente para el SKU:', sku, data[0].stock_disp, quantityRequested);
           result.message = 'Stock insuficiente';
         } else {
-          console.log('Stock suficiente para el SKU:', sku);
+          console.log('Stock suficiente para el SKU:', sku, data[0].stock_disp, quantityRequested);
           return true; // Aquí podríamos simplemente devolver result si queremos mantener la estructura consistente
         }
       } else {
