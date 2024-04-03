@@ -351,27 +351,27 @@ export default function FormatContext({ context, componente }) {
         }
       }),
 
-      billing_company_rut: yup.string().test({
-        name: "Rut Empresa",
-        message: "Ingresa un Rut Empresa válido en HubSpot",
-        test: async function (value) {
-          if (value) {
-            try {
-              return await validateRUT(value);
-            } catch (error) {
-              // Aquí puedes decidir qué hacer si hay un error. 
-              // Puedes retornar false o configurar un mensaje de error personalizado.
-              this.createError({
-                path: this.path,
-                message: 'Error al validar el RUT. Por favor, inténtalo de nuevo.'
-              });
-            }
-          }
-          // Si value no está presente o es falsy (por ejemplo, una cadena vacía), puedes decidir si eso es válido o no.
-          // Si decides que no es válido cuando no hay valor, simplemente retornar false.
-          return false;
-        }
-      }),
+      // billing_company_rut: yup.string().test({
+      //   name: "Rut Empresa",
+      //   message: "Ingresa un Rut Empresa válido en HubSpot",
+      //   test: async function (value) {
+      //     if (value) {
+      //       try {
+      //         return await validateRUT(value);
+      //       } catch (error) {
+      //         // Aquí puedes decidir qué hacer si hay un error. 
+      //         // Puedes retornar false o configurar un mensaje de error personalizado.
+      //         this.createError({
+      //           path: this.path,
+      //           message: 'Error al validar el RUT. Por favor, inténtalo de nuevo.'
+      //         });
+      //       }
+      //     }
+      //     // Si value no está presente o es falsy (por ejemplo, una cadena vacía), puedes decidir si eso es válido o no.
+      //     // Si decides que no es válido cuando no hay valor, simplemente retornar false.
+      //     return false;
+      //   }
+      // }),
 
       billing_company_business: yup.string().nullable(
         "Giro es requerido"
