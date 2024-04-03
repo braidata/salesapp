@@ -304,10 +304,10 @@ const OrderTable = ({ data, functionS }) => {
                       ID
                     </th>
                     <th scope="col" className="py-3 px-2">
-                      Cliente
+                      Empresa
                     </th>
                     <th scope="col" className="py-3 px-2 hidden lg:flex lg:flex-row">
-                      Correo
+                      Tipo de Entrega
                     </th>
                     {/* <th scope="col" className="py-3 px-2 hidden lg:flex lg:flex-row">
                       Teléfono
@@ -316,7 +316,9 @@ const OrderTable = ({ data, functionS }) => {
                       Rut
                     </th> */}
                     <th scope="col" className="py-3 px-2">
-                      Fecha de Entrega
+                    Fecha de Entrega</th>
+                    <th scope="col" className="py-3 px-2">
+                    Rut de Empresa
                     </th>
                     <th scope="col" className="py-3 px-2 rounded-tr-lg ">
                       Estado
@@ -328,11 +330,11 @@ const OrderTable = ({ data, functionS }) => {
                   <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg
                   ">
                     <td className="py-3 px-2 rounded-bl-lg">{modalData.id}</td>
-                    <td className="py-3 px-2">{modalData.customer_name}</td>
-                    <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_email}</td>
+                    <td className="py-3 px-2">{modalData.billing_company_name}</td>
+                    <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.Shipping_Tipo_de_Despacho.replace(/_/g, " ")}</td>
                     <td className="py-3 px-2">{modalData.Shipping_Fecha_de_Despacho_o_Retiro}</td>
-                    {/* <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_phone}</td>
-                    <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_rut}</td> */}
+                    {/* <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_phone}</td>*/}
+                    <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.billing_company_rut}</td> 
                     <td className="py-3 px-2 rounded-br-lg">{modalStatus}</td>
                   </tr>
                 </tbody>
@@ -378,7 +380,7 @@ const OrderTable = ({ data, functionS }) => {
                 </table>
               </section>
             )}
-            {modalData.payments && (
+            {/* {modalData.payments && (
               <section className=" p-2 dark:text-gray-300 mt-2">
                 <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
@@ -416,7 +418,7 @@ const OrderTable = ({ data, functionS }) => {
 
 
 
-            )}
+            )} */}
 
             {/* glass mini footer */}
             <footer className=" flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80  
