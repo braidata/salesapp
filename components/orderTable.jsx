@@ -18,7 +18,7 @@ const OrderTable = ({ data, functionS }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteModalData, setDeleteModalData] = useState({});
- 
+
 
 
   // Función para manejar la presentación del formulario de edición.
@@ -31,7 +31,7 @@ const OrderTable = ({ data, functionS }) => {
   const extractNumber = (text) => {
     const regex = /\d+/; // Expresión regular para encontrar números
     const match = text.match(regex);
-  
+
     return match ? match[0] : '';
   };
 
@@ -76,8 +76,9 @@ const OrderTable = ({ data, functionS }) => {
       });
 
       if (response.ok) {
-        const data = await response.json();}
-} catch (error) {
+        const data = await response.json();
+      }
+    } catch (error) {
       console.error('Hubo un error', error);
     }
   };
@@ -241,12 +242,12 @@ const OrderTable = ({ data, functionS }) => {
                         <p className="py-4 px-2 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-gray-400 rounded shadow
                         hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700/20 dark:hover:text-gray-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
                         ">{message} </p>
-                        
+
                         <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen3(message, status)}>
-                      Info SAP
-                    </button>
-                        
-                        </div>
+                          Info SAP
+                        </button>
+
+                      </div>
                     ))}
                   </td>
 
@@ -316,9 +317,9 @@ const OrderTable = ({ data, functionS }) => {
                       Rut
                     </th> */}
                     <th scope="col" className="py-3 px-2">
-                    Fecha de Entrega</th>
+                      Fecha de Entrega</th>
                     <th scope="col" className="py-3 px-2">
-                    Rut de Empresa
+                      Rut de Empresa
                     </th>
                     <th scope="col" className="py-3 px-2 rounded-tr-lg ">
                       Estado
@@ -334,7 +335,7 @@ const OrderTable = ({ data, functionS }) => {
                     <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.Shipping_Tipo_de_Despacho.replace(/_/g, " ")}</td>
                     <td className="py-3 px-2">{modalData.Shipping_Fecha_de_Despacho_o_Retiro}</td>
                     {/* <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_phone}</td>*/}
-                    <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.billing_company_rut}</td> 
+                    <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.billing_company_rut}</td>
                     <td className="py-3 px-2 rounded-br-lg">{modalStatus}</td>
                   </tr>
                 </tbody>
@@ -344,7 +345,7 @@ const OrderTable = ({ data, functionS }) => {
               <section className=" p-2 dark:text-gray-300 mt-2">
                 <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
-                    <tr className="w-full max-w-sm py-3 px-2 text-gray-700 bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md">
+                    <tr className="w-full max-w-sm py-3 px-2 text-gray-700 dark:text-gray-200  bg-gray-300/80 border-b border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 rounded-md">
                       <th scope="col" className="py-3 px-2 rounded-tl-lg">
                         Producto
                       </th>
@@ -370,16 +371,25 @@ const OrderTable = ({ data, functionS }) => {
                   </thead>
                   <tbody className="">
                     {modalData.order_items.map((item, i) => (
-                      <tr className={`text-center -mt-${(i + 4) * 2} max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg z-${i + 2}0`} key={i}>
-                        <td className="py-3  px-2 ">{item.name}</td>
-                        <td className="py-3  px-2">{item.price}</td>
-                        <td className="py-3  px-2">{item.quantity}</td>
-                        <td className="py-3  px-2 ">{item.sku}</td>
-                        <td className="py-3  px-2 ">{item.discount = isNaN(item.discount) ? 0 : item.discount}</td>
-                        <td className="py-3  px-2 ">{modalData.almacen}</td>
-                        <td className="-py-8  px-2">{item.price * item.quantity}</td>
+                      <tr
+                        className={`text-center -mt-${(i + 4) * 2} max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg z-${i + 2}0`}
+                        key={i}
+                      >
+                        <td className="py-3 px-2 ">{item.name}</td>
+                        <td className="py-3 px-2">{item.price / item.quantity}</td>
+                        <td className="py-3 px-2">{item.quantity}</td>
+                        <td className="py-3 px-2 ">{item.sku}</td>
+                        <td className="py-3 px-2 ">{item.discount = isNaN(item.discount) ? 0 : item.discount}</td>
+                        <td className="py-3 px-2 ">{modalData.almacen}</td>
+                        <td className="-py-8 px-2">{item.price}</td>
                       </tr>
                     ))}
+                    <tr className="text-center py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg">
+                      <td colSpan="6" className="py-3 px-2 text-right text-gray-700 dark:text-gray-200">Total:</td>
+                      <td className="py-3 px-2">
+                        {modalData.order_items.reduce((total, item) => total + parseFloat(item.price), 0)}
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </section>
@@ -481,32 +491,32 @@ const OrderTable = ({ data, functionS }) => {
         </div>
       )}
 
-{modalIsOpen3 && (
-  <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed inset-0 z-50 flex items-center justify-center overflow-auto">
-    {/* modal-background gradient */}
-    <div className="bg-gray-900 bg-opacity-30 absolute w-11/12 md:w-4/5 lg:w-3/5 xl:w-1/2 max-h-[90vh] overflow-hidden flex flex-col">
-    {/* modal-card */}
-    {/* <div className="bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-hidden"> */}
-      {/* modal-card-head */}
-      <header className="bg-gray-300/90 flex items-center justify-between p-4 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800">
-        {/* modal-card-title */}
-        <p className="text-gray-600 text-xl font-semibold dark:text-gray-300">Detalles del Pedido en SAP</p>
-        <button
-          title="Cerrar"
-          className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-          aria-label="close"
-          onClick={handleModalClose3}
-        >
-          X
-        </button>
-      </header>
-      {/* modal-card-body */}
-      <section className="p-4 overflow-auto dark:text-gray-300 mt-2 rounded-lg">
-        <SalesData salesOrder={modalData3} />
-      </section>
-    </div>
-  </div>
-)}
+      {modalIsOpen3 && (
+        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed inset-0 z-50 flex items-center justify-center overflow-auto">
+          {/* modal-background gradient */}
+          <div className="bg-gray-900 bg-opacity-30 absolute w-11/12 md:w-4/5 lg:w-3/5 xl:w-1/2 max-h-[90vh] overflow-hidden flex flex-col">
+            {/* modal-card */}
+            {/* <div className="bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-hidden"> */}
+            {/* modal-card-head */}
+            <header className="bg-gray-300/90 flex items-center justify-between p-4 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+              {/* modal-card-title */}
+              <p className="text-gray-600 text-xl font-semibold dark:text-gray-300">Detalles del Pedido en SAP</p>
+              <button
+                title="Cerrar"
+                className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                aria-label="close"
+                onClick={handleModalClose3}
+              >
+                X
+              </button>
+            </header>
+            {/* modal-card-body */}
+            <section className="p-4 overflow-auto dark:text-gray-300 mt-2 rounded-lg">
+              <SalesData salesOrder={modalData3} />
+            </section>
+          </div>
+        </div>
+      )}
 
       {showEditModal && (
         <div className="fixed z-10 inset-0 overflow-y-auto ">
