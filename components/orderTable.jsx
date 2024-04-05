@@ -360,6 +360,9 @@ const OrderTable = ({ data, functionS }) => {
                       <th scope="col" className="py-3 px-2 ">
                         % Descuento
                       </th>
+                      <th scope="col" className="py-3 px-2 ">
+                        Almacén
+                      </th>
                       <th scope="col" className="py-3 px-2 rounded-tr-lg">
                         Totales
                       </th>
@@ -372,7 +375,8 @@ const OrderTable = ({ data, functionS }) => {
                         <td className="py-3  px-2">{item.price}</td>
                         <td className="py-3  px-2">{item.quantity}</td>
                         <td className="py-3  px-2 ">{item.sku}</td>
-                        <td className="py-3  px-2 ">{item.discount}</td>
+                        <td className="py-3  px-2 ">{item.discount = isNaN(item.discount) ? 0 : item.discount}</td>
+                        <td className="py-3  px-2 ">{modalData.almacen}</td>
                         <td className="-py-8  px-2">{item.price * item.quantity}</td>
                       </tr>
                     ))}
