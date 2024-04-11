@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 statusSAP: "Borrado",
                 //verifica que el dealId no tenga " ELIMINADO" al final
                 dealId: existingOrder.dealId.includes(" ELIMINADO") ? existingOrder.dealId :
-                existingOrder.dealId + " ELIMINADO", // Concatenando "delete" al dealId existente
+                existingOrder.dealId + " " + id + " ELIMINADO" , // Concatenando "delete" al dealId existente
                 
             },
         });

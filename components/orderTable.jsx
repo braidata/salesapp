@@ -394,45 +394,62 @@ const OrderTable = ({ data, functionS }) => {
                 </table>
               </section>
             )}
-            {/* {modalData.payments && (
+            {modalData && (
               <section className=" p-2 dark:text-gray-300 mt-2">
                 <table className="py-3 px-2  w-full text-sm dark:text-gray-400 rounded-lg">
                   <thead>
                     <tr className="w-full max-w-sm py-3 px-2 text-gray-700 bg-gray-300/80 border-t border-blue-300/30 dark:border-gray-800/80 dark:bg-gray-900/80 dark:text-gray-200 rounded-md" >
                       <th scope="col" className="py-3 px-2 rounded-tl-lg">
-                        Método de Pago
+                        Tipo de Dirección
                       </th>
                       <th scope="col" className="py-3 px-2">
-                        Total
+                        Calle
                       </th>
                       <th scope="col" className="py-3 px-2">
-                        Monto
+                        Número
                       </th>
                       <th scope="col" className="py-3 px-2">
-                        Rut Pagador
+                        Depto.
+                      </th>
+                      <th scope="col" className="py-3 px-2">
+                        Comuna
+                      </th>
+                      <th scope="col" className="py-3 px-2">
+                        Ciudad
                       </th>
                       <th scope="col" className="py-3 px-2 rounded-tr-lg">
-                        Fecha de Pago
+                        Región
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {modalData.payments.map((item, i) => (
+                    
                       <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
-                        <td className="py-3  px-2 rounded-bl-lg">{item.method}</td>
-                        <td className="py-3  px-2">{item.payment_count}</td>
-                        <td className="py-3  px-2">{item.payment_amount}</td>
-                        <td className="py-3  px-2">{item.rut_pagador}</td>
-                        <td className="py-3  px-2 rounded-br-lg">{item.payment_date}</td>
+                      <td className="py-3  px-2 rounded-bl-lg">DIRECCIÓN FACTURACIÓN</td>
+                        <td className="py-3  px-2 rounded-bl-lg">{modalData.billing_street}</td>
+                        <td className="py-3  px-2">{modalData.billing_number}</td>
+                        <td className="py-3  px-2">{modalData.billing_department}</td>
+                        <td className="py-3  px-2">{modalData.billing_commune}</td>
+                        <td className="py-3  px-2">{modalData.billing_city}</td>
+                        <td className="py-3  px-2 rounded-br-lg">{modalData.billing_region}</td>
                       </tr>
-                    ))}
+{ modalData.Shipping_street ?                     <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
+                        <td className="py-3  px-2 rounded-bl-lg">DIRECCIÓN ENVÍO</td>
+                        <td className="py-3  px-2">{modalData.Shipping_street}</td>
+                        <td className="py-3  px-2">{modalData.Shipping_number}</td>
+                        <td className="py-3  px-2">{modalData.Shipping_department}</td>
+                        <td className="py-3  px-2">{modalData.Shipping_commune}</td>
+                        <td className="py-3  px-2">{modalData.Shipping_city}</td>
+                        <td className="py-3  px-2 rounded-br-lg">{modalData.Shipping_region}</td>
+                      </tr> : ""}
+                   
                   </tbody>
                 </table>
               </section>
 
 
 
-            )} */}
+            )}
 
             {/* glass mini footer */}
             <footer className=" flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80  
