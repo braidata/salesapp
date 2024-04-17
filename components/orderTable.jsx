@@ -20,7 +20,6 @@ const OrderTable = ({ data, functionS }) => {
   const [deleteModalData, setDeleteModalData] = useState({});
 
 
-
   // Función para manejar la presentación del formulario de edición.
   const handleEditSubmit = (event) => {
     event.preventDefault();
@@ -134,6 +133,16 @@ const OrderTable = ({ data, functionS }) => {
   const handleModalClose3 = () => {
     setModalIsOpen3(false);
   };
+
+  // Función para cerrar el modal al hacer clic fuera de él
+  const handleOutsideClick = (event) => {
+    if (event.target.id === "modal") {
+      handleModalClose();
+      handleModalClose2();
+      handleModalClose3();
+    }
+  };
+
 
   return (
     <div className="flex flex-grow flex-col mt-10 overflow-x-auto relative shadow-md sm:rounded-lg">
@@ -273,12 +282,14 @@ const OrderTable = ({ data, functionS }) => {
         </tbody>
       </table>
       {modalIsOpen && (
-        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto 
-         
-        " id="modal">
+        <div
+          className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto"
+          id="modal"
+          onClick={handleOutsideClick}
+        >
           {/* modal-background gradient */}
-          <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
-          "></div>
+          {/* <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
+          "></div> */}
           {/* modal-card */}
           <div className=" bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
           ">
@@ -423,26 +434,26 @@ const OrderTable = ({ data, functionS }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    
-                      <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
+
+                    <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
                       <td className="py-3  px-2 rounded-bl-lg">DIRECCIÓN FACTURACIÓN</td>
-                        <td className="py-3  px-2 rounded-bl-lg">{modalData.billing_street}</td>
-                        <td className="py-3  px-2">{modalData.billing_number}</td>
-                        <td className="py-3  px-2">{modalData.billing_department}</td>
-                        <td className="py-3  px-2">{modalData.billing_commune}</td>
-                        <td className="py-3  px-2">{modalData.billing_city}</td>
-                        <td className="py-3  px-2 rounded-br-lg">{modalData.billing_region}</td>
-                      </tr>
-{ modalData.Shipping_street ?                     <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
-                        <td className="py-3  px-2 rounded-bl-lg">DIRECCIÓN ENVÍO</td>
-                        <td className="py-3  px-2">{modalData.Shipping_street}</td>
-                        <td className="py-3  px-2">{modalData.Shipping_number}</td>
-                        <td className="py-3  px-2">{modalData.Shipping_department}</td>
-                        <td className="py-3  px-2">{modalData.Shipping_commune}</td>
-                        <td className="py-3  px-2">{modalData.Shipping_city}</td>
-                        <td className="py-3  px-2 rounded-br-lg">{modalData.Shipping_region}</td>
-                      </tr> : ""}
-                   
+                      <td className="py-3  px-2 rounded-bl-lg">{modalData.billing_street}</td>
+                      <td className="py-3  px-2">{modalData.billing_number}</td>
+                      <td className="py-3  px-2">{modalData.billing_department}</td>
+                      <td className="py-3  px-2">{modalData.billing_commune}</td>
+                      <td className="py-3  px-2">{modalData.billing_city}</td>
+                      <td className="py-3  px-2 rounded-br-lg">{modalData.billing_region}</td>
+                    </tr>
+                    {modalData.Shipping_street ? <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
+                      <td className="py-3  px-2 rounded-bl-lg">DIRECCIÓN ENVÍO</td>
+                      <td className="py-3  px-2">{modalData.Shipping_street}</td>
+                      <td className="py-3  px-2">{modalData.Shipping_number}</td>
+                      <td className="py-3  px-2">{modalData.Shipping_department}</td>
+                      <td className="py-3  px-2">{modalData.Shipping_commune}</td>
+                      <td className="py-3  px-2">{modalData.Shipping_city}</td>
+                      <td className="py-3  px-2 rounded-br-lg">{modalData.Shipping_region}</td>
+                    </tr> : ""}
+
                   </tbody>
                 </table>
               </section>
@@ -463,12 +474,14 @@ const OrderTable = ({ data, functionS }) => {
       )}
 
       {modalIsOpen2 && (
-        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto 
-         
-        " id="modal">
+        <div
+          className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto"
+          id="modal"
+          onClick={handleOutsideClick}
+        >
           {/* modal-background gradient */}
-          <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
-          "></div>
+          {/* <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
+          "></div> */}
           {/* modal-card */}
           <div className=" bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
           ">
@@ -509,8 +522,11 @@ const OrderTable = ({ data, functionS }) => {
       )}
 
       {modalIsOpen3 && (
-        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed inset-0 z-50 flex items-center justify-center overflow-auto">
-          {/* modal-background gradient */}
+        <div
+          className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed inset-0 z-50 flex items-center justify-center overflow-auto"
+          id="modal"
+          onClick={handleOutsideClick}
+        > {/* modal-background gradient */}
           <div className="bg-gray-900 bg-opacity-30 absolute w-11/12 md:w-4/5 lg:w-3/5 xl:w-1/2 max-h-[90vh] overflow-hidden flex flex-col">
             {/* modal-card */}
             {/* <div className="bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-hidden"> */}
@@ -584,8 +600,10 @@ const OrderTable = ({ data, functionS }) => {
       )}
 
       {showDeleteModal && (
-        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto">
-          <div className="bg-gray-900 bg-opacity-30 absolute w-full h-full z-0"></div>
+        <div className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed inset-0 z-50 flex items-center justify-center overflow-auto"
+          id="modal"
+          onClick={handleDeleteModalClose}>
+          {/* <div className="bg-gray-900 bg-opacity-30 absolute w-full h-full z-0"></div> */}
           <div className="bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto">
             <header className="bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800">
               <p className="text-gray-600 text-xl font-semibold dark:text-gray-300">Confirmar Eliminación</p>
