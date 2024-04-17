@@ -47,9 +47,8 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const totalNeto = salesData.reduce((sum, item) => sum + parseFloat(item.ItemNetAmountOfBillingDoc as string), 0);
-  const totalBruto = salesData.reduce((sum, item) => sum + parseFloat(item.TOTAL as string), 0);
-
+  const totalNeto = salesData.reduce((sum, item) => sum + (parseInt(item.BillingQuantity) * item.NetPriceAmount || 0), 0);
+  const totalBruto = salesData.reduce((sum, item) => sum + (((parseInt(item.BillingQuantity) * item.NetPriceAmount) || 0) * 1.19), 0);
 
   useEffect(() => {
     const fetchSAPSalesData = async () => {
@@ -94,6 +93,9 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
           <span className="font-bold">{globalData.BLART_TEXT || "DTE"}:</span> {globalData.DocumentReferenceID}
         </div>
         <div className="mb-2">
+          <span className="font-bold">Factura Interna SAP:</span> {globalData.BillingDocument}
+        </div>
+        <div className="mb-2">
           <span className="font-bold">Forma de Pago:</span> {globalData.CustomerPaymentTerms} - {globalData.CustomerPaymentTerms_TEXT}
         </div>
         <div className="mb-2">
@@ -116,7 +118,7 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
           <span className="font-bold">Transporte:</span>
           <span className="ml-1">{globalData.SalesOrderItemText || "Sin Despacho"}</span>
         </div> */}
-        
+
       </div>
 
       {/* <div className=" overflow-hidden"> */}
@@ -134,14 +136,14 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
                 Cant. Solicitada
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
-                Cant. Procesada
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
                 Precio Neto
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
-                Totales
+                Precio Bruto
               </th>
+              {/* <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/6">
+                Totales
+              </th> */}
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -152,23 +154,26 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
                   {item.OrderQuantity || ''} {item.BillingQuantityUnit || ''}
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{parseInt(item.BillingQuantity) * item.NetPriceAmount || ''}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {item.BillingQuantity || ''} {item.BillingQuantityUnit || ''}
+                  {((parseInt(item.BillingQuantity) * item.NetPriceAmount) * 1.19).toFixed(0) || ''}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.NetPriceAmount || ''}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+                {/* <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
                   Neto: {item.ItemNetAmountOfBillingDoc} Bruto: {item.TOTAL}
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr className="bg-gray-50 dark:bg-gray-700">
-              <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-right font-bold">
+              <td colSpan={3} className="px-6 py-4 whitespace-nowrap text-right font-bold">
                 Totales:
               </td>
-              <td className="px-6 py-4 whitespace-nowrap font-bold">
-                Neto: {totalNeto.toFixed(0)} Bruto: {totalBruto.toFixed(0)}
+              <td className="px-6 py-4 whitespace-nowrap font-bold text-right">
+                {totalNeto.toFixed(0)}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap font-bold text-right">
+                {totalBruto.toFixed(0)}
               </td>
             </tr>
           </tfoot>
