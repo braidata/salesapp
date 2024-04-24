@@ -2998,5 +2998,89 @@
         "Nombre": "VENTILADOR DE CARBON",
         "Precio rebajado": null,
         "Precio normal": "8990"
+    },
+    {
+        "SKU": 100861,
+        "Nombre": "Filtros para Campana",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100468,
+        "Nombre": "Cúpula para Salad Bar Autoservicio 3 Depósitos",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100469,
+        "Nombre": "Cúpula para Salad Bar Autoservicio 4 Depósitos",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100802,
+        "Nombre": "Bandejas para Horno Turbo a Gas",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100932,
+        "Nombre": "Cúpula para Roller de Hotdog 9 Rodillos de Teflón",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100933,
+        "Nombre": "Cúpula para Roller de Hotdog 11 Rodillos de Teflón",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100598,
+        "Nombre": "Cúpula para Vitrina Barquillera VVB-7",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100930,
+        "Nombre": "Vasos para Dispensador de Jugos Concentrados 2 Vasos 18x2 Lts",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100931,
+        "Nombre": "Vasos para Dispensador de Jugos Concentrados 3 Vasos 18x3 Lts",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100935,
+        "Nombre": "Cúpula para Mesón Saladette 2 Puertas Cubierta Mármol con Vidrio 5 GN 1/3",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100937,
+        "Nombre": "Cúpula para Mesón Saladette 2 Puertas Cubierta Mármol con Vidrio",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100934,
+        "Nombre": "Cúpula para Mesón Saladette 3 Puertas Cubierta Mármol con Vidrio 7 GN 1/3",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 100224,
+        "Nombre": "Kit para Horno Skylinepros",
+        "Precio rebajado": null,
+        "Precio normal": null
+    },
+    {
+        "SKU": 101331,
+        "Nombre": "Sonda Multipunto para Retermalizador RRT101E",
+        "Precio rebajado": null,
+        "Precio normal": null
     }
 ]
