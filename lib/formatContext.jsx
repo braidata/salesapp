@@ -204,6 +204,7 @@ export default function FormatContext({ context, componente }) {
       Shipping_commune: contexts.deale[0].comuna_envio,
       Shipping_zip_code: contexts.deale[0].codigo_postal_de_envio,
       user: contexts.user,
+      creator: contexts.creator,
       team: contexts.team,
       centro: contexts.deale[0].centro,
       almacen: contexts.deale[0].almacen,
