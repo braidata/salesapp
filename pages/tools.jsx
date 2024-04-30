@@ -7,6 +7,8 @@ import CreadorPagos from "../lib/creadorPagos";
 import RefreshButton from "../components/refreshButton";
 import { useSession } from "next-auth/react";
 import Uploader from "../components/uploader";
+import OCR from "../components/ocr"
+import NavBarUserMenu from "../components/NavBarUserMenu"
 
 
 
@@ -20,6 +22,8 @@ const App = () => {
 
     },
   });
+
+  const loggedInUserEmail = session ? session.session.user.email : null
 
   const [creadorPagosVisible, setCreadorPagosVisible] = useState(false);
   const [llamadorPagosVisible, setLlamadorPagosVisible] = useState(false);
@@ -168,11 +172,12 @@ const App = () => {
 
 
         <div className="mt-10">
-        <Uploader />
+        <OCR />
           {/* <BuscaHubspotD functions={refreshPage} /> */}
         </div>
 
         {/* <CardClosable children={<BuscaHubspotD functions={refreshPage} />} title="Buscador de Negocios" name="Busca por mail" description="Encuentra los datos de contacto, negocio y productos" /> */}
+          <NavBarUserMenu loggedInUserEmail={loggedInUserEmail} />
       </div>
     </>
   );

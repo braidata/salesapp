@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, createRef } from "react";
 import { useDataData } from "../../context/data";
+import { useSelectedUser } from '../../context/SelectUserContext';
 import SpinnerButton from "../spinnerButton";
 import CardDeal from "../forms/cardDeal";
 import SuccessMessage from "../forms/succesMessage";
@@ -28,10 +29,11 @@ export default function PageWithJSbasedForm3({session}) {
   const [isDisabled, setIsDisabled] = useState(false);
 
   //const { data: session } = useSession();
+  const { selectedUser, setSelectedUser, teamUsers, setTeamUsers } = useSelectedUser();
   const [user, setUser] = useState(session ? session.token.email : null);
   const [team, setTeam] = useState(session ? session.token.sub : null);
 
-//   console.log(data, status, data.user.email);
+  console.log("contextual", selectedUser, teamUsers);
 
   //crete context for objects
   const [context, setContext] = useState({
@@ -45,7 +47,8 @@ export default function PageWithJSbasedForm3({session}) {
 
     lines: lines,
     products: products,
-    user: user,
+    user: selectedUser === null ? user:selectedUser,
+    creator: user,
     team: team,
     owner: owner,
     owners: owners,
@@ -65,13 +68,14 @@ export default function PageWithJSbasedForm3({session}) {
       ),
       lines: lines,
       products: products,
-      user: user,
+      user: selectedUser === null ? user:selectedUser,
+      creator: user,
       team: team,
       owner: owner,
       owners: owners,
       id: id,
     });
-  }, [contacts, companies, billing, deals, deale, lines, products]);
+  }, [contacts, companies, billing, deals, deale, lines, products, selectedUser]);
 
   const liniera = async (idD) => {
     

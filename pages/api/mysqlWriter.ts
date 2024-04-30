@@ -10,6 +10,7 @@ export default async function handler(
 ) {
 
   const user = req.body.user ? req.body.user : null;
+  const creator = req.body.creator ? req.body.creator : null;
   const team = req.body.team ? req.body.team : null;
   const dealId = req.body.dealId ? req.body.dealId : null;
   const statusSAP = req.body.statusSAP ? req.body.statusSAP : 'Procesando';
@@ -138,6 +139,7 @@ export default async function handler(
         Shipping_commune,
         Shipping_zip_code,
         user,
+        creator,
         team,
         centro,
         almacen,

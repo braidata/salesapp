@@ -45,6 +45,7 @@ model orders {
   Shipping_flete                      String?       @default("sin envio") @db.VarChar(255)
   customer_last_name                  String?       @default("sin datos de contacto") @db.VarChar(255)
   user                                String        @db.VarChar(255)
+  creator                             String?       @db.VarChar(255)
   dealId                              String        @unique @db.VarChar(255)
   Shipping_city                       String?       @default("sin envio") @db.VarChar(255)
   Shipping_commune                    String?       @default("sin envio") @db.VarChar(255)
@@ -73,7 +74,7 @@ model orders {
 
 model payments {
   id                 Int     @id @default(autoincrement())
-  order_id           Int     @unique
+  order_id           Int     
   method             String? @default("sin pago") @db.VarChar(255)
   authorization_code String? @default("sin pago") @db.VarChar(255)
   payment_count      String? @default("sin pago") @db.VarChar(255)
@@ -86,6 +87,7 @@ model payments {
   type               String? @default("sin pago") @db.VarChar(255)
   banco_destino      String? @default("sin pago") @db.VarChar(255)
   imagenUrl          String? @default("sin pago") @db.VarChar(255)
+  textoImg           String? @default("sin pago") @db.VarChar(512)
   rut_cliente        String? @default("sin pago") @db.VarChar(255)
   orders             orders? @relation(fields: [order_id], references: [id])
 

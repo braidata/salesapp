@@ -6,9 +6,11 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import LoginButton from "../components/loginButton";
+
 import dynamic from "next/dynamic";
 import { useSession, signIn, signOut } from "next-auth/react"
+import NavBarUserMenu from "../components/NavBarUserMenu"
+import { SelectContainer } from "../components/SelectUserContainer";
 
 
 
@@ -17,6 +19,8 @@ const BlurNavbar = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const { data: session, status } = useSession()
   const [showLogistica, setShowLogistica] = useState(false);
+
+  const loggedInUserEmail = session ? session.session.user.email : null
 
   const checkPermissions = async (requiredRoles) => {
     const res = await fetch("/api/mysqlPerm", {
@@ -265,21 +269,21 @@ const BlurNavbar = () => {
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Pedido HubSpot</p>
             </Link>
-            <Link href="/neoForm">
-              <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
+              <Link href="/neoForm">
+                <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Pedido Manual</p>
-            </Link>
+              </Link>
               <Link href="/dashboard">
                 <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Dashboard</p>
               </Link>
               <Link href="https://imega.atlassian.net/servicedesk/customer/portal/1" target="blank">
-              <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
+                <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Soporte</p>
-            </Link></> : null}
+              </Link></> : null}
             <Link href="/toolset">
               <p className="hidden lg:flex hover:backdrop-blur rounded p-2 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
@@ -297,8 +301,11 @@ const BlurNavbar = () => {
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Logística</p>
             </Link></> : null}</> : null}
 
-        <LoginButton />
+        <NavBarUserMenu loggedInUserEmail={loggedInUserEmail} />
         {renderThemeChanger()}
+
+
+
       </div>
     </div>
   );
