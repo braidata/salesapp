@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelectedUser } from '../context/SelectUserContext';
 import LoginButton from "../components/loginButton";
 
 
 const UserSelector = ({ loggedInUserEmail }) => {
   const { selectedUser, setSelectedUser, teamUsers, setTeamUsers } = useSelectedUser();
+  
 
   useEffect(() => {
     const fetchTeamUsers = async () => {
@@ -52,6 +53,7 @@ const UserSelector = ({ loggedInUserEmail }) => {
     setSelectedUser(selectedUserEmail);
   };
 
+ const  tagName = selectedUser
   console.log('teamUsers in component:', teamUsers);
   console.log('selectedUser in component:', selectedUser);
 
@@ -68,6 +70,7 @@ const UserSelector = ({ loggedInUserEmail }) => {
       >
         <option value="">Ver opciones</option>
         {teamUsers?.map((user) => (
+          
           <option key={user.email} value={user.email}>
             {user.name}
           </option>
@@ -81,11 +84,14 @@ const UserSelector = ({ loggedInUserEmail }) => {
       </div>
     </div>
 
-    <div className="shadow-md flex items-center bg-gradient-to-br from-lime-200 to-teal-200 dark:bg-gradient-to-br dark:from-blue-800 dark:to-teal-900 p-3 rounded-full cursor-pointer duration-300">
+    <div className="mx-4 my-2 shadow-md flex items-center bg-gradient-to-br from-lime-200 to-teal-200 dark:bg-gradient-to-br dark:from-blue-800 dark:to-teal-900 p-3 rounded-full cursor-pointer duration-300">
 
       <LoginButton />
+      <p className="px-4 py-2">{tagName}</p>
+      
       
     </div>
+    
       </div>
     
   );
