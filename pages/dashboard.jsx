@@ -3,19 +3,30 @@ import Image from "next/image";
 import OrderTable from "../components/orderTable";
 import { useSession } from "next-auth/react";
 import Text from "../components/text";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelectedUser } from '../context/SelectUserContext';
 
 const Dashboard = () => {
-  const { data: session } = useSession()
+  const { selectedUser, setSelectedUser, teamUsers, setTeamUsers } = useSelectedUser();
+  const { data: session } = useSession();
   const [data, setData] = useState();
   const [companyName, setCompanyName] = useState("");
-  const userSender = async (event) => {
+  const [user, setUser] = useState(session ? session.token.email : null);
+
+  useEffect(() => {
+    if (session) {
+      const userEmail = selectedUser || session.token.email;
+      userSender(userEmail);
+    }
+  }, [selectedUser, session]);
+
+  const userSender = async (userEmail) => {
     try {
       let data = {
         name: session.token.name,
-        email: session.token.email,
+        email: userEmail,
         id: parseInt(session.token.sub),
-        companyName: companyName, // Agrega el nombre de la empresa al objeto data
+        companyName: companyName,
       };
 
       const JSONdata = JSON.stringify(data);
@@ -31,7 +42,7 @@ const Dashboard = () => {
       const response = await fetch(endpoint, options);
       const result = response;
       const resDB = await result.json();
-      data = setData(resDB);
+      setData(resDB);
       console.log("base", resDB);
     } catch {
       console.log("No hay datos DB");
