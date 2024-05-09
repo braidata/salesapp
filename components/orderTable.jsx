@@ -2,6 +2,8 @@ import React from "react";
 import { useState } from "react";
 import ShippingModal from "../components/simpliRouteDateEditor"
 import SalesData from "../components/sapSalesData"
+import CreadorPagos from "../lib/creadorPagos";
+import VisualizatorPayments from "../lib/visualizatorPayments";
 
 const OrderTable = ({ data, functionS }) => {
   // Estado para manejar la apertura y cierre del modal
@@ -113,6 +115,7 @@ const OrderTable = ({ data, functionS }) => {
   };
 
   const handleModalOpen2 = (data, status) => {
+
     setModalData2(data);
     setModalStatus2(status);
     setModalIsOpen2(true);
@@ -265,11 +268,9 @@ const OrderTable = ({ data, functionS }) => {
                       Ver +
                     </button>
                     {status === "Borrado" ? null :
-                      <><button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,60,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen2(item, status)}>
-                        Envio
+                      <><button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,60,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen2(item.id, status)}>
+                        Pagos
                       </button>
-
-
                         <button className="mt-2 mb-5 bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleDeleteModalOpen(item)}>
                           Borrar
                         </button></>}
@@ -473,22 +474,51 @@ const OrderTable = ({ data, functionS }) => {
         </div>
       )}
 
-      {modalIsOpen2 && (
+{modalIsOpen2 && (
+  <div
+    className="mt-8 mb-8 mx-4 my-4 backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-30 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-30 flex items-center justify-center"
+    id="modal"
+    onClick={handleOutsideClick}
+  >
+    <div className="mt-8 mb-8 bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-30">
+      <header className="mt-8 mb-8 bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+        <p className="text-gray-600 text-xl font-semibold dark:text-gray-300">
+          Editar Fecha de Envío
+        </p>
+        <button
+          title="Cerrar"
+          className="rounded-full p-2 text-gray-600 dark:text-gray-300 text-2xl font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:hover:text-green-100/80 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+          aria-label="close"
+          onClick={handleModalClose2}
+        >
+          X
+        </button>
+      </header>
+      <div className="max-h-[80vh] overflow-y-auto">
+        <section className="p-2 dark:text-gray-300 mt-2 rounded-lg">
+          <CreadorPagos orderId={modalData2} />
+          <VisualizatorPayments orderId={modalData2} />
+        </section>
+        <footer className="flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80"></footer>
+      </div>
+    </div>
+  </div>
+)}
+
+      {/* {modalIsOpen2 && (
         <div
           className="backdrop-blur-sm bg-white/30 transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/30 supports-backdrop-blur:bg-white/30 dark:bg-transparent fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center overflow-auto"
           id="modal"
           onClick={handleOutsideClick}
         >
-          {/* modal-background gradient */}
-          {/* <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
-          "></div> */}
-          {/* modal-card */}
+     
+
           <div className=" bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
           ">
-            {/* modal-card-head*/}
+          
             <header className="bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800 
             ">
-              {/* modal-card-title */}
+       
               <p className="text-gray-600  text-xl font-semibold dark:text-gray-300 
               ">Editar Fecha de Envío</p>
               <button
@@ -499,7 +529,7 @@ const OrderTable = ({ data, functionS }) => {
                 onClick={handleModalClose2}
               >X</button>
             </header>
-            {/* modal-card-body */}
+      
             <section className=" p-2 dark:text-gray-300 mt-2 rounded-lg">
 
               <ShippingModal order={modalData2} onClose={handleModalClose2} />
@@ -510,16 +540,15 @@ const OrderTable = ({ data, functionS }) => {
 
 
 
-            {/* glass mini footer */}
             <footer className=" flex justify-end p-5 border-t border-gray-300 dark:border-gray-700 dark:bg-gray-800/80  
             ">
-              {/* <button className="button is-success">Save changes</button> */}
-              {/* colocar boton en  */}
+
 
             </footer>
           </div>
         </div>
       )}
+     */}
 
       {modalIsOpen3 && (
         <div
@@ -543,13 +572,15 @@ const OrderTable = ({ data, functionS }) => {
                 X
               </button>
             </header>
-            {/* modal-card-body */}
+            {/* modal-card-body <CreadorPagos/>*/}
             <section className="p-4 overflow-auto dark:text-gray-300 mt-2 rounded-lg">
               <SalesData salesOrder={modalData3} />
             </section>
           </div>
         </div>
       )}
+
+
 
       {showEditModal && (
         <div className="fixed z-10 inset-0 overflow-y-auto ">

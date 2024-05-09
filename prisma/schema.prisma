@@ -45,7 +45,6 @@ model orders {
   Shipping_flete                      String?       @default("sin envio") @db.VarChar(255)
   customer_last_name                  String?       @default("sin datos de contacto") @db.VarChar(255)
   user                                String        @db.VarChar(255)
-  creator                             String?       @db.VarChar(255)
   dealId                              String        @unique @db.VarChar(255)
   Shipping_city                       String?       @default("sin envio") @db.VarChar(255)
   Shipping_commune                    String?       @default("sin envio") @db.VarChar(255)
@@ -68,14 +67,26 @@ model orders {
   order_class                         String?       @db.VarChar(255)
   respuestaSAP                        String?       @db.Text
   status                              String?       @default("1") @db.VarChar(255)
+  creator                             String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
 
 model payments {
+  id             Int     @id @default(autoincrement())
+  order_id       Int
+  method         String? @default("sin pago") @db.VarChar(255)
+  payment_amount String? @default("sin pago") @db.VarChar(255)
+  type           String? @default("sin pago") @db.VarChar(255)
+  orders         orders? @relation(fields: [order_id], references: [id])
+
+  @@index([order_id])
+}
+
+model payments_validator {
   id                 Int     @id @default(autoincrement())
-  order_id           Int     
-  method             String? @default("sin pago") @db.VarChar(255)
+  order_id           Int
+  payment_method     String? @default("sin pago") @db.VarChar(255)
   authorization_code String? @default("sin pago") @db.VarChar(255)
   payment_count      String? @default("sin pago") @db.VarChar(255)
   payment_amount     String? @default("sin pago") @db.VarChar(255)
@@ -83,15 +94,13 @@ model payments {
   rut_pagador        String? @default("sin pago") @db.VarChar(255)
   observation        String? @default("sin pago") @db.VarChar(255)
   status             String? @default("sin pago") @db.VarChar(255)
+  order_date         String? @default("sin pago") @db.VarChar(255)
   validation_date    String? @default("sin pago") @db.VarChar(255)
-  type               String? @default("sin pago") @db.VarChar(255)
+  team               String? @default("sin pago") @db.VarChar(255)
   banco_destino      String? @default("sin pago") @db.VarChar(255)
   imagenUrl          String? @default("sin pago") @db.VarChar(255)
   textoImg           String? @default("sin pago") @db.VarChar(512)
   rut_cliente        String? @default("sin pago") @db.VarChar(255)
-  orders             orders? @relation(fields: [order_id], references: [id])
-
-  @@index([order_id])
 }
 
 model users {
