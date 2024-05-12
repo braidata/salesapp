@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { PrismaClient } from "@prisma/client";
 
-
+const prisma = new PrismaClient();
 
 //sending data to prisma
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log("los pagos son:", data)
 
-const prisma = new PrismaClient();
+
 
 try {
 

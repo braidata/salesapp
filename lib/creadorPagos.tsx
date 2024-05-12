@@ -1,18 +1,25 @@
 import { useState } from "react";
 import OCRForm from "../components/ocr"
 
-const PaymentForm: React.FC = (orderId: {}) => {
+const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
   const idOrder = orderId ? Object.entries(orderId).map((i: any) => { return i[1] }) : ""
+  const date = new Date(idOrder[1])
+  const fechaFormateada = date.getFullYear() + "-" +
+    ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+    ("0" + date.getDate()).slice(-2);
   const [paymentData, setPaymentData] = useState({
-    order_id: idOrder,
-    order_date: "",
-    payment_date: "",
-    rut_cliente: "",
-    rut_pagador: "",
+    order_id: idOrder[0],
+    order_date: fechaFormateada,
+    payment_date: fechaFormateada,
+    rut_cliente: idOrder[2],
+    rut_pagador: idOrder[2],
     banco_destino: "",
     imagenUrl: "",
     textoImg: "",
     team: "",
+    payment_amount: "",
+    observation: "",
+    status: "Pendiente",
   });
   const handleOCRResult = (ocrResult: string | null, uploadedImageUrl: string | null) => {
     setPaymentData((prevData) => ({
@@ -33,15 +40,18 @@ const PaymentForm: React.FC = (orderId: {}) => {
     });
     if (res.status === 201) {
       setPaymentData({
-        order_id: idOrder,
-        order_date: "",
+        order_id: idOrder[0],
+        order_date: fechaFormateada,
         payment_date: "",
-        rut_cliente: "",
+        rut_cliente: idOrder[2],
         rut_pagador: "",
         banco_destino: "",
         imagenUrl: "",
         textoImg: "",
         team: "",
+        payment_amount: "",
+        observation: "",
+        status: "Pendiente",
       });
       alert("El Pago fue creado con éxito");
     } else {
@@ -62,7 +72,7 @@ const PaymentForm: React.FC = (orderId: {}) => {
       <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="order_id">
-            Order ID:
+            ID:
           </label>
           <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 cursor-not-allowed opacity-50" type="text" name="order_id" value={paymentData.order_id} readOnly disabled required />
         </div>
@@ -70,19 +80,19 @@ const PaymentForm: React.FC = (orderId: {}) => {
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="order_date">
             Fecha del Pedido:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="order_date" value={paymentData.order_date} onChange={handleChange} required />
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date" name="order_date" value={paymentData.order_date} readOnly disabled onChange={handleChange} required />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="payment_date">
             Fecha del Pago:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="payment_date" value={paymentData.payment_date} onChange={handleChange} required />
-          </div>
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date" name="payment_date" value={paymentData.payment_date} onChange={handleChange} required />
+        </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="rut_cliente">
             Rut del Cliente:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="rut_cliente" value={paymentData.rut_cliente} onChange={handleChange} required />
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 cursor-not-allowed opacity-50" type="text" name="rut_cliente" value={paymentData.rut_cliente} onChange={handleChange} readOnly disabled required />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="rut_pagador">
@@ -94,20 +104,68 @@ const PaymentForm: React.FC = (orderId: {}) => {
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="banco_destino">
             Banco de Destino:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="banco_destino" value={paymentData.banco_destino} onChange={handleChange} required />
+          <select
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
+            name="banco_destino"
+            value={paymentData.banco_destino}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona un banco</option>
+            <option value="Itaú">ITAU</option>
+            <option value="BCI">BCI</option>
+            <option value="BICE">BICE</option>
+            <option value="Banco Chile">Banco Chile</option>
+            <option value="Santander">Santander</option>
+            <option value="Scotiabank">Scotiabank</option>
+            <option value="Banco Estado">Banco Estado</option>
+            <option value="transbank">transbank</option>
+            <option value="webpay">webpay</option>
+            <option value="Factura Anticipada">Factura Anticipada</option>
+            <option value="Saldo a favor">Saldo a Favor</option>
+            <option value="Guia de Despacho">Guia de Despacho</option>
+            <option value="Abono a Rut">Abono a Rut</option>
+            <option value="Banco Internacional">Banco Internacional</option>
+            <option value="Orden de Compra">Orden de Compra</option>
+          </select>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="team">
             Equipo:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="team" value={paymentData.team} onChange={handleChange} required />
+          <select
+    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
+    name="team"
+    value={paymentData.team}
+    onChange={handleChange}
+    required
+  >
+    <option value="">Selecciona tu Equipo</option>
+    <option value="Venta Directa">Venta Directa</option>
+    <option value="Imega">Imega</option>
+    <option value="Ecommerce">Ecommerce</option>
+    <option value="Repuestos">Repuestos</option>
+    <option value="Distribución">Distribución</option>
+  </select>
         </div>
         <div className="mb-4">
-        <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="image">
-          Imagen:
-        </label>
-        <OCRForm onOCRResult={handleOCRResult} />
-      </div>
+          <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="payment_amount">
+            Monto:
+          </label>
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="payment_amount" value={paymentData.payment_amount} onChange={handleChange} required />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="observation">
+            Observacón:
+          </label>
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="observation" value={paymentData.observation} onChange={handleChange} required />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="image">
+            Imagen:
+          </label>
+          <OCRForm onOCRResult={handleOCRResult} />
+        </div>
         <div className="flex items-center justify-center">
           <button className="mt-2 mb-5 py-2 px-4 rounded-full font-bold text-gray-800 dark:text-gray-200 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 border-green-800 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] hover:bg-green-600/50 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 dark:border-green-200 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:hover:bg-green-900" type="submit">
             Crear Pago

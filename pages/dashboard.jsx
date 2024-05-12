@@ -18,7 +18,7 @@ const Dashboard = () => {
       const userEmail = selectedUser || session.token.email;
       userSender(userEmail);
     }
-  }, [selectedUser, session]);
+  }, [selectedUser, session, companyName]);
 
   const userSender = async (userEmail) => {
     try {
@@ -26,6 +26,7 @@ const Dashboard = () => {
         name: session.token.name,
         email: userEmail,
         id: parseInt(session.token.sub),
+        orderId: null,
         companyName: companyName,
       };
 
