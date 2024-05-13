@@ -9,7 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       const payments = await prisma.payments_validator.findMany({
-        where: { order_id: parseInt(order_id) },
+        where: {
+          order_id: parseInt(order_id),
+          NOT: {
+            status: {
+              in: ['Borrado', 'Rechazado'],
+            },
+          },
+        },
         select: {
           payment_amount: true,
         },

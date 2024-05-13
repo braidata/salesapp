@@ -284,22 +284,22 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                   aria-modal="true"
                   aria-labelledby="modal-headline"
                 >
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="bg-gray-300 dark:bg-gray-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div className="sm:flex sm:items-start">
-                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left ">
+                        <h3 className="text-lg leading-6 font-medium dark:text-gray-200 text-gray-900" id="modal-headline">
                           Texto extraído
                         </h3>
-                        <div className="mt-2">
-                          <p className="text-sm text-gray-500 whitespace-pre-wrap">{pagos[0].textoImg}</p>
+                        <div className="mt-2 bg-gray-300 dark:bg-gray-700">
+                          <p className="text-sm text-gray-500 dark:text-gray-200 bg-gray-300 dark:bg-gray-700 whitespace-pre-wrap">{pagos[0].textoImg}</p>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <div className="bg-gray-300 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button
                       type="button"
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      className="w-full inline-flex justify-center rounded-md sm:ml-3 sm:w-auto sm:text-sm mt-2 mb-5 bg-gradient-to-r from-gray-600/40 to-gray-800/40 border-2 drop-shadow-[0_9px_9px_rgba(35,35,35,0.75)]  border-gray-800 hover:bg-gray-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-gray-500/40 dark:to-gray-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(190,190,190,0.25)]  dark:border-gray-200 dark:hover:bg-gray-900 dark:text-gray-200 transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center px-2 py-2"
                       onClick={() => setShowModal(false)}
                     >
                       Cerrar
