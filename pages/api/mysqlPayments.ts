@@ -7,30 +7,33 @@ const prisma = new PrismaClient();
 
 //sending data to prisma
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-
-    const data = req.body;
-    const oId = data.order_id || req.query.id;
-    
-
-    console.log("los pagos son:", data)
-
-
-
-try {
-
-const payment = await prisma.payments_validator.findMany({where:{
-     order_id: parseInt(oId)
-}});
-
-
-
-
-
-res.status(200).json({payment});}
-catch{
-console.log("error");
-} finally {
-    await prisma.$disconnect();
+    if (req.method === 'POST') {
+      const { email, orderId, status } = req.body;
+  
+      try {
+        let payments;
+  
+        if (orderId) {
+          payments = await prisma.payments_validator.findMany({
+            where: {
+              order_id: parseInt(orderId),
+              status: status || undefined,
+            },
+          });
+        } else {
+          payments = await prisma.payments_validator.findMany({
+            where: {
+              status: status || undefined,
+            },
+          });
+        }
+  
+        res.status(200).json(payments);
+      } catch (error) {
+        console.error('Error al obtener los pagos:', error);
+        res.status(500).json({ message: 'Error al obtener los pagos' });
+      }
+    } else {
+      res.status(405).json({ message: 'Method not allowed' });
     }
-
-}
+  }

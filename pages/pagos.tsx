@@ -3,7 +3,7 @@ import Image from "next/image";
 import PaymentsTable from "../components/paymentsTable";
 import { useSession } from "next-auth/react";
 import Text from "../components/text";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { useSelectedUser } from '../context/SelectUserContext';
 
 const Pagos = () => {
@@ -13,7 +13,13 @@ const Pagos = () => {
   const [dataP, setDataP] = useState();
   const [orderId, setOrderId] = useState();
   const [user, setUser] = useState(session ? session.token.email : null);
+  const [selectedPaymentId, setSelectedPaymentId] = useState();
+  const [paymentStatus, setPaymentStatus] = useState('');
+  // Función para manejar la presentación del formulario de edición.
 
+  const handlePaymentStatusChange = (status: SetStateAction<string>) => {
+    setPaymentStatus(status);
+  };
   useEffect(() => {
     if (session) {
       const userEmail = selectedUser || session.token.email;
@@ -28,10 +34,11 @@ const Pagos = () => {
         email: userEmail,
         id: parseInt(session?.token.sub),
         orderId: orderId,
+        status: paymentStatus,
       };
-
+  
       const JSONdata = JSON.stringify(data);
-      const endpoint = "/api/mysqlConsulta";
+      const endpoint = "/api/mysqlPayments";
       const options = {
         method: "POST",
         headers: {
@@ -39,7 +46,7 @@ const Pagos = () => {
         },
         body: JSONdata,
       };
-
+  
       const response = await fetch(endpoint, options);
       const result = response;
       const resDB = await result.json();
@@ -50,33 +57,28 @@ const Pagos = () => {
     }
   };
 
-    const paymentFetcher = async (userEmail: any) => {
+  const paymentFetcher = async (status, orderId) => {
     try {
-      let data = {
-
-        order_id: orderId,
-        
-      };
-  
-      const JSONdata = JSON.stringify(data);
-      const endpoint = "/api/mysqlPayments"; // Cambia el endpoint a "/api/mysqlPayments"
-      const options = {
-        method: "POST",
+      const response = await fetch('/api/mysqlPayments', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSONdata,
-      };
-  
-      const response = await fetch(endpoint, options);
-      const result = response;
-      const resDB = await result.json();
-      setDataP(resDB);
-      console.log("Pbase", resDB);
-    } catch {
-      console.log("No hay datos PDB");
+        body: JSON.stringify({ status, orderId }),
+      });
+      const data = await response.json();
+      setDataP(data);
+    } catch (error) {
+      console.error('Error al obtener los pagos:', error);
     }
-  }; 
+  };
+
+  useEffect(() => {
+    if (session) {
+      const userEmail = selectedUser || session.token.email;
+      userSender(userEmail);
+    }
+  }, [selectedUser, session, orderId, paymentStatus]);
 
 
 
@@ -89,7 +91,7 @@ const Pagos = () => {
         border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
         description="En esta sección podrás ver los pagos que se han creado y validarlos."
       />
-      <button className="bmt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+      {/* <button className="bmt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
         onClick={userSender}>Actualizar</button>
       <div className="relative">
         <input
@@ -124,7 +126,7 @@ const Pagos = () => {
       <button className="bmt-2 mb-5 bg-gradient-to-r from-teal-600/40 to-teal-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,155,0.75)]  border-teal-800 hover:bg-teal-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-teal-500/40 dark:to-teal-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,222,0.25)]  dark:border-teal-200 dark:hover:bg-teal-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
         onClick={userSender}>Buscar</button>
         <button className="bmt-2 mb-5 bg-gradient-to-r from-teal-600/40 to-teal-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,155,0.75)]  border-teal-800 hover:bg-teal-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-teal-500/40 dark:to-teal-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,222,0.25)]  dark:border-teal-200 dark:hover:bg-teal-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-        onClick={paymentFetcher}>Buscar Pagos</button>
+        onClick={paymentFetcher}>Buscar Pagos</button> */}
       <PaymentsTable data={data} dataP={dataP} functionS={userSender} functionsSP={paymentFetcher} />
     </div>
   );
