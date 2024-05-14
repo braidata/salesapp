@@ -1,9 +1,17 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
-import { FaCopy } from 'react-icons/fa'
+import { FaCopy, FaTimes, FaEdit } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
+import { useSession } from 'next-auth/react';
+
+
+
+
+
 const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId: string }) => {
+  const { data: session } = useSession();
+  const [userId, setUserId] = useState<string | null>();
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -11,7 +19,19 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
   const [selectedRow, setSelectedRow] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [showModal, setShowModal] = useState(false);
+  const [showModalE, setShowModalE] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [editFields, setEditFields] = useState([]); // State for multiple edit fields
+  const [editValues, setEditValues] = useState({}); // State for multiple edit values
+  const [editPago, setEditPago] = useState(null);
+
+  useEffect(() => {
+    if (session) {
+      setUserId(session ? session.session.user.name : null);
+      const loggedInUserEmail = session ? session.session.user.name : null
+      console.log("editador", loggedInUserEmail)
+    }
+  }, [session]);
 
   function getKeyFromUrl(url: string) {
     const bucketPattern = /^https?:\/\/([^/]+)\/(.+?)\?/;
@@ -109,6 +129,45 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
     setTimeout(() => setShowTooltip(false), 2000);
   };
 
+  const handleUpdate = async (userId: string) => {
+    if (!editPago) {
+      console.error('No hay datos de pago para actualizar');
+      return;
+    }
+
+    console.log("editador", userId)
+  
+    try {
+      const updatedData = {
+        ...editPago,
+        ...editValues,
+        editedBy: userId, // Asegúrate de que userId sea un número entero
+      };
+  
+      const response = await axios.put('/api/mysqlPaymentsEditor', updatedData);
+      const updatedPago = response.data;
+      setPagos((prevPagos) => prevPagos.map((p) => (p.id === editPago.id ? updatedPago : p)));
+      setShowModalE(false);
+    } catch (error) {
+      console.error('Error al actualizar el pago:', error);
+    }
+  };
+
+
+  const handleAddField = () => {
+    setEditFields([...editFields, ""]);
+  };
+
+  const handleFieldChange = (index, value) => {
+    const newFields = [...editFields];
+    newFields[index] = value;
+    setEditFields(newFields);
+  };
+
+  const handleValueChange = (field, value) => {
+    setEditValues({ ...editValues, [field]: value });
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4">
       <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">
@@ -146,16 +205,22 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
               <thead>
                 <tr>
                   <th
-                    onClick={() => requestSort('payment_method')}
+                    onClick={() => requestSort('id')}
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer rounded-tl-md"
                   >
-                    Método de pago
+                    ID
                   </th>
                   <th
-                    onClick={() => requestSort('authorization_code')}
+                    onClick={() => requestSort('order_id')}
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
                   >
-                    Código de autorización
+                    Order ID
+                  </th>
+                  <th
+                    onClick={() => requestSort('status')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    Estado
                   </th>
                   <th
                     onClick={() => requestSort('payment_amount')}
@@ -164,22 +229,28 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                     Monto
                   </th>
                   <th
-                    onClick={() => requestSort('payment_date')}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
-                  >
-                    Fecha de pago
-                  </th>
-                  <th
-                    onClick={() => requestSort('rut_pagador')}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
-                  >
-                    RUT pagador
-                  </th>
-                  <th
                     onClick={() => requestSort('observation')}
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
                   >
                     Observación
+                  </th>
+                  <th
+                    onClick={() => requestSort('rut_cliente')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    RUT cliente
+                  </th>
+                  <th
+                    onClick={() => requestSort('banco_destino')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    Banco destino
+                  </th>
+                  <th
+                    onClick={() => requestSort('payment_date')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    Fecha de pago
                   </th>
                   <th
                     onClick={() => requestSort('order_date')}
@@ -194,28 +265,31 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                     Fecha de validación
                   </th>
                   <th
-                    onClick={() => requestSort('team')}
+                    onClick={() => requestSort('payment_method')}
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    Método de pago
+                  </th>
+                  <th
+                    onClick={() => requestSort('authorization_code')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    Código de autorización
+                  </th>
+                  <th
+                    onClick={() => requestSort('rut_pagador')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    RUT pagador
+                  </th>
+                  <th
+                    onClick={() => requestSort('team')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer rounded-tr-md"
                   >
                     Equipo
                   </th>
-                  <th
-                    onClick={() => requestSort('banco_destino')}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
-                  >
-                    Banco destino
-                  </th>
-                  <th
-                    onClick={() => requestSort('rut_cliente')}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
-                  >
-                    RUT cliente
-                  </th>
-                  <th
-                    onClick={() => requestSort('status')}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer rounded-tr-md"
-                  >
-                    Estado
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Acción
                   </th>
                 </tr>
               </thead>
@@ -226,23 +300,125 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                     onClick={() => setSelectedRow(pago.id)}
                     className={selectedRow === pago.id ? 'bg-gray-300 dark:bg-gray-800' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}
                   >
-                    <td className="px-6 py-4">{pago.payment_method}</td>
-                    <td className="px-6 py-4">{pago.authorization_code}</td>
+                    <td className="px-6 py-4">{pago.id}</td>
+                    <td className="px-6 py-4">{pago.order_id}</td>
+                    <td className="px-6 py-4">{pago.status}</td>
                     <td className="px-6 py-4">{pago.payment_amount}</td>
-                    <td className="px-6 py-4">{pago.payment_date}</td>
-                    <td className="px-6 py-4">{pago.rut_pagador}</td>
                     <td className="px-6 py-4">{pago.observation}</td>
+                    <td className="px-6 py-4">{pago.rut_cliente}</td>
+                    <td className="px-6 py-4">{pago.banco_destino}</td>
+                    <td className="px-6 py-4">{pago.payment_date}</td>
                     <td className="px-6 py-4">{pago.order_date}</td>
                     <td className="px-6 py-4">{pago.validation_date}</td>
+                    <td className="px-6 py-4">{pago.payment_method}</td>
+                    <td className="px-6 py-4">{pago.authorization_code}</td>
+                    <td className="px-6 py-4">{pago.rut_pagador}</td>
                     <td className="px-6 py-4">{pago.team}</td>
-                    <td className="px-6 py-4">{pago.banco_destino}</td>
-                    <td className="px-6 py-4">{pago.rut_cliente}</td>
-                    <td className="px-6 py-4">{pago.status}</td>
+                    <td className="px-6 py-4">
+                      {pago.status === 'Rechazado' && (
+                        <>
+                          <button
+                            className="z-50 px-2 py-2 rounded-lg bg-blue-300/30 dark:bg-blue-700/30 text-blue-800 dark:text-blue-100/80 font-semibold leading-none hover:text-blue-200 hover:bg-blue-300/50 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-blue-400/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
+                            onClick={() => {
+                              setEditPago(pago); // Set the payment data to be edited
+                              setShowModalE(true);
+                            }}
+                          >
+                            Editar
+                          </button>
+                          {showModalE && (
+                            <div className="fixed z-10 inset-0 overflow-y-auto" onClick={() => setShowModalE(false)}>
+                              <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                                  <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                </div>
+                                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                                  &#8203;
+                                </span>
+                                <div
+                                  className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                                  role="dialog"
+                                  aria-modal="true"
+                                  aria-labelledby="modal-headline"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div className="sm:flex sm:items-start">
+                                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-200" id="modal-headline">
+                                          Editar Pedido
+                                        </h3>
+                                        <div className="mt-2">
+                                          {editFields.map((field, index) => (
+                                            <div key={index} className="mb-2">
+                                              <select
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200"
+                                                value={field}
+                                                onChange={(e) => handleFieldChange(index, e.target.value)}
+                                              >
+                                                <option value="">Seleccionar campo</option>
+                                                <option value="status">Estado</option>
+                                                <option value="payment_amount">Monto de Pago</option>
+                                                <option value="observation">Observación</option>
+                                                <option value="rut_cliente">RUT Cliente</option>
+                                                <option value="banco_destino">Banco Destino</option>
+                                                <option value="payment_date">Fecha de Pago</option>
+                                                <option value="order_date">Fecha de Orden</option>
+                                                <option value="validation_date">Fecha de Validación</option>
+                                                <option value="payment_method">Método de Pago</option>
+                                                <option value="authorization_code">Código de Autorización</option>
+                                                <option value="rut_pagador">RUT Pagador</option>
+                                                <option value="team">Equipo</option>
+                                              </select>
+                                              <input
+                                                type="text"
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200"
+                                                placeholder="Nuevo valor"
+                                                value={editValues[field] || ""}
+                                                onChange={(e) => handleValueChange(field, e.target.value)}
+                                              />
+                                            </div>
+                                          ))}
+                                          <button
+                                            type="button"
+                                            className="mt-2 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                            onClick={handleAddField}
+                                          >
+                                            Agregar Campo
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                    <button
+                                      type="button"
+                                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                      onClick={()=>handleUpdate(userId)}
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white dark:bg-gray-600 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                                      onClick={() => setShowModalE(false)}
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>{pagos[0].imagenUrl && (
+          </div>
+          {pagos[0].imagenUrl && (
             <div className="mt-4 relative">
               {isPDF ? (
                 <iframe src={pagos[0].imagenUrl} width="100%" height="500px" />
@@ -270,7 +446,7 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
             </div>
           )}
           {showModal && (
-            <div className="fixed z-10 inset-0 overflow-y-auto">
+            <div className="fixed z-10 inset-0 overflow-y-auto" onClick={() => setShowModal(false)}>
               <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                   <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -283,15 +459,16 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby="modal-headline"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <div className="bg-gray-300 dark:bg-gray-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div className="sm:flex sm:items-start">
-                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left ">
+                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                         <h3 className="text-lg leading-6 font-medium dark:text-gray-200 text-gray-900" id="modal-headline">
                           Texto extraído
                         </h3>
-                        <div className="mt-2 bg-gray-300 dark:bg-gray-700">
-                          <p className="text-sm text-gray-500 dark:text-gray-200 bg-gray-300 dark:bg-gray-700 whitespace-pre-wrap">{pagos[0].textoImg}</p>
+                        <div className="mt-2 bg-gray-300 dark:bg-gray-700 p-4 rounded-md">
+                          <p className="text-sm text-gray-500 dark:text-gray-200 whitespace-pre-wrap">{pagos[0].textoImg}</p>
                         </div>
                       </div>
                     </div>
@@ -299,24 +476,26 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                   <div className="bg-gray-300 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button
                       type="button"
-                      className="w-full inline-flex justify-center rounded-md sm:ml-3 sm:w-auto sm:text-sm mt-2 mb-5 bg-gradient-to-r from-gray-600/40 to-gray-800/40 border-2 drop-shadow-[0_9px_9px_rgba(35,35,35,0.75)]  border-gray-800 hover:bg-gray-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-gray-500/40 dark:to-gray-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(190,190,190,0.25)]  dark:border-gray-200 dark:hover:bg-gray-900 dark:text-gray-200 transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center px-2 py-2"
+                      className="w-full inline-flex justify-center rounded-md sm:ml-3 sm:w-auto sm:text-sm mt-2 mb-5 bg-gradient-to-r from-gray-600/40 to-gray-800/40 border-2 drop-shadow-[0_9px_9px_rgba(35,35,35,0.75)] border-gray-800 hover:bg-gray-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-gray-500/40 dark:to-gray-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(190,190,190,0.25)] dark:border-gray-200 dark:hover:bg-gray-900 dark:text-gray-200 transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center px-2 py-2"
                       onClick={() => setShowModal(false)}
                     >
                       Cerrar
+                    </button>
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 p-2 text-gray-800 dark:text-gray-200"
+                      onClick={() => setShowModal(false)}
+                    >
+                      <FaTimes />
                     </button>
                   </div>
                 </div>
               </div>
             </div>
           )}</>)}
-
-
-
-
     </div>
   )
 }
-
 
 
 export default VisualizadorPagos;

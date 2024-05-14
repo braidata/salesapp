@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OCRForm from "../components/ocr"
+import { useSession } from 'next-auth/react';
 
 const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
+  const { data: session } = useSession();
+  const [userId, setUserId] = useState<string | null>();
   const idOrder = orderId ? Object.entries(orderId).map((i: any) => { return i[1] }) : ""
   const date = new Date(idOrder[1])
   const fechaFormateada = date.getFullYear() + "-" +
@@ -20,7 +23,18 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
     payment_amount: "",
     observation: "",
     status: "Pendiente",
+    createdBy: userId
   });
+
+  useEffect(() => {
+    if (session) {
+      setUserId(session ? session.session.user.name : null);
+      const loggedInUserEmail = session ? session.session.user.name : null
+      console.log("editador", loggedInUserEmail)
+    }
+  }, [session]);
+
+
   const handleOCRResult = (ocrResult: string | null, uploadedImageUrl: string | null) => {
     setPaymentData((prevData) => ({
       ...prevData,
@@ -36,7 +50,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(paymentData),
+      body: JSON.stringify({ ...paymentData, createdBy: userId }),
     });
     if (res.status === 201) {
       setPaymentData({
@@ -52,12 +66,30 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
         payment_amount: "",
         observation: "",
         status: "Pendiente",
+        createdBy: userId
       });
       alert("El Pago fue creado con éxito");
     } else {
       alert("Error al crear el Pago");
     }
   };
+
+  // const handleResetForm = () => {
+  //   setPaymentData({
+  //     order_id: '',
+  //     order_date: '',
+  //     payment_date: '',
+  //     rut_cliente: '',
+  //     rut_pagador: '',
+  //     banco_destino: '',
+  //     imagenUrl: '',
+  //     textoImg: '',
+  //     team: '',
+  //     payment_amount: '',
+  //     observation: '',
+  //     status: 'Pendiente',
+  //   });
+  // };
 
   const handleChange = (event: { target: { name: any; value: any; }; }) => {
     const { name, value } = event.target;
@@ -69,7 +101,9 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
       <h1 className="w-full text-4xl sm:text-6xl font-bold text-center mt-24 mb-12 py-4 px-4 rounded-lg transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-gray-900 border-2 border-gray-400 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 dark:text-gray-300 dark:border-sky-200 dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)] hover:text-gray-900 hover:bg-gray-600/50 dark:hover:bg-sky-900 hover:animate-pulse">
         INGRESA EL PAGO DE TU PEDIDO
       </h1>
+
       <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
+
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="order_id">
             ID:
@@ -166,7 +200,14 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
           </label>
           <OCRForm onOCRResult={handleOCRResult} />
         </div>
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
+        {/* <button
+        type="button"
+        onClick={handleResetForm}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110"
+      >
+        Reiniciar Formulario
+      </button> */}
           <button className="mt-2 mb-5 py-2 px-4 rounded-full font-bold text-gray-800 dark:text-gray-200 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 border-green-800 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] hover:bg-green-600/50 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 dark:border-green-200 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:hover:bg-green-900" type="submit">
             Crear Pago
           </button>

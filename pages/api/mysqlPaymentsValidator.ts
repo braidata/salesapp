@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { id,    observation, status, order_date, team, banco_destino, imagenUrl, textoImg, rut_cliente } = req.body;
+    const { id,    observation, status, validatedBy, order_date, team, banco_destino, imagenUrl, textoImg, rut_cliente } = req.body;
 
     // Obtener la fecha y hora actual
     const validation_date = new Date().toString();
@@ -19,6 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         observation,
         status,
         validation_date,
+        validatedBy,
       },
     });
 

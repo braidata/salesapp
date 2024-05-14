@@ -86,21 +86,24 @@ model payments {
 model payments_validator {
   id                 Int     @id @default(autoincrement())
   order_id           Int
-  payment_method     String? @default("sin pago") @db.VarChar(255)
-  authorization_code String? @default("sin pago") @db.VarChar(255)
-  payment_count      String? @default("sin pago") @db.VarChar(255)
-  payment_amount     String? @default("sin pago") @db.VarChar(255)
-  payment_date       String? @default("sin pago") @db.VarChar(255)
-  rut_pagador        String? @default("sin pago") @db.VarChar(255)
-  observation        String? @default("sin pago") @db.VarChar(255)
-  status             String? @default("sin pago") @db.VarChar(255)
-  order_date         String? @default("sin pago") @db.VarChar(255)
-  validation_date    String? @default("sin pago") @db.VarChar(255)
-  team               String? @default("sin pago") @db.VarChar(255)
-  banco_destino      String? @default("sin pago") @db.VarChar(255)
-  imagenUrl          String? @default("sin pago") @db.VarChar(255)
-  textoImg           String? @default("sin pago") @db.VarChar(512)
-  rut_cliente        String? @default("sin pago") @db.VarChar(255)
+  payment_method     String? @default("sin datos") @db.VarChar(255)
+  authorization_code String? @default("sin datos") @db.VarChar(255)
+  payment_count      String? @default("sin datos") @db.VarChar(255)
+  payment_amount     String? @default("sin datos") @db.VarChar(255)
+  payment_date       String? @default("sin datos") @db.VarChar(255)
+  rut_pagador        String? @default("sin datos") @db.VarChar(255)
+  observation        String? @default("sin datos") @db.VarChar(255)
+  status             String? @default("sin datos") @db.VarChar(255)
+  order_date         String? @default("sin datos") @db.VarChar(255)
+  validation_date    String? @default("sin datos") @db.VarChar(255)
+  team               String? @default("sin datos") @db.VarChar(255)
+  banco_destino      String? @default("sin datos") @db.VarChar(255)
+  imagenUrl          String? @default("sin datos") @db.VarChar(255)
+  textoImg           String? @default("sin datos") @db.VarChar(512)
+  rut_cliente        String? @default("sin datos") @db.VarChar(255)
+  createdBy          String?
+  validatedBy        String?
+  editedBy           String?
 }
 
 model users {

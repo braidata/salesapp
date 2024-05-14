@@ -6,29 +6,37 @@ import { saveAs } from 'file-saver';
 import { FaCopy } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 
-const ValidatorPayments = ({ orderId }) => {
-  const [pagos, setPagos] = useState([]);
+const ValidatorPayments = ({ orderId }: { orderId: string }) => {
+  const [pagos, setPagos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
-  const [modalData2, setModalData2] = useState({});
-  const [modalDate2, setModalDate2] = useState({});
-  const [modalRut2, setModalRut2] = useState({});
-  const [modalStatus2, setModalStatus2] = useState("Procesando");
-  const [idPago, setIdPago] = useState('');
-  const [sessionInfo, setSessionInfo] = useState();
-  const { data: session } = useSession();
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const [modalData2, setModalData2] = useState<any>({});
+  const [modalDate2, setModalDate2] = useState<any>({});
+  const [modalRut2, setModalRut2] = useState<any>({});
+  const [modalStatus2, setModalStatus2] = useState<string>("Procesando");
+  const [idPago, setIdPago] = useState<string>('');
+  const [sessionInfo, setSessionInfo] = useState<string | undefined>();
+  const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: string | null }>({ key: null, direction: null });
   const [observationModal, setObservationModal] = useState(false);
-  const [observation, setObservation] = useState('');
-  const [selectedPaymentId, setSelectedPaymentId] = useState(null);
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(null);
-  const [totalPedido, setTotalPedido] = useState();
-  const [totalPagado, setTotalPagado] = useState();
-  const [totalValidado, setTotalValidado] = useState(0);
-  const [totalPendiente, setTotalPendiente] = useState(0);
+  const [observation, setObservation] = useState<string>('');
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string | null>(null);
+  const [totalPedido, setTotalPedido] = useState<number | undefined>();
+  const [totalPagado, setTotalPagado] = useState<number | undefined>();
+  const [totalValidado, setTotalValidado] = useState<number>(0);
+  const [totalPendiente, setTotalPendiente] = useState<number>(0);
+  const { data: session } = useSession();
+  const [userId, setUserId] = useState<string | null>();
 
+  useEffect(() => {
+    if (session) {
+      setUserId(session ? session.session.user.name : null);
+      const loggedInUserEmail = session ? session.session.user.name : null
+      console.log("editador", loggedInUserEmail)
+    }
+  }, [session]);
 
   useEffect(() => {
     const fetchPagos = async () => {
@@ -44,9 +52,8 @@ const ValidatorPayments = ({ orderId }) => {
 
     fetchPagos();
     permisos();
-    fetchEstadoPago( orderId);
+    fetchEstadoPago(orderId);
   }, [orderId]);
-
 
   const permisos = async () => {
     const res = await fetch("/api/mysqlPerm", {
@@ -55,20 +62,15 @@ const ValidatorPayments = ({ orderId }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: session ? session.session.user.email : null,
+        email: session ? session?.session?.user.email : null,
       }),
     });
     const data = await res.json();
-    console.log("el permisos: ", data.user[0].rol);
     const userRol = data ? data.user[0].permissions : "No conectado";
-    console.log("el permisos2: ", data.user[0].permissions);
-    //const userPerm = data ? data.user[0].permissions : "No conectado";
-    setSessionInfo(userRol)
-
-    return sessionInfo
+    setSessionInfo(userRol);
+    return sessionInfo;
   };
-
-  const fetchEstadoPago = async ( orderId) => {
+  const fetchEstadoPago = async (orderId: string) => {
     try {
       const responseTotalPedido = await axios.post(`/api/mysqlOrderAmount`, { order_id: orderId });
       const responseTotalPagado = await axios.post(`/api/mysqlPaymentsAmount`, { order_id: orderId });
@@ -89,18 +91,16 @@ const ValidatorPayments = ({ orderId }) => {
     }
   };
 
-  const handleValidate = (pagoId: any, paymentId: string) => {
+  const handleValidate = (pagoId: string, paymentId: string) => {
     setSelectedPaymentId(paymentId);
     setSelectedPaymentStatus('Validado');
     setObservationModal(true);
-    fetchEstadoPago(pagoId);
   };
 
-  const handleReject = (pagoId: any, paymentId: string) => {
+  const handleReject = (pagoId: string, paymentId: string) => {
     setSelectedPaymentId(paymentId);
     setSelectedPaymentStatus('Rechazado');
     setObservationModal(true);
-    fetchEstadoPago(pagoId);
   };
 
   const handleConfirmValidation = async () => {
@@ -110,31 +110,32 @@ const ValidatorPayments = ({ orderId }) => {
         status: selectedPaymentStatus,
         observation: observation,
         validation_date: new Date(),
+        validatedBy: userId,
       });
-      setPagos((prevPagos: any) =>
-        prevPagos.map((pago: any) =>
+      setPagos((prevPagos) =>
+        prevPagos.map((pago) =>
           pago.id === selectedPaymentId
             ? {
-              ...pago,
-              status: selectedPaymentStatus,
-              validation_date: new Date(),
-              observation: observation,
-            }
+                ...pago,
+                status: selectedPaymentStatus,
+                validation_date: new Date(),
+                observation: observation,
+                validatedBy: userId,
+              }
             : pago
         )
       );
       setObservationModal(false);
       setObservation('');
-      fetchEstadoPago();
+      fetchEstadoPago(orderId); // Refresh the payment status
     } catch (error) {
       console.error('Error al validar el pago:', error);
     }
   };
 
-  const handleModalOpen2 = (data: React.SetStateAction<{}>, id: React.SetStateAction<string>) => {
-
+  const handleModalOpen2 = (data: string, id: React.SetStateAction<string>) => {
     setModalData2(data);
-    setIdPago(id)
+    setIdPago(id);
     setModalIsOpen2(true);
   };
 
@@ -142,16 +143,13 @@ const ValidatorPayments = ({ orderId }) => {
     setModalIsOpen2(false);
   };
 
-  // Función para cerrar el modal al hacer clic fuera de él
   const handleOutsideClick = (event: { target: { id: string; }; }) => {
     if (event.target.id === "modal") {
-
       handleModalClose2();
-
     }
   };
 
-  const requestSort = (key) => {
+  const requestSort = (key: string | null) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
@@ -160,6 +158,7 @@ const ValidatorPayments = ({ orderId }) => {
   };
 
   const sortedData = pagos.sort((a, b) => {
+    if (!sortConfig.key) return 0; // Add this check
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === 'ascending' ? -1 : 1;
     }
@@ -168,7 +167,7 @@ const ValidatorPayments = ({ orderId }) => {
     }
     return 0;
   });
-
+  
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(pagos);
     const workbook = XLSX.utils.book_new();
@@ -190,75 +189,76 @@ const ValidatorPayments = ({ orderId }) => {
   };
 
   return (
-
     <div className="space-y-4">
       <div className="mt-8">
-  <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-200">Estado de Pago del Pedido</h3>
-  <div className="overflow-x-auto">
-    <table className="min-w-full divide-y divide-gray-200 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-md">
-      <thead>
-        <tr>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-            Total del Pedido
-          </th>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-            Total Pagado
-          </th>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-            Total Validado
-          </th>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-            Total Pendiente
-          </th>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-            Estado
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td className="px-6 py-4 whitespace-nowrap">
-            <div className="text-sm text-gray-900 dark:text-gray-200">
-              $ {totalPedido}
-            </div>
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap">
-            <div className="text-sm text-gray-900 dark:text-gray-200">
-              $ {totalPagado}
-            </div>
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap">
-            <div className="text-sm text-gray-900 dark:text-gray-200">
-              $ {totalValidado}
-            </div>
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap">
-            <div className="text-sm text-gray-900 dark:text-gray-200">
-              $ {totalPendiente}
-            </div>
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap">
-            {totalValidado >= totalPedido ? (
-              totalValidado > totalPedido ? (
-                <span className="px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-200 text-green-800">
-                  Saldo a favor: $ {totalValidado - totalPedido}
-                </span>
-              ) : (
-                <span className="px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-200 text-yellow-800">
-                  Pagado completo
-                </span>
-              )
-            ) : (
-              <span className="px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-200 text-red-800">
-                Faltan pagos por aprobar
-              </span>
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+        <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-200">Estado de Pago del Pedido</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-md">
+            <thead>
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Total del Pedido
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Total Pagado
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Total Validado
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Total Pendiente
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Estado
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 dark:text-gray-200">
+                    $ {totalPedido}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 dark:text-gray-200">
+                    $ {totalPagado}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 dark:text-gray-200">
+                    $ {totalValidado}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 dark:text-gray-200">
+                    $ {totalPendiente}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {totalValidado >= (totalPedido ?? 0) ? (
+                    <div
+                      className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        totalValidado > (totalPedido ?? 0)
+                          ? 'bg-green-200 text-green-800'
+                          : 'bg-yellow-200 text-yellow-800'
+                      }`}
+                    >
+                      {totalValidado > (totalPedido ?? 0)
+                        ? `Saldo a favor: $ ${totalValidado - (totalPedido ?? 0)}`
+                        : 'Pagado completo'}
+                    </div>
+                  ) : (
+                    <div className="px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-200 text-red-800">
+                      Faltan pagos por aprobar: $ {(totalPedido ?? 0) - totalValidado}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
       <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Pagos del Pedido</h2>
       {loading ? (
         <p className="text-gray-600 dark:text-gray-200">Cargando pagos...</p>
@@ -321,7 +321,7 @@ const ValidatorPayments = ({ orderId }) => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200">
-                {sortedData.map((pago: any) => (
+                {sortedData.map((pago) => (
                   <tr
                     key={pago.id}
                     onClick={() => setSelectedRow(pago.id)}
