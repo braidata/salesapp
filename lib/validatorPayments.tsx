@@ -241,7 +241,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                       className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         totalValidado > (totalPedido ?? 0)
                           ? 'bg-green-200 text-green-800'
-                          : 'bg-yellow-200 text-yellow-800'
+                          : 'bg-gradient-to-r from-yellow-600 to-yellow-800 border-2 drop-shadow-[0_9px_9px_rgba(177,177,0,0.75)]  border-yellow-800 hover:bg-yellow-600 text-gray-800 dark:bg-gradient-to-r dark:from-yellow-500 dark:to-yellow-800 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-yellow-200 dark:hover:bg-yellow-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2'
                       }`}
                     >
                       {totalValidado > (totalPedido ?? 0)
@@ -249,8 +249,8 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                         : 'Pagado completo'}
                     </div>
                   ) : (
-                    <div className="px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-200 text-red-800">
-                      Faltan pagos por aprobar: $ {(totalPedido ?? 0) - totalValidado}
+                    <div className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2">
+                      Pendiente: $ {(totalPedido ?? 0) - totalValidado}
                     </div>
                   )}
                 </td>
@@ -331,30 +331,34 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                     <td className="px-6 py-4">{pago.payment_amount}</td>
                     <td className="px-6 py-4">{pago.payment_date}</td>
                     <td className="px-6 py-4">{pago.status}</td>
-                    <td className="px-6 py-4">
-                      <button
-                        className="bg-gradient-to-r from-blue-600/40 to-blue-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,0,177,0.75)]  border-blue-800 hover:bg-blue-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-blue-500/40 dark:to-blue-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,0,255,0.25)]  dark:border-blue-200 dark:hover:bg-blue-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-                        onClick={() => handleModalOpen2(orderId, pago.id)}
-                      >
-                        Revisar
-                      </button>
-                      {sessionInfo === "payments" || sessionInfo === "all" ? (
-                        <>
-                          <button
-                            className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-                            onClick={() => handleValidate(orderId, pago.id)}
-                          >
-                            Validar
-                          </button>
-                          <button
-                            className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-                            onClick={() => handleReject(orderId, pago.id)}
-                          >
-                            Rechazar
-                          </button>
-                        </>
-                      ) : null}
-                    </td>
+<td className="px-6 py-4">
+  <button
+    className="bg-gradient-to-r from-blue-600/40 to-blue-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,0,177,0.75)]  border-blue-800 hover:bg-blue-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-blue-500/40 dark:to-blue-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,0,255,0.25)]  dark:border-blue-200 dark:hover:bg-blue-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+    onClick={() => handleModalOpen2(orderId, pago.id)}
+  >
+    Revisar
+  </button>
+  {sessionInfo === "payments" || sessionInfo === "all" ? (
+    <>
+      {pago.status !== 'Validado' && pago.status !== 'Borrado' && (
+        <button
+          className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+          onClick={() => handleValidate(orderId, pago.id)}
+        >
+          Validar
+        </button>
+      )}
+      {pago.status !== 'Rechazado' && pago.status !== 'Borrado' && (
+        <button
+          className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+          onClick={() => handleReject(orderId, pago.id)}
+        >
+          Rechazar
+        </button>
+      )}
+    </>
+  ) : null}
+</td>
                   </tr>
                 ))}
               </tbody>
@@ -372,7 +376,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
           <div className="mt-8 mb-8 bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-30">
             <header className="mt-8 mb-8 bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800">
               <p className="text-gray-600 text-xl font-semibold dark:text-gray-300">
-                Validación de Pagos.
+                Visualizador de Pagos.
               </p>
               <button
                 title="Cerrar"
