@@ -11,9 +11,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const paymentsPending = await prisma.payments_validator.findMany({
           where: {
             order_id: parseInt(order_id),
-            status: 'Pendiente',
+            status: {
+              in: ['Pendiente', 'Doble Revisión'],
+            },
           },
         });
+
+        console.log('Payments Pending:', paymentsPending);
   
         const totalPendiente = paymentsPending.reduce((total, payment) => {
           const paymentAmount = parseFloat(payment.payment_amount || '0');
