@@ -29,6 +29,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [totalPendiente, setTotalPendiente] = useState<number>(0);
   const { data: session } = useSession();
   const [userId, setUserId] = useState<string | null>();
+  const [authCode, setAuthCode] = useState<string>('');
 
   useEffect(() => {
     if (session) {
@@ -111,6 +112,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         observation: observation,
         validation_date: new Date(),
         validatedBy: userId,
+        authorization_code: authCode,
       });
       setPagos((prevPagos) =>
         prevPagos.map((pago) =>
@@ -121,12 +123,14 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                 validation_date: new Date(),
                 observation: observation,
                 validatedBy: userId,
+                authorization_code: authCode,
               }
             : pago
         )
       );
       setObservationModal(false);
       setObservation('');
+      setAuthCode('');
       fetchEstadoPago(orderId); // Refresh the payment status
     } catch (error) {
       console.error('Error al validar el pago:', error);
@@ -424,6 +428,17 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                         value={observation}
                         onChange={(e) => setObservation(e.target.value)}
                       ></textarea>
+
+<label htmlFor="authCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 mt-4">
+                        Código de Autorización:
+                      </label>
+                      <input
+                        id="authCode"
+                        name="authCode"
+                        className="mt-1 px-2 py-2 block w-4xl rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-300"
+                        value={authCode}
+                        onChange={(e) => setAuthCode(e.target.value)}
+                      ></input>
                     </div>
                   </div>
                 </div>

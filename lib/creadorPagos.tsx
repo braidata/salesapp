@@ -160,7 +160,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
             <option value="Guia de Despacho">Guia de Despacho</option>
             <option value="Abono a Rut">Abono a Rut</option>
             <option value="Banco Internacional">Banco Internacional</option>
-            <option value="Orden de Compra">Orden de Compra</option>
+            
           </select>
         </div>
         <div className="mb-4">
