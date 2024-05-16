@@ -113,7 +113,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
   return (
     <>
       <h1 className="w-full text-4xl sm:text-6xl font-bold text-center mt-24 mb-12 py-4 px-4 rounded-lg transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-gray-900 border-2 border-gray-400 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 dark:text-gray-300 dark:border-sky-200 dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)] hover:text-gray-900 hover:bg-gray-600/50 dark:hover:bg-sky-900 hover:animate-pulse">
-        INGRESA EL PAGO DE TU PEDIDO
+        CREA UN NUEVO PAGO
       </h1>
 
       <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
