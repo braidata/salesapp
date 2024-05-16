@@ -8,12 +8,24 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
   const idOrder = orderId ? Object.entries(orderId).map((i: any) => { return i[1] }) : ""
   const date = new Date(idOrder[1])
   const fechaFormateada = date.getFullYear() + "-" +
-    ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
-    ("0" + date.getDate()).slice(-2);
+  ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+  ("0" + date.getDate()).slice(-2) + " " +
+  ("0" + date.getHours()).slice(-2) + ":" +
+  ("0" + date.getMinutes()).slice(-2);
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    return now.getFullYear() + "-" +
+      ("0" + (now.getMonth() + 1)).slice(-2) + "-" +
+      ("0" + now.getDate()).slice(-2) + " " + // Reemplazar "T" con un espacio
+      ("0" + now.getHours()).slice(-2) + ":" +
+      ("0" + now.getMinutes()).slice(-2);
+  };
+
   const [paymentData, setPaymentData] = useState({
     order_id: idOrder[0],
     order_date: fechaFormateada,
-    payment_date: fechaFormateada,
+    payment_date: getCurrentDateTime(),
     rut_cliente: idOrder[2],
     rut_pagador: idOrder[2],
     banco_destino: "",
@@ -45,18 +57,20 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
 
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
+    const formattedPaymentDate = paymentData.payment_date.replace("T", " ");
+    const formattedOrderDate = paymentData.order_date.replace("T", " ");
     const res = await fetch("/api/mysqlPaymentsCreatorModule", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...paymentData, createdBy: userId }),
+      body: JSON.stringify({ ...paymentData,payment_date: formattedPaymentDate,order_date: formattedOrderDate, createdBy: userId }),
     });
     if (res.status === 201) {
       setPaymentData({
         order_id: idOrder[0],
-        order_date: fechaFormateada,
-        payment_date: "",
+        order_date: formattedOrderDate,
+        payment_date: formattedPaymentDate,
         rut_cliente: idOrder[2],
         rut_pagador: "",
         banco_destino: "",
@@ -114,13 +128,13 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="order_date">
             Fecha del Pedido:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date" name="order_date" value={paymentData.order_date} readOnly disabled onChange={handleChange} required />
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date-local" name="order_date" value={paymentData.order_date} readOnly disabled onChange={handleChange} required />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="payment_date">
             Fecha del Pago:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date" name="payment_date" value={paymentData.payment_date} onChange={handleChange} required />
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date-local" name="payment_date" value={paymentData.payment_date} onChange={handleChange} required />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="rut_cliente">
