@@ -132,9 +132,9 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="payment_date">
-            Fecha del Pago:
+            Fecha de Creación:
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date-local" name="payment_date" value={paymentData.payment_date} onChange={handleChange} required />
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none cursor-not-allowed focus:shadow-outline bg-white dark:bg-gray-700" type="date-local" name="payment_date" value={paymentData.payment_date} readOnly disabled onChange={handleChange} required />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="rut_cliente">
