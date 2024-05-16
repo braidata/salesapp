@@ -28,7 +28,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [filterId, setFilterId] = useState("");
-  
+
 
   useEffect(() => {
     functionsSP(paymentStatus);
@@ -200,8 +200,8 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   });
 
   const filteredData = filterId
-  ? sortedData?.filter((payment) => payment.order_id.toString().includes(filterId))
-  : sortedData;
+    ? sortedData?.filter((payment) => payment.order_id.toString().includes(filterId))
+    : sortedData;
 
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dataP);
@@ -225,10 +225,11 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   };
 
   return (
-    <div className="flex flex-grow px-4 py-4 flex-col mt-10 mb-24 overflow-x-auto relative shadow-md sm:rounded-lg">
+    <div className="flex flex-col px-4 py-4 mt-10 mb-24 overflow-x-auto relative shadow-md sm:rounded-lg">
       <div className="mb-8">
-        <label htmlFor="paymentStatus">Filtrar por estado de pago:</label>
+        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="paymentStatus">Filtrar por estado de pago:</label>
         <select
+          className="block w-full p-2.5 mb-4 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           id="paymentStatus"
           value={paymentStatus}
           onChange={(e) => handlePaymentStatusChange(e.target.value)}
@@ -236,37 +237,39 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
           <option value="">Todos</option>
           <option value="Pendiente">Pendiente</option>
           <option value="Validado">Validado</option>
+          <option value="Doble Revisión">Doble Revisión</option>
           <option value="Rechazado">Rechazado</option>
           <option value="Borrado">Borrado</option>
         </select>
-        <div className="relative">
-  <input
-    type="text"
-    value={filterId}
-    onChange={(e) => setFilterId(e.target.value)}
-    placeholder="Buscar por ID de Pago"
-    className="mt-2 mb-5 px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-  />
-  {filterId && (
-    <button
-      className="absolute inset-y-0 right-0 flex items-center pr-3 dark:text-gray-300 font-bold rounded-lg hover:text-gray-900 border-gray-40 text-gray-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 text-center transition duration-500 ease-in-out drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
-      onClick={() => setFilterId("")}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 mb-2"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fillRule="evenodd"
-          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </button>
-  )}
-</div>
+        <div className="relative mb-4">
+          <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por ID de pedido:</label>
+          <input
+            type="text"
+            value={filterId}
+            onChange={(e) => setFilterId(e.target.value)}
+            placeholder="Buscar por ID de Pago"
+            className="block w-full p-2.5 pr-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+          {filterId && (
+            <button
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-900 dark:text-gray-300 font-bold rounded-lg hover:text-gray-900 dark:hover:text-white transition duration-500 ease-in-out mt-8"
+              onClick={() => setFilterId("")}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row justify-end gap-2 mt-2 mb-4">
@@ -334,32 +337,31 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
             </tr>
           </thead>
           <tbody>
-  {filteredData?.map((payment) => (
-    <tr
-      key={payment.id}
-      onClick={() => setSelectedRow(payment.id)}
-      className={`${
-        selectedRow === payment.id
-          ? 'bg-gray-300 dark:bg-gray-800'
-          : 'hover:bg-gray-100 dark:hover:bg-gray-600'
-      } bg-white border-b dark:bg-gray-900 dark:border-gray-700`}
-    >
-      <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.id}</td>
-      <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.order_id}</td>
-      <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.status}</td>
-      <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.payment_amount}</td>
-      <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.payment_date}</td>
-      <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">
-        <button
-          className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-semibold py-1 px-1 rounded-lg transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-          onClick={() => handleModalOpen2(payment.order_id, payment.id)}
-        >
-          Ver Pago
-        </button>
-      </td>
-    </tr>
-  ))}
-</tbody>
+            {filteredData?.map((payment) => (
+              <tr
+                key={payment.id}
+                onClick={() => setSelectedRow(payment.id)}
+                className={`${selectedRow === payment.id
+                    ? 'bg-gray-300 dark:bg-gray-800'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-600'
+                  } bg-white border-b dark:bg-gray-900 dark:border-gray-700`}
+              >
+                <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.id}</td>
+                <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.order_id}</td>
+                <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.status}</td>
+                <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.payment_amount}</td>
+                <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.payment_date}</td>
+                <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">
+                  <button
+                    className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-semibold py-1 px-1 rounded-lg transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                    onClick={() => handleModalOpen2(payment.order_id, payment.id)}
+                  >
+                    Ver Pago
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
 

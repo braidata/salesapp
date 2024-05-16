@@ -119,13 +119,13 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         prevPagos.map((pago) =>
           pago.id === selectedPaymentId
             ? {
-                ...pago,
-                status: selectedPaymentStatus,
-                validation_date: new Date(),
-                observation: observation,
-                validatedBy: userId,
-                authorization_code: authCode,
-              }
+              ...pago,
+              status: selectedPaymentStatus,
+              validation_date: new Date(),
+              observation: observation,
+              validatedBy: userId,
+              authorization_code: authCode,
+            }
             : pago
         )
       );
@@ -172,7 +172,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
     }
     return 0;
   });
-  
+
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(pagos);
     const workbook = XLSX.utils.book_new();
@@ -243,11 +243,10 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {totalValidado >= (totalPedido ?? 0) ? (
                     <div
-                      className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        totalValidado > (totalPedido ?? 0)
+                      className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${totalValidado > (totalPedido ?? 0)
                           ? 'bg-green-200 text-green-800'
                           : 'bg-gradient-to-r from-yellow-600 to-yellow-800 border-2 drop-shadow-[0_9px_9px_rgba(177,177,0,0.75)]  border-yellow-800 hover:bg-yellow-600 text-gray-800 dark:bg-gradient-to-r dark:from-yellow-500 dark:to-yellow-800 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-yellow-200 dark:hover:bg-yellow-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2'
-                      }`}
+                        }`}
                     >
                       {totalValidado > (totalPedido ?? 0)
                         ? `Saldo a favor: $ ${totalValidado - (totalPedido ?? 0)}`
@@ -336,34 +335,34 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                     <td className="px-6 py-4">{pago.payment_amount}</td>
                     <td className="px-6 py-4">{pago.payment_date}</td>
                     <td className="px-6 py-4">{pago.status}</td>
-<td className="px-6 py-4">
-  <button
-    className="bg-gradient-to-r from-blue-600/40 to-blue-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,0,177,0.75)]  border-blue-800 hover:bg-blue-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-blue-500/40 dark:to-blue-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,0,255,0.25)]  dark:border-blue-200 dark:hover:bg-blue-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-    onClick={() => handleModalOpen2(orderId, pago.id)}
-  >
-    Revisar
-  </button>
-  {sessionInfo === "payments" || sessionInfo === "all" ? (
-    <>
-      {pago.status !== 'Validado' && pago.status !== 'Borrado' && (
-        <button
-          className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-          onClick={() => handleValidate(orderId, pago.id)}
-        >
-          Validar
-        </button>
-      )}
-      {pago.status !== 'Rechazado' && pago.status !== 'Borrado' && pago.status !== 'Doble Revisión' &&  (
-        <button
-          className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-          onClick={() => handleReject(orderId, pago.id)}
-        >
-          Rechazar
-        </button>
-      )}
-    </>
-  ) : null}
-</td>
+                    <td className="px-6 py-4">
+                      <button
+                        className="bg-gradient-to-r from-blue-600/40 to-blue-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,0,177,0.75)]  border-blue-800 hover:bg-blue-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-blue-500/40 dark:to-blue-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,0,255,0.25)]  dark:border-blue-200 dark:hover:bg-blue-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+                        onClick={() => handleModalOpen2(orderId, pago.id)}
+                      >
+                        Revisar
+                      </button>
+                      {sessionInfo === "payments" || sessionInfo === "all" ? (
+                        <>
+                          {pago.status !== 'Validado' && pago.status !== 'Borrado' && (
+                            <button
+                              className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+                              onClick={() => handleValidate(orderId, pago.id)}
+                            >
+                              Validar
+                            </button>
+                          )}
+                          {pago.status !== 'Rechazado' && pago.status !== 'Borrado' && pago.status !== 'Doble Revisión' && (
+                            <button
+                              className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+                              onClick={() => handleReject(orderId, pago.id)}
+                            >
+                              Rechazar
+                            </button>
+                          )}
+                        </>
+                      ) : null}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -430,22 +429,22 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                         onChange={(e) => setObservation(e.target.value)}
                       ></textarea>
 
-<label htmlFor="selectedPaymentStatus">Filtrar por estado de pago:</label>
-        <select
-          id="selectedPaymentStatus"
-          value={selectedPaymentStatus}
-          onChange={(e) => setSelectedPaymentStatus(e.target.value)}
-        >
-          <option value="">Todos</option>
-          <option value="Doble Revisión">Doble Revisión</option>
-          <option value="Pendiente">Pendiente</option>
-          <option value="Validado">Validado</option>
-          <option value="Rechazado">Rechazado</option>
-          <option value="Borrado">Borrado</option>
-          
-        </select>
+                      <label htmlFor="selectedPaymentStatus">Filtrar por estado de pago:</label>
+                      <select
+                        id="selectedPaymentStatus"
+                        value={selectedPaymentStatus}
+                        onChange={(e) => setSelectedPaymentStatus(e.target.value)}
+                      >
+                        <option value="">Todos</option>
+                        <option value="Doble Revisión">Doble Revisión</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Validado">Validado</option>
+                        <option value="Rechazado">Rechazado</option>
+                        <option value="Borrado">Borrado</option>
 
-<label htmlFor="authCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 mt-4">
+                      </select>
+
+                      <label htmlFor="authCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 mt-4">
                         Código de Autorización:
                       </label>
                       <input
@@ -460,7 +459,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                 </div>
               </div>
               <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                {selectedPaymentStatus === 'Validado' ?
+                {selectedPaymentStatus === 'Validado' || 'Doble Revisión' ?
                   <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-green-600/40 to-green-800/40 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200  my-2 mx-2  transform perspective-1000 transition duration-500 origin-center"
