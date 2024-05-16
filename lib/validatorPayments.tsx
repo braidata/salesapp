@@ -22,7 +22,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [observationModal, setObservationModal] = useState(false);
   const [observation, setObservation] = useState<string>('');
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string | null>(null);
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string | null>('');
   const [totalPedido, setTotalPedido] = useState<number | undefined>();
   const [totalPagado, setTotalPagado] = useState<number | undefined>();
   const [totalValidado, setTotalValidado] = useState<number>(0);
@@ -30,6 +30,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const { data: session } = useSession();
   const [userId, setUserId] = useState<string | null>();
   const [authCode, setAuthCode] = useState<string>('');
+
 
   useEffect(() => {
     if (session) {
@@ -352,7 +353,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
           Validar
         </button>
       )}
-      {pago.status !== 'Rechazado' && pago.status !== 'Borrado' && (
+      {pago.status !== 'Rechazado' && pago.status !== 'Borrado' && pago.status !== 'Doble Revisión' &&  (
         <button
           className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
           onClick={() => handleReject(orderId, pago.id)}
@@ -428,6 +429,21 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                         value={observation}
                         onChange={(e) => setObservation(e.target.value)}
                       ></textarea>
+
+<label htmlFor="selectedPaymentStatus">Filtrar por estado de pago:</label>
+        <select
+          id="selectedPaymentStatus"
+          value={selectedPaymentStatus}
+          onChange={(e) => setSelectedPaymentStatus(e.target.value)}
+        >
+          <option value="">Todos</option>
+          <option value="Doble Revisión">Doble Revisión</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="Validado">Validado</option>
+          <option value="Rechazado">Rechazado</option>
+          <option value="Borrado">Borrado</option>
+          
+        </select>
 
 <label htmlFor="authCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 mt-4">
                         Código de Autorización:
