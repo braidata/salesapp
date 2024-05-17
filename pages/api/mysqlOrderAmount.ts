@@ -27,7 +27,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const totalPedido = order?.order_items.reduce((total: number, item: { price: any; quantity: string }) => {
       const price = parseFloat(item.price || '0');
       const quantity = parseInt(item.quantity);
-      return total + price * quantity;
+      const ivaChileno = 1.19; // IVA chileno del 19%
+      const totalConIva = total + price * quantity * ivaChileno;
+      return Math.floor(totalConIva / 10) * 10; // Truncar los decimales para que el número termine en cero
     }, 0);
 
     res.status(200).json({ total_pedido: totalPedido || 0 });
