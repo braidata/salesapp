@@ -39,7 +39,7 @@ yarn-error.log*
 
 *.pyc
 __pycache__/
-/fapp/ocr.cpython-310.pyc
+/fapp/__pycache__/ocr.cpython-310.pyc
 
 # typescript
 *.tsbuildinfo
