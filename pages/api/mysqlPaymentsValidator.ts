@@ -5,10 +5,12 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { id,    observation, status, validatedBy, order_date, team, banco_destino, imagenUrl, textoImg, rut_cliente, authorization_code } = req.body;
+    const { id, observation, status, validatedBy, order_date, team, banco_destino, imagenUrl, textoImg, rut_cliente, authorization_code } = req.body;
 
-    // Obtener la fecha y hora actual
-    const validation_date = new Date().toString();
+    // Obtener la fecha y hora actual y ajustar por GMT-4
+    const now = new Date();
+    now.setHours(now.getHours() - 4);
+    const validation_date = now.toISOString().slice(0, 16).replace('T', ' ');
 
     // Actualizar el estado del pago
     const updatedPayment = await prisma.payments_validator.update({

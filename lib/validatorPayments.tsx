@@ -107,11 +107,22 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
 
   const handleConfirmValidation = async () => {
     try {
+      const formattedDate = new Date().toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).replace(',', '');
+
+      
+
       await axios.post('/api/mysqlPaymentsValidator', {
         id: selectedPaymentId,
         status: selectedPaymentStatus,
         observation: observation,
-        validation_date: new Date(),
+        validation_date: formattedDate,
         validatedBy: userId,
         authorization_code: authCode,
       });
@@ -121,7 +132,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
             ? {
               ...pago,
               status: selectedPaymentStatus,
-              validation_date: new Date(),
+              validation_date: formattedDate,
               observation: observation,
               validatedBy: userId,
               authorization_code: authCode,
@@ -244,8 +255,8 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                   {totalValidado >= (totalPedido ?? 0) ? (
                     <div
                       className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${totalValidado > (totalPedido ?? 0)
-                          ? 'bg-green-200 text-green-800'
-                          : 'bg-gradient-to-r from-yellow-600 to-yellow-800 border-2 drop-shadow-[0_9px_9px_rgba(177,177,0,0.75)]  border-yellow-800 hover:bg-yellow-600 text-gray-800 dark:bg-gradient-to-r dark:from-yellow-500 dark:to-yellow-800 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-yellow-200 dark:hover:bg-yellow-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2'
+                        ? 'bg-green-200 text-green-800'
+                        : 'bg-gradient-to-r from-yellow-600 to-yellow-800 border-2 drop-shadow-[0_9px_9px_rgba(177,177,0,0.75)]  border-yellow-800 hover:bg-yellow-600 text-gray-800 dark:bg-gradient-to-r dark:from-yellow-500 dark:to-yellow-800 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-yellow-200 dark:hover:bg-yellow-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2'
                         }`}
                     >
                       {totalValidado > (totalPedido ?? 0)
@@ -409,14 +420,14 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
               &#8203;
             </span>
-            <div className=" inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle">
+            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle">
               <div className="bg-gray-200 w-full dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start w-full">
-                  <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <div className="w-full mt-3 text-center sm:text-left">
                     <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                       {selectedPaymentStatus === 'Validado' ? 'Validar Pago' : 'Rechazar Pago'}
                     </h3>
-                    <div className="mt-2 flex flex-col w-full ">
+                    <div className="mt-2 flex flex-col w-full">
                       <label htmlFor="observation" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 mt-4">
                         Observación:
                       </label>
@@ -429,9 +440,12 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                         onChange={(e) => setObservation(e.target.value)}
                       ></textarea>
 
-                      <label htmlFor="selectedPaymentStatus">Filtrar por estado de pago:</label>
+                      <label htmlFor="selectedPaymentStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 mt-4">
+                        Filtrar por estado de pago:
+                      </label>
                       <select
                         id="selectedPaymentStatus"
+                        className="mt-1 px-2 py-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-300"
                         value={selectedPaymentStatus}
                         onChange={(e) => setSelectedPaymentStatus(e.target.value)}
                       >
@@ -441,7 +455,6 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                         <option value="Validado">Validado</option>
                         <option value="Rechazado">Rechazado</option>
                         <option value="Borrado">Borrado</option>
-
                       </select>
 
                       <label htmlFor="authCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 mt-4">
@@ -459,20 +472,23 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                 </div>
               </div>
               <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                {selectedPaymentStatus === 'Validado' || 'Doble Revisión' ?
+                {selectedPaymentStatus === 'Validado' || selectedPaymentStatus === 'Doble Revisión' ? (
                   <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-green-600/40 to-green-800/40 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200  my-2 mx-2  transform perspective-1000 transition duration-500 origin-center"
                     onClick={handleConfirmValidation}
                   >
                     Validar
-                  </button> : <button
+                  </button>
+                ) : (
+                  <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-red-600/40 to-red-800/40 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200  my-2 mx-2  transform perspective-1000 transition duration-500 origin-center"
                     onClick={handleConfirmValidation}
                   >
                     Rechazar
-                  </button>}
+                  </button>
+                )}
                 <button
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-gray-600/40 to-gray-800/40 drop-shadow-[0_9px_9px_rgba(177,177,177,0.75)]  border-gray-800 hover:bg-gray-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-gray-500/40 dark:to-gray-800/60 dark:drop-shadow-[0_9px_9px_rgba(200,200,200,0.25)]  dark:border-gray-200 dark:hover:bg-gray-900 dark:text-gray-200  my-2 mx-2  transform perspective-1000 transition duration-500 origin-center"
