@@ -5,6 +5,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const name = req.body.name ? req.body.name : null;
   const email = req.body.email ? req.body.email : null;
   const id = req.body.id ? req.body.id : null;
+  const orderId = req.body.orderId ? req.body.orderId : null;
   const companyName = req.body.companyName ? req.body.companyName : null;
 
   const prisma = new PrismaClient();
@@ -25,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const where = {
       user: email,
-      ...(companyName && { billing_company_name: companyName }),
+      ...(companyName && {billing_company_name: companyName} ||orderId && { id: parseInt(orderId) }),
     };
 
     const orders = await prisma.orders.findMany({

@@ -153,11 +153,8 @@ export default async function handler(
           create: {
             method,
             type,
-            rut_pagador,
-            authorization_code,
-            payment_count,
             payment_amount,
-            payment_date,
+
 
           }
         },
