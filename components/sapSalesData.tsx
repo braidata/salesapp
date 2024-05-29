@@ -29,6 +29,8 @@ interface SAPSalesDataResult {
   SDProcessStatus: string;
   SDPROCESSSTATUS_TEXT: string;
   TVLST_TEXT: string;
+  febosFC: string;
+  febosGD: string;
 }
 
 interface SAPSalesData {
@@ -65,6 +67,17 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
 
     fetchSAPSalesData();
   }, [salesOrder]);
+
+  const viewDocument = async (id: string) => {
+    try {
+      const response = await fetch(`/api/febos?id=${id}`);
+      const data = await response.json();
+      window.open(data.imagenLink, '_blank');
+    } catch (error) {
+      console.error('Error al obtener el documento de Febos:', error);
+    }
+  };
+
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -117,7 +130,24 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
           <span className="font-bold">Transporte:</span>
           <span className="ml-1">{globalData.SalesOrderItemText || "Sin Despacho"}</span>
         </div> */}
-
+        <div className="mb-2">
+          {globalData.febosFC && (
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+              onClick={() => viewDocument(globalData.febosFC)}
+            >
+              Ver Factura
+            </button>
+          )}
+          {globalData.febosGD && (
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded"
+              onClick={() => viewDocument(globalData.febosGD)}
+            >
+              Ver Guía
+            </button>
+          )}
+        </div>
       </div>
 
       {/* <div className=" overflow-hidden"> */}
