@@ -86,6 +86,7 @@ model payments {
 model payments_validator {
   id                 Int     @id @default(autoincrement())
   order_id           Int
+  sapId              String? @default("sin datos") @db.VarChar(255)
   payment_method     String? @default("sin datos") @db.VarChar(255)
   authorization_code String? @default("sin datos") @db.VarChar(255)
   payment_count      String? @default("sin datos") @db.VarChar(255)
@@ -104,6 +105,7 @@ model payments_validator {
   createdBy          String?
   validatedBy        String?
   editedBy           String?
+  contId             String? @default("sin datos") @db.VarChar(255)
 }
 
 model users {
@@ -117,4 +119,16 @@ model users {
   rol         String? @db.VarChar(255)
   team        String? @db.VarChar(255)
   rut         String? @db.VarChar(255)
+}
+
+model aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl {
+  id       Int     @id @default(autoincrement())
+  order_id Int
+  sku      String  @db.VarChar(255)
+  name     String? @db.VarChar(255)
+  price    String? @db.VarChar(255)
+  quantity String  @db.VarChar(255)
+
+  @@index([order_id], map: "order_items_order_id_idx")
+  @@map("_69aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl")
 }

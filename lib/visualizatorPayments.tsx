@@ -118,6 +118,7 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
       Banco destino: ${selectedPago.banco_destino}
       RUT cliente: ${selectedPago.rut_cliente}
       Estado: ${selectedPago.status}
+      SAP ID: ${selectedPago.sapId}
     `;
     navigator.clipboard.writeText(textToCopy);
   };
@@ -136,15 +137,40 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
     }
 
     console.log("editador", userId)
-  
+
     try {
       const updatedData = {
         ...editPago,
         ...editValues,
         editedBy: userId, // Asegúrate de que userId sea un número entero
       };
-  
+
       const response = await axios.put('/api/mysqlPaymentsEditor', updatedData);
+      const updatedPago = response.data;
+      setPagos((prevPagos) => prevPagos.map((p) => (p.id === editPago.id ? updatedPago : p)));
+      setShowModalE(false);
+    } catch (error) {
+      console.error('Error al actualizar el pago:', error);
+    }
+  };
+
+
+  const handleUpdateC = async (userId: string) => {
+    if (!editPago) {
+      console.error('No hay datos de pago para actualizar');
+      return;
+    }
+
+    console.log("editador", userId)
+
+    try {
+      const updatedData = {
+        ...editPago,
+        ...editValues,
+        editedBy: userId, // Asegúrate de que userId sea un número entero
+      };
+
+      const response = await axios.put('/api/mysqlPaymentsCont', updatedData);
       const updatedPago = response.data;
       setPagos((prevPagos) => prevPagos.map((p) => (p.id === editPago.id ? updatedPago : p)));
       setShowModalE(false);
@@ -215,6 +241,12 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
                   >
                     Order ID
+                  </th>
+                  <th
+                    onClick={() => requestSort('sapId')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    SAP ID
                   </th>
                   <th
                     onClick={() => requestSort('status')}
@@ -288,6 +320,12 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                   >
                     Equipo
                   </th>
+                  <th
+                    onClick={() => requestSort('contId')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer rounded-tr-md"
+                  >
+                    Cont ID
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Acción
                   </th>
@@ -302,6 +340,7 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                   >
                     <td className="px-6 py-4">{pago.id}</td>
                     <td className="px-6 py-4">{pago.order_id}</td>
+                    <td className="px-6 py-4">{pago.sapId}</td>
                     <td className="px-6 py-4">{pago.status}</td>
                     <td className="px-6 py-4">{pago.payment_amount}</td>
                     <td className="px-6 py-4">{pago.observation}</td>
@@ -314,7 +353,97 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                     <td className="px-6 py-4">{pago.authorization_code}</td>
                     <td className="px-6 py-4">{pago.rut_pagador}</td>
                     <td className="px-6 py-4">{pago.team}</td>
+                    <td className="px-6 py-4">{pago.contId}</td>
                     <td className="px-6 py-4">
+                      {pago.status === 'Validado' && (
+
+                        <>
+                          <button
+                            className="z-50 px-2 py-2 rounded-lg bg-blue-300/30 dark:bg-blue-700/30 text-blue-800 dark:text-blue-100/80 font-semibold leading-none hover:text-blue-200 hover:bg-blue-300/50 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-blue-400/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
+                            onClick={() => {
+                              setEditPago(pago); // Set the payment data to be edited
+                              setShowModalE(true);
+                            }}
+                          >
+                            Contabilizador
+                          </button>
+                          {showModalE && (
+                            <div className="fixed z-10 inset-0 overflow-y-auto" onClick={() => setShowModalE(false)}>
+                              <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                                  <div className="absolute inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm"></div>
+                                </div>
+                                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                                  &#8203;
+                                </span>
+                                <div
+                                  className="inline-block align-bottom bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                                  role="dialog"
+                                  aria-modal="true"
+                                  aria-labelledby="modal-headline"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div className="sm:flex sm:items-start">
+                                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 className="text-lg leading-6 font-medium text-gray-800 dark:text-gray-200" id="modal-headline">
+                                          Contabilizar Pedido
+                                        </h3>
+                                        <div className="mt-2">
+                                          {editFields.map((field, index) => (
+                                            <div key={index} className="mb-4">
+                                              <select
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200"
+                                                value={field}
+                                                onChange={(e) => handleFieldChange(index, e.target.value)}
+                                              >
+                                                <option value="">Seleccionar campo</option>
+                                                <option value="contId">Contabilización</option>
+                                                
+                                              </select>
+                                              <input
+                                                type="text"
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200"
+                                                placeholder="Nuevo valor"
+                                                value={editValues[field] || ""}
+                                                onChange={(e) => handleValueChange(field, e.target.value)}
+                                              />
+                                            </div>
+                                          ))}
+                                          <button
+                                            type="button"
+                                            className="bg-gradient-to-r from-blue-600/40 to-blue-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,0,177,0.75)] border-blue-800 hover:bg-blue-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-blue-500/40 dark:to-blue-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,200,255,0.25)] dark:border-blue-200 dark:hover:bg-blue-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+                                            onClick={handleAddField}
+                                          >
+                                            Agregar ID
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="bg-gray-50 dark:bg-gray-700 bg-opacity-90 backdrop-blur-md px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                    <button
+                                      type="button"
+                                      className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(85,85,85,0.75)] border-green-800 hover:bg-green-600/50 text-green-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,255,0.25)] dark:border-gray-200 dark:hover:bg-gray-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
+                                      onClick={() => handleUpdateC(userId)}
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="bg-gradient-to-r from-gray-600/40 to-gray-800/40 border-2 drop-shadow-[0_9px_9px_rgba(85,85,85,0.75)] border-gray-800 hover:bg-gray-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-gray-500/40 dark:to-gray-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,255,0.25)] dark:border-gray-200 dark:hover:bg-gray-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2 hover:text-red-700 dark:hover:text-red-600"
+                                      onClick={() => setShowModalE(false)}
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </>
+
+                      )}
                       {pago.status === 'Rechazado' && (
                         <>
                           <button
@@ -394,7 +523,7 @@ const VisualizadorPagos = ({ orderId, paymentId }: { orderId: string; paymentId:
                                     <button
                                       type="button"
                                       className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(85,85,85,0.75)] border-green-800 hover:bg-green-600/50 text-green-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,255,0.25)] dark:border-gray-200 dark:hover:bg-gray-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-                                      onClick={()=>handleUpdate(userId)}
+                                      onClick={() => handleUpdate(userId)}
                                     >
                                       Guardar
                                     </button>

@@ -116,13 +116,16 @@ const OrderTable = ({ data, functionS }) => {
     setModalIsOpen(false);
   };
 
-  const handleModalOpen2 = (data, date, rut, status) => {
+  const handleModalOpen2 = (data, date, rut, status, message) => {
 
     setModalData2(data);
     setModalDate2(date);
     setModalRut2(rut)
     setModalStatus2(status);
+    let messageId = extractNumber(message)
+    setModalData3(messageId);
     setModalIsOpen2(true);
+
   };
 
   const handleModalClose2 = () => {
@@ -131,7 +134,6 @@ const OrderTable = ({ data, functionS }) => {
 
   const handleModalOpen3 = (data, status) => {
     data = extractNumber(data)
-    console.log("rata", data)
     setModalData3(data);
     setModalStatus3(status);
     setModalIsOpen3(true);
@@ -253,11 +255,11 @@ const OrderTable = ({ data, functionS }) => {
                   <td>
                     {/* Muestra cada mensaje */}
                     {messages.map((message, index) => (
-                      // extractNumber(message),
                       <div key={index}>
                         <p className="py-4 px-2 mt-2 mb-2 rounded-md border dark:border-blue-300/80 dark:hover:border-blue-200/80 border border-gray-400 rounded shadow
                         hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-gray-700/20 dark:hover:text-gray-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
                         ">{message} </p>
+                        
 
                         <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen3(message, status)}>
                           Info SAP
@@ -272,9 +274,13 @@ const OrderTable = ({ data, functionS }) => {
                       Ver +
                     </button>
                     {status === "Borrado" ? null :
-                      <><button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,60,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen2(item.id, item.order_date, item.billing_company_rut, status)}>
+                      <>
+                      {messages.map((message, index) => (
+                      
+                      <button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,60,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen2(item.id, item.order_date, item.billing_company_rut, status, message)}>
                         Pagos
                       </button>
+                      ))}
                         <button className="mt-2 mb-5 bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleDeleteModalOpen(item)}>
                           Borrar
                         </button></>}
@@ -501,7 +507,7 @@ const OrderTable = ({ data, functionS }) => {
             <div className="max-h-[80vh] overflow-y-auto">
               <section className="p-2 dark:text-gray-300 mt-2 rounded-lg">
                 <ValidatorPayments orderId={modalData2} />
-                <CreadorPagos orderId={modalData2} orderDate={modalDate2} rut={modalRut2} />
+                <CreadorPagos orderId={modalData2} orderDate={modalDate2} rut={modalRut2} sapId={modalData3}/>
                 {/* <VisualizatorPayments orderId={modalData2} /> */}
 
               </section>

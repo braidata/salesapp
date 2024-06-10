@@ -28,6 +28,8 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [filterId, setFilterId] = useState("");
+  const [filterSapId, setFilterSapId] = useState("");
+  const [filterAmmount, setFilterAmmount] = useState("");
 
 
   useEffect(() => {
@@ -201,7 +203,12 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
 
   const filteredData = filterId
     ? sortedData?.filter((payment) => payment.order_id.toString().includes(filterId))
-    : sortedData;
+    : filterAmmount
+      ? sortedData?.filter((payment) => payment.payment_amount.toString().includes(filterAmmount))
+      : filterSapId
+        ? sortedData?.filter((payment) => payment.sapId.toString().includes(filterSapId))
+        : sortedData;
+
 
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dataP);
@@ -241,6 +248,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
           <option value="Rechazado">Rechazado</option>
           <option value="Borrado">Borrado</option>
         </select>
+        <div className="flex flex-row gap-2">
         <div className="relative mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por ID de pedido:</label>
           <input
@@ -269,6 +277,65 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
               </svg>
             </button>
           )}
+        </div>
+        <div className="relative mb-4">
+          <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por ID de pedido SAP:</label>
+          <input
+            type="text"
+            value={filterSapId}
+            onChange={(e) => setFilterSapId(e.target.value)}
+            placeholder="Buscar por ID de pedido SAP"
+            className="block w-full p-2.5 pr-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+          {filterSapId && (
+            <button
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-900 dark:text-gray-300 font-bold rounded-lg hover:text-gray-900 dark:hover:text-white transition duration-500 ease-in-out mt-8"
+              onClick={() => setFilterSapId("")}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+        <div className="relative mb-4">
+          <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por Monto:</label>
+          <input
+            type="text"
+            value={filterAmmount}
+            onChange={(e) => setFilterAmmount(e.target.value)}
+            placeholder="Buscar por monto"
+            className="block w-full p-2.5 pr-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+          {filterAmmount && (
+            <button
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-900 dark:text-gray-300 font-bold rounded-lg hover:text-gray-900 dark:hover:text-white transition duration-500 ease-in-out mt-8"
+              onClick={() => setFilterAmmount("")}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
         </div>
       </div>
 
@@ -312,6 +379,13 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
               </th>
               <th
                 scope="col"
+                onClick={() => requestSort('order_id')}
+                className="py-2 px-2 cursor-pointer"
+              >
+                SAP ID
+              </th>
+              <th
+                scope="col"
                 onClick={() => requestSort('status')}
                 className="py-2 px-2 cursor-pointer"
               >
@@ -342,12 +416,13 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
                 key={payment.id}
                 onClick={() => setSelectedRow(payment.id)}
                 className={`${selectedRow === payment.id
-                    ? 'bg-gray-300 dark:bg-gray-800'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-600'
+                  ? 'bg-gray-300 dark:bg-gray-800'
+                  : 'hover:bg-gray-100 dark:hover:bg-gray-600'
                   } bg-white border-b dark:bg-gray-900 dark:border-gray-700`}
               >
                 <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.id}</td>
                 <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.order_id}</td>
+                <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.sapId}</td>
                 <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.status}</td>
                 <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.payment_amount}</td>
                 <td className="py-4 px-2 h-24 w-4xl mx-2 my-2">{payment.payment_date}</td>
