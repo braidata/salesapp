@@ -391,70 +391,70 @@ export default function FormatContext({ context, componente }) {
 
       //valida que el array productos tenga al menos un producto
 
-    //   order_items: yup
-    //     .array()
-    //     .of(
-    //       yup.object().shape({
-    //         product_id: yup
-    //           .string()
-    //           .nullable("Producto es requerido")
-    //           .test({
-    //             name: "Producto",
-    //             message: "Ingresa un Producto en HubSpot",
-    //             test: (value) => {
-    //               if (value === null) {
-    //                 return false;
-    //               } else {
-    //                 return true;
-    //               }
-    //             },
-    //           }),
-    //         quantity: yup
-    //           .number()
-    //           .nullable()
-    //           .required("Cantidad es requerida")
-    //           .test(
-    //             "check-stock",
-    //             "No hay suficiente stock para el producto seleccionado",
-    //             async function (value) {
-    //               const parentData = this.parent;
-    //               const sku = parentData.sku || parentData.product_id;
-    //               console.log("DATAZOS",this.parent,"sku", sku, "value", value, "centro", contexts.deale[0].centro, "almacen", contexts.deale[0].almacen)
-    //               if (sku === "600003" || sku === "600001") {
-    //                 console.log(`SKU ${sku} es un flete, saltando la verificación de stock.`);
-    //                 return true;
-    //               }
-    //               const result = await checkStockAvailable(
-    //                 sku,
-    //                 value,
-    //                 contexts.deale[0].centro,
-    //                 contexts.deale[0].almacen
-    //               );
-    //               if (result !== true) {
-    //                 // Crear un error con un mensaje personalizado
-    //                 return this.createError({
-    //                   message: `No hay suficiente stock para el producto con SKU: ${sku}. Stock disponible: ${Math.floor(result.stockAvailable)}`,
-    //                   path: this.path, // 'quantity'
-    //                 });
-    //               }
-    //               return true;
-    //             }
-    //           ),
-    //         // ...otras validaciones para los campos del producto...
-    //       })
-    //     )
-    //     .min(1, "Debes agregar al menos un producto")
-    //     .test({
-    //       name: "Productos",
-    //       message: "Ingresa al menos un Producto en HubSpot",
-    //       test: (value) => {
-    //         if (value.length === 0) {
-    //           return false;
-    //         } else {
-    //           return true;
-    //         }
-    //       },
-    //     }),
+      order_items: yup
+        .array()
+        .of(
+          yup.object().shape({
+            product_id: yup
+              .string()
+              .nullable("Producto es requerido")
+              .test({
+                name: "Producto",
+                message: "Ingresa un Producto en HubSpot",
+                test: (value) => {
+                  if (value === null) {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                },
+              }),
+            quantity: yup
+              .number()
+              .nullable()
+              .required("Cantidad es requerida")
+              .test(
+                "check-stock",
+                "No hay suficiente stock para el producto seleccionado",
+                async function (value) {
+                  const parentData = this.parent;
+                  const sku = parentData.sku || parentData.product_id;
+                  console.log("DATAZOS",this.parent,"sku", sku, "value", value, "centro", contexts.deale[0].centro, "almacen", contexts.deale[0].almacen)
+                  if (sku === "600003" || sku === "600001") {
+                    console.log(`SKU ${sku} es un flete, saltando la verificación de stock.`);
+                    return true;
+                  }
+                  const result = await checkStockAvailable(
+                    sku,
+                    value,
+                    contexts.deale[0].centro,
+                    contexts.deale[0].almacen
+                  );
+                  if (result !== true) {
+                    // Crear un error con un mensaje personalizado
+                    return this.createError({
+                      message: `No hay suficiente stock para el producto con SKU: ${sku}. Stock disponible: ${Math.floor(result.stockAvailable)}`,
+                      path: this.path, // 'quantity'
+                    });
+                  }
+                  return true;
+                }
+              ),
+            // ...otras validaciones para los campos del producto...
+          })
+        )
+        .min(1, "Debes agregar al menos un producto")
+        .test({
+          name: "Productos",
+          message: "Ingresa al menos un Producto en HubSpot",
+          test: (value) => {
+            if (value.length === 0) {
+              return false;
+            } else {
+              return true;
+            }
+          },
+        }),
      });
 
     try {
