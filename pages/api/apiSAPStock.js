@@ -1,66 +1,66 @@
 import axios from 'axios';
 
 export default async (req, res) => {
-  const { Material, werks, lgort } = req.query;
+  const { Material, werks, lgort, chunkSize = 500 } = req.query; // El cliente puede especificar el tamaño del chunk o utilizar un valor predeterminado
 
   const SAP_USER = process.env.SAP_USER;
   const SAP_PASSWORD = process.env.SAP_PASSWORD;
 
-  const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO(Material='${Material}',werks='${werks}',lgort='${lgort}')`;
+  const buildFilterPart = (param, paramName) => {
+    if (!param) return '';
+    const values = param.split(',');
+    const filterParts = values.map(value => `${paramName} eq '${value.trim()}'`);
+    return filterParts.length > 1 ? `(${filterParts.join(' or ')})` : filterParts[0];
+  };
 
-  try {
-    const response = await axios.get(SAP_URL, {
-      auth: {
-        username: SAP_USER,
-        password: SAP_PASSWORD
-      },
-    });
+  // Omito la función buildFilterPart por brevedad, asumiendo que está definida arriba
 
-    const data = response.data.d;
+  const materialFilter = buildFilterPart(Material, 'Material');
+  const werksFilter = buildFilterPart(werks, 'werks');
+  const lgortFilter = buildFilterPart(lgort, 'lgort');
 
-    const result = {
-      Material: data.Material,
-      werks: data.werks,
-      lgort: data.lgort,
-      prdha: data.prdha,
-      nameprdha: data.nameprdha,
-      lgpbe: data.lgpbe,
-      MaterialName: data.MaterialName,
-      marcatext: data.marcatext,
-      PlantName: data.PlantName,
-      StorageLocationName: data.StorageLocationName,
-      prctr: data.prctr,
-      ktext: data.ktext,
-      ProductType: data.ProductType,
-      mtbez: data.mtbez,
-      STOCK_ENTREGA: data.STOCK_ENTREGA,
-      STOCK_PEDIDO: data.STOCK_PEDIDO,
-      MaterialBaseUnit: data.MaterialBaseUnit,
-      MATLWRHSSTKQTYINMATLBASEUNIT: data.MATLWRHSSTKQTYINMATLBASEUNIT,
-      MATLCNSMPNQTYINMATLBASEUNIT: data.MATLCNSMPNQTYINMATLBASEUNIT,
-      MATLSTKINCRQTYINMATLBASEUNIT: data.MATLSTKINCRQTYINMATLBASEUNIT,
-      MATLSTKDECRQTYINMATLBASEUNIT: data.MATLSTKDECRQTYINMATLBASEUNIT,
-      labst: data.labst,
-      sperr: data.sperr,
-      umlme: data.umlme,
-      insme: data.insme,
-      einme: data.einme,
-      speme: data.speme,
-      retme: data.retme,
-      WAERS: data.WAERS,
-      verpr: data.verpr,
-      BaseUnitSpecificProductLength: data.BaseUnitSpecificProductLength,
-      BaseUnitSpecificProductWidth: data.BaseUnitSpecificProductWidth,
-      BaseUnitSpecificProductHeight: data.BaseUnitSpecificProductHeight,
-      ProductMeasurementUnit: data.ProductMeasurementUnit,
-      stock_Comp: data.stock_Comp,
-      stock_disp: data.stock_disp,
-      PRICINGDATE: data.PRICINGDATE
-    };
+  const filters = [materialFilter, werksFilter, lgortFilter].filter(Boolean).join(' and ');
 
-    return res.json(result);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+  let allData = [];
+
+  let hasMoreData = true;
+
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 2000; // Puedes ajustar el tamaño de la página
+  let skip = (page - 1) * pageSize;
+
+  // Continúa haciendo solicitudes hasta que no haya más datos
+  while (hasMoreData) {
+    // Solo obtén y devuelve una página de resultados a la vez
+
+
+    const SAP_URL = `http://20.83.154.218:8102/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp&$top=${pageSize}&$skip=${skip}`;
+
+
+    try {
+      const response = await axios.get(SAP_URL, {
+        auth: {
+          username: SAP_USER,
+          password: SAP_PASSWORD,
+        },
+      });
+
+      const chunkData = response.data.d.results;
+      allData = allData.concat(chunkData);
+
+      // Comprueba si todavía hay más datos por cargar
+      hasMoreData = chunkData.length === chunkSize;
+      skip += chunkSize;
+
+    } catch (error) {
+      // Manejar errores, por ejemplo, parar el bucle y registrar el error
+      hasMoreData = false;
+      console.error('Error al recuperar datos del servicio SAP', error);
+      break;
+    }
   }
-}
+
+  return res.json(allData);
+};
+
 

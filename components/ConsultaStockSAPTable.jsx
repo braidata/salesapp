@@ -29,6 +29,7 @@ const ConsultaStockComponent = () => {
                 <button
                     className="bg-purple-300 text-gray-900 dark:bg-purple-900 dark:text-gray-200 w-full p-4 rounded-lg shadow-md mx-2 my-2"
                     onClick={handleSubmit}
+                    aria-label='search'
                 >
                     Consultar
                 </button>

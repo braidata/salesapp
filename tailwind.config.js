@@ -9,6 +9,9 @@ module.exports = {
     extend: {
       colors: {
         'turquoise': '#009b9b',
+        'reddarky': '#8B0000',
+        'golden': '#FFD700',
+        'deepblue': '#00008B',
       },
     },
   },

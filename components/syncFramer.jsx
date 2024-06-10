@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
 const channels = [
-    { name: 'Mercado Libre Ventus', url: 'https://novahucp.ventuscorp.cl/integracion-nova/sync-orders-ml.php' },
-    { name: 'Mercado Libre Blanik', url: 'https://novahucp.ventuscorp.cl/integracion-nova/sync-orders-ml-blanik.php' },
-    { name: 'Mercado Libre BBQ', url: 'https://novahucp.ventuscorp.cl/integracion-nova/sync-orders-ml-bbq.php' },
-    { name: 'Blanik', url: 'https://novahucp.ventuscorp.cl/integracion-nova/sync-orders-blanik.php' },
-    { name: 'BBQ', url: 'https://novahucp.ventuscorp.cl/integracion-nova/sync-orders-bbq.php' },
-    { name: 'Ventus', url: 'https://novahucp.ventuscorp.cl/integracion-nova/sync-orders.php' },
+    { name: 'Mercado Libre Ventus', url: 'https://novahucp.ventuscorp.cl/integracion-sap/sync-orders-ml.php' },
+    { name: 'Mercado Libre Blanik', url: 'https://novahucp.ventuscorp.cl/integracion-sap/sync-orders-ml-blanik.php' },
+    { name: 'Mercado Libre BBQ', url: 'https://novahucp.ventuscorp.cl/integracion-sap/sync-orders-ml-bbq.php' },
+    { name: 'Blanik', url: 'https://novahucp.ventuscorp.cl/integracion-sap/sync-orders-blanik.php' },
+    { name: 'BBQ', url: 'https://novahucp.ventuscorp.cl/integracion-sap/sync-orders-bbq.php' },
+    { name: 'Ventus', url: 'https://novahucp.ventuscorp.cl/integracion-sap/sync-orders.php' },
 ];
 
 function App() {

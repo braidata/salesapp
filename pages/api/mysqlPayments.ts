@@ -3,46 +3,37 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { PrismaClient } from "@prisma/client";
 
-
+const prisma = new PrismaClient();
 
 //sending data to prisma
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-
-    const data = req.body;
-
-    const rut = JSON.parse(data).rut_pagador;
-    const oId = JSON.parse(data).order_id;
-    
-
-    console.log("los pagos son:", data, "rut:", rut)
-
-const prisma = new PrismaClient();
-
-try {
-
-const payment = await prisma.payments.findMany({where:{
-     order_id: parseInt(oId)
-}});
-
-
-//generate a payment with order_id as an optional value to find in the where clause
-// const payment = await prisma.payments.create({
-//    data: {
-//        order_id,
-//        rut_pagador,
-//        payment_amount,
-//        payment_date,
-//        payment_count,
-//        authorization_code,
-//        }
-//    });
-
-
-res.status(200).json({payment});}
-catch{
-console.log("error");
-} finally {
-    await prisma.$disconnect();
+    if (req.method === 'POST') {
+      const { email, orderId, status } = req.body;
+  
+      try {
+        let payments;
+  
+        if (orderId) {
+          payments = await prisma.payments_validator.findMany({
+            where: {
+              order_id: parseInt(orderId),
+              status: status || undefined,
+            },
+          });
+        } else {
+          payments = await prisma.payments_validator.findMany({
+            where: {
+              status: status || undefined,
+            },
+          });
+        }
+  
+        res.status(200).json(payments);
+      } catch (error) {
+        console.error('Error al obtener los pagos:', error);
+        res.status(500).json({ message: 'Error al obtener los pagos' });
+      }
+    } else {
+      res.status(405).json({ message: 'Method not allowed' });
     }
-
-}
+  }

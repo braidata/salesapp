@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 
 
 
-const LlamadorPagos = () => {
+const LlamadorPagos = (orderId: any) => {
 
 
 

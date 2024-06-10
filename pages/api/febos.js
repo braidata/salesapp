@@ -3,8 +3,8 @@ import fetch from 'node-fetch';
 export default async function handler(req, res) {
   const  id  = req.body.id ? req.body.id : req.query.id;
 
-  const empresa = '99522260-4';
-  const token = 'MWJhZjJiNDkyNzIyNTI0NmQ3MmIyZDQyNzk2MTUzMWI1NTlh';
+  const empresa = process.env.EMPRESAF;
+  const token = process.env.TOKENF;
 
   const url = `https://api.febos.cl/produccion/documentos/${id}?imagen=si&tipoImagen=3&regenerar=no&incrustar=no&xmlFirmado=si`;
 

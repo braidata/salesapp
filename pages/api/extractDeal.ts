@@ -17,6 +17,28 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
         Authorization: `Bearer ${process.env.HUBSPOT_TOKEN}`,
       },
       data: {
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: "hs_object_id",
+                operator: "EQ",
+                value: id,
+              },
+              {
+                propertyName: "dealstage",
+                operator: "EQ",
+                value: "50940199",
+              },
+            ],
+          },
+        ],
+        sorts: [
+          {
+            propertyName: "createdate",
+            direction: "DESCENDING",
+          },
+        ],
         properties: [
           "dealname",
           "rut_pagador",
@@ -50,31 +72,10 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
           "almacen",
           "centro",
         ],
-        filterGroups: [
-          {
-            filters: [
-              {
-                propertyName: "hs_object_id",
-                operator: "EQ",
-                value: id,
-              },
-              {
-                propertyName: "dealstage",
-                operator: "EQ",
-                value: "50940199",
-              },
-            ],
-          },
-        ],
-        sorts: [
-          {
-            propertyName: "createdate",
-            direction: "DESCENDING",
-          },
-        ],
+        
       },
     });
-    if(response.data.results.length >= 0)
+    if(response.data.results.length > 0)
 {    console.log("DEALAZO: ", response.data.results, "ID: ", id, "size: ", response.data.results.length);
     res.status(200).json({ success: true, data: response.data.results });}
   } catch (error) {

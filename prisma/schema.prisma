@@ -3,6 +3,7 @@ generator client {
 }
 
 datasource db {
+  
   provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
@@ -67,29 +68,45 @@ model orders {
   order_class                         String?       @db.VarChar(255)
   respuestaSAP                        String?       @db.Text
   status                              String?       @default("1") @db.VarChar(255)
+  creator                             String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
 }
 
 model payments {
-  id                 Int     @id @default(autoincrement())
-  order_id           Int     @unique
-  method             String? @default("sin pago") @db.VarChar(255)
-  authorization_code String? @default("sin pago") @db.VarChar(255)
-  payment_count      String? @default("sin pago") @db.VarChar(255)
-  payment_amount     String? @default("sin pago") @db.VarChar(255)
-  payment_date       String? @default("sin pago") @db.VarChar(255)
-  rut_pagador        String? @default("sin pago") @db.VarChar(255)
-  observation        String? @default("sin pago") @db.VarChar(255)
-  status             String? @default("sin pago") @db.VarChar(255)
-  validation_date    String? @default("sin pago") @db.VarChar(255)
-  type               String? @default("sin pago") @db.VarChar(255)
-  banco_destino      String? @default("sin pago") @db.VarChar(255)
-  imagenUrl          String? @default("sin pago") @db.VarChar(255)
-  rut_cliente        String? @default("sin pago") @db.VarChar(255)
-  orders             orders? @relation(fields: [order_id], references: [id])
+  id             Int     @id @default(autoincrement())
+  order_id       Int
+  method         String? @default("sin pago") @db.VarChar(255)
+  payment_amount String? @default("sin pago") @db.VarChar(255)
+  type           String? @default("sin pago") @db.VarChar(255)
+  orders         orders? @relation(fields: [order_id], references: [id])
 
   @@index([order_id])
+}
+
+model payments_validator {
+  id                 Int     @id @default(autoincrement())
+  order_id           Int
+  sapId              String? @default("sin datos") @db.VarChar(255)
+  payment_method     String? @default("sin datos") @db.VarChar(255)
+  authorization_code String? @default("sin datos") @db.VarChar(255)
+  payment_count      String? @default("sin datos") @db.VarChar(255)
+  payment_amount     String? @default("sin datos") @db.VarChar(255)
+  payment_date       String? @default("sin datos") @db.VarChar(255)
+  rut_pagador        String? @default("sin datos") @db.VarChar(255)
+  observation        String? @default("sin datos") @db.VarChar(255)
+  status             String? @default("sin datos") @db.VarChar(255)
+  order_date         String? @default("sin datos") @db.VarChar(255)
+  validation_date    String? @default("sin datos") @db.VarChar(255)
+  team               String? @default("sin datos") @db.VarChar(255)
+  banco_destino      String? @default("sin datos") @db.VarChar(255)
+  imagenUrl          String? @default("sin datos") @db.VarChar(255)
+  textoImg           String? @default("sin datos") @db.VarChar(512)
+  rut_cliente        String? @default("sin datos") @db.VarChar(255)
+  createdBy          String?
+  validatedBy        String?
+  editedBy           String?
+  contId             String? @default("sin datos") @db.VarChar(255)
 }
 
 model users {
@@ -103,4 +120,16 @@ model users {
   rol         String? @db.VarChar(255)
   team        String? @db.VarChar(255)
   rut         String? @db.VarChar(255)
+}
+
+model aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl {
+  id       Int     @id @default(autoincrement())
+  order_id Int
+  sku      String  @db.VarChar(255)
+  name     String? @db.VarChar(255)
+  price    String? @db.VarChar(255)
+  quantity String  @db.VarChar(255)
+
+  @@index([order_id], map: "order_items_order_id_idx")
+  @@map("_69aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl")
 }

@@ -2,7 +2,7 @@
 // import yup
 import * as yup from "yup";
 //import rut validator
-//import { validateRUT, getCheckDigit, generateRandomRUT } from "validar-rut";
+import { validateRUT, getCheckDigit, generateRandomRUT } from "validar-rut";
 import React, { useState, useEffect, useRef } from "react";
 import { useDataData } from "../context/data";
 import ProductTable from "../components/productTable";
@@ -30,22 +30,22 @@ export default function FormatContext({ context, componente }) {
 
   console.log("los data values son:  ", JSON.stringify(contexts));
 
-  const validateRUT = async (rut) => {
-    try {
-      const response = await fetch(`https://api.libreapi.cl/rut/validate?rut=${rut}`);
+  // const validateRUT = async (rut) => {
+  //   try {
+  //     const response = await fetch(`https://api.libreapi.cl/rut/validate?rut=${rut}`);
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok');
+  //     }
 
-      const data = await response.json();
-      return data.data.valid; // Devolviendo directamente la propiedad "valid".
+  //     const data = await response.json();
+  //     return data.data.valid; // Devolviendo directamente la propiedad "valid".
 
-    } catch (error) {
-      console.error('Error fetching and parsing data:', error);
-      throw error;
-    }
-  }
+  //   } catch (error) {
+  //     console.error('Error fetching and parsing data:', error);
+  //     throw error;
+  //   }
+  // }
 
 
   async function checkStockAvailable(sku, quantityRequested, werks, lgort) {
@@ -71,13 +71,14 @@ export default function FormatContext({ context, componente }) {
       const response = await fetch(`/api/apiSAPStock?Material=${sku}&werks=${werks}&lgort=${lgort}`);
       if (response.ok) {
         const data = await response.json();
-        result.stockAvailable = data.stock_disp;
+        result.stockAvailable = data[0].stock_disp;
+        console.log("dispo suficiente", data[0].stock_disp)
         
-        if (data.stock_disp < quantityRequested) {
-          console.log('Stock insuficiente para el SKU:', sku);
+        if (data[0].stock_disp < quantityRequested) {
+          console.log('Stock insuficiente para el SKU:', sku, data[0].stock_disp, quantityRequested);
           result.message = 'Stock insuficiente';
         } else {
-          console.log('Stock suficiente para el SKU:', sku);
+          console.log('Stock suficiente para el SKU:', sku, data[0].stock_disp, quantityRequested);
           return true; // Aquí podríamos simplemente devolver result si queremos mantener la estructura consistente
         }
       } else {
@@ -203,6 +204,7 @@ export default function FormatContext({ context, componente }) {
       Shipping_commune: contexts.deale[0].comuna_envio,
       Shipping_zip_code: contexts.deale[0].codigo_postal_de_envio,
       user: contexts.user,
+      creator: contexts.creator,
       team: contexts.team,
       centro: contexts.deale[0].centro,
       almacen: contexts.deale[0].almacen,
@@ -356,7 +358,7 @@ export default function FormatContext({ context, componente }) {
         test: async function (value) {
           if (value) {
             try {
-              return await validateRUT(value);
+              return validateRUT(value);
             } catch (error) {
               // Aquí puedes decidir qué hacer si hay un error. 
               // Puedes retornar false o configurar un mensaje de error personalizado.

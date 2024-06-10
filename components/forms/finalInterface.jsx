@@ -1,26 +1,18 @@
 // //nextjs tailwind unform hubspot component
 
 import { useState, useEffect, useRef, createRef } from "react";
-import dynamic from "next/dynamic";
 import { useDataData } from "../../context/data";
+import { useSelectedUser } from '../../context/SelectUserContext';
 import SpinnerButton from "../spinnerButton";
 import CardDeal from "../forms/cardDeal";
 import SuccessMessage from "../forms/succesMessage";
-import { useSession } from "next-auth/react";
-import SessionInfo from "../forms/sessionInfo";
 import ModalStock from "../../components/modalStock";
 
 let negocios = [];
-let negoci;
 
 export default function PageWithJSbasedForm3({session}) {
-  //   const CardDeal = dynamic(() => import("../forms/cardDeal"), {
-  //         ssr: false,
-  //         //loading: () => <p>Loading...</p>
-  //       });
-  //console.log("hubspot api client", createClient({ apiKey: process.env.APP_KEY }))
+
   const tdRef = useRef(null);
-  //const tdRef = createRef([]);
   const [contacts, setContacts] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [billing, setBilling] = useState([]);
@@ -37,10 +29,11 @@ export default function PageWithJSbasedForm3({session}) {
   const [isDisabled, setIsDisabled] = useState(false);
 
   //const { data: session } = useSession();
+  const { selectedUser, setSelectedUser, teamUsers, setTeamUsers } = useSelectedUser();
   const [user, setUser] = useState(session ? session.token.email : null);
   const [team, setTeam] = useState(session ? session.token.sub : null);
 
-//   console.log(data, status, data.user.email);
+  console.log("contextual", selectedUser, teamUsers);
 
   //crete context for objects
   const [context, setContext] = useState({
@@ -54,7 +47,8 @@ export default function PageWithJSbasedForm3({session}) {
 
     lines: lines,
     products: products,
-    user: user,
+    user: selectedUser === null ? user:selectedUser,
+    creator: user,
     team: team,
     owner: owner,
     owners: owners,
@@ -74,13 +68,14 @@ export default function PageWithJSbasedForm3({session}) {
       ),
       lines: lines,
       products: products,
-      user: user,
+      user: selectedUser === null ? user:selectedUser,
+      creator: user,
       team: team,
       owner: owner,
       owners: owners,
       id: id,
     });
-  }, [contacts, companies, billing, deals, deale, lines, products]);
+  }, [contacts, companies, billing, deals, deale, lines, products, selectedUser]);
 
   const liniera = async (idD) => {
     
@@ -205,12 +200,13 @@ export default function PageWithJSbasedForm3({session}) {
       };
       const response = await fetch(endpoint, options);
       let result = await response.json();
-      const idT = result.data.map((deal) => deal);
+      result.data.map((deal) => deal);
       let DealNS = [];
+      result.data.map((deal) => DealNS.push(deal.toObjectId));
+      //console.log("DEALMOTHER",DealNS)
       setDeals(DealNS);
-      let idL = result.data.map((deal) => DealNS.push(deal.toObjectId));
-
       DealNS.map((deal) => idDeals(deal));
+      
     } catch {
       console.log("No hay negocios asociados");
     }
@@ -314,6 +310,7 @@ export default function PageWithJSbasedForm3({session}) {
       const data = {
         id: id,
       };
+      console.log("MOTHER", id)
       const JSONdata = JSON.stringify(data);
       const endpoint = "/api/extractDeal";
       const options = {
@@ -323,20 +320,16 @@ export default function PageWithJSbasedForm3({session}) {
         },
         body: JSONdata,
       };
-      let response = await fetch(endpoint, options);
+      const response = await fetch(endpoint, options);
       let result = await response.json();
+      //console.log("MOTHER", result.data[0])
       result.data ? negocios.push(result.data[0].properties) : "NO HAY DATOS";
       negocios = negocios.filter((negocio) => negocio.dealstage === "50940199");
-
-      negoci = negocios.length > 0 ? negocios[0].hs_object_id : "No hay linea";
-      console.log("ID OWNER DEAL ", negocios[0].hubspot_owner_id);
+      setDeal(negocios);
       setOwner(negocios[0].hubspot_owner_id);
       owner ? idOwners(owner) : "No hay owner";
-      setDeal(negocios);
-      //setDataValues(context);
-      //console.log("negocios", context)
     } catch {
-      console.log("No hay negocios");
+      console.log("No hay negocios 0");
     }
   };
 
