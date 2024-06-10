@@ -86,6 +86,7 @@ model payments {
 model payments_validator {
   id                 Int     @id @default(autoincrement())
   order_id           Int
+  sapId              String? @default("sin datos") @db.VarChar(255)
   payment_method     String? @default("sin datos") @db.VarChar(255)
   authorization_code String? @default("sin datos") @db.VarChar(255)
   payment_count      String? @default("sin datos") @db.VarChar(255)
@@ -104,7 +105,9 @@ model payments_validator {
   createdBy          String?
   validatedBy        String?
   editedBy           String?
+  contId             String? @default("sin datos") @db.VarChar(255)
 }
+
 
 model users {
   id          Int     @id @default(autoincrement())
