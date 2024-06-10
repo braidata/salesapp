@@ -21,13 +21,14 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
       ("0" + now.getHours()).slice(-2) + ":" +
       ("0" + now.getMinutes()).slice(-2);
   };
-
+  console.log("sapoid",idOrder[3])
   const [paymentData, setPaymentData] = useState({
     order_id: idOrder[0],
     order_date: fechaFormateada,
     payment_date: getCurrentDateTime(),
     rut_cliente: idOrder[2],
     rut_pagador: idOrder[2],
+    sapId: idOrder[3],
     banco_destino: "",
     imagenUrl: "",
     textoImg: "",
@@ -73,6 +74,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
         payment_date: formattedPaymentDate,
         rut_cliente: idOrder[2],
         rut_pagador: "",
+        sapId:"",
         banco_destino: "",
         imagenUrl: "",
         textoImg: "",
@@ -147,6 +149,12 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
             Rut del Pagador:
           </label>
           <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="rut_pagador" value={paymentData.rut_pagador} onChange={handleChange} />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="rut_pagador">
+            ID SAP:
+          </label>
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700" type="text" name="sapId" value={paymentData.sapId} onChange={handleChange} />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="banco_destino">
