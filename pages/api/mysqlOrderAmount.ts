@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const price = parseFloat(item.price || '0');
       const quantity = parseInt(item.quantity);
       const ivaChileno = 1.19; // IVA chileno del 19%
-      const totalConIva = total + price * quantity * ivaChileno;
+      const totalConIva = total + price * ivaChileno;
       return Math.round(totalConIva / 10) * 10; // Truncar los decimales para que el número termine en cero
     }, 0);
 
