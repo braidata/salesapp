@@ -3,7 +3,6 @@ generator client {
 }
 
 datasource db {
-  
   provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
@@ -71,6 +70,7 @@ model orders {
   creator                             String?       @db.VarChar(255)
   payments                            payments[]
   order_items                         order_items[]
+  posts                               posts[]
 }
 
 model payments {
@@ -87,7 +87,6 @@ model payments {
 model payments_validator {
   id                 Int     @id @default(autoincrement())
   order_id           Int
-  sapId              String? @default("sin datos") @db.VarChar(255)
   payment_method     String? @default("sin datos") @db.VarChar(255)
   authorization_code String? @default("sin datos") @db.VarChar(255)
   payment_count      String? @default("sin datos") @db.VarChar(255)
@@ -106,20 +105,109 @@ model payments_validator {
   createdBy          String?
   validatedBy        String?
   editedBy           String?
+  sapId              String? @default("sin datos") @db.VarChar(255)
   contId             String? @default("sin datos") @db.VarChar(255)
+  posts              posts[]
 }
 
 model users {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(255)
-  email       String  @unique @db.VarChar(255)
-  ownerId     Int     @unique
-  password    String? @db.VarChar(255)
-  image       String?
-  permissions String? @db.VarChar(255)
-  rol         String? @db.VarChar(255)
-  team        String? @db.VarChar(255)
-  rut         String? @db.VarChar(255)
+  id               Int            @id @default(autoincrement())
+  name             String         @db.VarChar(255)
+  email            String         @unique @db.VarChar(255)
+  ownerId          Int            @unique
+  password         String?        @db.VarChar(255)
+  image            String?
+  permissions      String?        @db.VarChar(255)
+  rol              String?        @db.VarChar(255)
+  team             String?        @db.VarChar(255)
+  rut              String?        @db.VarChar(255)
+  notifications    Notification[]
+  messagesSent     Message[]      @relation("MessageSender")
+  messagesReceived Message[]      @relation("MessageReceiver")
+  conversations    Conversation[] @relation("UserConversations")
+  comments         Comment[]
+  posts            posts[]
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  content   String
+  status    String   @default("unread")
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      users    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Message {
+  id             Int           @id @default(autoincrement())
+  senderId       Int
+  receiverId     Int
+  content        String
+  status         String        @default("unread")
+  category       String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  conversationId Int?
+  sender         users         @relation("MessageSender", fields: [senderId], references: [id])
+  receiver       users         @relation("MessageReceiver", fields: [receiverId], references: [id])
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([conversationId])
+}
+
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  postId    Int?
+  users     users[]   @relation("UserConversations")
+  messages  Message[]
+  post      posts?    @relation(fields: [postId], references: [id])
+
+  @@index([postId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int
+  content   String
+  status    String   @default("active")
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      users    @relation(fields: [userId], references: [id])
+  post      posts    @relation(fields: [postId], references: [id])
+
+  @@index([userId])
+  @@index([postId])
+}
+
+model posts {
+  id                 Int                 @id @default(autoincrement())
+  title              String
+  content            String
+  authorId           Int
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  orderId            Int?
+  paymentValidatorId Int?
+  author             users               @relation(fields: [authorId], references: [id])
+  order              orders?             @relation(fields: [orderId], references: [id])
+  paymentValidator   payments_validator? @relation(fields: [paymentValidatorId], references: [id])
+  comments           Comment[]
+  conversations      Conversation[]
+
+  @@index([authorId])
+  @@index([orderId])
+  @@index([paymentValidatorId])
 }
 
 model aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl {
@@ -132,4 +220,13 @@ model aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl {
 
   @@index([order_id], map: "order_items_order_id_idx")
   @@map("_69aa74cd_95de_538d_992c_3f96ecb7beae_20230802205640_vrepl")
+}
+
+model UserConversations {
+  A Int
+  B Int
+
+  @@unique([A, B], map: "_UserConversations_AB_unique")
+  @@index([B], map: "_UserConversations_B_index")
+  @@map("_UserConversations")
 }

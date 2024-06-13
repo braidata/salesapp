@@ -7,6 +7,7 @@ import Layout from "../components/layout";
 import FormProvider from "../context";
 import DataProvider from "../context/data";
 import { SelectedUserProvider } from "../context/SelectUserContext";
+import { NotificationProvider } from '../context/NotificationContext';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   if (typeof window === "undefined") {
@@ -16,6 +17,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <SelectedUserProvider>
       <SessionProvider session={session}>
+      <NotificationProvider>
         <ThemeProvider enableSystem={true} attribute="class">
           <DataProvider>
             <FormProvider>
@@ -27,6 +29,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             </FormProvider>
           </DataProvider>
         </ThemeProvider>
+        </NotificationProvider>
       </SessionProvider>
     </SelectedUserProvider>
   );
