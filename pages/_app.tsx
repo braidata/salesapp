@@ -8,6 +8,7 @@ import FormProvider from "../context";
 import DataProvider from "../context/data";
 import { SelectedUserProvider } from "../context/SelectUserContext";
 import { NotificationProvider } from '../context/NotificationContext';
+import { PostProvider } from '../context/PostContext'; 
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   if (typeof window === "undefined") {
@@ -21,11 +22,12 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         <ThemeProvider enableSystem={true} attribute="class">
           <DataProvider>
             <FormProvider>
+            <PostProvider>
 
               <Layout>
                 <Component {...pageProps} />
               </Layout>
-
+              </PostProvider>
             </FormProvider>
           </DataProvider>
         </ThemeProvider>
