@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
   const { data: session } = useSession();
   const [userId, setUserId] = useState<string | null>();
+  const [userIdN, setUserIdN] = useState<number | null>();
   const idOrder = orderId ? Object.entries(orderId).map((i: any) => { return i[1] }) : ""
   const date = new Date(idOrder[1])
   const fechaFormateada = date.getFullYear() + "-" +
@@ -21,7 +22,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
       ("0" + now.getHours()).slice(-2) + ":" +
       ("0" + now.getMinutes()).slice(-2);
   };
-  console.log("sapoid",idOrder[3])
+  // console.log("sapoid",idOrder[3])
   const [paymentData, setPaymentData] = useState({
     order_id: idOrder[0],
     order_date: fechaFormateada,
@@ -42,8 +43,9 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
   useEffect(() => {
     if (session) {
       setUserId(session ? session.session.user.name : null);
+      setUserIdN(session ? session.token.sub : null)
       const loggedInUserEmail = session ? session.session.user.name : null
-      console.log("editador", loggedInUserEmail)
+      // console.log("editador", loggedInUserEmail, userIdN)
     }
   }, [session]);
 
@@ -68,6 +70,8 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
       body: JSON.stringify({ ...paymentData,payment_date: formattedPaymentDate,order_date: formattedOrderDate, createdBy: userId }),
     });
     if (res.status === 201) {
+      const newPayment = await res.json();
+      sendNotification(newPayment);
       setPaymentData({
         order_id: idOrder[0],
         order_date: formattedOrderDate,
@@ -88,6 +92,24 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
     } else {
       alert("Error al crear el Pago");
     }
+  };
+
+  const sendNotification = async (payment: any) => {
+    // console.log(payment)
+    const notification = {
+      userId: userIdN,
+      content: `El usuario ${userId} ha creado un nuevo pago con ID: ${payment.id}`,
+      category: 'payment',
+      status: 'unread'
+    };
+
+    await fetch("/api/mysqlNotifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(notification),
+    });
   };
 
   // const handleResetForm = () => {

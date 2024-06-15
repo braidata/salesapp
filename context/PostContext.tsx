@@ -7,7 +7,6 @@ interface Comment {
   userId: number;
   content: string;
   status: string;
-  category: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,7 +17,6 @@ interface Post {
   orderId: number;
   paymentValidatorId: number;
   userId: number;
-  authorId: number;
   title: string;
   content: string;
   category: string;

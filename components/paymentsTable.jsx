@@ -6,7 +6,7 @@ import ValidatorPayments from "../lib/validatorPayments";
 import { saveAs } from 'file-saver';
 import { FaCopy } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
-import Posts from '../components/post'
+
 const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   // Estado para manejar la apertura y cierre del modal
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -435,7 +435,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
                     Ver Pago
                   </button>
                 </td>
-                <td><Posts orderId={payment.order_id} paymentValidatorId={payment.id}/></td>
+                <td></td>
               </tr>
             ))}
           </tbody>
@@ -467,6 +467,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
 
                 <ValidatorPayments orderId={modalData2} />
               </section>
+              {/* <section><Posts orderId={modalData2}/></section> */}
               <section className="flex flex-col justify-center">
                 <p className="mt-8 mx-4 text-2xl font-bold">Borrar Pago Id {paymentP} del pedido {modalData2}</p>
                 {

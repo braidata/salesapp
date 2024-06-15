@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { saveAs } from 'file-saver';
 import { FaCopy } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
+import Posts from '../components/postButton'
 
 const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [pagos, setPagos] = useState<any[]>([]);
@@ -371,9 +372,12 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                               Rechazar
                             </button>
                           )}
+
                         </>
                       ) : null}
+                      <Posts orderId={parseInt(orderId)} paymentValidatorId={pago.id}/>
                     </td>
+                    
                   </tr>
                 ))}
               </tbody>

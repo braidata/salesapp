@@ -20,11 +20,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           where: {
             orderId: parseInt(orderId as string),
           },
+          include: {
+            comments: true, // Incluye los comentarios
+          },
         });
       } else if (paymentValidatorId) {
         posts = await prisma.posts.findMany({
           where: {
             paymentValidatorId: parseInt(paymentValidatorId as string),
+          },
+          include: {
+            comments: true, // Incluye los comentarios
           },
         });
       } else if (authorId) {
@@ -32,9 +38,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           where: {
             authorId: parseInt(authorId as string),
           },
+          include: {
+            comments: true, // Incluye los comentarios
+          },
         });
       } else {
-        posts = await prisma.posts.findMany();
+        posts = await prisma.posts.findMany({
+          include: {
+            comments: true, // Incluye los comentarios
+          },
+        });
       }
 
       res.status(200).json(posts);
@@ -81,4 +94,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
-
