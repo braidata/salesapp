@@ -208,6 +208,14 @@ const OrderTable = ({ data, functionS }) => {
     setActiveFilter(null); // Close any active filter input when closing modal
   };
 
+  const filterLabels = {
+    orderId: 'ID',
+    status: 'Estado',
+    companyName: 'Razón Social',
+    sap: 'ID SAP',
+    hubspot: 'ID HubSpot'
+  };
+
 
 
 
@@ -216,18 +224,20 @@ const OrderTable = ({ data, functionS }) => {
     <div className="flex flex-col items-center justify-center mt-10 w-full relative shadow-md sm:rounded-lg">
     <button
       onClick={toggleModal}
-      className="px-4 py-2 mx-2 my-2 bg-blue-600 text-white rounded-lg">
+      className="px-4 py-2 mx-2 my-2 dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+        mt-48 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+        border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
       Filtros
     </button>
 
     {showModal && (
       <div
-        className="fixed inset-0 flex items-center justify-center mt-0 z-50"
+        className="w-full bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg z-50 mb-4"
         id="modal"
         onClick={handleOutsideClick}
       >
-        <div className="flex items-center justify-center overflow-auto fixed top-0 left-0 w-full h-full z-50 bg-white/30 dark:bg-transparent">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-11/12 md:w-1/2">
+        <div className="flex items-center justify-center overflow-auto  top-0 left-0 w-full h-full z-50 bg-white/30 dark:bg-transparent">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-full">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Filtros</h2>
               <button
@@ -248,19 +258,19 @@ const OrderTable = ({ data, functionS }) => {
               </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center overflow-auto mt-4 gap-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center w-full overflow-auto mt-4 gap-2">
               {['orderId', 'status', 'companyName', 'sap', 'hubspot'].map(filter => (
                 <div key={filter} className="mb-2">
                   <button
                     onClick={() => setActiveFilter(filter)}
-                    className={`block w-full text-left px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg ${activeFilter === filter ? 'font-bold' : ''}`}>
-                    {`Filtrar por ${filter}`}
+                    className={`block w-52 text-left px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg ${activeFilter === filter ? 'font-bold' : ''}`}>
+                    {`Filtrar por ${filterLabels[filter]}`}
                   </button>
                   {activeFilter === filter && (
                     <div className="relative mt-2">
                       <input
                         type="text"
-                        placeholder={`Filtrar por ${filter}`}
+                        placeholder={`Filtrar por ${filterLabels[filter]}`}
                         value={filter[filter]}
                         onChange={(e) => handleFilterChange({ [filter]: e.target.value })}
                         className="block w-full p-2.5 pr-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
