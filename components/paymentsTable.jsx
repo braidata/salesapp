@@ -145,7 +145,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   };
 
   const handleModalOpen2 = (payment, paymentId) => {
-    console.log("pagotas", payment, paymentId)
+    
     setModalData2(payment);
     setPayment(paymentId)
     setModalIsOpen2(true);
@@ -162,7 +162,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
 
   const handleModalOpen3 = (data, status) => {
     data = extractNumber(data)
-    console.log("rata", data)
+    
     setModalData3(data);
     setModalStatus3(status);
     setModalIsOpen3(true);

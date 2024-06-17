@@ -44,7 +44,7 @@ const Dashboard = () => {
       const result = response;
       const resDB = await result.json();
       setData(resDB);
-      console.log("base", resDB);
+      
     } catch {
       console.log("No hay datos DB");
     }
@@ -52,7 +52,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
+    <div className="w-full lg:w-full flex flex-col items-center justify-center py-2">
       <Text
         title="Dashboard"
         classe="dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
@@ -60,9 +60,9 @@ const Dashboard = () => {
         border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
         description="En esta sección podrás ver las ordenes que se han creado y las que se han entregado."
       />
-      <button className="bmt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+      {/*<button className="bmt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
         onClick={userSender}>Ver Pedidos</button>
-      <div className="relative">
+       <div className="relative">
         <input
           type="text"
           value={companyName}
@@ -93,7 +93,7 @@ const Dashboard = () => {
       </div>
 
       <button className="bmt-2 mb-5 bg-gradient-to-r from-teal-600/40 to-teal-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,155,0.75)]  border-teal-800 hover:bg-teal-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-teal-500/40 dark:to-teal-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,222,0.25)]  dark:border-teal-200 dark:hover:bg-teal-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-        onClick={userSender}>Buscar</button>
+        onClick={userSender}>Buscar</button> */}
       <OrderTable data={data} functionS={userSender} />
     </div>
   );

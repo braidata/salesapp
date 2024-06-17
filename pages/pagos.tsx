@@ -53,7 +53,7 @@ const Pagos = () => {
       const result = response;
       const resDB = await result.json();
       setData(resDB);
-      console.log("base", resDB);
+      
     } catch (error) {
       console.log("No hay datos DB", error);
     }
