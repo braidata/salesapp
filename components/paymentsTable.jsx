@@ -5,6 +5,7 @@ import ValidatorPayments from "../lib/validatorPayments";
 import { saveAs } from 'file-saver';
 import { FaCopy } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
+import Link from "next/link";
 
 const PaymentsTable = ({ data, dataP, functionS, functionsSP, initialPaymentId, initialOrderId }) => {
   // Estado para manejar la apertura y cierre del modal
@@ -238,9 +239,10 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP, initialPaymentId, 
   return (
     <div className="flex flex-col px-4 py-4 mt-10 mb-24 overflow-x-auto relative shadow-md sm:rounded-lg">
       <div className="mb-8">
+
         <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="paymentStatus">Filtrar por estado de pago:</label>
         <select
-          className="block w-full p-2.5 mb-4 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           id="paymentStatus"
           value={paymentStatus}
           onChange={(e) => handlePaymentStatusChange(e.target.value)}
@@ -252,6 +254,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP, initialPaymentId, 
           <option value="Rechazado">Rechazado</option>
           <option value="Borrado">Borrado</option>
         </select>
+        
         <div className="flex flex-row gap-2">
         <div className="relative mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por ID de pedido:</label>
@@ -340,17 +343,31 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP, initialPaymentId, 
             </button>
           )}
         </div>
-        </div>
+        
+      </div>
+      
       </div>
 
       <div className="flex flex-col md:flex-row justify-end gap-2 mt-2 mb-4">
-        {dataP?.length > 0 && (
+      <Link href="/pagos" passHref>
+            <button
+              className="px-2 py-2 mx-2 my-2 dark:text-gray-300 font-bold rounded-lg  hover:text-gray-900   border-teal-400 hover:bg-teal-600/50 text-teal-900 dark:bg-gradient-to-r dark:from-teal-400/80 dark:via-teal-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-teal-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+           mb-5 mt-5 bg-gradient-to-r from-teal-200 via-teal-100 to-green-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+            border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
+            >
+              Refrescar
+            </button>
+          </Link>
+        {dataP?.length > 0 && (<>
           <button
             onClick={handleDownloadExcel}
-            className="px-2 py-2 rounded-lg bg-green-300/30 dark:bg-green-700/30 text-green-800 dark:text-green-100/80 font-semibold leading-none hover:text-green-200 hover:bg-green-300/50 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-green-400/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
+            className="px-2 py-2 mx-2 my-2 dark:text-gray-300 font-bold rounded-lg  hover:text-gray-900   border-green-400 hover:bg-green-600/50 text-green-900 dark:bg-gradient-to-r dark:from-green-400/80 dark:via-green-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-green-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+           mb-5 mt-5 bg-gradient-to-r from-green-200 via-green-100 to-green-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+            border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
           >
             Descargar Excel
           </button>
+          </>
         )}
         {selectedRow !== null && (
           <button
