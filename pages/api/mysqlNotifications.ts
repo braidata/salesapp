@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Si es un vendedor, obtiene solo sus notificaciones de la categoría 'payment' or 'Nueva Validación'
         notifications = await prisma.notification.findMany({
           where: {
-            userId: userId as string,
+            // userId: userId as string,
             category: category as string,
           },
         });

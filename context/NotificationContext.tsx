@@ -32,7 +32,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   // Función para obtener las notificaciones desde la base de datos
   const fetchNotifications = async (userId: number, category: string) => {
     try {
-      const response = await fetch(`/api/mysqlNotifications?userId=${userId}&category=${category}`);
+      const response = await fetch(`/api/mysqlNotifications?userId=${userId}&category=${category||"Nueva Validación"}`);
       const data = await response.json();
       setNotifications(data);
     } catch (error) {

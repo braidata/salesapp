@@ -45,7 +45,7 @@ const NotificationBell: React.FC = () => {
     return () => socket.disconnect();
   }, [fetchNotifications, session]);
 
-  const unreadCount = notifications.filter((notif) => notif.status === 'unread').length;
+  const unreadCount = notifications.length>0? notifications.filter((notif) => notif.status === 'unread').length : 0;
 
   const handleMarkAsRead = async (id: number, content: string) => {
     await markAsRead(id);
@@ -155,9 +155,7 @@ const NotificationBell: React.FC = () => {
       {dropdownOpen && (
         <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-50">
           <div className="px-4 py-2 text-lg font-semibold text-gray-800 dark:text-white">Notificaciones</div>
-          {notifications.length === 0 ? (
-            <div className="px-4 py-2 text-gray-700 dark:text-gray-300">No hay notificaciones</div>
-          ) : (
+          {notifications.length > 0 ? (
             notifications.map((notif) => (
               <div
                 key={notif.id}
@@ -177,7 +175,9 @@ const NotificationBell: React.FC = () => {
                 </div>
               </div>
             ))
-          )}
+          ):(
+            <div className="px-4 py-2 text-gray-700 dark:text-gray-300">No hay notificaciones</div>
+          )  }
         </div>
       )}
     </div>
