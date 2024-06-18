@@ -9,10 +9,10 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
   const idOrder = orderId ? Object.entries(orderId).map((i: any) => { return i[1] }) : ""
   const date = new Date(idOrder[1])
   const fechaFormateada = date.getFullYear() + "-" +
-  ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
-  ("0" + date.getDate()).slice(-2) + " " +
-  ("0" + date.getHours()).slice(-2) + ":" +
-  ("0" + date.getMinutes()).slice(-2);
+    ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+    ("0" + date.getDate()).slice(-2) + " " +
+    ("0" + date.getHours()).slice(-2) + ":" +
+    ("0" + date.getMinutes()).slice(-2);
 
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -67,7 +67,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...paymentData,payment_date: formattedPaymentDate,order_date: formattedOrderDate, createdBy: userId }),
+      body: JSON.stringify({ ...paymentData, payment_date: formattedPaymentDate, order_date: formattedOrderDate, createdBy: userId }),
     });
     if (res.status === 201) {
       const newPayment = await res.json();
@@ -78,7 +78,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
         payment_date: formattedPaymentDate,
         rut_cliente: idOrder[2],
         rut_pagador: "",
-        sapId:"",
+        sapId: "",
         banco_destino: "",
         imagenUrl: "",
         textoImg: "",
@@ -95,14 +95,13 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
   };
 
   const sendNotification = async (payment: any) => {
-    // console.log(payment)
     const notification = {
       userId: userIdN,
-      content: `El usuario ${userId} ha creado un nuevo pago con ID: ${payment.id}`,
-      category: 'payment',
-      status: 'unread'
+      content: `El usuario ${userId} ha creado un nuevo pago ${payment.id} para el pedido ${payment.order_id}`,
+      category: 'Nuevo Pago',
+      status: 'unread',
     };
-
+  
     await fetch("/api/mysqlNotifications", {
       method: "POST",
       headers: {
@@ -111,6 +110,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
       body: JSON.stringify(notification),
     });
   };
+  
 
   // const handleResetForm = () => {
   //   setPaymentData({
@@ -204,7 +204,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
             <option value="Guia de Despacho">Guia de Despacho</option>
             <option value="Abono a Rut">Abono a Rut</option>
             <option value="Banco Internacional">Banco Internacional</option>
-            
+
           </select>
         </div>
         <div className="mb-4">
@@ -212,19 +212,19 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
             Equipo:
           </label>
           <select
-    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
-    name="team"
-    value={paymentData.team}
-    onChange={handleChange}
-    required
-  >
-    <option value="">Selecciona tu Equipo</option>
-    <option value="Venta Directa">Venta Directa</option>
-    <option value="Imega">Imega</option>
-    <option value="Ecommerce">Ecommerce</option>
-    <option value="Repuestos">Repuestos</option>
-    <option value="Distribución">Distribución</option>
-  </select>
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
+            name="team"
+            value={paymentData.team}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona tu Equipo</option>
+            <option value="Venta Directa">Venta Directa</option>
+            <option value="Imega">Imega</option>
+            <option value="Ecommerce">Ecommerce</option>
+            <option value="Repuestos">Repuestos</option>
+            <option value="Distribución">Distribución</option>
+          </select>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 dark:text-gray-300 font-bold mb-2" htmlFor="payment_amount">
@@ -245,7 +245,7 @@ const PaymentForm: React.FC = (orderId: {}, orderDate,) => {
           <OCRForm onOCRResult={handleOCRResult} />
         </div>
         <div className="flex flex-col items-center justify-center">
-        {/* <button
+          {/* <button
         type="button"
         onClick={handleResetForm}
         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110"

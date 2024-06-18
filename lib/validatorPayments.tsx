@@ -30,14 +30,16 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [totalPendiente, setTotalPendiente] = useState<number>(0);
   const { data: session } = useSession();
   const [userId, setUserId] = useState<string | null>();
+  const [userIdN, setUserIdN] = useState<number | null>();
   const [authCode, setAuthCode] = useState<string>('');
 
 
   useEffect(() => {
     if (session) {
       setUserId(session ? session.session.user.name : null);
+      setUserIdN(session ? session.token.sub : null)
       const loggedInUserEmail = session ? session.session.user.name : null
-      console.log("editador", loggedInUserEmail)
+      // console.log("editador", loggedInUserEmail, userIdN)
     }
   }, [session]);
 
@@ -89,6 +91,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
       setTotalPagado(totalPagado);
       setTotalValidado(totalValidado);
       setTotalPendiente(totalPendiente);
+
     } catch (error) {
       console.error('Error al obtener el estado de pago:', error);
     }
@@ -127,10 +130,12 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         validatedBy: userId,
         authorization_code: authCode,
       });
+      sendNotification(selectedPaymentId,userId,orderId)
       setPagos((prevPagos) =>
         prevPagos.map((pago) =>
           pago.id === selectedPaymentId
             ? {
+              
               ...pago,
               status: selectedPaymentStatus,
               validation_date: formattedDate,
@@ -139,12 +144,16 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
               authorization_code: authCode,
             }
             : pago
+
+            
         )
       );
+      
       setObservationModal(false);
       setObservation('');
       setAuthCode('');
       fetchEstadoPago(orderId); // Refresh the payment status
+      
     } catch (error) {
       console.error('Error al validar el pago:', error);
     }
@@ -203,6 +212,23 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
           Estado: ${selectedPago.status}
         `;
     navigator.clipboard.writeText(textToCopy);
+  };
+
+  const sendNotification = async (selectedPaymentId: string | null,userId: string | null | undefined,orderId: string) => {
+    const notification = {
+      userId: userIdN,
+      content: `El analista ${userId} ha evaluado el pago ${selectedPaymentId} del pedido ${orderId}`,
+      category: 'Nueva Validación',
+      status: 'unread',
+    };
+  
+    await fetch("/api/mysqlNotifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(notification),
+    });
   };
 
   return (

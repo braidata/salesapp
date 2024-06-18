@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import ShippingModal from "../components/simpliRouteDateEditor"
 import SalesData from "../components/sapSalesData"
@@ -222,85 +223,98 @@ const OrderTable = ({ data, functionS }) => {
 
   return (
     <div className="flex flex-col items-center justify-center mt-10 w-full relative shadow-md sm:rounded-lg">
-    <button
-      onClick={toggleModal}
-      className="px-4 py-2 mx-2 my-2 dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+      <div className="flex flex-row items-center justify-center px-2"
+      ><Link href="/dashboard" passHref>
+        <button
+          className="px-4 py-2 mx-2 my-2 dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-teal-400 hover:bg-teal-600/50 text-teal-900 dark:bg-gradient-to-r dark:from-teal-400/80 dark:via-teal-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-teal-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+        mt-48 mt-2 mb-5 bg-gradient-to-r from-teal-200 via-teal-100 to-green-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+        border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
+        >
+          Refrescar
+        </button>
+      </Link>
+        <button
+          onClick={toggleModal}
+          className="px-4 py-2 mx-2 my-2 dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
         mt-48 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
         border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]">
-      Filtros
-    </button>
+          Filtros
+        </button></div>
 
-    {showModal && (
-      <div
-        className="w-full bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg z-50 mb-4"
-        id="modal"
-        onClick={handleOutsideClick}
-      >
-        <div className="flex items-center justify-center overflow-auto  top-0 left-0 w-full h-full z-50 bg-white/30 dark:bg-transparent">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-full">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Filtros</h2>
-              <button
-                onClick={toggleModal}
-                className="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center w-full overflow-auto mt-4 gap-2">
-              {['orderId', 'status', 'companyName', 'sap', 'hubspot'].map(filter => (
-                <div key={filter} className="mb-2">
-                  <button
-                    onClick={() => setActiveFilter(filter)}
-                    className={`block w-52 text-left px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg ${activeFilter === filter ? 'font-bold' : ''}`}>
-                    {`Filtrar por ${filterLabels[filter]}`}
-                  </button>
-                  {activeFilter === filter && (
-                    <div className="relative mt-2">
-                      <input
-                        type="text"
-                        placeholder={`Filtrar por ${filterLabels[filter]}`}
-                        value={filter[filter]}
-                        onChange={(e) => handleFilterChange({ [filter]: e.target.value })}
-                        className="block w-full p-2.5 pr-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      />
-                      <button
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-900 dark:text-gray-300 font-bold rounded-lg hover:text-gray-900 dark:hover:text-white transition duration-500 ease-in-out"
-                        onClick={() => clearFilter(filter)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
+
+
+      {showModal && (
+        <div
+          className="w-full bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg z-30 mb-4"
+          id="modal"
+          onClick={handleOutsideClick}
+        >
+          <div className="flex items-center justify-center overflow-auto  top-0 left-0 w-full h-full z-30 bg-white/30 dark:bg-transparent">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-full">
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Filtros</h2>
+                <button
+                  onClick={toggleModal}
+                  className="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center w-full overflow-auto mt-4 gap-2">
+                {['orderId', 'status', 'companyName', 'sap', 'hubspot'].map(filter => (
+                  <div key={filter} className="mb-2">
+                    <button
+                      onClick={() => setActiveFilter(filter)}
+                      className={`block w-52 text-left px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg ${activeFilter === filter ? 'font-bold' : ''}`}>
+                      {`Filtrar por ${filterLabels[filter]}`}
+                    </button>
+                    {activeFilter === filter && (
+                      <div className="relative mt-2">
+                        <input
+                          type="text"
+                          placeholder={`Filtrar por ${filterLabels[filter]}`}
+                          value={filter[filter]}
+                          onChange={(e) => handleFilterChange({ [filter]: e.target.value })}
+                          className="block w-full p-2.5 pr-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                        <button
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-900 dark:text-gray-300 font-bold rounded-lg hover:text-gray-900 dark:hover:text-white transition duration-500 ease-in-out"
+                          onClick={() => clearFilter(filter)}
                         >
-                          <path
-                            fillRule="evenodd"
-                            d="M12 4V1L8 5l4 4V6a8 8 0 11-7.53 11.36l-1.42-1.42A10 10 0 1012 4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M12 4V1L8 5l4 4V6a8 8 0 11-7.53 11.36l-1.42-1.42A10 10 0 1012 4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
 
 
@@ -611,9 +625,7 @@ const OrderTable = ({ data, functionS }) => {
                     <th scope="col" className="py-3 px-2">
                       Rut de Empresa
                     </th>
-                    <th scope="col" className="py-3 px-2 rounded-tr-lg ">
-                      Estado
-                    </th>
+
 
                   </tr>
                 </thead>
@@ -624,9 +636,9 @@ const OrderTable = ({ data, functionS }) => {
                     <td className="py-3 px-2">{modalData.billing_company_name}</td>
                     <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.Shipping_Tipo_de_Despacho.replace(/_/g, " ")}</td>
                     <td className="py-3 px-2">{modalData.Shipping_Fecha_de_Despacho_o_Retiro}</td>
-                    {/* <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.customer_phone}</td>*/}
+                    
                     <td className="py-3 px-2 hidden lg:flex lg:flex-row">{modalData.billing_company_rut}</td>
-                    <td className="py-3 px-2 rounded-br-lg">{modalStatus}</td>
+                    
                   </tr>
                 </tbody>
               </table>

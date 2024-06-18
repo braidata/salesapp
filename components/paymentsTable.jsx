@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import SalesData from "../components/sapSalesData";
 import CreadorPagos from "../lib/creadorPagos";
 import ValidatorPayments from "../lib/validatorPayments";
@@ -7,7 +6,7 @@ import { saveAs } from 'file-saver';
 import { FaCopy } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 
-const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
+const PaymentsTable = ({ data, dataP, functionS, functionsSP, initialPaymentId, initialOrderId }) => {
   // Estado para manejar la apertura y cierre del modal
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalData, setModalData] = useState({});
@@ -28,14 +27,23 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   const [paymentStatus, setPaymentStatus] = useState('Pendiente');
   const [selectedRow, setSelectedRow] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [filterId, setFilterId] = useState("");
+  const [filterId, setFilterId] = useState(initialOrderId || "");
   const [filterSapId, setFilterSapId] = useState("");
   const [filterAmmount, setFilterAmmount] = useState("");
-
+  const [filterPaymentId, setFilterPaymentId] = useState(initialPaymentId || "");
 
   useEffect(() => {
     functionsSP(paymentStatus);
   }, [paymentStatus]);
+
+  useEffect(() => {
+    if (initialPaymentId) {
+      setFilterPaymentId(initialPaymentId);
+    }
+    if (initialOrderId) {
+      setFilterId(initialOrderId);
+    }
+  }, [initialPaymentId, initialOrderId]);
 
   const handlePaymentStatusChange = (status) => {
     setPaymentStatus(status);
@@ -190,8 +198,6 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
     setSortConfig({ key, direction });
   };
 
-
-
   const sortedData = dataP?.sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -202,14 +208,11 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
     return 0;
   });
 
-  const filteredData = filterId
-    ? sortedData?.filter((payment) => payment.order_id.toString().includes(filterId))
-    : filterAmmount
-      ? sortedData?.filter((payment) => payment.payment_amount.toString().includes(filterAmmount))
-      : filterSapId
-        ? sortedData?.filter((payment) => payment.sapId.toString().includes(filterSapId))
-        : sortedData;
-
+  const filteredData = sortedData
+    ?.filter((payment) => filterId ? payment.order_id.toString().includes(filterId) : true)
+    .filter((payment) => filterAmmount ? payment.payment_amount.toString().includes(filterAmmount) : true)
+    .filter((payment) => filterSapId ? payment.sapId.toString().includes(filterSapId) : true)
+    .filter((payment) => filterPaymentId ? payment.id.toString().includes(filterPaymentId) : true);
 
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dataP);
@@ -604,8 +607,5 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
     </div>
   );
 };
-
-
-
 
 export default PaymentsTable;

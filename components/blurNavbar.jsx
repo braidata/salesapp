@@ -261,7 +261,7 @@ const BlurNavbar = () => {
         </div>
       </div>
 
-      <div className="flex flex-row justify-center items-center ml-auto">
+      <div className="flex flex-row justify-center gap-4 items-center ml-auto">
         {session ?
           <>
             {!showLogistica ? <><Link href="/neoForm2">
