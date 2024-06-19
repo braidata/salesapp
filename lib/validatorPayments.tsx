@@ -32,6 +32,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [userId, setUserId] = useState<string | null>();
   const [userIdN, setUserIdN] = useState<number | null>();
   const [authCode, setAuthCode] = useState<string>('');
+  const [notificationSent, setNotificationSent] = useState(false);
 
 
   useEffect(() => {
@@ -42,6 +43,15 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
       // console.log("editador", loggedInUserEmail, userIdN)
     }
   }, [session]);
+
+  useEffect(() => {
+    if ((totalValidado > (totalPedido ?? 0) || totalValidado === (totalPedido ?? 0)) && !notificationSent) {
+      sendValidationNotification();
+      setNotificationSent(true);
+    } else if (!(totalValidado > (totalPedido ?? 0) || totalValidado === (totalPedido ?? 0))) {
+      setNotificationSent(false); // Reset notificationSent if conditions are not met
+    }
+  }, [totalValidado, totalPedido]);
 
   useEffect(() => {
     const fetchPagos = async () => {
@@ -59,6 +69,27 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
     permisos();
     fetchEstadoPago(orderId);
   }, [orderId]);
+
+  const sendValidationNotification = async () => {
+    const notificationContent = totalValidado > (totalPedido ?? 0)
+      ? `El pedido ${orderId} ha sido validado con un saldo a favor de $ ${totalValidado - (totalPedido ?? 0)}.`
+      : `El pedido ${orderId} ha sido pagado completamente.`;
+
+    const notification = {
+      userId: userIdN,
+      content: notificationContent,
+      category: 'Nueva Validación',
+      status: 'unread',
+    };
+
+    await fetch("/api/mysqlNotifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(notification),
+    });
+  };
 
   const permisos = async () => {
     const res = await fetch("/api/mysqlPerm", {
@@ -279,12 +310,12 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {totalValidado >= (totalPedido ?? 0) ? (
+                  {totalValidado >= (totalPedido ?? 0) || Math.abs((totalPedido ?? 0) - totalValidado) <= 100 ? (
                     <div
                       className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${totalValidado > (totalPedido ?? 0)
                         ? 'bg-green-200 text-green-800'
                         : 'bg-gradient-to-r from-yellow-600 to-yellow-800 border-2 drop-shadow-[0_9px_9px_rgba(177,177,0,0.75)]  border-yellow-800 hover:bg-yellow-600 text-gray-800 dark:bg-gradient-to-r dark:from-yellow-500 dark:to-yellow-800 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-yellow-200 dark:hover:bg-yellow-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2'
-                        }`}
+                      }`}
                     >
                       {totalValidado > (totalPedido ?? 0)
                         ? `Saldo a favor: $ ${totalValidado - (totalPedido ?? 0)}`
@@ -301,6 +332,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
           </table>
         </div>
       </div>
+    
       <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Pagos del Pedido</h2>
       {loading ? (
         <p className="text-gray-600 dark:text-gray-200">Cargando pagos...</p>

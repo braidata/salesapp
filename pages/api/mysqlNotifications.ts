@@ -30,6 +30,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             category: category as string,
           },
         });
+      } else if(category==='All') {
+        notifications = await prisma.notification.findMany({
+          where: {
+            category: {
+              in: ['comment', 'Nueva Validación', 'message', 'Nuevo Pago'], // Agrega las categorías que desees incluir
+            },
+          },
+        });
       }
 
       res.status(200).json(notifications);

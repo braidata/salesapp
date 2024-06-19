@@ -11,19 +11,67 @@ const NotificationBell: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [socket, setSocket] = useState(null);
+  const [filteredNotifications, setFilteredNotifications] = useState([]);
+
+  const getCreatorByPaymentId = async (orderId) => {
+    const res = await fetch('/api/mysqlPaymentsId', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderId }),
+    });
+  
+    const data = await res.json();
+    if (data && data.length > 0) {
+      console.log("nametor payments", data[0].createdBy, data)
+      return data[0].createdBy; // Asumiendo que el campo del creador en la respuesta es 'createdBy'
+    }
+    return null;
+  };
+
+  const isValidNotificationForUser = async (content, loggedInUserName) => {
+  const paymentIdMatch = content.match(/pago (\d+)/);
+  const paymentId = paymentIdMatch ? paymentIdMatch[1] : null;
+
+  if (paymentId) {
+    const creatorName = await getCreatorByPaymentId(paymentId);
+    console.log("nametor", creatorName, loggedInUserName)
+    return creatorName === loggedInUserName;
+  }
+  return true; // Si no hay ID de pago en el contenido, asumimos que es válido para todos
+};
+
+const fetchPermissionsAndFilterNotifications = async () => {
+  if (session) {
+    const permission = await checkPermissions(['payments', 'all', 'ventas']);
+    if (permission) {
+      const category = permission === 'payments' ? 'Nuevo Pago' : 'Nueva Validación';
+      await fetchNotifications(parseInt(session.token.sub), category);
+
+      if (Array.isArray(notifications)) {
+        const filtered = [];
+        for (const notif of notifications) {
+          const isPaymentsAndNuevoPago = permission === 'payments' && notif.category === 'Nuevo Pago';
+          const isValid = isPaymentsAndNuevoPago || await isValidNotificationForUser(notif.content, session.session.user.name);
+          console.log(`Notification: ${notif.content}, isValid: ${isValid}`);
+          if (isValid) {
+            filtered.push(notif);
+          }
+        }
+        setFilteredNotifications(filtered);
+      } else {
+        console.error("Error: fetchNotifications did not return an array");
+      }
+    }
+  }
+};
 
   useEffect(() => {
-    if (session) {
-      const fetchPermissionsAndNotifications = async () => {
-        const permission = await checkPermissions(['payments', 'all']);
-        if (permission) {
-          const category = permission === 'payments' ? 'Nuevo Pago' : 'Nueva Validación';
-          fetchNotifications(parseInt(session.token.sub), category);
-        }
-      };
-      fetchPermissionsAndNotifications();
-    }
+    fetchPermissionsAndFilterNotifications();
   }, [session]);
+
+  
 
   useEffect(() => {
     const socket = io({
@@ -33,7 +81,7 @@ const NotificationBell: React.FC = () => {
 
     socket.on('newNotification', () => {
       const fetchPermissionsAndNotifications = async () => {
-        const permission = await checkPermissions(['payments', 'all']);
+        const permission = await checkPermissions(['payments', 'all', 'ventas']);
         if (permission) {
           const category = permission === 'payments' ? 'Nuevo Pago' : 'Nueva Validación';
           fetchNotifications(parseInt(session.token.sub), category);
@@ -45,7 +93,7 @@ const NotificationBell: React.FC = () => {
     return () => socket.disconnect();
   }, [fetchNotifications, session]);
 
-  const unreadCount = notifications.length>0? notifications.filter((notif) => notif.status === 'unread').length : 0;
+  const unreadCount = filteredNotifications.length>0? filteredNotifications.filter((notif) => notif.status === 'unread').length : 0;
 
   const handleMarkAsRead = async (id: number, content: string) => {
     await markAsRead(id);
@@ -120,6 +168,8 @@ const NotificationBell: React.FC = () => {
     return null;
   };
 
+  
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -155,8 +205,8 @@ const NotificationBell: React.FC = () => {
       {dropdownOpen && (
         <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-50">
           <div className="px-4 py-2 text-lg font-semibold text-gray-800 dark:text-white">Notificaciones</div>
-          {notifications.length > 0 ? (
-            notifications.map((notif) => (
+          {filteredNotifications.length > 0 ? (
+            filteredNotifications.map((notif) => (
               <div
                 key={notif.id}
                 className={`px-4 py-2 border-b border-gray-200 dark:border-gray-700 cursor-pointer ${notif.status === 'read' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gray-200 dark:bg-gray-600'} hover:bg-gray-300 dark:hover:bg-gray-500`}

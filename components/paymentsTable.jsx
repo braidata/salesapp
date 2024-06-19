@@ -118,34 +118,12 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP, initialPaymentId, 
     setShowEditModal(true);
   };
 
-  // Función para abrir el modal de confirmación de borrado y establecer los datos actuales del pedido.
-  // const handleDeleteModalOpen = (item) => {
-  //   setDeleteModalData(item);
-  //   setShowDeleteModal(true);
-  // };
 
-
-  // Estado para manejar los estados de la orden
-
-
-  // const handleModalOpen = (data, status) => {
-  //   setModalData(data);
-  //   setModalStatus(status);
-  //   setModalIsOpen(true);
-  // };
 
   const handleModalClose = () => {
     setModalIsOpen(false);
   };
 
-  // const handleModalOpen2 = (data, date, rut, status) => {
-
-  //   setModalData2(data);
-  //   setModalDate2(date);
-  //   setModalRut2(rut)
-  //   setModalStatus2(status);
-  //   setModalIsOpen2(true);
-  // };
 
   const handleModalOpen = (payment, status) => {
     setModalData(payment);
