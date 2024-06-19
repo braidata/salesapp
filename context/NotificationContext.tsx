@@ -37,6 +37,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       setNotifications(data);
     } catch (error) {
       console.error('Error al obtener las notificaciones:', error);
+      setNotifications([]);
     }
   };
 
@@ -80,7 +81,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   };
 
   return (
-    <NotificationContext.Provider value={{ notifications, fetchNotifications, addNotification, markAsRead, deleteNotification }}>
+    <NotificationContext.Provider value={{ notifications , fetchNotifications, addNotification, markAsRead, deleteNotification }}>
       {children}
     </NotificationContext.Provider>
   );
