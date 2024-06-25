@@ -265,7 +265,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   return (
     <div className="space-y-4">
       <div className="mt-8">
-        <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-200">Estado de Pago del Pedido</h3>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Estado de Pago del Pedido</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-md">
             <thead>
@@ -389,6 +389,18 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                   >
                     Estado
                   </th>
+                  <th
+                    onClick={() => requestSort('rut_cliente')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    Rut
+                  </th>
+                  <th
+                    onClick={() => requestSort('sapId')}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                  >
+                    ID SAP
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-md">
                     Acciones
                   </th>
@@ -405,6 +417,8 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                     <td className="px-6 py-4">{pago.payment_amount}</td>
                     <td className="px-6 py-4">{pago.payment_date}</td>
                     <td className="px-6 py-4">{pago.status}</td>
+                    <td className="px-6 py-4">{pago.rut_cliente}</td>
+                    <td className="px-6 py-4">{pago.sapId}</td>
                     <td className="px-6 py-4">
                       <button
                         className="bg-gradient-to-r from-blue-600/40 to-blue-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,0,177,0.75)]  border-blue-800 hover:bg-blue-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-blue-500/40 dark:to-blue-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,0,255,0.25)]  dark:border-blue-200 dark:hover:bg-blue-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
