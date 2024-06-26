@@ -95,7 +95,7 @@ const SelectComponent = () => {
 
     return (
         permisos(),
-        sessionInfo === "ecommerce" || sessionInfo === "all" ? (
+        sessionInfo === "payments" || sessionInfo === "all" ? (
             <div className="p-4">
                 <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">
                     Buscador de Pedidos Woocommerce
