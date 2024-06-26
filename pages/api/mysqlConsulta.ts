@@ -1,6 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from "@prisma/client";
 
+import atob from 'atob';
+
+// Definir globalmente atob si no está definido
+if (typeof global.atob === 'undefined') {
+  global.atob = atob;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const name = req.body.name ? req.body.name : null;
   const email = req.body.email ? req.body.email : null;
