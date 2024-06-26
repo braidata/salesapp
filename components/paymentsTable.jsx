@@ -1,12 +1,13 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import SalesData from "../components/sapSalesData";
 import CreadorPagos from "../lib/creadorPagos";
 import ValidatorPayments from "../lib/validatorPayments";
 import { saveAs } from 'file-saver';
 import { FaCopy } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
-const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
+import Link from "next/link";
+
+const PaymentsTable = ({ data, dataP, functionS, functionsSP, initialPaymentId, initialOrderId }) => {
   // Estado para manejar la apertura y cierre del modal
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalData, setModalData] = useState({});
@@ -27,14 +28,23 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   const [paymentStatus, setPaymentStatus] = useState('Pendiente');
   const [selectedRow, setSelectedRow] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [filterId, setFilterId] = useState("");
+  const [filterId, setFilterId] = useState(initialOrderId || "");
   const [filterSapId, setFilterSapId] = useState("");
   const [filterAmmount, setFilterAmmount] = useState("");
-
+  const [filterPaymentId, setFilterPaymentId] = useState(initialPaymentId || "");
 
   useEffect(() => {
     functionsSP(paymentStatus);
   }, [paymentStatus]);
+
+  useEffect(() => {
+    if (initialPaymentId) {
+      setFilterPaymentId(initialPaymentId);
+    }
+    if (initialOrderId) {
+      setFilterId(initialOrderId);
+    }
+  }, [initialPaymentId, initialOrderId]);
 
   const handlePaymentStatusChange = (status) => {
     setPaymentStatus(status);
@@ -108,34 +118,12 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
     setShowEditModal(true);
   };
 
-  // Función para abrir el modal de confirmación de borrado y establecer los datos actuales del pedido.
-  // const handleDeleteModalOpen = (item) => {
-  //   setDeleteModalData(item);
-  //   setShowDeleteModal(true);
-  // };
 
-
-  // Estado para manejar los estados de la orden
-
-
-  // const handleModalOpen = (data, status) => {
-  //   setModalData(data);
-  //   setModalStatus(status);
-  //   setModalIsOpen(true);
-  // };
 
   const handleModalClose = () => {
     setModalIsOpen(false);
   };
 
-  // const handleModalOpen2 = (data, date, rut, status) => {
-
-  //   setModalData2(data);
-  //   setModalDate2(date);
-  //   setModalRut2(rut)
-  //   setModalStatus2(status);
-  //   setModalIsOpen2(true);
-  // };
 
   const handleModalOpen = (payment, status) => {
     setModalData(payment);
@@ -144,7 +132,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   };
 
   const handleModalOpen2 = (payment, paymentId) => {
-    console.log("pagotas", payment, paymentId)
+    
     setModalData2(payment);
     setPayment(paymentId)
     setModalIsOpen2(true);
@@ -161,7 +149,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
 
   const handleModalOpen3 = (data, status) => {
     data = extractNumber(data)
-    console.log("rata", data)
+    
     setModalData3(data);
     setModalStatus3(status);
     setModalIsOpen3(true);
@@ -189,8 +177,6 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
     setSortConfig({ key, direction });
   };
 
-
-
   const sortedData = dataP?.sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -201,14 +187,11 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
     return 0;
   });
 
-  const filteredData = filterId
-    ? sortedData?.filter((payment) => payment.order_id.toString().includes(filterId))
-    : filterAmmount
-      ? sortedData?.filter((payment) => payment.payment_amount.toString().includes(filterAmmount))
-      : filterSapId
-        ? sortedData?.filter((payment) => payment.sapId.toString().includes(filterSapId))
-        : sortedData;
-
+  const filteredData = sortedData
+    ?.filter((payment) => filterId ? payment.order_id.toString().includes(filterId) : true)
+    .filter((payment) => filterAmmount ? payment.payment_amount.toString().includes(filterAmmount) : true)
+    .filter((payment) => filterSapId ? payment.sapId.toString().includes(filterSapId) : true)
+    .filter((payment) => filterPaymentId ? payment.id.toString().includes(filterPaymentId) : true);
 
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dataP);
@@ -234,9 +217,10 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
   return (
     <div className="flex flex-col px-4 py-4 mt-10 mb-24 overflow-x-auto relative shadow-md sm:rounded-lg">
       <div className="mb-8">
+
         <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="paymentStatus">Filtrar por estado de pago:</label>
         <select
-          className="block w-full p-2.5 mb-4 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           id="paymentStatus"
           value={paymentStatus}
           onChange={(e) => handlePaymentStatusChange(e.target.value)}
@@ -248,6 +232,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
           <option value="Rechazado">Rechazado</option>
           <option value="Borrado">Borrado</option>
         </select>
+        
         <div className="flex flex-row gap-2">
         <div className="relative mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por ID de pedido:</label>
@@ -336,17 +321,31 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
             </button>
           )}
         </div>
-        </div>
+        
+      </div>
+      
       </div>
 
       <div className="flex flex-col md:flex-row justify-end gap-2 mt-2 mb-4">
-        {dataP?.length > 0 && (
+      <Link href="/pagos" passHref>
+            <button
+              className="px-2 py-2 mx-2 my-2 dark:text-gray-300 font-bold rounded-lg  hover:text-gray-900   border-teal-400 hover:bg-teal-600/50 text-teal-900 dark:bg-gradient-to-r dark:from-teal-400/80 dark:via-teal-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-teal-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+           mb-5 mt-5 bg-gradient-to-r from-teal-200 via-teal-100 to-green-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+            border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
+            >
+              Refrescar
+            </button>
+          </Link>
+        {dataP?.length > 0 && (<>
           <button
             onClick={handleDownloadExcel}
-            className="px-2 py-2 rounded-lg bg-green-300/30 dark:bg-green-700/30 text-green-800 dark:text-green-100/80 font-semibold leading-none hover:text-green-200 hover:bg-green-300/50 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-green-400/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
+            className="px-2 py-2 mx-2 my-2 dark:text-gray-300 font-bold rounded-lg  hover:text-gray-900   border-green-400 hover:bg-green-600/50 text-green-900 dark:bg-gradient-to-r dark:from-green-400/80 dark:via-green-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-green-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
+           mb-5 mt-5 bg-gradient-to-r from-green-200 via-green-100 to-green-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
+            border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
           >
             Descargar Excel
           </button>
+          </>
         )}
         {selectedRow !== null && (
           <button
@@ -434,6 +433,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
                     Ver Pago
                   </button>
                 </td>
+                <td></td>
               </tr>
             ))}
           </tbody>
@@ -465,6 +465,7 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
 
                 <ValidatorPayments orderId={modalData2} />
               </section>
+              {/* <section><Posts orderId={modalData2}/></section> */}
               <section className="flex flex-col justify-center">
                 <p className="mt-8 mx-4 text-2xl font-bold">Borrar Pago Id {paymentP} del pedido {modalData2}</p>
                 {
@@ -601,8 +602,5 @@ const PaymentsTable = ({ data, dataP, functionS, functionsSP }) => {
     </div>
   );
 };
-
-
-
 
 export default PaymentsTable;

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-
+import NotificationTest from '../components/bell'
 import dynamic from "next/dynamic";
 import { useSession, signIn, signOut } from "next-auth/react"
 import NavBarUserMenu from "../components/NavBarUserMenu"
@@ -261,7 +261,7 @@ const BlurNavbar = () => {
         </div>
       </div>
 
-      <div className="flex flex-row justify-center items-center ml-auto">
+      <div className="flex flex-row justify-center gap-4 items-center ml-auto">
         {session ?
           <>
             {!showLogistica ? <><Link href="/neoForm2">
@@ -301,6 +301,7 @@ const BlurNavbar = () => {
         font-bold dark:text-white/70 text-cyan-800 ml-2 dark:hover:bg-white/20">Logística</p>
             </Link></> : null}</> : null}
 
+        <NotificationTest/>
         <NavBarUserMenu loggedInUserEmail={loggedInUserEmail} />
         {renderThemeChanger()}
 
