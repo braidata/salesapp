@@ -73,25 +73,25 @@ const fetchPermissionsAndFilterNotifications = async () => {
 
   
 
-  useEffect(() => {
-    const socket = io({
-      path: '/api/socketServer',
-    });
-    setSocket(socket);
+  // useEffect(() => {
+  //   const socket = io({
+  //     path: '/api/socketServer',
+  //   });
+  //   setSocket(socket);
 
-    socket.on('newNotification', () => {
-      const fetchPermissionsAndNotifications = async () => {
-        const permission = await checkPermissions(['payments', 'all', 'ventas']);
-        if (permission) {
-          const category = permission === 'payments' ? 'Nuevo Pago' : 'Nueva Validación';
-          fetchNotifications(parseInt(session.token.sub), category);
-        }
-      };
-      fetchPermissionsAndNotifications();
-    });
+  //   socket.on('newNotification', () => {
+  //     const fetchPermissionsAndNotifications = async () => {
+  //       const permission = await checkPermissions(['payments', 'all', 'ventas']);
+  //       if (permission) {
+  //         const category = permission === 'payments' ? 'Nuevo Pago' : 'Nueva Validación';
+  //         fetchNotifications(parseInt(session.token.sub), category);
+  //       }
+  //     };
+  //     fetchPermissionsAndNotifications();
+  //   });
 
-    return () => socket.disconnect();
-  }, [fetchNotifications, session]);
+  //   return () => socket.disconnect();
+  // }, [fetchNotifications, session]);
 
   const unreadCount = filteredNotifications.length>0? filteredNotifications.filter((notif) => notif.status === 'unread').length : 0;
 

@@ -14,14 +14,7 @@ import { PostProvider } from '../context/PostContext';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const router = useRouter();
-
-  useEffect(() => {
-    const socketInitializer = async () => {
-      await fetch('/api/socketServer');
-    };
-
-    socketInitializer();
-  }, [router]);
+  ;
   if (typeof window === "undefined") {
     global.atob = (str) => Buffer.from(str, 'base64').toString('binary');
   }
