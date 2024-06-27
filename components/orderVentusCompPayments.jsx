@@ -39,7 +39,7 @@ const SelectComponent = () => {
         const id = e.target.id.value;
 
         try {
-            const response = await fetch(`/api/ordersVentus`, {
+            const response = await fetch(`/api/orderVentusPay`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -67,7 +67,7 @@ const SelectComponent = () => {
         if (!orderData) return;
 
         try {
-            const response = await fetch(`/api/ordersVentus`, {
+            const response = await fetch(`/api/orderVentusPay`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +76,8 @@ const SelectComponent = () => {
                     id: orderData.ID,
                     updatedData: { status: "processing" },
                     mode: "put",
-                    store
+                    store,
+                    user: session.session.user.name
                 }),
             });
 
