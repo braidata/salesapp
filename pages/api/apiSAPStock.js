@@ -13,7 +13,7 @@ export default async (req, res) => {
     return filterParts.length > 1 ? `(${filterParts.join(' or ')})` : filterParts[0];
   };
 
-  // Omito la función buildFilterPart por brevedad, asumiendo que está definida arriba
+  // recuerda revisar el nombre de las variables del cubo 
 
   const materialFilter = buildFilterPart(Material, 'Material');
   const werksFilter = buildFilterPart(werks, 'werks');

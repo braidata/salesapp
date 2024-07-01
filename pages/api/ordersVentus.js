@@ -31,6 +31,7 @@ export default async (req, res) => {
   const store = req.body.store ? req.body.store : req.query.store;
   const mode = req.body.mode ? req.body.mode : req.query.mode;
   const updatedData = req.body.updatedData ? req.body.updatedData : req.query.updatedData;
+  const user = req.body.user ? req.body.user : "Ejecutivo de Ecommerce";
   console.log(req.body);
 
   // example url: https://test-ventus-sales.ventuscorp.cl/api/
@@ -45,6 +46,10 @@ export default async (req, res) => {
       const existingOrder = await api.get(`orders/${id}`);
       const mergedData = merge(existingOrder.data, updatedData);
       const { data } = await api.put(`orders/${id}`, updatedData);
+      await api.post(`orders/${id}/notes`, {
+        note: `${user} modificó esto: ${JSON.stringify(updatedData, null, 2)}`,
+        customer_note: false,
+      });
       res.status(200).json(data);
     }}
     else if(store === "BBQ"){
@@ -55,6 +60,10 @@ export default async (req, res) => {
         const existingOrder = await apiBBQ.get(`orders/${id}`);
         const mergedData = merge(existingOrder.data, updatedData);
         const { data } = await apiBBQ.put(`orders/${id}`, updatedData);
+        await api.post(`orders/${id}/notes`, {
+          note: `${user} modificó esto: ${JSON.stringify(updatedData, null, 2)}`,
+          customer_note: false,
+        });
         res.status(200).json(data);
       }
     }
@@ -66,6 +75,10 @@ export default async (req, res) => {
         const existingOrder = await apiBLK.get(`orders/${id}`);
         const mergedData = merge(existingOrder.data, updatedData);
         const { data } = await apiBLK.put(`orders/${id}`, updatedData);
+        await api.post(`orders/${id}/notes`, {
+          note: `${user} modificó esto: ${JSON.stringify(updatedData, null, 2)}`,
+          customer_note: false,
+        });
         res.status(200).json(data);
       }
     }
