@@ -2,15 +2,8 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import SimpliRoute from "../components/simpliRoute";
-import Cotizador from "../components/CotizadorEnviame";
-// import CotizadorStarken2 from "../components/CotizadorStarken2";
 
-
-
-
-
-
-const Logistica = () => {
+const Agenda = () => {
   const { data: session } = useSession()
   const [data, setData] = useState();
   const userSender = async (event) => {
@@ -84,15 +77,8 @@ const Logistica = () => {
       <div className="flex flex-row gap-4 mt-24">
       </div>
         <SimpliRoute />
-        {/*  
-        <SapO2/>
-        <SapO3/>
-        <FedEx />
-        
-        <Febos/> 
-        */}
       </div></>
   );
 };
 
-export default Logistica;
+export default Agenda;

@@ -34,6 +34,8 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [authCode, setAuthCode] = useState<string>('');
   const [notificationSent, setNotificationSent] = useState(false);
 
+  
+
 
   useEffect(() => {
     if (session) {
@@ -45,13 +47,16 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   }, [session]);
 
   useEffect(() => {
-    if ((totalValidado > (totalPedido ?? 0) || totalValidado === (totalPedido ?? 0)) && !notificationSent) {
+    const shouldSendNotification = 
+      totalValidado >= (totalPedido ?? 0) && 
+      !notificationSent && 
+      totalPedido !== undefined && 
+      totalValidado !== 0;
+  
+    if (shouldSendNotification) {
       sendValidationNotification();
-      setNotificationSent(true);
-    } else if (!(totalValidado > (totalPedido ?? 0) || totalValidado === (totalPedido ?? 0))) {
-      setNotificationSent(false); // Reset notificationSent if conditions are not met
     }
-  }, [totalValidado, totalPedido]);
+  }, [totalValidado, totalPedido, notificationSent]);
 
   useEffect(() => {
     const fetchPagos = async () => {
@@ -70,25 +75,62 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
     fetchEstadoPago(orderId);
   }, [orderId]);
 
+  useEffect(() => {
+    if (totalValidado < (totalPedido ?? 0)) {
+      setNotificationSent(false);
+    }
+  }, [totalValidado, totalPedido]);
+
+  const handleStatus = async (id: string): Promise<boolean> => {
+    try {
+      const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
+      
+      if (currentStatus.status === 'Pagado') {
+        return false; // El pedido ya está marcado como pagado, no necesitamos hacer nada
+      }
+  
+      const response = await fetch(`/api/mysqlStatusPayd?id=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Hubo un error', error);
+      return false;
+    }
+  };
+
   const sendValidationNotification = async () => {
-    const notificationContent = totalValidado > (totalPedido ?? 0)
-      ? `El pedido ${orderId} ha sido validado con un saldo a favor de $ ${totalValidado - (totalPedido ?? 0)}.`
-      : `El pedido ${orderId} ha sido pagado completamente.`;
-
-    const notification = {
-      userId: userIdN,
-      content: notificationContent,
-      category: 'Nueva Validación',
-      status: 'unread',
-    };
-
-    await fetch("/api/mysqlNotifications", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(notification),
-    });
+    if (notificationSent) return; // Evita enviar notificaciones duplicadas
+  
+    const statusUpdated = await handleStatus(orderId);
+    
+    if (statusUpdated) {
+      const notificationContent = totalValidado > (totalPedido ?? 0)
+        ? `El pedido ${orderId} ha sido validado con un saldo a favor de $ ${totalValidado - (totalPedido ?? 0)}.`
+        : `El pedido ${orderId} ha sido pagado completamente.`;
+  
+      const notification = {
+        userId: userIdN,
+        content: notificationContent,
+        category: 'Nueva Validación',
+        status: 'unread',
+      };
+  
+      await fetch("/api/mysqlNotifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(notification),
+      });
+    }
   };
 
   const permisos = async () => {
@@ -151,7 +193,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         hour12: false
       }).replace(',', '');
 
-      
+
 
       await axios.post('/api/mysqlPaymentsValidator', {
         id: selectedPaymentId,
@@ -161,12 +203,12 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         validatedBy: userId,
         authorization_code: authCode,
       });
-      sendNotification(selectedPaymentId,userId,orderId)
+      sendNotification(selectedPaymentId, userId, orderId)
       setPagos((prevPagos) =>
         prevPagos.map((pago) =>
           pago.id === selectedPaymentId
             ? {
-              
+
               ...pago,
               status: selectedPaymentStatus,
               validation_date: formattedDate,
@@ -176,15 +218,19 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
             }
             : pago
 
-            
+
         )
       );
-      
+
+      if (totalValidado < (totalPedido ?? 0)) {
+        setNotificationSent(false);
+      }else{setNotificationSent(true)}
+
       setObservationModal(false);
       setObservation('');
       setAuthCode('');
       fetchEstadoPago(orderId); // Refresh the payment status
-      
+
     } catch (error) {
       console.error('Error al validar el pago:', error);
     }
@@ -245,14 +291,14 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
     navigator.clipboard.writeText(textToCopy);
   };
 
-  const sendNotification = async (selectedPaymentId: string | null,userId: string | null | undefined,orderId: string) => {
+  const sendNotification = async (selectedPaymentId: string | null, userId: string | null | undefined, orderId: string) => {
     const notification = {
       userId: userIdN,
       content: `El analista ${userId} ha evaluado el pago ${selectedPaymentId} del pedido ${orderId}`,
       category: 'Nueva Validación',
       status: 'unread',
     };
-  
+
     await fetch("/api/mysqlNotifications", {
       method: "POST",
       headers: {
@@ -310,21 +356,25 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {totalValidado >= (totalPedido ?? 0) || Math.abs((totalPedido ?? 0) - totalValidado) <= 100 ? (
-                    <div
-                      className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${totalValidado > (totalPedido ?? 0)
-                        ? 'bg-green-200 text-green-800'
-                        : 'bg-gradient-to-r from-yellow-600 to-yellow-800 border-2 drop-shadow-[0_9px_9px_rgba(177,177,0,0.75)]  border-yellow-800 hover:bg-yellow-600 text-gray-800 dark:bg-gradient-to-r dark:from-yellow-500 dark:to-yellow-800 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-yellow-200 dark:hover:bg-yellow-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2'
-                      }`}
-                    >
-                      {totalValidado > (totalPedido ?? 0)
-                        ? `Saldo a favor: $ ${totalValidado - (totalPedido ?? 0)}`
-                        : 'Pagado completo'}
-                    </div>
+                  {totalPedido !== undefined && totalValidado !== undefined ? (
+                    totalValidado >= totalPedido || Math.abs(totalPedido - totalValidado) <= 100 ? (
+                      <div
+                        className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${totalValidado > totalPedido
+                            ? 'bg-green-200 text-green-800'
+                            : 'bg-gradient-to-r from-yellow-600 to-yellow-800 border-2 drop-shadow-[0_9px_9px_rgba(177,177,0,0.75)]  border-yellow-800 hover:bg-yellow-600 text-gray-800 dark:bg-gradient-to-r dark:from-yellow-500 dark:to-yellow-800 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)]  dark:border-yellow-200 dark:hover:bg-yellow-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2'
+                          }`}
+                      >
+                        {totalValidado > totalPedido
+                          ? `Saldo a favor: $ ${totalValidado - totalPedido}`
+                          : 'Pagado'}
+                      </div>
+                    ) : (
+                      <div className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2">
+                        Pendiente: $ {totalPedido - totalValidado}
+                      </div>
+                    )
                   ) : (
-                    <div className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2">
-                      Pendiente: $ {(totalPedido ?? 0) - totalValidado}
-                    </div>
+                    <div className="text-gray-500">Calculando...</div>
                   )}
                 </td>
               </tr>
@@ -332,7 +382,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
           </table>
         </div>
       </div>
-    
+
       <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Pagos del Pedido</h2>
       {loading ? (
         <p className="text-gray-600 dark:text-gray-200">Cargando pagos...</p>
@@ -447,9 +497,9 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
 
                         </>
                       ) : null}
-                      <Posts orderId={parseInt(orderId)} paymentValidatorId={pago.id}/>
+                      <Posts orderId={parseInt(orderId)} paymentValidatorId={pago.id} />
                     </td>
-                    
+
                   </tr>
                 ))}
               </tbody>

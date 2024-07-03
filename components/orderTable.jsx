@@ -366,7 +366,7 @@ const OrderTable = ({ data, functionS }) => {
                     status = () => handleStatus(item[1]);
                     messages.push(responses[0].TEXT);
                   } else {
-                    status = "En SAP"
+                    // status = "En SAP"
                     messages.push(responses?.TEXT);
                   }
                 }
@@ -395,7 +395,7 @@ const OrderTable = ({ data, functionS }) => {
                       {status === "Procesando" ? (
                         <p className="py-2 px-2 mt-2 mb-2 sm:w-24 text-center rounded-md border dark:border-yellow-300/80 dark:hover:border-yellow-200/80 border border-yellow-700 rounded shadow hover:bg-yellow-100/20 hover:text-yellow-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-yellow-700/20 dark:hover:text-yellow-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
   ">{status}</p>
-                      ) : status === "Facturado" ? (
+                      ) : status === "Pagado" ? (
                         <p className="py-2 px-2 mt-2 mb-2 sm:w-24 text-center rounded-md border dark:border-green-300/80 dark:hover:border-green-200/80 border border-green-600 rounded shadow hover:bg-green-200/20 hover:text-green-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:hover:bg-green-700/20 dark:hover:text-green-300 dark:focus:shadow-outline dark:focus:outline-none dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out
   ">{status}</p>
                       ) : status === "Error SAP" ? (
@@ -475,7 +475,7 @@ const OrderTable = ({ data, functionS }) => {
                     status = () => handleStatus(item[0]);
                     messages.push(responses[0].TEXT);
                   } else {
-                    status = "En SAP"
+                    // status = "En SAP"
                     messages.push(responses?.TEXT);
                   }
                 }
