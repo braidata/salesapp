@@ -34,6 +34,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     "Shipping_Observacion": true,
                     "order_date": true,
                     "respuestaSAP": true,
+                    "statusSAP": true,
+                    "order_class": true,
+                    "user": true,
                     
                 },
                 where: {
