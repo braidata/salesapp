@@ -5,7 +5,20 @@ import * as XLSX from 'xlsx';
 const ShippingOrderTable = () => {
     const [dataS, setData] = useState([]);
     const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
-    const [selectedDate, setSelectedDate] = useState()
+    const [selectedDate, setSelectedDate] = useState('');
+
+    useEffect(() => {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed, así que se añade 1
+      const day = String(today.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      setSelectedDate(formattedDate);
+    }, []);
+  
+    const handleDateChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+      setSelectedDate(event.target.value);
+    };
 
     useEffect(() => {
         if (selectedDate) {
@@ -173,11 +186,11 @@ const ShippingOrderTable = () => {
         <>
             <div className="w-full sm:w-full items-center justify-center flex flex-col mt-10 shadow-md sm:rounded-lg py-4 px-4">
                 <Text
-                    title="Logística"
+                    title="Facturación"
                     classe="dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-sky-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
         mt-48 mt-2 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
         border-2 drop-shadow-[0_10px_10px_rgba(10,15,17,0.75)] dark:drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)]"
-                    description="En esta sección podrás ver las órdenes listas para despachar según la fecha."
+                    description="En esta sección podrás ver las órdenes listas para facturar según la fecha."
                 />
                 <form className="mt-4 mb-4 flex flex-col items-center justify-center">
                     <label className="text-gray-700 dark:text-gray-200 text-sm font-bold mb-2 mt-5">
@@ -188,7 +201,8 @@ const ShippingOrderTable = () => {
                         type="date"
                         name="date"
                         id="date"
-                        onChange={getOrders}
+                        onChange={handleDateChange}
+                        value={selectedDate}
                     />
                 </form>
                 <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={exportTableToExcel}>Descargar como Excel</button>
@@ -260,14 +274,14 @@ const ShippingOrderTable = () => {
                                     </td>
                                     <td className="w-full sm:w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <div className="flex flex-col gap-2">
-                                        
-                                        {item[1].order_class==="ZVFA"?<button className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,155,0,0.75)] border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-500/40 dark:to-orange-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)] dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-                                            onClick={() => handleStatusF(item[1].id)}>
-                                            Facturar
-                                        </button>:<button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-                                            onClick={() => handleStatusP(item[1].id)}>
-                                            Procesar
-                                        </button>}
+
+                                            {item[1].order_class === "ZVFA" ? <button className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,155,0,0.75)] border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-500/40 dark:to-orange-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)] dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                                                onClick={() => handleStatusF(item[1].id)}>
+                                                Facturar
+                                            </button> : <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                                                onClick={() => handleStatusP(item[1].id)}>
+                                                Procesar
+                                            </button>}
                                         </div>
                                     </td>
                                 </tr>
