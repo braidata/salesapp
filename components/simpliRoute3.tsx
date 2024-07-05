@@ -11,7 +11,7 @@ const ShippingOrderTable = () => {
         if (selectedDate) {
             const fetchData = async () => {
                 try {
-                    const response = await fetch(`/api/mysqlShipping?date=${selectedDate}`);
+                    const response = await fetch(`/api/mysqlShippingF?date=${selectedDate}`);
                     const data = await response.json();
                     setData(data);
                     loadUserNames(data);
@@ -30,7 +30,7 @@ const ShippingOrderTable = () => {
             };
             setSelectedDate(data.date)
             const JSONdata = JSON.stringify(data);
-            const endpoint = "/api/mysqlShipping";
+            const endpoint = "/api/mysqlShippingF";
             const options = {
                 method: "POST",
                 headers: {
@@ -47,13 +47,13 @@ const ShippingOrderTable = () => {
         }
     };
 
-    const handleStatus = async (id: string): Promise<boolean> => {
+    const handleStatusP = async (id: string): Promise<boolean> => {
         try {
             const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
-            if (currentStatus.status !== 'Pagado' || currentStatus.status === 'Agendado') {
+            if (currentStatus.status !== 'Agendado') {
                 return false; // El pedido ya está marcado como pagado, no necesitamos hacer nada
             }
-            const response = await fetch(`/api/mysqlStatusAgenda?id=${id}`, {
+            const response = await fetch(`/api/mysqlStatusProcesado?id=${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,10 +69,10 @@ const ShippingOrderTable = () => {
     const handleStatusF = async (id: string): Promise<boolean> => {
         try {
             const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
-            if (currentStatus.status !== 'Prefacturar'||currentStatus.status === 'Facturado') {
+            if (currentStatus.status !== 'Facturar') {
                 return false; // El pedido ya está marcado como pagado, no necesitamos hacer nada
             }
-            const response = await fetch(`/api/mysqlStatusFacturar?id=${id}`, {
+            const response = await fetch(`/api/mysqlStatusFacturado?id=${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -261,12 +261,12 @@ const ShippingOrderTable = () => {
                                     <td className="w-full sm:w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <div className="flex flex-col gap-2">
                                         
-                                        {item[1].statusSAP==='Prefacturar'&&item[1].order_class==="ZVFA"?<button className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,155,0,0.75)] border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-500/40 dark:to-orange-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)] dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                                        {item[1].order_class==="ZVFA"?<button className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,155,0,0.75)] border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-500/40 dark:to-orange-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,255,0,0.25)] dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
                                             onClick={() => handleStatusF(item[1].id)}>
-                                            Solicitar Facturación
+                                            Facturar
                                         </button>:<button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
-                                            onClick={() => handleStatus(item[1].id)}>
-                                            Agendar
+                                            onClick={() => handleStatusP(item[1].id)}>
+                                            Procesar
                                         </button>}
                                         </div>
                                     </td>

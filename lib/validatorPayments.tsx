@@ -56,6 +56,8 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
     if (shouldSendNotification) {
       sendValidationNotification();
     }
+
+    else if(!shouldSendNotification){sendValidationNotificationR()}
   }, [totalValidado, totalPedido, notificationSent]);
 
   useEffect(() => {
@@ -115,6 +117,57 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
       const notificationContent = totalValidado > (totalPedido ?? 0)
         ? `El pedido ${orderId} ha sido validado con un saldo a favor de $ ${totalValidado - (totalPedido ?? 0)}.`
         : `El pedido ${orderId} ha sido pagado completamente.`;
+  
+      const notification = {
+        userId: userIdN,
+        content: notificationContent,
+        category: 'Nueva Validación',
+        status: 'unread',
+      };
+  
+      await fetch("/api/mysqlNotifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(notification),
+      });
+    }
+  };
+
+  const handleStatusR = async (id: string): Promise<boolean> => {
+    try {
+      const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
+      
+      if (currentStatus.status === 'Procesando' || currentStatus.status === 'Procesado') {
+        return false; // El pedido ya está marcado como pagado, no necesitamos hacer nada
+      }
+  
+      const response = await fetch(`/api/mysqlStatusProcesando?id=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Hubo un error', error);
+      return false;
+    }
+  };
+
+  const sendValidationNotificationR = async () => {
+    if (notificationSent) return; // Evita enviar notificaciones duplicadas
+  
+    const statusUpdated = await handleStatusR(orderId);
+    
+    if (statusUpdated) {
+      const notificationContent = `El pedido ${orderId} ha sido cambiado a Procesando`
+     
   
       const notification = {
         userId: userIdN,

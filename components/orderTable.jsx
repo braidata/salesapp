@@ -217,6 +217,31 @@ const OrderTable = ({ data, functionS }) => {
     hubspot: 'ID HubSpot'
   };
 
+  const handleStatusPf = async (id) => {
+    try {
+      const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
+      
+      if (currentStatus.status === 'Prefacturar' || currentStatus.status === 'Facturado') {
+        return false; // El pedido ya está marcado como pagado, no necesitamos hacer nada
+      }
+  
+      const response = await fetch(`/api/mysqlStatusPreFacturar?id=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Hubo un error', error);
+      return false;
+    }
+  };
+
 
 
 
@@ -420,6 +445,7 @@ const OrderTable = ({ data, functionS }) => {
                       className="hidden lg:flex lg:flex-row text-center py-4 px-2 font-medium text-gray-900 whitespace-nowrap dark:text-white dark:hover:text-gray-300 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out"
                     >
                       {item[1]?.dealId}
+                      
                     </td>
 
                     <td>
@@ -440,11 +466,16 @@ const OrderTable = ({ data, functionS }) => {
                     </td>
 
                     <td className="w-full sm:w-24 py-4 px-2 text-sm dark:text-gray-400">
+                      
                       <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen(item[1], status)}>
                         Ver +
                       </button>
+                      
                       {status === "Borrado" ? null :
                         <>
+                        {status !== "Prefacturar"&&status !== "Agendado"&&status !== "Procesado"&&status !== "Facturar"&&status !== "Facturado"&&status !== "Pagado"&&item[1].order_class==='ZVFA'?<button className="mt-2 mb-5 bg-gradient-to-r from-orange-600/40 to-orange-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,60,0.75)]  border-orange-800 hover:bg-orange-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-orange-500/40 dark:to-orange-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-orange-200 dark:hover:bg-orange-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleStatusPf(item[1].id)}>
+                              Facturar
+                            </button>:null}
                           {messages.map((message, index) => (
 
                             <button className="mt-2 mb-5 bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,60,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={() => handleModalOpen2(item[1].id, item[1].order_date, item[1].billing_company_rut, status, message)}>

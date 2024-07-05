@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 where: {
                     Shipping_Fecha_de_Despacho_o_Retiro: date,
                     statusSAP: {
-                        in: ['Pagado', 'Prefacturar'],
+                        in: ['Facturar'],
                       },
 
                 }
@@ -57,7 +57,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
 }
-
-//order_items, payments
-
-
