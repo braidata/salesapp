@@ -12,6 +12,7 @@ import data from "./data";
 import styles from "../styles/styles.module.scss";
 import { isLabeledStatement } from "typescript";
 import Link from "next/link";
+import packs from '../utils/packs.json'
 
 
 
@@ -50,6 +51,8 @@ export default function FormatContext({ context, componente }) {
 
   async function checkStockAvailable(sku, quantityRequested, werks, lgort) {
     console.log('Verificando SKU:', sku);
+
+    const packComponents = packs;
   
     // Inicializar un objeto de resultado con todas las propiedades necesarias
     const result = {
@@ -66,6 +69,21 @@ export default function FormatContext({ context, componente }) {
       result.message = `No stock check required for SKU: ${sku}.`;
       return result;
     }
+
+    // Verificar si el SKU es un pack
+  if (packComponents[sku]) {
+    for (const component of packComponents[sku].components) {
+      const componentSku = component.sku;
+      const componentQuantityRequested = component.quantity * quantityRequested;
+
+      const componentResult = await checkStockAvailable(componentSku, componentQuantityRequested, werks, lgort);
+
+      if (componentResult !== true) {
+        return componentResult;
+      }
+    }
+    return true;
+  }
   
     try {
       const response = await fetch(`/api/apiSAPStock?Material=${sku}&werks=${werks}&lgort=${lgort}`);

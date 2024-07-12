@@ -10,13 +10,12 @@ const ShippingOrderTable = () => {
     const [showModal, setShowModal] = useState(false);
     const [activeFilter, setActiveFilter] = useState(null);
 
-
     // Estado para manejar los filtros
     const [filteredOrders, setFilteredOrders] = useState({});
     const [filter, setFilter] = useState({ orderId: null, status: null, tipoDespacho: null, sap: null, orderClass: null });
 
     const statusOptions = ["Pagado"];
-    const tipoDespachoOptions = ["retira_local","envio_starken_regiones", "envio_gratis_santiago"];
+    const tipoDespachoOptions = ["retira_local", "envio_starken_regiones", "envio_gratis_santiago"];
     const orderClassOptions = ["ZVFA", "ZVDI"];
 
     useEffect(() => {
@@ -82,16 +81,16 @@ const ShippingOrderTable = () => {
     };
 
     useEffect(() => {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed, así que se añade 1
-      const day = String(today.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
-      setSelectedDate(formattedDate);
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexed, así que se añade 1
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        setSelectedDate(formattedDate);
     }, []);
-  
+
     const handleDateChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-      setSelectedDate(event.target.value);
+        setSelectedDate(event.target.value);
     };
 
     useEffect(() => {
@@ -208,7 +207,6 @@ const ShippingOrderTable = () => {
         setUserNames(names);
     };
 
-
     useEffect(() => {
         if (dataS.length > 0) {
             loadUserNames(dataS);
@@ -255,6 +253,27 @@ const ShippingOrderTable = () => {
             minute: 'numeric'
         });
     }
+
+    const handleColumnClick = async () => {
+        // Cambiar el estado a procesado
+        const updatedData = await Promise.all(
+            dataS.orders.map(async (order) => {
+                await handleStatusP(order.id);
+                return { ...order, statusSAP: 'Procesado' };
+            })
+        );
+        setData({ ...dataS, orders: updatedData });
+    
+        // Copiar los IDs al portapapeles
+        const idsToCopy = dataS.orders.map(order => getValidCOD_SAP(order.respuestaSAP)).join('\n');
+        try {
+            await navigator.clipboard.writeText(idsToCopy);
+            alert('IDs copiados al portapapeles');
+        } catch (error) {
+            console.error('Error al copiar los IDs al portapapeles:', error);
+        }
+    };
+    
 
     return (
         <>
@@ -330,7 +349,7 @@ const ShippingOrderTable = () => {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row items-center justify-center w-full overflow-auto mt-4 gap-2">
-                                    {['orderId','tipoDespacho', 'sap', 'orderClass'].map(filter => (
+                                    {['orderId', 'tipoDespacho', 'sap', 'orderClass'].map(filter => (
                                         <div key={filter} className="mb-2">
                                             <button
                                                 onClick={() => setActiveFilter(filter)}
@@ -394,7 +413,11 @@ const ShippingOrderTable = () => {
                             <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-lg">
                                 ID
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            <th 
+                                scope="col" 
+                                className="px-6 py-4 whitespace-nowrap bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold text-left text-xs font-semibold uppercase tracking-wider cursor-pointer"
+                                onClick={handleColumnClick}
+                            >
                                 ID SAP
                             </th>
                             <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
