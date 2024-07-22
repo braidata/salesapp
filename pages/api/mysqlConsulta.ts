@@ -68,6 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         "respuestaSAP": true,
         "dealId": true,
         "almacen": true,
+        "order_class": true,
       },
       where,
       orderBy: {
