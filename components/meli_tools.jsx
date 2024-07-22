@@ -7,6 +7,15 @@ const OrderStatus = () => {
   const [orderId, setOrderId] = useState('');
   const [orderData, setOrderData] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageOrder, setErrorMessageOrder] = useState('');
+
+  // Función para convertir la lista de órdenes en un mensaje de error
+  const formatOrderErrorMessage = (orders) => {
+    if (orders.length === 0) {
+      return "No hay órdenes disponibles.";
+    }
+    return `Los siguientes pedidos tienen problemas: ${orders.map(order => order.id).join(', ')}`;
+  };
 
   const handleChange = (event) => {
     setOrderId(event.target.value);
@@ -23,6 +32,7 @@ const OrderStatus = () => {
       // Check if the response contains an error message
       if (data.code === 'OK') {
         setErrorMessage(data.message);
+        setErrorMessageOrder(`El número de Orden Id es: ${(data.orders).map(order => order.id).join(', ')}`);
         setOrderData(null);
       } else {
         // Extract the required fields
@@ -57,6 +67,7 @@ const OrderStatus = () => {
       </form>
 
       {errorMessage && <p>{errorMessage}</p>}
+      {errorMessageOrder && <p>{errorMessageOrder}</p>}
 
       {orderData && (
         <div>
