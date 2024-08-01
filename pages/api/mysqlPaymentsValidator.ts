@@ -8,16 +8,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { id, observation, status, validatedBy, authorization_code } = req.body;
 
     try {
-      // Obtener el estado actual de la orden
-      const existingOrder = await prisma.orders.findUnique({
-        where: { id },
-      });
-      console.log("agarra", id)
+      // // Obtener el estado actual de la orden
+      // const existingOrder = await prisma.orders.findUnique({
+      //   where: { id },
+      // });
+      // console.log("agarra", id)
 
-      if (!existingOrder) {
-        console.log("no agarra", id)
-        return res.status(404).json({ message: "Orden no encontrada" });
-      }
+      // if (!existingOrder) {
+      //   console.log("no agarra", id)
+      //   return res.status(404).json({ message: "Orden no encontrada" });
+      // }
 
       // Verificar si el cambio de estado a "Pagado" está permitido
       const statesNotAllowed = ['Pagado', 'Agendado', 'Procesado'];
