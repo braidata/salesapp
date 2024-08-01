@@ -14,7 +14,7 @@ const ShippingOrderTable = () => {
     const [filteredOrders, setFilteredOrders] = useState({});
     const [filter, setFilter] = useState({ orderId: null, status: null, tipoDespacho: null, sap: null, orderClass: null });
 
-    const statusOptions = ["Pagado"];
+    const statusOptions = ["Agendado", "Procesado"];
     const tipoDespachoOptions = ["retira_local", "envio_starken_regiones", "envio_gratis_santiago"];
     const orderClassOptions = ["ZVFA", "ZVDI"];
 
@@ -349,7 +349,7 @@ const ShippingOrderTable = () => {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row items-center justify-center w-full overflow-auto mt-4 gap-2">
-                                    {['orderId', 'tipoDespacho', 'sap', 'orderClass'].map(filter => (
+                                    {['orderId','status', 'tipoDespacho', 'sap', 'orderClass'].map(filter => (
                                         <div key={filter} className="mb-2">
                                             <button
                                                 onClick={() => setActiveFilter(filter)}

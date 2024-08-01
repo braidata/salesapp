@@ -15,7 +15,7 @@ const ShippingOrderTable = () => {
     const [filteredOrders, setFilteredOrders] = useState({});
     const [filter, setFilter] = useState({ orderId: null, status: null, tipoDespacho: null, sap: null, orderClass: null });
 
-    const statusOptions = ["Pagado", "Pendiente", "Cancelado"];
+    const statusOptions = ["Pagado","Procesado","Procesando","Pendiente","Facturar","Facturado","Borrado"];
     const tipoDespachoOptions = ["envio_starken_regiones", "envio_gratis_santiago"];
     const orderClassOptions = ["ZVFA", "ZVDI"];
 

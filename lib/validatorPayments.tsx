@@ -529,7 +529,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                       >
                         Revisar
                       </button>
-                      {sessionInfo === "payments" || sessionInfo === "all" ? (
+                      {sessionInfo === "payments" || sessionInfo === "all" || sessionInfo === "ventas" ? (
                         <>
                           {pago.status !== 'Validado' && pago.status !== 'Borrado' && (
                             <button
