@@ -163,27 +163,27 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const sendValidationNotificationR = async () => {
     if (notificationSent) return; // Evita enviar notificaciones duplicadas
   
-    const statusUpdated = await handleStatusR(orderId);
+    // const statusUpdated = await handleStatusR(orderId);
     
-    if (statusUpdated) {
-      const notificationContent = `El pedido ${orderId} ha sido cambiado a Procesando`
+    // if (statusUpdated) {
+    //   const notificationContent = `El pedido ${orderId} ha sido cambiado a Procesando`
      
   
-      const notification = {
-        userId: userIdN,
-        content: notificationContent,
-        category: 'Nueva Validación',
-        status: 'unread',
-      };
+    //   const notification = {
+    //     userId: userIdN,
+    //     content: notificationContent,
+    //     category: 'Nueva Validación',
+    //     status: 'unread',
+    //   };
   
-      await fetch("/api/mysqlNotifications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(notification),
-      });
-    }
+    //   await fetch("/api/mysqlNotifications", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(notification),
+    //   });
+    // }
   };
 
   const permisos = async () => {
@@ -197,7 +197,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
       }),
     });
     const data = await res.json();
-    const userRol = data ? data.user[0].permissions : "No conectado";
+    const userRol = data ? data.user[0].rol : "No conectado";
     setSessionInfo(userRol);
     return sessionInfo;
   };
@@ -529,7 +529,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                       >
                         Revisar
                       </button>
-                      {sessionInfo === "payments" || sessionInfo === "all" ? (
+                      {sessionInfo === "validator" || sessionInfo === "all" || sessionInfo === "leader" ? (
                         <>
                           {pago.status !== 'Validado' && pago.status !== 'Borrado' && (
                             <button

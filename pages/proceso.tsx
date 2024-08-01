@@ -1,10 +1,20 @@
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import SimpliRoute from "../components/simpliRoute2";
+import usePermissions from "../hooks/usePermissions";
+
+
 
 const Agenda = () => {
   const { data: session } = useSession()
+  const combinations = [
+    { permissions: ["logistics"], roles: ["leader"] },
+    { permissions: ["logistics"], roles: ["proceso"] }, 
+    // Add more combinations as needed
+  ];
+
+  const { access } = usePermissions(combinations);
   const [data, setData] = useState();
   const userSender = async (event) => {
     event.preventDefault();
@@ -71,12 +81,14 @@ const Agenda = () => {
 
   return (
     <>
-      
+
       <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
-      {/* <h1 className="mt-24">Portal Logística</h1> */}
-      <div className="flex flex-row gap-4 mt-24">
-      </div>
-        <SimpliRoute />
+        {/* <h1 className="mt-24">Portal Logística</h1> */}
+        <div className="flex flex-row gap-4 mt-24">
+        </div>
+        {access["logistics|leader"] && <SimpliRoute />}
+        {access["logistics|proceso"] && <SimpliRoute />}
+
       </div></>
   );
 };

@@ -14,7 +14,7 @@ const ShippingOrderTable = () => {
     const [filteredOrders, setFilteredOrders] = useState({});
     const [filter, setFilter] = useState({ orderId: null, status: null, tipoDespacho: null, sap: null, orderClass: null });
 
-    const statusOptions = ["Pagado"];
+    const statusOptions = ["Agendado", "Procesado"];
     const tipoDespachoOptions = ["retira_local", "envio_starken_regiones", "envio_gratis_santiago"];
     const orderClassOptions = ["ZVFA", "ZVDI"];
 
@@ -300,7 +300,7 @@ const ShippingOrderTable = () => {
                 </form>
                 <button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)]  border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]  dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center" onClick={exportTableToExcel}>Descargar como Excel</button>
                 <div className="flex flex-row items-center justify-center px-2"
-                ><Link href="/agenda" passHref>
+                ><Link href="/proceso" passHref>
                         <button
                             className="px-4 py-2 mx-2 my-2 dark:text-gray-300 font-bold py-2 px-4 rounded-lg  hover:text-gray-900   border-teal-400 hover:bg-teal-600/50 text-teal-900 dark:bg-gradient-to-r dark:from-teal-400/80 dark:via-teal-600 dark:to-purple-200/50 border-2   dark:border-sky-200 dark:hover:bg-teal-900  hover:animate-pulse transform hover:-translate-y-1 hover:scale-110
         mt-48 mt-2 mb-5 bg-gradient-to-r from-teal-200 via-teal-100 to-green-300/30 text-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 
@@ -349,7 +349,7 @@ const ShippingOrderTable = () => {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row items-center justify-center w-full overflow-auto mt-4 gap-2">
-                                    {['orderId', 'tipoDespacho', 'sap', 'orderClass'].map(filter => (
+                                    {['orderId','status', 'tipoDespacho', 'sap', 'orderClass'].map(filter => (
                                         <div key={filter} className="mb-2">
                                             <button
                                                 onClick={() => setActiveFilter(filter)}
@@ -480,10 +480,10 @@ const ShippingOrderTable = () => {
                                     <td className="w-full sm:w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <div className="flex flex-col gap-2">
                                         
-                                        {<button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
+                                        {item[1].statusSAP !== "Procesado" && (<button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
                                             onClick={() => handleStatusP(item[1].id)}>
                                             Procesar
-                                        </button>}
+                                        </button>)}
                                         </div>
                                     </td>
                                 </tr>

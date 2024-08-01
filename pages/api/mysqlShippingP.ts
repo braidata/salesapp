@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 where: {
                     Shipping_Fecha_de_Despacho_o_Retiro: date,
                     statusSAP: {
-                        in: ['Agendado'],
+                        in: ['Agendado', 'Procesado'],
                       },
 
                 }

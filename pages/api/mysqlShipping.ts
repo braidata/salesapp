@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const date = req.body.date ? req.body.date : req.query.date
-    
+
 
     const prisma = new PrismaClient();
 
@@ -37,13 +37,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     "statusSAP": true,
                     "order_class": true,
                     "user": true,
-                    
+
                 },
                 where: {
                     Shipping_Fecha_de_Despacho_o_Retiro: date,
                     statusSAP: {
-                        in: ['Pagado', 'Prefacturar'],
-                      },
+                        in: ['Pagado', 'Borrado', 'Agendado', 'Prefacturar', 'Facturar', 'Facturado', 'Procesado', 'Procesando'],
+                    },
 
                 }
             }

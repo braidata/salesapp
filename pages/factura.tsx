@@ -1,10 +1,75 @@
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import SimpliRoute from "../components/simpliRoute3";
 
+const usePermissions = () => {
+  const { data: session } = useSession();
+  const [permissions, setPermissions] = useState({});
+  const [roles, setRoles] = useState([]);
+
+  const checkPermissions = async (requiredPermissions: any[], requiredRoles: any[]) => {
+    const res = await fetch("/api/mysqlPerm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: session ? session.session.user.email : null,
+      }),
+    });
+    const data = await res.json();
+    console.log("Los permisos y roles son: ", data);
+
+    if (data && data.user && data.user[0]) {
+      const userPermissions = data.user[0].permissions || [];
+      const userRoles = data.user[0].rol || [];
+      console.log("Los permisos y roles son: ", userPermissions, userRoles );
+
+      const hasPermissions = requiredPermissions.every(permission =>
+        userPermissions.includes(permission)
+      );
+      console.log("Los permisos y roles son: ", hasPermissions);
+      const hasRoles = requiredRoles.every(role =>
+        userRoles.includes(role)
+      );
+      console.log("Los permisos y roles son: ", hasRoles);
+
+      return hasPermissions && hasRoles;
+
+      
+    }
+    return false;
+  };
+
+  const fetchPermissions = async (requiredPermissions: any[], requiredRoles: any[]) => {
+    const hasAccess = await checkPermissions(requiredPermissions, requiredRoles);
+    console.log("Has access: ", hasAccess);
+
+    setPermissions(prevPermissions => ({
+      ...prevPermissions,
+      [requiredPermissions.join(",")]: hasAccess,
+    }));
+
+    setRoles(prevRoles => ({
+      ...prevRoles,
+      [requiredRoles.join(",")]: hasAccess,
+    }));
+  };
+
+  useEffect(() => {
+    if (session) {
+      fetchPermissions(["logistics"], ["factura"]);
+      // Add more fetchPermissions calls as needed for different permissions and roles combinations
+    }
+  }, [session]);
+  console.log("gatos",permissions, roles)
+  return { permissions, roles };
+};
+
 const Agenda = () => {
   const { data: session } = useSession()
+  const { permissions, roles } = usePermissions();
   const [data, setData] = useState();
   const userSender = async (event) => {
     event.preventDefault();
@@ -76,7 +141,7 @@ const Agenda = () => {
       {/* <h1 className="mt-24">Portal Logística</h1> */}
       <div className="flex flex-row gap-4 mt-24">
       </div>
-        <SimpliRoute />
+      {permissions["logistics"] && roles["factura"] &&(<SimpliRoute />)}
       </div></>
   );
 };
