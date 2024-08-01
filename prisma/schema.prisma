@@ -105,8 +105,8 @@ model payments_validator {
   createdBy          String?
   validatedBy        String?
   editedBy           String?
-  sapId              String? @default("sin datos") @db.VarChar(255)
   contId             String? @default("sin datos") @db.VarChar(255)
+  sapId              String? @default("sin datos") @db.VarChar(255)
   posts              posts[]
 }
 
