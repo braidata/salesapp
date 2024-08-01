@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 
 const SelectComponent = () => {
     const [store, setStore] = useState("Ventus");
+    const [isLoading, setIsLoading] = useState(false);
     const [orderData, setOrderData] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const { data: session } = useSession();
@@ -66,6 +67,7 @@ const SelectComponent = () => {
     const handleSendToSAP = async () => {
         if (!orderData) return;
 
+        setIsLoading(true);
         try {
             const response = await fetch(`/api/orderVentusPay`, {
                 method: "POST",
@@ -91,6 +93,8 @@ const SelectComponent = () => {
         } catch (error) {
             console.error("Error al cambiar de estado:", error);
             alert("Error al cambiar de estado, intenta nuevamente.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -158,12 +162,13 @@ const SelectComponent = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            {showSapButton && (
+                            {showSapButton && orderData.Estado === 'En espera' && (
                                 <button
-                                    className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full"
+                                    className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full disabled:opacity-50"
                                     onClick={handleSendToSAP}
+                                    disabled={isLoading}
                                 >
-                                    Enviar a SAP
+                                    {isLoading ? 'Cargando...' : 'Enviar a SAP'}
                                 </button>
                             )}
                         </div>
