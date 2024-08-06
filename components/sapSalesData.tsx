@@ -17,7 +17,7 @@ interface SAPSalesDataResult {
   deliverydate: string;
   Material: string;
   SalesOrderItemText: string;
-  OrderQuantity: number;
+  ORDERQUANTITY: number;
   OrderQuantityUnit: string;
   NetPriceAmount: number;
   CustomerPaymentTerms: string;
@@ -48,8 +48,8 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const totalNeto = salesData.reduce((sum, item) => sum + (item.OrderQuantity * item.NetPriceAmount || 0), 0);
-  const totalBruto = salesData.reduce((sum, item) => sum + (((item.OrderQuantity * item.NetPriceAmount) || 0) * 1.19), 0);
+  const totalNeto = salesData.reduce((sum, item) => sum + (item.ORDERQUANTITY * item.NetPriceAmount || 0), 0);
+  const totalBruto = salesData.reduce((sum, item) => sum + (((item.ORDERQUANTITY * item.NetPriceAmount) || 0) * 1.19), 0);
 
   useEffect(() => {
     const fetchSAPSalesData = async () => {
@@ -181,11 +181,11 @@ const SAPSalesDetails: React.FC<SAPSalesDetailsProps> = ({ salesOrder }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.Material}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.SalesOrderItemText || ''}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {item.OrderQuantity || ''} {item.OrderQuantityUnit || ''}
+                  {(item.ORDERQUANTITY) || ''} {item.OrderQuantityUnit || ''}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.OrderQuantity * item.NetPriceAmount || ''}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{item.ORDERQUANTITY * item.NetPriceAmount || ''}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {((item.OrderQuantity * item.NetPriceAmount) * 1.19).toFixed(0) || ''}
+                  {((item.ORDERQUANTITY * item.NetPriceAmount) * 1.19).toFixed(0) || ''}
                 </td>
                 {/* <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
                   Neto: {item.ItemNetAmountOfBillingDoc} Bruto: {item.TOTAL}
