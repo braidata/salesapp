@@ -3,9 +3,8 @@ import axios from 'axios';
 import VisualizatorPayments from "../lib/visualizatorPayments";
 import { useSession } from "next-auth/react";
 import { saveAs } from 'file-saver';
-import { FaCopy } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
-import Posts from '../components/postButton'
+import Posts from '../components/postButton';
 
 const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [pagos, setPagos] = useState<any[]>([]);
@@ -13,9 +12,6 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [error, setError] = useState<string>('');
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [modalData2, setModalData2] = useState<any>({});
-  const [modalDate2, setModalDate2] = useState<any>({});
-  const [modalRut2, setModalRut2] = useState<any>({});
-  const [modalStatus2, setModalStatus2] = useState<string>("Procesando");
   const [idPago, setIdPago] = useState<string>('');
   const [sessionInfo, setSessionInfo] = useState<string | undefined>();
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
@@ -23,58 +19,51 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const [observationModal, setObservationModal] = useState(false);
   const [observation, setObservation] = useState<string>('');
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string | null>('');
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string>('');
   const [totalPedido, setTotalPedido] = useState<number | undefined>();
   const [totalPagado, setTotalPagado] = useState<number | undefined>();
   const [totalValidado, setTotalValidado] = useState<number>(0);
   const [totalPendiente, setTotalPendiente] = useState<number>(0);
   const { data: session } = useSession();
-  const [userId, setUserId] = useState<string | null>();
-  const [userIdN, setUserIdN] = useState<number | null>();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userIdN, setUserIdN] = useState<number | null>(null);
   const [authCode, setAuthCode] = useState<string>('');
   const [notificationSent, setNotificationSent] = useState(false);
 
-  
-
-
   useEffect(() => {
     if (session) {
-      setUserId(session ? session.session.user.name : null);
-      setUserIdN(session ? session.token.sub : null)
-      const loggedInUserEmail = session ? session.session.user.name : null
-      // console.log("editador", loggedInUserEmail, userIdN)
+      setUserId(session?.session.user.name || null);
+      setUserIdN(Number(session?.session.user.id) || null);
     }
   }, [session]);
 
   useEffect(() => {
-    const shouldSendNotification = 
-      totalValidado >= (totalPedido ?? 0) && 
-      !notificationSent && 
-      totalPedido !== undefined && 
-      totalValidado !== 0;
-  
-    if (shouldSendNotification) {
+    if (totalValidado >= (totalPedido ?? 0) && !notificationSent && totalPedido !== undefined && totalValidado !== 0) {
       sendValidationNotification();
+    } else if (totalValidado < (totalPedido ?? 0) && notificationSent) {
+      sendValidationNotificationR();
+      setNotificationSent(false);
     }
-
-    else if(!shouldSendNotification){sendValidationNotificationR()}
   }, [totalValidado, totalPedido, notificationSent]);
 
   useEffect(() => {
-    const fetchPagos = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`/api/mysqlPaymentsValidator?id=${orderId}`);
-        setPagos(response.data);
+        const [pagosResponse, permisosResponse, estadoPagoResponse] = await Promise.all([
+          axios.get(`/api/mysqlPaymentsValidator?id=${orderId}`),
+          fetchEstadoPago(orderId),
+          permisos()
+        ]);
+  
+        setPagos(pagosResponse.data);
         setLoading(false);
       } catch (error) {
         setError('Error al obtener los pagos pendientes');
         setLoading(false);
       }
     };
-
-    fetchPagos();
-    permisos();
-    fetchEstadoPago(orderId);
+  
+    fetchData();
   }, [orderId]);
 
   useEffect(() => {
@@ -86,22 +75,18 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const handleStatus = async (id: string): Promise<boolean> => {
     try {
       const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
-      
-      if (currentStatus.status === 'Pagado') {
+      if (currentStatus.status === 'Procesado') {
         return false; // El pedido ya está marcado como pagado, no necesitamos hacer nada
       }
   
-      const response = await fetch(`/api/mysqlStatusPayd?id=${id}`, {
+      const response = await fetch(`/api/mysqlStatusPaydR?id=${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
       });
   
-      if (response.ok) {
-        return true;
-      }
-      return false;
+      return response.ok;
     } catch (error) {
       console.error('Hubo un error', error);
       return false;
@@ -132,6 +117,8 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         },
         body: JSON.stringify(notification),
       });
+
+      setNotificationSent(true); // Asegura que la notificación no se envíe nuevamente
     }
   };
 
@@ -140,7 +127,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
       const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
       
       if (currentStatus.status === 'Procesando' || currentStatus.status === 'Procesado') {
-        return false; // El pedido ya está marcado como pagado, no necesitamos hacer nada
+        return false; // El pedido ya está marcado como Procesando, no necesitamos hacer nada
       }
   
       const response = await fetch(`/api/mysqlStatusProcesando?id=${id}`, {
@@ -150,10 +137,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         },
       });
   
-      if (response.ok) {
-        return true;
-      }
-      return false;
+      return response.ok;
     } catch (error) {
       console.error('Hubo un error', error);
       return false;
@@ -163,27 +147,26 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   const sendValidationNotificationR = async () => {
     if (notificationSent) return; // Evita enviar notificaciones duplicadas
   
-    // const statusUpdated = await handleStatusR(orderId);
+    const statusUpdated = await handleStatusR(orderId);
     
-    // if (statusUpdated) {
-    //   const notificationContent = `El pedido ${orderId} ha sido cambiado a Procesando`
+    if (statusUpdated) {
+      const notificationContent = `El pedido ${orderId} ha sido cambiado a Procesando`;
      
+      const notification = {
+        userId: userIdN,
+        content: notificationContent,
+        category: 'Nueva Validación',
+        status: 'unread',
+      };
   
-    //   const notification = {
-    //     userId: userIdN,
-    //     content: notificationContent,
-    //     category: 'Nueva Validación',
-    //     status: 'unread',
-    //   };
-  
-    //   await fetch("/api/mysqlNotifications", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(notification),
-    //   });
-    // }
+      await fetch("/api/mysqlNotifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(notification),
+      });
+    }
   };
 
   const permisos = async () => {
@@ -193,14 +176,14 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: session ? session?.session?.user.email : null,
+        email: session?.session.user.email || null,
       }),
     });
     const data = await res.json();
-    const userRol = data ? data.user[0].rol : "No conectado";
+    const userRol = data?.user[0]?.rol || "No conectado";
     setSessionInfo(userRol);
-    return sessionInfo;
   };
+
   const fetchEstadoPago = async (orderId: string) => {
     try {
       const responseTotalPedido = await axios.post(`/api/mysqlOrderAmount`, { order_id: orderId });
@@ -208,28 +191,22 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
       const responseTotalValidado = await axios.post(`/api/mysqlPaymentsValidatedAmount`, { order_id: orderId });
       const responseTotalPendiente = await axios.post(`/api/mysqlPaymentsPendingAmount`, { order_id: orderId });
 
-      const totalPedido = responseTotalPedido.data.total_pedido;
-      const totalPagado = responseTotalPagado.data.total_pagado;
-      const totalValidado = responseTotalValidado.data.total_validado;
-      const totalPendiente = responseTotalPendiente.data.total_pendiente;
-
-      setTotalPedido(totalPedido);
-      setTotalPagado(totalPagado);
-      setTotalValidado(totalValidado);
-      setTotalPendiente(totalPendiente);
-
+      setTotalPedido(responseTotalPedido.data.total_pedido);
+      setTotalPagado(responseTotalPagado.data.total_pagado);
+      setTotalValidado(responseTotalValidado.data.total_validado);
+      setTotalPendiente(responseTotalPendiente.data.total_pendiente);
     } catch (error) {
       console.error('Error al obtener el estado de pago:', error);
     }
   };
 
-  const handleValidate = (pagoId: string, paymentId: string) => {
+  const handleValidate = (paymentId: string) => {
     setSelectedPaymentId(paymentId);
     setSelectedPaymentStatus('Validado');
     setObservationModal(true);
   };
 
-  const handleReject = (pagoId: string, paymentId: string) => {
+  const handleReject = (paymentId: string) => {
     setSelectedPaymentId(paymentId);
     setSelectedPaymentStatus('Rechazado');
     setObservationModal(true);
@@ -246,8 +223,6 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         hour12: false
       }).replace(',', '');
 
-
-
       await axios.post('/api/mysqlPaymentsValidator', {
         id: selectedPaymentId,
         status: selectedPaymentStatus,
@@ -256,34 +231,32 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
         validatedBy: userId,
         authorization_code: authCode,
       });
-      sendNotification(selectedPaymentId, userId, orderId)
+
+      sendNotification(selectedPaymentId, userId, orderId);
+      
       setPagos((prevPagos) =>
         prevPagos.map((pago) =>
           pago.id === selectedPaymentId
             ? {
-
-              ...pago,
-              status: selectedPaymentStatus,
-              validation_date: formattedDate,
-              observation: observation,
-              validatedBy: userId,
-              authorization_code: authCode,
-            }
+                ...pago,
+                status: selectedPaymentStatus,
+                validation_date: formattedDate,
+                observation: observation,
+                validatedBy: userId,
+                authorization_code: authCode,
+              }
             : pago
-
-
         )
       );
-
-      if (totalValidado < (totalPedido ?? 0)) {
-        setNotificationSent(false);
-      }else{setNotificationSent(true)}
 
       setObservationModal(false);
       setObservation('');
       setAuthCode('');
       fetchEstadoPago(orderId); // Refresh the payment status
 
+      if (totalValidado < (totalPedido ?? 0)) {
+        setNotificationSent(false);
+      }
     } catch (error) {
       console.error('Error al validar el pago:', error);
     }
@@ -335,16 +308,18 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
 
   const handleCopyToClipboard = () => {
     const selectedPago = pagos.find((pago) => pago.id === selectedRow);
-    const textToCopy = `
-          ID de Pago: ${selectedPago.id}
-          Monto: ${selectedPago.payment_amount}
-          Fecha de Pago: ${selectedPago.payment_date}
-          Estado: ${selectedPago.status}
-        `;
-    navigator.clipboard.writeText(textToCopy);
+    if (selectedPago) {
+      const textToCopy = `
+        ID de Pago: ${selectedPago.id}
+        Monto: ${selectedPago.payment_amount}
+        Fecha de Pago: ${selectedPago.payment_date}
+        Estado: ${selectedPago.status}
+      `;
+      navigator.clipboard.writeText(textToCopy);
+    }
   };
 
-  const sendNotification = async (selectedPaymentId: string | null, userId: string | null | undefined, orderId: string) => {
+  const sendNotification = async (selectedPaymentId: string | null, userId: string | null, orderId: string) => {
     const notification = {
       userId: userIdN,
       content: `El analista ${userId} ha evaluado el pago ${selectedPaymentId} del pedido ${orderId}`,
@@ -534,7 +509,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                           {pago.status !== 'Validado' && pago.status !== 'Borrado' && (
                             <button
                               className="bg-gradient-to-r from-green-600/40 to-green-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,177,0,0.75)]  border-green-800 hover:bg-green-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-green-500/40 dark:to-green-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,0,0.25)]  dark:border-green-200 dark:hover:bg-green-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-                              onClick={() => handleValidate(orderId, pago.id)}
+                              onClick={() => handleValidate(pago.id)}
                             >
                               Validar
                             </button>
@@ -542,17 +517,15 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
                           {pago.status !== 'Rechazado' && pago.status !== 'Borrado' && pago.status !== 'Doble Revisión' && (
                             <button
                               className="bg-gradient-to-r from-red-600/40 to-red-800/40 border-2 drop-shadow-[0_9px_9px_rgba(177,0,0,0.75)]  border-red-800 hover:bg-red-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-red-500/40 dark:to-red-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(255,0,0,0.25)]  dark:border-red-200 dark:hover:bg-red-900 dark:text-gray-200 font-semibold py-1 px-1 my-2 mx-2 rounded-lg transform perspective-1000 transition duration-500 origin-center mx-2"
-                              onClick={() => handleReject(orderId, pago.id)}
+                              onClick={() => handleReject(pago.id)}
                             >
                               Rechazar
                             </button>
                           )}
-
                         </>
                       ) : null}
                       <Posts orderId={parseInt(orderId)} paymentValidatorId={pago.id} />
                     </td>
-
                   </tr>
                 ))}
               </tbody>

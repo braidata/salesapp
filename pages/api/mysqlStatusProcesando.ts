@@ -15,6 +15,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(404).json({ message: "Orden no encontrada" });
         }
 
+        // Lista de estados que no deben ser cambiados
+        const estadosNoModificables = ["Facturar", "Facturado", "Prefacturar"];
+
+        // Verifica si el estado actual está en la lista de estados no modificables
+        if (estadosNoModificables.includes(existingOrder.statusSAP)) {
+            console.log(`Orden ${id} no actualizada. Estado actual: ${existingOrder.statusSAP}`);
+            return res.status(200).json({ message: "Estado no cambiado", estado: existingOrder.statusSAP });
+        }
+
+        // Si el estado no está en la lista de no modificables, procede con la actualización
         const updatedOrder = await prisma.orders.update({
             where: { id: parseInt(id) },
             data: {
