@@ -1,21 +1,47 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect } from "react"
 import { useSession, signIn, signOut } from "next-auth/react"
 //use context to get session
 import { SessionProvider } from "next-auth/react"
 
 export default function Component() {
-
-  //get user session data
   const { data: session, status } = useSession()
-  //save the session token data permanently
-  //const [sessionF, setsessionF] = useState(session)
-  console.log("session", session)
-  
+  const [imageSrc, setImageSrc] = useState("")
+
+  useEffect(() => {
+    const checkImageExists = async (url) => {
+      try {
+        const response = await fetch(url)
+        if (response.ok) {
+          return true
+        }
+        return false
+      } catch (error) {
+        return false
+      }
+    }
+
+    const updateImageSrc = async () => {
+      if (session) {
+        const imageUrl = `../profiles/logo${session.token.picture}.png`
+        const imageExists = await checkImageExists(imageUrl)
+        if (imageExists) {
+          setImageSrc(imageUrl)
+        } else {
+          setImageSrc("../profiles/logoU.png")
+        }
+      } else {
+        setImageSrc("../profiles/logoU.png")
+      }
+    }
+
+    updateImageSrc()
+  }, [session])
+
   if (session) {
     return (
       <>
         <br />
-        <img src={ `../profiles/logo${session.session ? session.token.picture : null}.png`} title={session.session ? session.token.name : "No conectado"} className="rounded-full w-10 h-10" />
+        <img src={imageSrc} title={session.token.name} className="rounded-full w-10 h-10" />
         {/* <button className="hover:backdrop-blur rounded-full p-1 m-1 hover:bg-blue-300/20 
         active:backdrop-blur-md active:bg-blue-300/40 dark:active:bg-white/40
         font-bold dark:text-white/70 text-cyan-800 ml-1 dark:hover:bg-white/20" onClick={() => signOut()}>
