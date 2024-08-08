@@ -1,12 +1,20 @@
-// pages/api/updateOrderStatus.ts
+// pages/api/mysqlStatusProcesando.ts
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from 'next';
 
+const prisma = new PrismaClient();
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-    const prisma = new PrismaClient();
+    if (req.method !== 'PUT') {
+        return res.status(405).json({ message: 'Método no permitido' });
+    }
 
     try {
         const { id } = req.query as { id: string };
+        if (!id) {
+            return res.status(400).json({ message: 'ID de la orden es requerido' });
+        }
+
         const existingOrder = await prisma.orders.findUnique({
             where: { id: parseInt(id) },
         });

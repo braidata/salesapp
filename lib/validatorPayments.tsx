@@ -40,7 +40,7 @@ const ValidatorPayments = ({ orderId }: { orderId: string }) => {
   useEffect(() => {
     if (totalValidado >= (totalPedido ?? 0) && !notificationSent && totalPedido !== undefined && totalValidado !== 0) {
       sendValidationNotification();
-    } else if (totalValidado < (totalPedido ?? 0) && notificationSent) {
+    } else if (totalValidado < (totalPedido ?? 0)) {
       sendValidationNotificationR();
       setNotificationSent(false);
     }
