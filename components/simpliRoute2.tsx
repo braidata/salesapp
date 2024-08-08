@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Text from "./text";
 import * as XLSX from 'xlsx';
+import SpinnerButton from '../components/spinnerButton.jsx'
 
 const ShippingOrderTable = () => {
     const [dataS, setData] = useState([]);
@@ -9,6 +10,7 @@ const ShippingOrderTable = () => {
     const [selectedDate, setSelectedDate] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [activeFilter, setActiveFilter] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // Nuevo estado
 
     // Estado para manejar los filtros
     const [filteredOrders, setFilteredOrders] = useState({});
@@ -16,7 +18,7 @@ const ShippingOrderTable = () => {
 
     const statusOptions = ["Agendado", "Procesado"];
     const tipoDespachoOptions = ["retira_local", "envio_starken_regiones", "envio_gratis_santiago"];
-    const orderClassOptions = ["ZVFA", "ZVDI"];
+    const orderClassOptions = ["ZVFA", "ZVDI", "ZPGA"];
 
     useEffect(() => {
         if (dataS && dataS.orders) {
@@ -134,6 +136,7 @@ const ShippingOrderTable = () => {
     };
 
     const handleStatusP = async (id: string): Promise<boolean> => {
+        setIsLoading(true);
         try {
             const currentStatus = await fetch(`/api/mysqlGetOrderStatus?id=${id}`).then(res => res.json());
             if (currentStatus.status !== 'Agendado') {
@@ -149,6 +152,8 @@ const ShippingOrderTable = () => {
         } catch (error) {
             console.error('Hubo un error', error);
             return false;
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -410,38 +415,38 @@ const ShippingOrderTable = () => {
                 <table id="excel" className="min-w-full divide-y divide-gray-200 mt-8 mb-4 text-sm text-left text-gray-500 dark:text-gray-200 rounded-t-lg">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-lg">
+                            <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-lg">
                                 ID
                             </th>
                             <th 
                                 scope="col" 
-                                className="px-6 py-4 whitespace-nowrap bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold text-left text-xs font-semibold uppercase tracking-wider cursor-pointer"
+                                className="px-2 break-words py-2 whitespace-nowrap bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold text-left text-xs font-semibold uppercase tracking-wider cursor-pointer"
                                 onClick={handleColumnClick}
                             >
                                 ID SAP
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
                                 Fecha de Creación
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
                                 Fecha de Despacho
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
                                 Estado
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
                                 Tipo de Despacho
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            {/* <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
                                 Observación
-                            </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            </th> */}
+                            <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
                                 Clase de Pedido
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-pre-line text-sm text-gray-500 dark:text-gray-200">
+                            <th scope="col" className="px-2 break-words py-2 whitespace-pre-line text-sm text-gray-500 dark:text-gray-200">
                                 Ejecutivo
                             </th>
-                            <th scope="col" className="px-6 py-4 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-lg">
+                            <th scope="col" className="px-2 break-words py-2 whitespace-nowrap bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-lg">
                                 Acciones
                             </th>
                         </tr>
@@ -453,36 +458,40 @@ const ShippingOrderTable = () => {
                                     <td scope="row" className="text-center py-4 px-2 font-medium text-gray-900 whitespace-nowrap dark:text-white dark:hover:text-gray-300 hover:text-gray-700 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:transition duration-150 ease-in-out dark:ease-in-out dark:duration-150 dark:shadow-outline dark:focus:outline-none dark:focus:shadow-outline dark:transition duration-150 ease-in-out">
                                         {item[1].id}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    <td className="px-2 break-words py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {getValidCOD_SAP(item[1].respuestaSAP)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    <td className="px-2 break-words py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {adjustDateForTimezone(item[1].order_date)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    <td className="px-2 break-words py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {adjustDateForTimezone(item[1].Shipping_Fecha_de_Despacho_o_Retiro).toString()}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    <td className="px-2 break-words py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {item[1].statusSAP}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    <td className="px-2 break-words py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {item[1].Shipping_Tipo_de_Despacho}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    {/* <td className="px-2 break-words py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200 max-x-64">
                                         {item[1].Shipping_Observacion}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
+                                    </td> */}
+                                    <td className="px-2 break-words  py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">
                                         {item[1].order_class}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-pre-line text-sm text-gray-500 dark:text-gray-200">
+                                    <td className="px-2 break-words  py-2 whitespace-pre-line text-sm text-gray-500 dark:text-gray-200">
                                         {userNames[item[1].user]}
                                     </td>
-                                    <td className="w-full sm:w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="w-full sm:w-24 px-2 break-words py-2 whitespace-nowrap text-sm text-gray-500">
                                         <div className="flex flex-col gap-2">
                                         
                                         {item[1].statusSAP !== "Procesado" && (<button className="mt-2 mb-5 bg-gradient-to-r from-sky-600/40 to-sky-800/40 border-2 drop-shadow-[0_9px_9px_rgba(0,155,177,0.75)] border-sky-800 hover:bg-sky-600/50 text-gray-800 dark:bg-gradient-to-r dark:from-sky-500/40 dark:to-sky-800/60 border-2 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)] dark:border-sky-200 dark:hover:bg-sky-900 dark:text-gray-200 font-bold py-2 px-4 rounded-full transform perspective-1000 hover:rotate-[0.1deg] hover:skew-x-1 hover:skew-y-1 hover:scale-105 focus:-rotate-[0.1deg] focus:-skew-x-1 focus:-skew-y-1 focus:scale-105 transition duration-500 origin-center"
                                             onClick={() => handleStatusP(item[1].id)}>
-                                            Procesar
+                                            {isLoading ? (
+                                                            <SpinnerButton/>
+                                                        ) : (
+                                                            "Procesar"
+                                                        )}
                                         </button>)}
                                         </div>
                                     </td>
