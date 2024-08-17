@@ -143,7 +143,7 @@ const ConsultaStockComponent = () => {
                             <h2 className=" text-gray-900 dark:text-gray-200">Resultados:</h2>
 
                             <StockTable data={results} />
-                            <div className="flex flex-row max-h-16 gap-2">
+                            <div className="flex flex-col md:flex-row max-h-16 gap-2">
                                 <button
                                     className="rounded-lg bg-gray-200/30 dark:bg-gray-700/60 text-gray-600 dark:text-green-100/80 font-semibold leading-none hover:text-gray-200 hover:bg-gray-500/20 drop-shadow-[0_9px_9px_rgba(0,10,20,0.85)] dark:hover:bg-gray-700/30 dark:drop-shadow-[0_9px_9px_rgba(0,255,255,0.25)]"
                                     onClick={() => {
