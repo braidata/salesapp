@@ -624,7 +624,7 @@ const OrderTable = ({ data, functionS }) => {
           {/* <div className=" bg-gray-900 bg-opacity-30 absolute w-full h-full z-0   
           "></div> */}
           {/* modal-card */}
-          <div className=" bg-gray-700/20 w-11/12 md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
+          <div className=" bg-gray-700/20 w-11/12 max-h-[80vh] md:max-w-3xl mx-auto rounded shadow-lg z-50 overflow-y-auto 
           ">
             {/* modal-card-head*/}
             <header className="bg-gray-300/90 flex items-center justify-between p-5 border-b border-gray-300 dark:border-gray-700 dark:bg-gray-800 
@@ -662,7 +662,7 @@ const OrderTable = ({ data, functionS }) => {
                     </th> */}
                     <th scope="col" className="py-3 px-2">
                       Fecha de Entrega</th>
-                    <th scope="col" className="py-3 px-2">
+                    <th scope="col" className="py-3 px-2 hidden lg:flex lg:flex-row">
                       Rut de Empresa
                     </th>
 
@@ -697,13 +697,13 @@ const OrderTable = ({ data, functionS }) => {
                       <th scope="col" className="py-3 px-2">
                         Cantidad
                       </th>
-                      <th scope="col" className="py-3 px-2 ">
+                      <th scope="col" className="py-3 px-2 hidden md:flex md:flex-row">
                         SKU
                       </th>
                       <th scope="col" className="py-3 px-2 ">
                         % Descuento
                       </th>
-                      <th scope="col" className="py-3 px-2 ">
+                      <th scope="col" className="py-3 px-2 hidden md:flex md:flex-row">
                         Almacén
                       </th>
                       <th scope="col" className="py-3 px-2 rounded-tr-lg">
@@ -720,13 +720,13 @@ const OrderTable = ({ data, functionS }) => {
                         <td className="py-3 px-2 ">{item.name}</td>
                         <td className="py-3 px-2">{item.price / item.quantity}</td>
                         <td className="py-3 px-2">{item.quantity}</td>
-                        <td className="py-3 px-2 ">{item.sku}</td>
+                        <td className="py-3 px-2 hidden md:flex md:flex-row">{item.sku}</td>
                         <td className="py-3 px-2 ">{item.discount = isNaN(item.discount) ? 0 : item.discount}</td>
-                        <td className="py-3 px-2 ">{modalData.almacen}</td>
+                        <td className="py-3 px-2 hidden md:flex md:flex-row">{modalData.almacen}</td>
                         <td className="-py-8 px-2">{item.price}</td>
                       </tr>
                     ))}
-                    <tr className="text-center py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg">
+                    <tr className="text-center py-3 px-2 invisible lg:visible text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg">
                       <td colSpan="6" className="py-3 px-2 text-right text-gray-700 dark:text-gray-200">Total:</td>
                       <td className="py-3 px-2">
                         {modalData.order_items.reduce((total, item) => total + parseFloat(item.price), 0)}
@@ -756,10 +756,10 @@ const OrderTable = ({ data, functionS }) => {
                       <th scope="col" className="py-3 px-2">
                         Comuna
                       </th>
-                      <th scope="col" className="py-3 px-2">
+                      <th scope="col" className="py-3 px-2 hidden  lg:flex-row">
                         Ciudad
                       </th>
-                      <th scope="col" className="py-3 px-2 rounded-tr-lg">
+                      <th scope="col" className="py-3 px-2 rounded-tr-lg hidden  lg:flex-row">
                         Región
                       </th>
                     </tr>
@@ -772,8 +772,8 @@ const OrderTable = ({ data, functionS }) => {
                       <td className="py-3  px-2">{modalData.billing_number}</td>
                       <td className="py-3  px-2">{modalData.billing_department}</td>
                       <td className="py-3  px-2">{modalData.billing_commune}</td>
-                      <td className="py-3  px-2">{modalData.billing_city}</td>
-                      <td className="py-3  px-2 rounded-br-lg">{modalData.billing_region}</td>
+                      <td className="py-3  px-2 hidden  lg:flex-row">{modalData.billing_city}</td>
+                      <td className="py-3  px-2 rounded-br-lg hidden  lg:flex-row">{modalData.billing_region}</td>
                     </tr>
                     {modalData.Shipping_street ? <tr className="text-center max-w-sm py-3 px-2 text-gray-600 bg-gray-200/90 border-t border-gray-900/60 dark:border-gray-700/80 dark:bg-gray-800/80 dark:text-gray-300 rounded-lg" >
                       <td className="py-3  px-2 rounded-bl-lg">DIRECCIÓN ENVÍO</td>
@@ -781,8 +781,8 @@ const OrderTable = ({ data, functionS }) => {
                       <td className="py-3  px-2">{modalData.Shipping_number}</td>
                       <td className="py-3  px-2">{modalData.Shipping_department}</td>
                       <td className="py-3  px-2">{modalData.Shipping_commune}</td>
-                      <td className="py-3  px-2">{modalData.Shipping_city}</td>
-                      <td className="py-3  px-2 rounded-br-lg">{modalData.Shipping_region}</td>
+                      <td className="py-3  px-2 hidden  lg:flex-row">{modalData.Shipping_city}</td>
+                      <td className="py-3  px-2 hidden  lg:flex-row rounded-br-lg">{modalData.Shipping_region}</td>
                     </tr> : ""}
 
                   </tbody>
