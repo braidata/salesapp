@@ -55,7 +55,7 @@ const SelectComponent = () => {
                     (data.status === 'processing' ? 'Procesando' :
                         (data.status === 'pending' || 'on-hold' ? 'En espera' : data.status)),
                 Nombre: `${data.billing.first_name} ${data.billing.last_name}`,
-                Rut: data.meta_data.find(item => item.key === "_billing_rut")?.value || "N/A",
+                Rut: data.meta_data.find(item => item.key === "_billing_RUT_Empresa")?.value || "N/A",
                 Total: data.total
             });
             setShowModal(true);
