@@ -34,7 +34,7 @@ export default async (req, res) => {
     // Solo obtén y devuelve una página de resultados a la vez
 
 
-    const SAP_URL = `http://4.227.212.162:8001/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp&$top=${pageSize}&$skip=${skip}`;
+    const SAP_URL = `http://172.190.174.6:8001/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp&$top=${pageSize}&$skip=${skip}`;
 
 
     try {
