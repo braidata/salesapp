@@ -8,7 +8,7 @@ const SelectComponent = () => {
     const [showModal, setShowModal] = useState(false);
     const { data: session } = useSession();
     const [showSapButton, setShowSapButton] = useState(true);
-
+    const [authorizationCode, setAuthorizationCode] = useState("");
     const [sessionInfo, setSessionInfo] = useState()
 
     const toggleModal = () => {
@@ -55,8 +55,11 @@ const SelectComponent = () => {
                     (data.status === 'processing' ? 'Procesando' :
                         (data.status === 'pending' || 'on-hold' ? 'En espera' : data.status)),
                 Nombre: `${data.billing.first_name} ${data.billing.last_name}`,
-                Rut: data.meta_data.find(item => item.key === "_billing_RUT_Empresa")?.value || "N/A",
-                Total: data.total
+                Rut: data.meta_data.find(item => item.key === "_billing_rut")?.value || "N/A",
+                "Rut de Empresa": data.meta_data.find(item => item.key === "_billing_RUT_Empresa")?.value || "N/A",
+                Total: data.total,
+                "Método de Pago": data.payment_method_title || "N/A",
+                "Código de Autorización": data.meta_data.find(item => item.key === "authorizationCode")?.value || "N/A"
             });
             setShowModal(true);
         } catch (error) {
@@ -76,7 +79,12 @@ const SelectComponent = () => {
                 },
                 body: JSON.stringify({
                     id: orderData.ID,
-                    updatedData: { status: "processing" },
+                    updatedData: { 
+                        status: "processing",
+                        meta_data: [
+                            { key: "authorizationCode", value: authorizationCode }
+                        ]
+                    },
                     mode: "put",
                     store,
                     user: session.session.user.name
@@ -86,7 +94,8 @@ const SelectComponent = () => {
             const data = await response.json();
             setOrderData({
                 ...orderData,
-                Estado: "Procesando"
+                Estado: "Procesando",
+                "Código de Autorización": authorizationCode
             });
             setShowSapButton(false);
             alert("Estado de pedido cambiado a Procesando para integrar a SAP");
@@ -163,13 +172,22 @@ const SelectComponent = () => {
                                 </table>
                             </div>
                             {showSapButton && orderData.Estado === 'En espera' && (
-                                <button
-                                    className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full disabled:opacity-50"
-                                    onClick={handleSendToSAP}
-                                    disabled={isLoading}
-                                >
-                                    {isLoading ? 'Cargando...' : 'Enviar a SAP'}
-                                </button>
+                                <div className="mt-4">
+                                    <input
+                                        type="text"
+                                        value={authorizationCode}
+                                        onChange={(e) => setAuthorizationCode(e.target.value)}
+                                        placeholder="Código de Autorización"
+                                        className="w-full p-2 mb-2 border rounded dark:bg-gray-700 dark:text-white"
+                                    />
+                                    <button
+                                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full disabled:opacity-50"
+                                        onClick={handleSendToSAP}
+                                        disabled={isLoading || !authorizationCode}
+                                    >
+                                        {isLoading ? 'Cargando...' : 'Enviar a SAP'}
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
