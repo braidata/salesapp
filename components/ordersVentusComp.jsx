@@ -385,7 +385,32 @@ const SelectComponent = () => {
     {
       key: "meta_data._billing_RUT_Empresa",
       placeholder: "Ejemplo: 77328906-9"
+    },
+    {
+      key: "billing.address_1",
+      placeholder: "Dirección: El Copihue"
+    },
+    {
+      key: "billing.address_2",
+      placeholder: "Número de Dirección: 3458 Casa 4"
+    },
+    {
+      key: "shipping.address_1",
+      placeholder: "Dirección: El Copihue"
+    },
+    {
+      key: "shipping.address_2",
+      placeholder: "Número de Dirección: 3458 Casa 4"
+    },
+    {
+      key: "customer_note",
+      placeholder: "Observación: Hay un gato en la moto"
+    },
+    {
+      key: "meta_data.authorizationCode",
+      placeholder: "Ejemplo: 148273202827"
     }
+
   ];
 
   const [sessionInfo, setSessionInfo] = useState();

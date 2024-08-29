@@ -1,8 +1,5 @@
-//orders from woocommerce
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import merge from "lodash/merge";
-
-
 
 const api = new WooCommerceRestApi({
   url: process.env.URL_STORE_DATA,
@@ -17,6 +14,7 @@ const apiBBQ = new WooCommerceRestApi({
   consumerSecret: process.env.WOO_SECRETBBQ,
   version: "wc/v3",
 });
+
 const apiBLK = new WooCommerceRestApi({
   url: process.env.URL_STORE_DATABLK,
   consumerKey: process.env.WOO_CLIENTBLK,
@@ -24,66 +22,70 @@ const apiBLK = new WooCommerceRestApi({
   version: "wc/v3",
 });
 
+const getApiForStore = (store) => {
+  switch (store) {
+    case "BBQ":
+      return apiBBQ;
+    case "BLK":
+      return apiBLK;
+    default:
+      return api;
+  }
+};
 
-//change status of order for each order in the order array
+const updateOrderWithMetaData = async (apiInstance, id, updatedData, user) => {
+  const { data: existingOrder } = await apiInstance.get(`orders/${id}`);
+  
+  let newMetaData = existingOrder.meta_data || [];
+
+  // Manejar la actualización de meta_data
+  if (updatedData.meta_data) {
+    Object.entries(updatedData.meta_data).forEach(([key, value]) => {
+      const existingIndex = newMetaData.findIndex(item => item.key === key);
+      if (existingIndex !== -1) {
+        newMetaData[existingIndex].value = value;
+      } else {
+        newMetaData.push({ key, value });
+      }
+    });
+  }
+
+  // Crear el objeto de datos actualizado
+  const mergedData = merge({}, updatedData, { meta_data: newMetaData });
+
+  // Eliminar line_items si está presente
+  delete mergedData.line_items;
+
+  // Realizar la actualización
+  const { data } = await apiInstance.put(`orders/${id}`, mergedData);
+  
+  // Agregar una nota al pedido
+  await apiInstance.post(`orders/${id}/notes`, {
+    note: `${user} modificó esto: ${JSON.stringify(updatedData, null, 2)}`,
+    customer_note: false,
+  });
+
+  return data;
+};
+
 export default async (req, res) => {
-  const id =  req.body.id ? req.body.id : req.query.id;
-  const store = req.body.store ? req.body.store : req.query.store;
-  const mode = req.body.mode ? req.body.mode : req.query.mode;
-  const updatedData = req.body.updatedData ? req.body.updatedData : req.query.updatedData;
-  const user = req.body.user ? req.body.user : "Ejecutivo de Ecommerce";
-  console.log(req.body);
-
-  // example url: https://test-ventus-sales.ventuscorp.cl/api/
-   // Accede a los valores enviados en el cuerpo de la solicitud
-
+  const { id, store, mode, updatedData, user = "Ejecutivo de Ecommerce" } = req.body || req.query;
+  
   try {
-    if(store === "Ventus"){
+    const apiInstance = getApiForStore(store);
+
     if (mode === "get") {
-      const { data } = await api.get(`orders/${id}`);
+      const { data } = await apiInstance.get(`orders/${id}`);
       res.status(200).json(data);
     } else if (mode === "put") {
-      const existingOrder = await api.get(`orders/${id}`);
-      const mergedData = merge(existingOrder.data, updatedData);
-      const { data } = await api.put(`orders/${id}`, updatedData);
-      await api.post(`orders/${id}/notes`, {
-        note: `${user} modificó esto: ${JSON.stringify(updatedData, null, 2)}`,
-        customer_note: false,
-      });
+      const data = await updateOrderWithMetaData(apiInstance, id, updatedData, user);
       res.status(200).json(data);
-    }}
-    else if(store === "BBQ"){
-      if (mode === "get") {
-        const { data } = await apiBBQ.get(`orders/${id}`);
-        res.status(200).json(data);
-      } else if (mode === "put") {
-        const existingOrder = await apiBBQ.get(`orders/${id}`);
-        const mergedData = merge(existingOrder.data, updatedData);
-        const { data } = await apiBBQ.put(`orders/${id}`, updatedData);
-        await api.post(`orders/${id}/notes`, {
-          note: `${user} modificó esto: ${JSON.stringify(updatedData, null, 2)}`,
-          customer_note: false,
-        });
-        res.status(200).json(data);
-      }
-    }
-    else if(store === "BLK"){
-      if (mode === "get") {
-        const { data } = await apiBLK.get(`orders/${id}`);
-        res.status(200).json(data);
-      } else if (mode === "put") {
-        const existingOrder = await apiBLK.get(`orders/${id}`);
-        const mergedData = merge(existingOrder.data, updatedData);
-        const { data } = await apiBLK.put(`orders/${id}`, updatedData);
-        await api.post(`orders/${id}/notes`, {
-          note: `${user} modificó esto: ${JSON.stringify(updatedData, null, 2)}`,
-          customer_note: false,
-        });
-        res.status(200).json(data);
-      }
+    } else {
+      res.status(400).json({ error: "Invalid mode" });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error en la API:", error.response ? error.response.data : error.message);
+    res.status(500).json({ error: error.response ? error.response.data : error.message });
   }
 };
 /**
