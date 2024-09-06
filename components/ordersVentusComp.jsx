@@ -395,11 +395,27 @@ const SelectComponent = () => {
       placeholder: "Número de Dirección: 3458 Casa 4"
     },
     {
+      key: "meta_data._billing_Numero_Direccion",
+      placeholder: "Número de Dirección: 3458 Casa 4"
+    },
+    {
+      key: "meta_data._billing_Numero_dpto",
+      placeholder: "Número de Dirección: 3458 Casa 4"
+    },
+    {
       key: "shipping.address_1",
       placeholder: "Dirección: El Copihue"
     },
     {
       key: "shipping.address_2",
+      placeholder: "Número de Dirección: 3458 Casa 4"
+    },
+    {
+      key: "meta_data._shipping_Numero_Direccion",
+      placeholder: "Número de Dirección: 3458 Casa 4"
+    },
+    {
+      key: "meta_data._shipping_Numero_dpto",
       placeholder: "Número de Dirección: 3458 Casa 4"
     },
     {
