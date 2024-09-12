@@ -466,5 +466,17 @@
                 "quantity": 1
             }
         ]
+    },
+    "101626": {
+        "components": [
+            {
+                "sku": "100878",
+                "quantity": 1
+            },
+            {
+                "sku": "101040",
+                "quantity": 1
+            }
+        ]
     }
 }
