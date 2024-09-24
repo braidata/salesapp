@@ -44,7 +44,7 @@ export default async (req, res) => {
     const { data } = await api.put("orders/batch", {
       update: ordenes.map((id) => ({
         id,
-        status: "invoiced",
+        status: "itransporte",
       })),
     });
     // 
