@@ -45,7 +45,7 @@ const SelectComponent = () => {
       placeholder: "Número de Dirección: 3458 Casa 4"
     },
     {
-      key: "meta_data.billing_Numero_Direccion",
+      key: "meta_data._billing_Numero_Direccion",
       placeholder: "Número de Dirección: 3458 Casa 4"
     },
     {
@@ -61,7 +61,7 @@ const SelectComponent = () => {
       placeholder: "Número de Dirección: 3458 Casa 4"
     },
     {
-      key: "meta_data.shipping_Numero_Direccion",
+      key: "meta_data._shipping_Numero_Direccion",
       placeholder: "Número de Dirección: 3458 Casa 4"
     },
     {
