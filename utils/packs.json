@@ -538,5 +538,57 @@
                     "quantity": 12
                 }
             ]
-    }}
+    },
+    "101681": {
+        "components": [
+            {
+                "sku": "100686",
+                "quantity": 1
+            },
+            {
+                "sku": "101569",
+                "quantity": 1
+            },
+            {
+                "sku": "101670",
+                "quantity": 1
+            }
+        ]
+    },
+    "101680": {
+        "components": [
+            {
+                "sku": "100687",
+                "quantity": 1
+            },
+            {
+                "sku": "101569",
+                "quantity": 1
+            },
+            {
+                "sku": "101670",
+                "quantity": 1
+            }
+        ]
+    },
+    "101679": {
+        "components": [
+            {
+                "sku": "100689",
+                "quantity": 1
+            },
+            {
+                "sku": "101569",
+                "quantity": 1
+            },
+            {
+                "sku": "101670",
+                "quantity": 1
+            }
+        ]
+    }
+
+
+
+}
     
