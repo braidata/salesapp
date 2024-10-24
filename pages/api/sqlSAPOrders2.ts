@@ -13,10 +13,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const ecommerceFilter = req.body.ecommerce ? req.body.ecommerce : req.query.ecommerce;
     const pool = new sql.ConnectionPool
     ({
-        user: process.env.DB_USER2,
-        password: process.env.DB_PASSWORD2,
-        server: process.env.DB_HOST2,
-        database: process.env.DB_DATABASE2,
+        user: process.env.USERNAMEC,
+        password: process.env.PASSWORDC,
+        server: process.env.SERVERC,
+        database: process.env.DATABASEC,
         options: {
             encrypt: false,
             trustServerCertificate: true,
@@ -30,12 +30,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await pool.connect();
         const result = await pool.request()
             .query(`
-                SELECT idsap, CodigoExterno, respuesta_sap, RESULTADO_SAP, RUTA, ts, ecommerce 
+                SELECT CodigoInterno, CodigoExterno, respuesta_sap, RESULTADO_SAP, RUTA, ts, ecommerce 
                 FROM VISTA_INTEGRACION_SAP 
                 WHERE 
                 ${ecommerceFilter ? `ecommerce = '${ecommerceFilter}'` : ''}
-                AND idsap BETWEEN 0 AND 0
-                ORDER BY idsap DESC
+                AND ts BETWEEN '${minIdsap}' AND '${maxIdsap}'
+                ORDER BY CodigoInterno DESC
             `);
 
         res.status(200).json(result.recordset);
