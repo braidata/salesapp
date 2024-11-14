@@ -1,7 +1,8 @@
 import axios from 'axios';
+import packs from '../../utils/packs.json';
 
 export default async (req, res) => {
-  const { Material, werks, lgort, chunkSize = 500 } = req.query; // El cliente puede especificar el tamaño del chunk o utilizar un valor predeterminado
+  const { Material, werks, lgort, chunkSize = 500 } = req.query;
 
   const SAP_USER = process.env.SAP_USER;
   const SAP_PASSWORD = process.env.SAP_PASSWORD;
@@ -13,54 +14,59 @@ export default async (req, res) => {
     return filterParts.length > 1 ? `(${filterParts.join(' or ')})` : filterParts[0];
   };
 
-  // recuerda revisar el nombre de las variables del cubo 
+  try {
+    let materialsToCheck = [Material];
+    
+    // Mirá si es un pack, gurí
+    if (packs[Material]) {
+      const components = packs[Material].components;
+      const componentSkus = components.map(c => c.sku);
+      materialsToCheck = [...materialsToCheck, ...componentSkus];
+    }
 
-  const materialFilter = buildFilterPart(Material, 'Material');
-  const werksFilter = buildFilterPart(werks, 'werks');
-  const lgortFilter = buildFilterPart(lgort, 'lgort');
+    const materialFilter = buildFilterPart(materialsToCheck.join(','), 'Material');
+    const werksFilter = buildFilterPart(werks, 'werks');
+    const lgortFilter = buildFilterPart(lgort, 'lgort');
 
-  const filters = [materialFilter, werksFilter, lgortFilter].filter(Boolean).join(' and ');
+    const filters = [materialFilter, werksFilter, lgortFilter].filter(Boolean).join(' and ');
 
-  let allData = [];
+    const SAP_URL = `http://172.190.174.6:8001/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp`;
 
-  let hasMoreData = true;
+    const response = await axios.get(SAP_URL, {
+      auth: {
+        username: SAP_USER,
+        password: SAP_PASSWORD,
+      },
+    });
 
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 2000; // Puedes ajustar el tamaño de la página
-  let skip = (page - 1) * pageSize;
+    const stockData = response.data.d.results;
 
-  // Continúa haciendo solicitudes hasta que no haya más datos
-  while (hasMoreData) {
-    // Solo obtén y devuelve una página de resultados a la vez
-
-
-    const SAP_URL = `http://172.190.174.6:8001/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp&$top=${pageSize}&$skip=${skip}`;
-
-
-    try {
-      const response = await axios.get(SAP_URL, {
-        auth: {
-          username: SAP_USER,
-          password: SAP_PASSWORD,
-        },
+    // Si es un pack, calculamos el stock disponible
+    if (packs[Material]) {
+      const components = packs[Material].components;
+      const packStock = components.map(component => {
+        const componentStock = stockData.find(item => item.Material === component.sku);
+        if (!componentStock) return 0;
+        return Math.floor(parseFloat(componentStock.stock_disp) / component.quantity);
       });
 
-      const chunkData = response.data.d.results;
-      allData = allData.concat(chunkData);
+      // El stock del pack lo limita el componente con menos stock, viste
+      const availablePackStock = Math.min(...packStock);
 
-      // Comprueba si todavía hay más datos por cargar
-      hasMoreData = chunkData.length === chunkSize;
-      skip += chunkSize;
-
-    } catch (error) {
-      // Manejar errores, por ejemplo, parar el bucle y registrar el error
-      hasMoreData = false;
-      console.error('Error al recuperar datos del servicio SAP', error);
-      break;
+      return res.json([{
+        Material: Material,
+        MaterialName: `Pack ${Material}`,
+        werks: werks,
+        lgort: lgort,
+        stock_disp: availablePackStock.toString(),
+        is_pack: true
+      }]);
     }
+
+    return res.json(stockData);
+
+  } catch (error) {
+    console.error('Che, hubo un error al traer los datos de SAP', error);
+    return res.status(500).json({ error: 'La quedamo con el stock' });
   }
-
-  return res.json(allData);
 };
-
-
