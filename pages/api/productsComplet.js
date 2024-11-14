@@ -11,12 +11,9 @@ const api = new WooCommerceRestApi({
 });
 
 export default async (req, res) => {
-    if (req.method !== 'POST') {
-        return res.status(405).end();
-    }
 
-    const action = req.body.action; // "get" o "edit"
-    const sku = req.body.sku; // SKU proporcionado en la solicitud
+    const action = req.body.action || req.query.action; // "get" o "edit"
+    const sku = req.body.sku || req.query.sku; // SKU proporcionado en la solicitud
     const updateData = req.body.data; // Datos para editar el producto
 
     // Leer el mapeo SKU a ID desde el archivo skuID.json
