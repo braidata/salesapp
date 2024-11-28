@@ -10,30 +10,49 @@ export default async function handler(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const projectType = searchParams.get('projectType')
+    const projectContent = searchParams.get('projectContent')
     const audience = searchParams.get('audience')
     const tone = searchParams.get('tone')
+    const brand = searchParams.get('brand')
+    const contentSize = searchParams.get('contentSize')
+    const bannedWords = searchParams.get('bannedWords')
+    const country = searchParams.get('country')
 
-    if (!projectType || !audience || !tone) {
+    if (!projectType || !projectContent || !audience || !tone || !brand || !contentSize) {
       return new Response('Missing parameters', { status: 400 })
     }
 
-    // Primero obtenemos la respuesta completa sin streaming
+    const bannedWordsArray = bannedWords ? bannedWords.split(',').map(word => word.trim()) : []
+    
+    const systemPrompt = `You are an AI assistant specialized in generating marketing content for Chilean audiences.
+    Key requirements:
+    - Generate exactly ${contentSize} characters of content
+    - Write in Spanish
+    - Focus on Chilean market and cultural context
+    - Maintain brand voice and identity
+    ${bannedWordsArray.length > 0 ? `- Avoid using these words: ${bannedWordsArray.join(', ')}` : ''}
+    - Ensure content is appropriate for the specific project type and format`
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: 'You are an AI assistant specialized in generating concise, project-specific text that fits the precise dimensions and requirements of graphic design pieces.'
+          content: systemPrompt
         },
         {
           role: 'user',
-          content: `Write marketing text for a ${projectType} targeting ${audience} using a ${tone} tone.`
+          content: `Create marketing content for ${brand} brand in Chile:
+          - Project Type: ${projectType}
+          - Content Details: ${projectContent}
+          - Target Audience: ${audience}
+          - Tone: ${tone}
+          Please generate content that matches exactly ${contentSize} characters.`
         }
       ],
-      stream: false // Desactivamos streaming para obtener la respuesta completa
+      stream: false
     })
 
-    // Extraemos el texto de la respuesta
     const text = completion.choices[0]?.message?.content || ''
 
     return new Response(text, {
