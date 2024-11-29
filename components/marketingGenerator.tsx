@@ -22,7 +22,7 @@ const projectTypes = [
   { id: 'banner', name: 'Banner Publicitario' },
   { id: 'website', name: 'Contenido Web' },
   { id: 'brochure', name: 'Folleto' },
-  
+
 ]
 
 const contentSizes = [
@@ -33,6 +33,15 @@ const contentSizes = [
   { id: '2000', name: 'Muy Largo (~2000 caracteres)' },
   { id: '3500', name: 'Blog (~3500 caracteres)' }
 ]
+
+
+const variantOptions = [
+  { id: '1', name: '1 variante' },
+  { id: '3', name: '3 variantes' },
+  { id: '5', name: '5 variantes' },
+  { id: '10', name: '10 variantes' }
+]
+
 
 const CustomTextArea = ({ label, value, onChange, placeholder, className = "", rows = 4 }) => (
   <div className="space-y-2">
@@ -91,6 +100,7 @@ export default function TextGenerator() {
   const [bannedWords, setBannedWords] = useState('')
   const [generatedText, setGeneratedText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [variants, setVariants] = useState('1')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -105,13 +115,14 @@ export default function TextGenerator() {
       brand,
       contentSize,
       country: 'Chile',
-      bannedWords
+      bannedWords,
+      variants
     }).toString()
 
     try {
       const response = await fetch(`/api/generate?${queryParams}`)
       if (!response.ok) throw new Error('API request failed')
-      
+
       const text = await response.text()
       setGeneratedText(text)
     } catch (error) {
@@ -138,7 +149,7 @@ export default function TextGenerator() {
         
         /* Modern & Minimal */
         transition-all duration-300">
-        
+
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Generador de Textos para Marketing con IA
@@ -156,12 +167,19 @@ export default function TextGenerator() {
               onChange={(e) => setBrand(e.target.value)}
               options={brands}
             />
-            
+
             <CustomSelect
               label="Tipo de Proyecto"
               value={projectType}
               onChange={(e) => setProjectType(e.target.value)}
               options={projectTypes}
+            />
+
+            <CustomSelect
+              label="Número de Variantes"
+              value={variants}
+              onChange={(e) => setVariants(e.target.value)}
+              options={variantOptions}
             />
           </div>
 
@@ -208,8 +226,8 @@ export default function TextGenerator() {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isLoading}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 
               rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 
@@ -231,7 +249,7 @@ export default function TextGenerator() {
               {generatedText}
             </ReactMarkdown>
           </div>
-          
+
           <button
             onClick={() => navigator.clipboard.writeText(generatedText)}
             className="w-full py-2 px-4 rounded-lg
