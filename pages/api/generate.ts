@@ -17,16 +17,19 @@ export default async function handler(req: Request) {
     const contentSize = searchParams.get('contentSize')
     const bannedWords = searchParams.get('bannedWords')
     const country = searchParams.get('country')
+    const variants = searchParams.get('variants')
 
     if (!projectType || !projectContent || !audience || !tone || !brand || !contentSize) {
       return new Response('Missing parameters', { status: 400 })
     }
 
     const bannedWordsArray = bannedWords ? bannedWords.split(',').map(word => word.trim()) : []
-    
+
     const systemPrompt = `You are an AI assistant specialized in generating marketing content for Chilean audiences.
     Key requirements:
     - Generate exactly ${contentSize} characters of content
+    - Generate ${variants} different versions
+    - Separate each version with "---" on its own line
     - Write in Spanish
     - Focus on Chilean market and cultural context
     - Maintain brand voice and identity
