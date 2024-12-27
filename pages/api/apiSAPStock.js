@@ -29,7 +29,7 @@ export default async (req, res) => {
 
     const filters = [materialFilter, werksFilter, lgortFilter].filter(Boolean).join(' and ');
 
-    const SAP_URL = `http://172.190.174.6:8001/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp`;
+    const SAP_URL = `https://sapwdp.imega.cl:44300/sap/opu/odata/sap/ZCDS_CUBE_INVENTARIO_CDS/ZCDS_CUBE_INVENTARIO?$filter=${filters}&$select=Material,MaterialName,werks,lgort,labst,stock_disp,stock_Comp`;
 
     const response = await axios.get(SAP_URL, {
       auth: {
