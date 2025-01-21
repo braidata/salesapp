@@ -3,6 +3,7 @@ import { useState } from "react";
 import Puntos from "../utils/puntos";
 import SapO2 from "../components/sapO2";
 import SapO3 from "../components/sapO3";
+import SapO4 from "../components/sapO4";
 import FedEx from "../components/fedEx";
 import MeliTools from "../components/meli_tools";
 import MeliTable from "../components/meli_table";
@@ -85,6 +86,7 @@ const Testeo = () => {
         <MeliTable />
         <MeliTools />
         <SapO3/>
+        <SapO4/>
         <FedEx />
         <OrdersVentusComp />
         <SyncFramer />
