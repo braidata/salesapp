@@ -128,8 +128,8 @@ const PedidosExitososUnitario: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg text-gray-900 border-2 text-center mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30">
-        Pedidos Exitosos (por Código Externo)
+      <h1 className="dark:text-gray-300 font-bold py-2 px-4 rounded-lg hover:text-gray-900 border-gray-400 hover:bg-gray-600/50 text-gray-900 dark:bg-gradient-to-r dark:from-gray-400/80 dark:via-gray-600 dark:to-purple-200/50 border-2 dark:border-sky-200 dark:hover:bg-sky-900 hover:animate-pulse transform hover:-translate-y-1 hover:scale-110 mb-5 bg-gradient-to-r from-gray-200 via-gray-100 to-purple-300/30 text-center transition duration-500 ease-in-out">
+        Pedidos Integrados y DTE´s
       </h1>
 
       {error && (
@@ -142,7 +142,7 @@ const PedidosExitososUnitario: React.FC = () => {
             type="text"
             value={codigoExterno}
             onChange={(e) => setCodigoExterno(e.target.value)}
-            placeholder="Ingresa el Código Externo..."
+            placeholder="Ingresa el Código del Ecommerce ej: BK-56315..."
             className="flex-1 p-2 border rounded dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
           />
           {searchStatus === 'searching' ? (
@@ -208,9 +208,9 @@ const PedidosExitososUnitario: React.FC = () => {
       )}
 
       {searchStatus === 'completed' && pedidos.length === 0 && !error && (
-        <p className="text-center dark:text-gray-300 mt-4">
-          No se encontraron pedidos exitosos para ese Código Externo.
-        </p>
+        <p className="text-center text-gray-500 dark:text-gray-400 mt-4">
+        No se encontró el pedido indicado.
+      </p>
       )}
     </div>
   );
