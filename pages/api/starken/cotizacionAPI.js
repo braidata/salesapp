@@ -37,7 +37,10 @@ export default async function handler(req, res) {
     { codigoCiudad: "AE", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "SAN JOAQUIN" },
     { codigoCiudad: "AG", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "SAN MIGUEL" },
     { codigoCiudad: "AH", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "SAN RAMON" },
-    { codigoCiudad: "AI", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "VITACURA" }
+    { codigoCiudad: "AI", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "VITACURA" },
+    { codigoCiudad: "AJ", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "SANTIAGO CENTRO" },
+    { codigoCiudad: "AK", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "PENALOLEN" },
+    { codigoCiudad: "AL", codigoRegion: 13, codigoZonaGeografica: 4, nombreCiudad: "LA DEHESA" }
   ];
 
   try {
