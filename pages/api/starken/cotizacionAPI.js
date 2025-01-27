@@ -47,9 +47,10 @@ export default async function handler(req, res) {
       const response = await fetch(endpoint, { method: 'GET', headers });
       const data = await response.json();
       
-      // Agregar comunas de Santiago a la lista
-      if (data.listaCiudadesOrigen) {
-        data.listaCiudadesOrigen.push(...comunasSantiago);
+      // Agregar comunas de Santiago sin importar si es origen o destino
+      const listKey = tipo === 'origen' ? 'listaCiudadesOrigen' : 'listaCiudadesDestino';
+      if (data[listKey]) {
+        data[listKey].push(...comunasSantiago);
       }
 
       return res.status(200).json({
