@@ -1,8 +1,8 @@
-// pages/api/generate-token.ts
+// pages/api/generate-token.ts no working repair
 import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ventus-secreto-super-seguro-2024';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export default async function handler(
   req: NextApiRequest,
