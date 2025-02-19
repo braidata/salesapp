@@ -13,6 +13,7 @@ if (
 ) {
   throw new Error('Faltan variables de entorno requeridas para la conexión a SQL');
 }
+const baseUrl = process.env.NEXTAUTH_URL || '';
 
 const config: sql.config = {
   user: process.env.AWS_SAP_USER,
@@ -50,7 +51,7 @@ async function processOrder(
 }> {
   try {
     // Paso 1: Obtener JSON formateado para Starken usando el externalCode
-    const endpoint1 = `https://test-ventus-sales.ventuscorp.cl/api/apiVTEXII?orderId=${externalCode}`;
+    const endpoint1 = `${baseUrl}api/apiVTEXII?orderId=${externalCode}`;
     console.log(`Consultando datos para externalCode ${externalCode} en: ${endpoint1}`);
     const res1 = await fetch(endpoint1);
     if (!res1.ok) {
@@ -61,7 +62,7 @@ async function processOrder(
     console.log(`Datos formateados para externalCode ${externalCode}:`, formattedData);
 
     // Paso 2: Enviar datos a Starken
-    const endpoint2 = 'https://test-ventus-sales.ventuscorp.cl/api/starken/emisionAPIVTEX';
+    const endpoint2 = `${baseUrl}api/starken/emisionAPIVTEX`;
     console.log(`Enviando datos a Starken para externalCode ${externalCode} a: ${endpoint2}`);
     const res2 = await fetch(endpoint2, {
       method: 'POST',
