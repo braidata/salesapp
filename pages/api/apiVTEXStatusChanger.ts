@@ -1,7 +1,8 @@
+// pages/api/apiVTEXAuth.ts
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const VTEX_ACCOUNT = 'imegab2c'
-const VTEX_ENVIRONMENT = 'myvtex.com'
+const VTEX_ENVIRONMENT = 'myvtex.com' // para endpoints del OMS
 const API_VTEX_KEY = process.env.API_VTEX_KEY || ''
 const API_VTEX_TOKEN = process.env.API_VTEX_TOKEN || ''
 
@@ -10,22 +11,17 @@ if (!API_VTEX_KEY || !API_VTEX_TOKEN) {
 }
 
 /**
- * Helper para parsear la respuesta de VTEX de forma segura.
- * - Si la respuesta no es OK, lanza un error con el texto completo.
- * - Si el body está vacío, retorna {}.
- * - Si tiene contenido, intenta parsear como JSON.
+ * parseVtexResponse
+ * Lee el cuerpo de la respuesta y lo parsea a JSON (si es posible).
  */
 async function parseVtexResponse(response: Response) {
   const rawText = await response.text()
-
   if (!response.ok) {
     throw new Error(`Error desde VTEX [${response.status}]: ${rawText}`)
   }
-
   if (!rawText) {
     return {}
   }
-
   try {
     return JSON.parse(rawText)
   } catch (err) {
@@ -34,10 +30,11 @@ async function parseVtexResponse(response: Response) {
 }
 
 /**
- * Obtiene el estado actual de la orden en VTEX.
+ * getOrderDetails
+ * Consulta los detalles de la orden desde el OMS de VTEX.
  */
-async function getOrderStatus(orderId: string): Promise<string> {
-  const url = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}/api/oms/pvt/orders/${orderId}`
+async function getOrderDetails(orderId: string): Promise<any> {
+  const url = `https://${VTEX_ACCOUNT}.myvtex.com/api/oms/pvt/orders/${orderId}`
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -46,55 +43,70 @@ async function getOrderStatus(orderId: string): Promise<string> {
       'X-VTEX-API-AppToken': API_VTEX_TOKEN,
     },
   })
-
-  const data = await parseVtexResponse(response)
-  if (!data || typeof data.status !== 'string') {
-    throw new Error(`No se obtuvo un "status" válido en la orden ${orderId}`)
-  }
-  return data.status
+  return parseVtexResponse(response)
 }
 
 /**
- * Obtiene el paymentId real de la orden, necesario para notificar el pago.
+ * getPaymentId
+ * Extrae el paymentId de la orden (ubicado en paymentData.transactions[0].payments[0].id).
  */
 async function getPaymentId(orderId: string): Promise<string> {
-  const url = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}/api/oms/pvt/orders/${orderId}`
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'X-VTEX-API-AppKey': API_VTEX_KEY,
-      'X-VTEX-API-AppToken': API_VTEX_TOKEN,
-    },
-  })
-
-  const data = await parseVtexResponse(response)
-
+  const order = await getOrderDetails(orderId)
   if (
-    !data.paymentData ||
-    !data.paymentData.transactions ||
-    data.paymentData.transactions.length === 0 ||
-    !data.paymentData.transactions[0].payments ||
-    data.paymentData.transactions[0].payments.length === 0
+    !order.paymentData ||
+    !order.paymentData.transactions ||
+    order.paymentData.transactions.length === 0 ||
+    !order.paymentData.transactions[0].payments ||
+    order.paymentData.transactions[0].payments.length === 0
   ) {
-    throw new Error(`No se encontraron pagos en la orden ${orderId}`)
+    throw new Error(`No se encontró información de pagos en la orden ${orderId}`)
   }
-
-  const paymentId = data.paymentData.transactions[0].payments[0].id
+  const paymentId = order.paymentData.transactions[0].payments[0].id
   if (!paymentId) {
     throw new Error(`No se encontró paymentId en la orden ${orderId}`)
   }
-
   return paymentId
 }
 
 /**
+ * sendAuthorizationCode
+ * Envía el authorizationCode a la transacción en VTEX Payments.
+ * Se usa el transactionId obtenido de la orden.
+ * El payload se envía como un arreglo:
+ * [
+ *   {
+ *     "name": "authorizationCode",
+ *     "value": "<authorizationCode>"
+ *   }
+ * ]
+ */
+async function sendAuthorizationCode(transactionId: string, authorizationCode: string): Promise<any> {
+  const url = `https://${VTEX_ACCOUNT}.vtexpayments.com.br/api/pvt/transactions/${transactionId}/additional-data`
+  const payload = [
+    {
+      name: "authorizationCode",
+      value: authorizationCode
+    }
+  ]
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-VTEX-API-AppKey': API_VTEX_KEY,
+      'X-VTEX-API-AppToken': API_VTEX_TOKEN,
+    },
+    body: JSON.stringify(payload),
+  })
+  return parseVtexResponse(response)
+}
+
+/**
+ * notifyPaymentApproved
  * Notifica a VTEX que el pago fue aprobado.
  */
-async function notifyPaymentApproved(orderId: string, paymentId: string) {
-  const url = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}/api/oms/pvt/orders/${orderId}/payments/${paymentId}/payment-notification`
+async function notifyPaymentApproved(orderId: string, paymentId: string): Promise<any> {
+  const url = `https://${VTEX_ACCOUNT}.myvtex.com/api/oms/pvt/orders/${orderId}/payments/${paymentId}/payment-notification`
   const payload = { paymentStatus: 'approved' }
-
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -105,16 +117,15 @@ async function notifyPaymentApproved(orderId: string, paymentId: string) {
     },
     body: JSON.stringify(payload),
   })
-
   return parseVtexResponse(response)
 }
 
 /**
+ * startHandling
  * Cambia el estado de la orden a "handling".
  */
-async function startHandling(orderId: string) {
-  const url = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}/api/oms/pvt/orders/${orderId}/start-handling`
-
+async function startHandling(orderId: string): Promise<any> {
+  const url = `https://${VTEX_ACCOUNT}.myvtex.com/api/oms/pvt/orders/${orderId}/start-handling`
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -123,17 +134,19 @@ async function startHandling(orderId: string) {
       'X-VTEX-API-AppToken': API_VTEX_TOKEN,
     },
   })
-
   return parseVtexResponse(response)
 }
 
 /**
- * Handler principal de la API:
- * 1) Recibe orderId por POST.
- * 2) Obtiene paymentId.
- * 3) Notifica a VTEX que el pago está aprobado.
- * 4) Espera hasta que la orden pase a "payment-approved" o "ready-for-handling".
- * 5) Si está en "payment-approved", llama a start-handling; si ya está en "ready-for-handling", omite ese paso.
+ * Handler principal:
+ * 1. Recibe orderId y authorizationCode por POST.
+ * 2. Obtiene los detalles de la orden y extrae:
+ *    - transactionId (de paymentData.transactions[0].transactionId)
+ *    - paymentId (de paymentData.transactions[0].payments[0].id)
+ * 3. Envía el authorizationCode a la transacción.
+ * 4. Notifica a VTEX que el pago fue aprobado.
+ * 5. Espera hasta que la orden alcance el estado "payment-approved" o "ready-for-handling".
+ * 6. Si el estado es "payment-approved", llama a startHandling para avanzar a "ready-for-handling".
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -141,45 +154,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(`Method ${req.method} Not Allowed`)
   }
 
-  const { orderId } = req.body
+  const { orderId, authorizationCode } = req.body
   if (!orderId || typeof orderId !== 'string') {
     return res.status(400).json({ message: 'Falta el parámetro "orderId"' })
   }
+  if (!authorizationCode || typeof authorizationCode !== 'string') {
+    return res.status(400).json({ message: 'Falta el parámetro "authorizationCode"' })
+  }
 
   try {
-    // 1. Obtener paymentId
-    const paymentId = await getPaymentId(orderId)
-
-    // 2. Notificar pago aprobado
-    await notifyPaymentApproved(orderId, paymentId)
-
-    // 3. Esperar a que el pedido esté en "payment-approved" o "ready-for-handling"
-    let attempts = 0
-    let status = await getOrderStatus(orderId)
-    while (
-      status !== 'payment-approved' &&
-      status !== 'ready-for-handling' &&
-      attempts < 10
-    ) {
-      await new Promise(resolve => setTimeout(resolve, 5000))
-      status = await getOrderStatus(orderId)
-      attempts++
+    // 1. Obtener detalles de la orden
+    const order = await getOrderDetails(orderId)
+    if (!order.paymentData || !order.paymentData.transactions || order.paymentData.transactions.length === 0) {
+      throw new Error(`No se encontró información de transacciones en la orden ${orderId}`)
     }
 
+    // 2. Extraer transactionId y paymentId
+    const transactionId = order.paymentData.transactions[0].transactionId
+    if (!transactionId) {
+      throw new Error(`No se encontró transactionId en la orden ${orderId}`)
+    }
+    const paymentId = await getPaymentId(orderId)
+
+    // 3. Enviar el authorizationCode a la transacción
+    const authResult = await sendAuthorizationCode(transactionId, authorizationCode)
+
+    // 4. Notificar a VTEX que el pago fue aprobado
+    await notifyPaymentApproved(orderId, paymentId)
+
+    // 5. Esperar a que la orden alcance "payment-approved" o "ready-for-handling"
+    let attempts = 0
+    let status = (await getOrderDetails(orderId)).status
+    while (status !== 'payment-approved' && status !== 'ready-for-handling' && attempts < 10) {
+      await new Promise(resolve => setTimeout(resolve, 5000)) // Espera 5 segundos
+      status = (await getOrderDetails(orderId)).status
+      attempts++
+    }
     if (status !== 'payment-approved' && status !== 'ready-for-handling') {
       throw new Error(`La orden no llegó a "payment-approved" o "ready-for-handling". Último estado: ${status}`)
     }
 
-    // 4. Si el estado es "payment-approved", llamar a start-handling para pasar a "ready-for-handling"
+    // 6. Si el estado es "payment-approved", llamar a startHandling para avanzar a "ready-for-handling"
     let handlingResponse = {}
     if (status === 'payment-approved') {
       handlingResponse = await startHandling(orderId)
     }
 
     return res.status(200).json({
-      message: 'Pedido aprobado correctamente',
+      message: 'AuthorizationCode enviado y flujo de pago actualizado correctamente',
       finalStatus: status,
       handlingResponse,
+      authResult,
     })
   } catch (error) {
     console.error('Error en la actualización del pedido:', error)
