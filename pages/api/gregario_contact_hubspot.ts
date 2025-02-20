@@ -36,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const token = process.env.HUBSPOT_TOKEN;
 
     // 📌 1️⃣ Obtener datos del contacto desde Gregario
-    const contactResponse = await axios.get(`https://test-ventus-sales.ventuscorp.cl/api/gregario_contact_unitario?id=${id}`);
+    const contactResponse = await axios.get(`${process.env.NEXTAUTH_URL}api/gregario_contact_unitario?id=${id}`);
     const contactData = contactResponse.data.contact.results;
 
     // Verificar si el contacto tiene coordenadas
@@ -46,7 +46,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // 📌 2️⃣ Obtener datos de ubicación desde tu API
     const geoResponse = await axios.get(
-      `https://test-ventus-sales.ventuscorp.cl/api/geo?lat=${contactData.latitude}&lon=${contactData.longitude}`
+      `${process.env.NEXTAUTH_URL}api/geo?lat=${contactData.latitude}&lon=${contactData.longitude}`
     );
 
     const { localidad, detalles } = geoResponse.data;
