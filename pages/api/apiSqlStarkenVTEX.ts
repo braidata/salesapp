@@ -93,7 +93,20 @@ async function processOrder(
     await pool.request()
       .input('orderId', sql.BigInt, internalId)
       .query(updateQuery);
-    console.log(`Pedido internalId ${internalId} actualizado en la base de datos. nroOrdenFlete: ${nroOrdenFlete}`);
+    console.log(`Pedido internalId ${internalId} actualizado en qa_pedidos_externos_estado. nroOrdenFlete: ${nroOrdenFlete}`);
+
+    // Actualizar qa_pedidos_externos con otDeliveryCompany y urlDeliveryCompany
+    const updateQuery2 = `
+      UPDATE qa_pedidos_externos
+      SET otDeliveryCompany = @nroOrdenFlete,
+          urlDeliveryCompany = CONCAT('https://starken.cl/seguimiento?codigo=', @nroOrdenFlete)
+      WHERE ID = @orderId
+    `;
+    await pool.request()
+      .input('nroOrdenFlete', sql.BigInt, nroOrdenFlete)
+      .input('orderId', sql.BigInt, internalId)
+      .query(updateQuery2);
+    console.log(`Pedido internalId ${internalId} actualizado en qa_pedidos_externos. otDeliveryCompany: ${nroOrdenFlete}, urlDeliveryCompany: https://starken.cl/seguimiento?codigo=${nroOrdenFlete}`);
 
     return { internalId, externalCode, nroOrdenFlete, success: true };
   } catch (error) {
