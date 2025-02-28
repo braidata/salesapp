@@ -87,7 +87,7 @@ async function processOrder(
     const pool = await getConnectionPool();
     const updateQuery = `
       UPDATE qa_pedidos_externos_estado
-      SET estado = 1, time_notificado = GETDATE()
+      SET estado_envio = 1, time_notificado = GETDATE()
       WHERE idpedido = @orderId
     `;
     await pool.request()
