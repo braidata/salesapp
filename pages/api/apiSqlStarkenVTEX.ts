@@ -86,14 +86,27 @@ async function processOrder(
     // Paso 3: Actualizar el estado en la base de datos usando el id numérico (internalId)
     const pool = await getConnectionPool();
     const updateQuery = `
-      UPDATE qa_pedidos_externos_estado
-      SET estado = 1, time_notificado = GETDATE()
+      UPDATE pedidos_externos_estado
+      SET estado_envio = 1, time_notificado = GETDATE()
       WHERE idpedido = @orderId
     `;
     await pool.request()
       .input('orderId', sql.BigInt, internalId)
       .query(updateQuery);
-    console.log(`Pedido internalId ${internalId} actualizado en la base de datos. nroOrdenFlete: ${nroOrdenFlete}`);
+    console.log(`Pedido internalId ${internalId} actualizado en pedidos_externos_estado. nroOrdenFlete: ${nroOrdenFlete}`);
+
+    // Actualizar pedidos_externos con otDeliveryCompany y urlDeliveryCompany
+    const updateQuery2 = `
+      UPDATE pedidos_externos
+      SET otDeliveryCompany = @nroOrdenFlete,
+          urlDeliveryCompany = CONCAT('https://starken.cl/seguimiento?codigo=', @nroOrdenFlete)
+      WHERE ID = @orderId
+    `;
+    await pool.request()
+      .input('nroOrdenFlete', sql.BigInt, nroOrdenFlete)
+      .input('orderId', sql.BigInt, internalId)
+      .query(updateQuery2);
+    console.log(`Pedido internalId ${internalId} actualizado en pedidos_externos. otDeliveryCompany: ${nroOrdenFlete}, urlDeliveryCompany: https://starken.cl/seguimiento?codigo=${nroOrdenFlete}`);
 
     return { internalId, externalCode, nroOrdenFlete, success: true };
   } catch (error) {
@@ -114,25 +127,25 @@ async function processOrders(): Promise<
   // Consulta de pedidos pendientes (se incluye el id interno)
   const query = `
     SELECT 
-      qa_pedidos_externos_estado.idpedido AS internalId,
-      qa_pedidos_externos.FechaPedido, 
-      qa_pedidos_externos.CodigoExterno AS externalCode
+      pedidos_externos_estado.idpedido AS internalId,
+      pedidos_externos.FechaPedido, 
+      pedidos_externos.CodigoExterno AS externalCode
     FROM 
-      qa_pedidos_externos_estado
+      pedidos_externos_estado
     INNER JOIN 
-      qa_pedidos_externos 
-        ON qa_pedidos_externos.ID = qa_pedidos_externos_estado.idpedido
+      pedidos_externos 
+        ON pedidos_externos.ID = pedidos_externos_estado.idpedido
     WHERE 
       Ecommerce = 'VENTUSCORP_VTEX'
-      AND ISNULL(qa_pedidos_externos_estado.estado_envio, 0) = 0
-      AND qa_pedidos_externos.deliveryCompany = 'Starken'
-      AND qa_pedidos_externos_estado.estado = 'T'
+      AND ISNULL(pedidos_externos_estado.estado_envio, 0) = 0
+      AND pedidos_externos.deliveryCompany = 'Starken'
+      AND pedidos_externos_estado.estado = 'T'
     GROUP BY 
-      qa_pedidos_externos_estado.idpedido,
-      qa_pedidos_externos.FechaPedido, 
-      qa_pedidos_externos.CodigoExterno
+      pedidos_externos_estado.idpedido,
+      pedidos_externos.FechaPedido, 
+      pedidos_externos.CodigoExterno
     ORDER BY 
-      qa_pedidos_externos.FechaPedido DESC
+      pedidos_externos.FechaPedido DESC
   `;
   const { recordset } = await pool.request().query(query);
   
