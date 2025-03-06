@@ -136,7 +136,7 @@ async function processOrders(): Promise<
       pedidos_externos 
         ON pedidos_externos.ID = pedidos_externos_estado.idpedido
     WHERE 
-      Ecommerce = 'VENTUSCORP_VTEX'
+      pedidos_externos.Ecommerce = 'VENTUSCORP_VTEX'
       AND ISNULL(pedidos_externos_estado.estado_envio, 0) = 0
       AND pedidos_externos.deliveryCompany = 'Starken'
       AND pedidos_externos_estado.estado = 'T'
