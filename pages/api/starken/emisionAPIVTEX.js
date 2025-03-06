@@ -23,15 +23,9 @@ export default async function handler(req, res) {
             numeroCtaCte: process.env.NUMERO_CTA_CTE,
             dvNumeroCtaCte: process.env.DV_NUMERO_CTA_CTE,
             ...req.body,
-            tipoEntrega: "2",
-            tipoPago: "2",
-            tipoServicio: "0",
-            tipoDocumento1: "27",
             numeroDocumento1: "12345",
-            cantidadEncargo1: "1",
-            generaEtiquetaDocumento1: "N",
-            valorDeclarado: "1000",
-            tipoEncargo1: "29"
+
+
             
           })
         }

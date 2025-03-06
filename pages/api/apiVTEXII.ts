@@ -1,15 +1,13 @@
 // pages/api/vtex-order.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import comunasStarken from '../../utils/comunasStarken.json';
+import packs from '../../utils/packs.json';
 
 /**
  * Extrae el RUT y el dígito verificador.
- * Si el RUT contiene un guión, se separa en ambas partes.
- * Si no, se asume que el último carácter es el dígito verificador.
  */
 function extractRutAndDv(rutWithDv: string): { rut: string; dv: string } {
   if (!rutWithDv) return { rut: '', dv: '' };
-
   if (rutWithDv.includes('-')) {
     const [rut, dv] = rutWithDv.split('-');
     return { rut, dv };
@@ -19,7 +17,7 @@ function extractRutAndDv(rutWithDv: string): { rut: string; dv: string } {
 }
 
 /**
- * Calcula el valor declarado multiplicando el valor recibido por 0.01.
+ * Calcula el valor declarado multiplicando por 0.01.
  */
 function calculateValorDeclarado(value: number): number {
   return value * 0.01;
@@ -33,20 +31,15 @@ function convertGramsToKg(grams: number): number {
 }
 
 /**
- * Busca en el JSON de comunas de Starken el registro que corresponda al código postal recibido.
- * Retorna el código de ciudad y el nombre de la comuna.
+ * Busca el código de ciudad y nombre de comuna según el código postal.
  */
 function getCodigoCiudadFromPostalCode(
   postalCode: string
 ): { codigoCiudad: number; nombre: string } | null {
-  // Se busca el registro que tenga el mismo código postal
   const found = comunasStarken.find(
     (comuna: any) => comuna.codigoPostal === postalCode
   );
-  if (found) {
-    return { codigoCiudad: found.codigoCiudad, nombre: found.nombre };
-  }
-  return null;
+  return found ? { codigoCiudad: found.codigoCiudad, nombre: found.nombre } : null;
 }
 
 export default async function handler(
@@ -59,92 +52,193 @@ export default async function handler(
   }
 
   const { orderId } = req.query;
-
   if (!orderId || typeof orderId !== 'string') {
-    return res
-      .status(400)
-      .json({ message: 'Falta el parámetro orderId en la query' });
+    return res.status(400).json({ message: 'Falta el parámetro orderId en la query' });
   }
 
   const VTEX_API_URL = `https://imegab2c.myvtex.com/api/oms/pvt/orders/${orderId}`;
   const API_VTEX_TOKEN = process.env.API_VTEX_TOKEN;
-
   if (!API_VTEX_TOKEN) {
-    return res.status(500).json({
-      message: 'API_VTEX_TOKEN no está configurada en las variables de entorno',
-    });
+    return res.status(500).json({ message: 'API_VTEX_TOKEN no está configurada en las variables de entorno' });
+  }
+
+  // Datos de configuración de Starken (sin valores por defecto)
+  const rutEmpresaEmisora = process.env.RUT_EMPRESA_EMISORA;
+  const rutUsuarioEmisor = process.env.RUT_USUARIO_EMISOR;
+  const claveUsuarioEmisor = process.env.CLAVE_USUARIO_EMISOR;
+
+  if (!rutEmpresaEmisora || !rutUsuarioEmisor || !claveUsuarioEmisor) {
+    return res.status(500).json({ message: 'Faltan variables de entorno para la configuración de Starken (empresa emisora, usuario y clave)' });
   }
 
   try {
+    // Solicitar la orden a VTEX
     const response = await fetch(VTEX_API_URL, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-VTEX-API-AppKey': process.env.API_VTEX_KEY || '', // Asegúrate de que esta variable contenga la clave correcta
+        'X-VTEX-API-AppKey': process.env.API_VTEX_KEY || '',
         'X-VTEX-API-AppToken': API_VTEX_TOKEN,
       },
     });
-
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Error en la API de VTEX: ${response.status} - ${errorText}`);
     }
-
     const data = await response.json();
 
-    // Extraer datos principales de la orden VTEX
+    // Datos del cliente y dirección
     const clientProfile = data.clientProfileData || {};
     const shippingAddress = data.shippingData?.address || {};
-    const item = data.items && data.items.length > 0 ? data.items[0] : null;
-    const dimension = item?.additionalInfo?.dimension;
 
-    // Procesar el RUT y dígito verificador
-    const rutField = clientProfile.document || '';
-    const { rut, dv } = extractRutAndDv(rutField);
-
-    // Definir nombre o razón social (según si es persona natural o jurídica)
+    const { rut, dv } = extractRutAndDv(clientProfile.document || '');
     const nombreRazonSocial =
       clientProfile.corporateName && clientProfile.corporateName.trim() !== ''
         ? clientProfile.corporateName
         : clientProfile.firstName || '';
 
-    // Buscar el código de ciudad y nombre de comuna en base al código postal
     const postalCode = shippingAddress.postalCode || '';
     const comunaData = getCodigoCiudadFromPostalCode(postalCode);
-    const codigoCiudad = comunaData ? comunaData.codigoCiudad : null;
-    const comunaNombre = comunaData ? comunaData.nombre : shippingAddress.neighborhood || '';
+    const comunaDestino = comunaData
+      ? comunaData.nombre
+      : shippingAddress.neighborhood || '';
 
-    // Construir el objeto que se enviará a la API de Starken
+    // === Procesar items ===
+    let items = data.items || [];
+    // Filtrar items con SKUs 600003 y 600001
+    items = items.filter(item => {
+      const sku = item.refId || item.RefId || item.sku || item.itemId || item.productId || '';
+      return sku !== '600003' && sku !== '600001';
+    });
+
+    interface ProcessedItem {
+      sku: string;
+      name: string;
+      quantity: number;
+      weight: number;
+    }
+    const processedItems: ProcessedItem[] = [];
+
+    for (const item of items) {
+      // Buscar el SKU usando refId (o variantes)
+      const sku = item.refId || item.RefId || item.sku || item.itemId || item.productId || '';
+      // Convertir la cantidad a número; si no es válida, usar 1
+      const quantity = Number(item.quantity) || 1;
+      console.log(`Procesando item con SKU ${sku}, cantidad recibida: ${item.quantity} convertida a: ${quantity}`);
+      
+      // Verificar si el SKU es un pack consultando el JSON de packs
+      if (sku && packs[sku]) {
+        console.log(`Item ${sku} es un pack. Detalles del pack:`, packs[sku]);
+        const packInfo = packs[sku];
+        for (const component of packInfo.components) {
+          const compQuantity = Number(component.quantity) || 1;
+          const totalCompQuantity = quantity * compQuantity;
+          console.log(`  Procesando componente ${component.sku}: cantidad del pack ${compQuantity}, total calculado: ${totalCompQuantity}`);
+          processedItems.push({
+            sku: component.sku,
+            name: component.name || item.name,
+            quantity: totalCompQuantity,
+            weight: item.additionalInfo?.dimension
+              ? convertGramsToKg(item.additionalInfo.dimension.weight) * totalCompQuantity
+              : 0,
+          });
+        }
+      } else {
+        console.log(`Item ${sku} no es un pack.`);
+        processedItems.push({
+          sku: sku,
+          name: item.name,
+          quantity: quantity,
+          weight: item.additionalInfo?.dimension
+            ? convertGramsToKg(item.additionalInfo.dimension.weight)
+            : 0,
+        });
+      }
+    }
+
+    // Construir "contenido" concatenado y calcular total de kilos
+    const contenido = processedItems
+      .map(p => `${p.name} x ${p.quantity}`)
+      .join(', ');
+    const kilosTotal = processedItems.reduce((sum, p) => sum + p.weight, 0);
+    // Calcular el total de bultos (suma de las cantidades de cada item)
+    const totalBultos = processedItems.reduce((sum, p) => sum + p.quantity, 0);
+
+    console.log('Processed Items:', processedItems);
+    console.log(`Total de bultos calculados: ${totalBultos}`);
+    console.log(`Contenido final: ${contenido}`);
+    console.log(`Kilos totales: ${kilosTotal}`);
+
+    // Usar las dimensiones del primer item, si existe
+    const firstDimension = data.items[0]?.additionalInfo?.dimension || {};
+
+    // Armar el objeto de respuesta con la estructura multibulto
     const otData = {
+      rutEmpresaEmisora,                    // Variable de entorno
+      rutUsuarioEmisor,                     // Variable de entorno
+      claveUsuarioEmisor,                   // Variable de entorno
       rutDestinatario: rut,
       dvRutDestinatario: dv,
       nombreRazonSocialDestinatario: nombreRazonSocial,
       apellidoPaternoDestinatario: clientProfile.lastName || '',
-      // Si no hay apellido materno, se asigna un guion
-      apellidoMaternoDestinatario: clientProfile.apellidoMaternoDestinatario && clientProfile.apellidoMaternoDestinatario.trim() !== ''
-        ? clientProfile.apellidoMaternoDestinatario
-        : 'no-informado',
+      apellidoMaternoDestinatario:
+        clientProfile.apellidoMaternoDestinatario &&
+        clientProfile.apellidoMaternoDestinatario.trim() !== ''
+          ? clientProfile.apellidoMaternoDestinatario
+          : 'no-informado',
       direccionDestinatario: shippingAddress.street || '',
       numeracionDireccionDestinatario: shippingAddress.number || '',
-      departamentoDireccionDestinatario: shippingAddress.complement || '', // "complement" se usará como departamento
-      // Se utilizan los datos del lookup mediante código postal:
-      codigoCiudad, // Código de ciudad obtenido del JSON de comunas de Starken
-      comunaDestino: comunaNombre, // Nombre de comuna
+      departamentoDireccionDestinatario: shippingAddress.complement || '',
+      comunaDestino,                        
       telefonoDestinatario: clientProfile.phone || '',
       emailDestinatario: clientProfile.email || '',
       nombreContactoDestinatario: shippingAddress.receiverName || '',
-
-      valorDeclarado: calculateValorDeclarado(data.value), // Valor declarado (value * 0.01)
-      // Variable adicional para Starken: numeroDocumento1 con el orderId
+      tipoEntrega: "2",
+      tipoPago: "2",
+      numeroCtaCte: "",
+      dvNumeroCtaCte: "",
+      centroCostoCtaCte: "0",
+      valorDeclarado: calculateValorDeclarado(data.value),
+      contenido,
+      kilosTotal,
+      alto: firstDimension.height || 0,
+      ancho: firstDimension.width || 0,
+      largo: firstDimension.length || 0,
+      tipoServicio: "0",
+      tipoDocumento1: "27",
       numeroDocumento1: data.orderId || '',
-      contenido: item?.name || '',
-      kilosTotal: dimension ? convertGramsToKg(dimension.weight) : 0,
-      alto: dimension?.height || 0,
-      ancho: dimension?.width || 0,
-      largo: dimension?.length || 0,
-      ciudadOrigenNom: 'SANTIAGO', // Valor predefinido según el origen del despacho
+      generaEtiquetaDocumento1: "N",
+      tipoDocumento2: "",
+      numeroDocumento2: "",
+      generaEtiquetaDocumento2: "",
+      tipoDocumento3: "",
+      numeroDocumento3: "",
+      generaEtiquetaDocumento3: "",
+      tipoDocumento4: "",
+      numeroDocumento4: "",
+      generaEtiquetaDocumento4: "",
+      tipoDocumento5: "",
+      numeroDocumento5: "",
+      generaEtiquetaDocumento5: "",
+      // Campos para multibulto
+      tipoEncargo1: "29",
+      cantidadEncargo1: totalBultos.toString(),
+      tipoEncargo2: "",
+      cantidadEncargo2: "",
+      tipoEncargo3: "",
+      cantidadEncargo3: "",
+      tipoEncargo4: "",
+      cantidadEncargo4: "",
+      tipoEncargo5: "",
+      cantidadEncargo5: "",
+      ciudadOrigenNom: "SANTIAGO",
       observacion: data.orderId || '',
-
+      codAgenciaOrigen: "",
+      latitud: "",
+      longitud: "",
+      precisión: "",
+      calidad: "",
+      match: ""
     };
 
     return res.status(200).json(otData);
