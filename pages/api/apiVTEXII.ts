@@ -195,8 +195,6 @@ export default async function handler(
       nombreContactoDestinatario: shippingAddress.receiverName || '',
       tipoEntrega: "2",
       tipoPago: "2",
-      numeroCtaCte: "",
-      dvNumeroCtaCte: "",
       centroCostoCtaCte: "0",
       valorDeclarado: calculateValorDeclarado(data.value),
       contenido,
