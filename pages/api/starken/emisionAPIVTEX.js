@@ -5,6 +5,8 @@ export default async function handler(req, res) {
   
     try {
       console.log('Request body:', JSON.stringify(req.body, null, 2));
+      const gato = req.body.numeroDocumento1.trim().replace(/-/g, '');
+      console.log('Gato sin guiones:', gato);
       if (!req.body) {
         return res.status(400).json({ error: 'Datos requeridos' });
       }
@@ -23,7 +25,7 @@ export default async function handler(req, res) {
             numeroCtaCte: process.env.NUMERO_CTA_CTE,
             dvNumeroCtaCte: process.env.DV_NUMERO_CTA_CTE,
             ...req.body,
-            numeroDocumento1: "12345",
+            numeroDocumento1: gato,
 
 
             
