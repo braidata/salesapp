@@ -51,3 +51,4 @@ next-env.d.ts
 .env.save
 .env.swp
 fapp/__pycache__/ocr.cpython-310.pyc
+.qodo

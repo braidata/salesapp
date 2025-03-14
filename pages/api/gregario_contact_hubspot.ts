@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET;
 const HUBSPOT_TOKEN = process.env.HUBSPOT_TOKEN;
 
-// Middleware de autenticación basado en tu código original
+// Middleware de autenticación basado en el código original
 function withProtection(handler: Function) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
@@ -29,12 +29,23 @@ function withProtection(handler: Function) {
   };
 }
 
-// 🔹 Función principal basada en tu código original
+// Función principal adaptada para método POST y lectura de un body con `id` y `response`
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Método no permitido. Use POST.' });
+  }
+  
   try {
-    const { id } = req.query;
-    const token = process.env.HUBSPOT_TOKEN;
-
+    // Extraer `id` y `response` desde el body de la petición
+    const { id, response } = req.body;
+    console.log('id:', id);
+    console.log('response:', response);
+    
+    // Validar que ambos campos estén presentes
+    if (!id || !response) {
+      return res.status(400).json({ success: false, error: 'Campos id y response son obligatorios' });
+    }
+    
     // 📌 1️⃣ Obtener datos del contacto desde Gregario
     const contactResponse = await axios.get(`${process.env.NEXTAUTH_URL}api/gregario_contact_unitario?id=${id}`);
     const contactData = contactResponse.data.contact.results;
@@ -51,7 +62,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const { localidad, detalles } = geoResponse.data;
 
-    // 📌 3️⃣ Extraer datos útiles para HubSpot
+    // Extraer datos útiles de ubicación
     const comuna = detalles.town || detalles.city || detalles.municipality || detalles.county || 'Desconocida';
     const region = detalles.state || 'Desconocida';
     const codigoPostal = detalles.postcode || '';
@@ -59,16 +70,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const calle = detalles.road || '';
     const numero = detalles.house_number || '';
 
-    // 🔹 **Cambio clave:** Usar `address` de Gregario en vez de la API de geolocalización
+    // 🔹 Usar `address` de Gregario en vez de la API de geolocalización
     const direccion = contactData.address || 'Dirección no disponible';
 
-    // 📌 4️⃣ Preparar datos de empresa en HubSpot
+    // 📌 3️⃣ Preparar datos de empresa en HubSpot, incluyendo la propiedad `response` en la descripción
     const companyData = {
       properties: {
         name: `${contactData.name} - Gregario Integration`,
         razon_social: contactData.name,
         phone: contactData.phones[0]?.replace(/['"]/g, '') || '',
-        description: `Gregario Integration ID: ${contactData.id} \n Coordenadas: ${contactData.latitude}, ${contactData.longitude} \n Código: ${contactData.code} Desc: ${contactData.description}`,
+        description: `Gregario Integration ID: ${contactData.id}\nId Gregario: ${contactData.code}\nDescripción: ${contactData.description}\nActividades Encuesta Gregario: ${response}\nCoordenadas: ${contactData.latitude}, ${contactData.longitude}\n`,
         industry: 'FOOD_BEVERAGES',
         address: direccion,
         calle: calle,
@@ -80,7 +91,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     };
 
-    // 📌 5️⃣ Crear empresa en HubSpot
+    // 📌 4️⃣ Crear empresa en HubSpot
     const companyResponse = await axios.post(
       'https://api.hubapi.com/crm/v3/objects/companies',
       companyData,
@@ -92,7 +103,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
     );
 
-    // 📌 6️⃣ Preparar datos de contacto en HubSpot
+    // 📌 5️⃣ Preparar datos de contacto en HubSpot
     const contactHubspotData = {
       properties: {
         email: contactData.emails[0] || '',
@@ -109,7 +120,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     };
 
-    // 📌 7️⃣ Crear contacto en HubSpot
+    // 📌 6️⃣ Crear contacto en HubSpot
     const contactHubspotResponse = await axios.post(
       'https://api.hubapi.com/crm/v3/objects/contacts',
       contactHubspotData,
@@ -121,7 +132,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
     );
 
-    // 📌 8️⃣ Asociar contacto con empresa en HubSpot
+    // 📌 7️⃣ Asociar contacto con empresa en HubSpot
     await axios.put(
       `https://api.hubapi.com/crm/v3/objects/companies/${companyResponse.data.id}/associations/contacts/${contactHubspotResponse.data.id}/company_to_contact`,
       {},
@@ -141,7 +152,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         contact: contactHubspotResponse.data,
       },
     });
-
+    
   } catch (error) {
     console.error('Error:', error.response?.data || error);
     return res.status(500).json({
