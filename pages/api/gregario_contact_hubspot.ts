@@ -79,7 +79,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         name: `${contactData.name} - Gregario Integration`,
         razon_social: contactData.name,
         phone: contactData.phones[0]?.replace(/['"]/g, '') || '',
-        description: `Gregario Integration ID: ${contactData.id}\nCoordenadas: ${contactData.latitude}, ${contactData.longitude}\nCódigo: ${contactData.code}\nDesc: ${contactData.description}\nResponse: ${response}`,
+        description: `Gregario Integration ID: ${contactData.id}\nId Gregario: ${contactData.code}\nDescripción: ${contactData.description}\nActividades Encuesta Gregario: ${response}\nCoordenadas: ${contactData.latitude}, ${contactData.longitude}\n`,
         industry: 'FOOD_BEVERAGES',
         address: direccion,
         calle: calle,
