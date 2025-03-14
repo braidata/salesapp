@@ -21,7 +21,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  // Se espera que en el body venga "pedido", que es el CódigoExterno (string)
   const { pedido } = req.body;
   if (!pedido) {
     return res.status(400).json({ 
@@ -32,8 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let pool;
   try {
     pool = await sql.connect(config);
-    
-    // Iniciar transacción
     const transaction = new sql.Transaction(pool);
     await transaction.begin();
 
@@ -52,9 +49,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         throw new Error('No se encontró el pedido en qa_pedidos_externos para actualizar');
       }
 
-      // 2. Actualizar qa_pedidos_externos_estado mediante JOIN:
-      // Se actualizan los campos estado_envio y estado para los registros cuyo idpedido coincide 
-      // con el ID del pedido obtenido a partir del CódigoExterno.
+      // 2. Obtener el ID del pedido actualizado
+      const pedidoResult = await transaction.request()
+        .input('pedido', sql.NVarChar(255), pedido)
+        .query(`
+          SELECT ID FROM qa_pedidos_externos
+          WHERE CodigoExterno = @pedido;
+        `);
+
+      if (!pedidoResult.recordset || pedidoResult.recordset.length === 0) {
+        throw new Error('No se pudo obtener el ID del pedido');
+      }
+      const idPedido = pedidoResult.recordset[0].ID;
+
+      // 3. Intentar actualizar qa_pedidos_externos_estado mediante JOIN
       const updateEstadoResult = await transaction.request()
         .input('pedido', sql.NVarChar(255), pedido)
         .input('estado_envio', sql.Int, 0)
@@ -68,12 +76,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           WHERE p.CodigoExterno = @pedido;
         `);
 
+      let estadoAccion = 'actualizado';
+      let estadoAffected = updateEstadoResult.rowsAffected[0];
+
+      // 4. Si no se actualizó ningún registro, crear uno nuevo
+      if (estadoAffected === 0) {
+        const insertEstadoResult = await transaction.request()
+          .input('idpedido', sql.Int, idPedido)
+          .input('estado_envio', sql.Int, 0)
+          .input('estado', sql.NVarChar(10), 'T')
+          .query(`
+            INSERT INTO qa_pedidos_externos_estado (idpedido, estado_envio, estado)
+            VALUES (@idpedido, @estado_envio, @estado);
+          `);
+        estadoAccion = 'creado';
+        estadoAffected = insertEstadoResult.rowsAffected[0];
+      }
+
       await transaction.commit();
 
       res.status(200).json({ 
         message: 'Actualización exitosa',
         pedidoActualizado: updatePedidoResult.rowsAffected[0],
-        estadoActualizado: updateEstadoResult.rowsAffected[0]
+        estadoAccion: estadoAccion,
+        estadoAffected: estadoAffected
       });
 
     } catch (error) {

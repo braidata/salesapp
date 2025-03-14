@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import SimpliRoute from "../components/simpliRoute";
 import Cotizador from "../components/CotizadorEnviame";
+import DashboardContainer from "@/components/super-dashboard/dashboard-container"
 // import CotizadorStarken2 from "../components/CotizadorStarken2";
 
 
@@ -79,22 +80,13 @@ const Logistica = () => {
   return (
     <>
       
-      <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
+      <div className="w-full flex min-h-screen flex-col items-center justify-center py-2 rounded-lg">
       {/* <h1 className="mt-24">Portal Logística</h1> */}
-      <div className="flex flex-row gap-4 mt-24">
+      <div className="flex flex-row gap-2 mt-24 rounded-lg">
+      <DashboardContainer />
       </div>
 
-        <Cotizador />
-        
-
-        <SimpliRoute />
-        {/*  
-        <SapO2/>
-        <SapO3/>
-        <FedEx />
-        
-        <Febos/> 
-        */}
+      
       </div></>
   );
 };
