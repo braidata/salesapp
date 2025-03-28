@@ -78,15 +78,15 @@ async function processStarkenOrder(
     // Paso 3: Actualizar la base de datos
     const pool = await getConnectionPool();
     const updateQuery = `
-      UPDATE qa_pedidos_externos_estado
+      UPDATE pedidos_externos_estado
       SET estado_envio = 1, time_notificado = GETDATE()
       WHERE idpedido = @orderId
     `;
     await pool.request().input('orderId', sql.BigInt, internalId).query(updateQuery);
-    console.log(`[Starken] Pedido internalId ${internalId} actualizado en qa_pedidos_externos_estado. nroOrdenFlete: ${nroOrdenFlete}`);
+    console.log(`[Starken] Pedido internalId ${internalId} actualizado en pedidos_externos_estado. nroOrdenFlete: ${nroOrdenFlete}`);
 
     const updateQuery2 = `
-      UPDATE qa_pedidos_externos
+      UPDATE pedidos_externos
       SET otDeliveryCompany = @nroOrdenFlete,
           urlDeliveryCompany = CONCAT('https://starken.cl/seguimiento?codigo=', @nroOrdenFlete)
       WHERE ID = @orderId
@@ -95,7 +95,7 @@ async function processStarkenOrder(
       .input('nroOrdenFlete', sql.BigInt, nroOrdenFlete)
       .input('orderId', sql.BigInt, internalId)
       .query(updateQuery2);
-    console.log(`[Starken] Pedido internalId ${internalId} actualizado en qa_pedidos_externos. OT: ${nroOrdenFlete}`);
+    console.log(`[Starken] Pedido internalId ${internalId} actualizado en pedidos_externos. OT: ${nroOrdenFlete}`);
     
     return { internalId, externalCode, nroOrdenFlete, success: true };
   } catch (error) {
@@ -251,16 +251,16 @@ async function process99MinOrder(
     
     // Actualizar estado en pedidos_externos_estado
     const updateQuery = `
-      UPDATE qa_pedidos_externos_estado
+      UPDATE pedidos_externos_estado
       SET estado_envio = 1, time_notificado = GETDATE()
       WHERE idpedido = @orderId
     `;
     await pool.request().input('orderId', sql.BigInt, internalId).query(updateQuery);
-    console.log(`[99Min] Pedido internalId ${internalId} actualizado en qa_pedidos_externos_estado. OT: ${nroOrdenFlete}`);
+    console.log(`[99Min] Pedido internalId ${internalId} actualizado en pedidos_externos_estado. OT: ${nroOrdenFlete}`);
 
     // Actualizar URL de seguimiento de 99minutos
     const updateQuery2 = `
-      UPDATE qa_pedidos_externos
+      UPDATE pedidos_externos
       SET otDeliveryCompany = @nroOrdenFlete,
           urlDeliveryCompany = CONCAT('https://tracking.99minutos.com/search/', @nroOrdenFlete)
       WHERE ID = @orderId
@@ -269,7 +269,7 @@ async function process99MinOrder(
       .input('nroOrdenFlete', sql.VarChar, nroOrdenFlete)
       .input('orderId', sql.BigInt, internalId)
       .query(updateQuery2);
-    console.log(`[99Min] Pedido internalId ${internalId} actualizado en qa_pedidos_externos. OT: ${nroOrdenFlete}`);
+    console.log(`[99Min] Pedido internalId ${internalId} actualizado en pedidos_externos. OT: ${nroOrdenFlete}`);
     
     return { internalId, externalCode, nroOrdenFlete, success: true };
   } catch (error) {
@@ -293,25 +293,25 @@ async function processOrders(createOrder: boolean): Promise<Array<{
   // Consulta SQL para obtener pedidos pendientes
   const query = `
     SELECT 
-      qa_pedidos_externos_estado.idpedido AS internalId,
-      qa_pedidos_externos.FechaPedido, 
-      qa_pedidos_externos.CodigoExterno AS externalCode,
-      qa_pedidos_externos.deliveryCompany
+      pedidos_externos_estado.idpedido AS internalId,
+      pedidos_externos.FechaPedido, 
+      pedidos_externos.CodigoExterno AS externalCode,
+      pedidos_externos.deliveryCompany
     FROM 
-      qa_pedidos_externos_estado
+      pedidos_externos_estado
     INNER JOIN 
-      qa_pedidos_externos ON qa_pedidos_externos.ID = qa_pedidos_externos_estado.idpedido
+      pedidos_externos ON pedidos_externos.ID = pedidos_externos_estado.idpedido
     WHERE 
-      qa_pedidos_externos.Ecommerce = 'BLANIK_VTEX'
-      AND ISNULL(qa_pedidos_externos_estado.estado_envio, 0) = 0
-      AND qa_pedidos_externos_estado.estado = 'T'
+      pedidos_externos.Ecommerce = 'BLANIK_VTEX'
+      AND ISNULL(pedidos_externos_estado.estado_envio, 0) = 0
+      AND pedidos_externos_estado.estado = 'T'
     GROUP BY 
-      qa_pedidos_externos_estado.idpedido,
-      qa_pedidos_externos.FechaPedido, 
-      qa_pedidos_externos.CodigoExterno,
-      qa_pedidos_externos.deliveryCompany
+      pedidos_externos_estado.idpedido,
+      pedidos_externos.FechaPedido, 
+      pedidos_externos.CodigoExterno,
+      pedidos_externos.deliveryCompany
     ORDER BY 
-      qa_pedidos_externos.FechaPedido DESC
+      pedidos_externos.FechaPedido DESC
   `;
   
   const { recordset } = await pool.request().query(query);
