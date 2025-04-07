@@ -175,7 +175,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             </motion.button>
             <motion.button
               onClick={() => applyPreset('99Min')}
-              className="px-4 py-1.5 rounded-full text-sm bg-green-600/20 text-green-300 border border-green-400/40 hover:bg-green-500/30 shadow-sm shadow-green-400/20"
+              className="px-4 py-1.5 rounded-full text-sm bg-green-500/20 text-green-300 border border-green-400/40 hover:bg-green-500/30 shadow-sm shadow-green-400/20"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >
