@@ -9,6 +9,7 @@ interface FetchAllOrdersParams {
   deliveryType?: string;   // selectedDeliveryChannel en logisticsInfo
   dateStart?: string | Date | null;
   dateEnd?: string | Date | null;
+  brand?: string;          // 'blanik' para usar el endpoint de Blanik, de lo contrario se usa el otro
 }
 
 // Cache para evitar sobrecargar la API
@@ -18,6 +19,48 @@ let orderCache = {
   filters: {},
   expiryTimeMs: 5 * 60 * 1000, // 5 minutos
 };
+
+// Función para obtener los detalles completos de un pedido específico
+// Agregar esta función a tu archivo lib/api.ts
+
+interface FetchOrderDetailsParams {
+  orderId: string;
+  brand?: string;  // 'blanik' para usar el endpoint de Blanik
+}
+
+export async function fetchOrderDetails({ orderId, brand }: FetchOrderDetailsParams) {
+  if (!orderId) {
+    throw new Error("Se requiere orderId para fetchOrderDetails");
+  }
+
+  console.log(`Fetching detailed order for ${orderId}, brand: ${brand || 'default'}`);
+
+  // Seleccionar endpoint según el valor de brand
+  const endpoint =
+    brand && brand.toLowerCase() === "blanik"
+      ? "/api/apiVTEXRobotsBlanik"
+      : "/api/apiVTEXRobots";
+
+  try {
+    const response = await fetch(`${endpoint}?orderId=${orderId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log(`Fetched detailed order data for ${orderId}: ${JSON.stringify(data)}`);
+    
+    return data;
+  } catch (error) {
+    console.error(`Error fetching order details for ${orderId}:`, error);
+    throw error;
+  }
+}
 
 /**
  * Formatea una fecha para la API de VTEX
@@ -47,6 +90,7 @@ function areFiltersEqual(filters1: any, filters2: any) {
     "deliveryType",
     "dateStart",
     "dateEnd",
+    "brand", // se incluye brand para que la caché respete la marca
   ];
   for (const key of relevantKeys) {
     if (!(key in filters1) || !(key in filters2)) continue;
@@ -158,7 +202,13 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
     }
   });
 
-  const apiUrl = `/api/apiVTEXRobots?${queryParams.toString()}`;
+  // Seleccionar endpoint según el valor de brand
+  const endpoint =
+    params.brand && params.brand.toLowerCase() === "blanik"
+      ? "/api/apiVTEXRobotsBlanik"
+      : "/api/apiVTEXRobots";
+
+  const apiUrl = `${endpoint}?${queryParams.toString()}`;
   console.log("Fetching all orders with single request:", apiUrl);
 
   try {
@@ -177,7 +227,7 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
     
     console.log(`Total orders fetched: ${allOrders.length}`);
 
-    // Guardamos en caché los resultados originales
+    // Guardamos en caché los resultados originales, incluyendo brand
     orderCache = {
       timestamp: now,
       data: allOrders,
@@ -220,7 +270,6 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
 
     // Información de diagnóstico para verificar la paginación
     if (allOrders.length > 15) {
-      // Mostrar algunos ejemplos de IDs para verificar que son diferentes
       console.log("Muestra de IDs de órdenes (primeras 5):", allOrders.slice(0, 5).map((o: any) => o.orderId));
       console.log("Muestra de IDs de órdenes (últimas 5):", allOrders.slice(-5).map((o: any) => o.orderId));
     }
