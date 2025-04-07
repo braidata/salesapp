@@ -46,6 +46,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     { value: "Despacho RM", label: "Despacho RM" },
     { value: "Starken", label: "Starken" },
     { value: "Retiro en tienda", label: "Retiro en tienda" },
+    { value: "Transportadora estándar", label: "99 Minutos" },
+    
   ]
 
   // Opciones de método de pago (paymentType)
@@ -127,6 +129,14 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       paymentType: "",
       deliveryType: "delivery" // Despacho a domicilio
     },
+    "99Min": {
+      dateRange: { start: null, end: null },
+      daysBack: 30, // Última semana
+      status: "handling", // En preparación
+      courier: "Transportadora estándar",
+      paymentType: "",
+      deliveryType: "delivery" // Despacho a domicilio
+    },
     all: {
       dateRange: { start: null, end: null },
       daysBack: 30, // Último mes
@@ -138,7 +148,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
   }
 
   // Aplicar un preset
-  const applyPreset = (presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | 'all') => {
+  const applyPreset = (presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | '99Min'| 'all') => {
     onFilterChange(presets[presetName])
     setActiveTimeFilter("days") // Asegurarse de que el filtro activo sea el correcto
   }
@@ -162,6 +172,14 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               whileTap={{ scale: 0.97 }}
             >
               Starken
+            </motion.button>
+            <motion.button
+              onClick={() => applyPreset('99Min')}
+              className="px-4 py-1.5 rounded-full text-sm bg-green-500/20 text-green-300 border border-green-400/40 hover:bg-green-500/30 shadow-sm shadow-green-400/20"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              99 Minutos
             </motion.button>
             <motion.button
               onClick={() => applyPreset('localPickup')}
@@ -223,13 +241,25 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             />
           </div>
 
-          {/* Filtro de courier (transportista) */}
+          {/* Filtro de transportista */}
           <div className="flex-1">
             <label className="block text-sm text-gray-400 mb-1">Transportista</label>
             <Select
               options={courierOptions}
               value={filters.courier}
               onChange={(value) => onFilterChange({ courier: value })}
+            />
+          </div>
+
+          {/* Nuevo filtro: Buscar por ID */}
+          <div className="flex-1">
+            <label className="block text-sm text-gray-400 mb-1">Buscar por ID</label>
+            <input
+              type="text"
+              placeholder="ID del pedido"
+              value={filters.orderId || ""}
+              onChange={(e) => onFilterChange({ orderId: e.target.value })}
+              className="w-full rounded border border-gray-600 bg-gray-800 text-white p-2"
             />
           </div>
 
@@ -243,9 +273,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`h-5 w-5 transition-transform duration-300 ${
-                  isExpanded ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -296,7 +324,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
                 />
               </div>
 
-              {/* Tipo de entrega (deliveryType) */}
+              {/* Tipo de entrega */}
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
                   Canal de entrega
@@ -350,6 +378,11 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               {deliveryOptions.find((o) => o.value === filters.deliveryType)?.label}
             </span>
           )}
+          {filters.orderId && (
+            <span className="px-2 py-1 text-xs rounded-full bg-gray-500/20 text-gray-300">
+              ID: {filters.orderId}
+            </span>
+          )}
         </div>
 
         <motion.button
@@ -361,6 +394,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               courier: "",
               paymentType: "",
               deliveryType: "",
+              orderId: "",
             })
           }
           className="px-3 py-1 text-sm rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center gap-1 transition-colors"

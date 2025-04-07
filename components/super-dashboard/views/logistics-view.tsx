@@ -8,8 +8,9 @@ import DataTable from "../ui/data-table"
 import { formatCurrency } from "@/lib/utils"
 import { exportToExcel } from "@/lib/export-utils"
 
-export default function LogisticsView({ orders, isLoading }) {
+export default function LogisticsView({ orders, isLoading, brand }) {
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [loadingOrder, setLoadingOrder] = useState(false)
 
   // Estadísticas básicas
   const totalOrders = orders.length
@@ -17,30 +18,15 @@ export default function LogisticsView({ orders, isLoading }) {
     (order) => order.status === "ready-for-handling"
   ).length
   const inTransit = orders.filter(
-    (order) => order.status === "shipped" || order.status === "out-for-delivery" || order.status === "handling"
+    (order) =>
+      order.status === "shipped" ||
+      order.status === "out-for-delivery" ||
+      order.status === "handling"
   ).length
   const delivered = orders.filter((order) => order.status === "invoiced").length
 
-  // Agrupación dinámica por transportista
-  const courierStats = orders.reduce((acc, order) => {
-    // Intenta obtener el transportista de las distintas ubicaciones posibles en el objeto
-    let courier = "Desconocido"
-    if (order.shippingData && order.shippingData.logisticsInfo && order.shippingData.logisticsInfo.length > 0) {
-      courier = order.shippingData.logisticsInfo[0].deliveryCompany || "Desconocido"
-    }
-    
-    acc[courier] = (acc[courier] || 0) + 1
-    return acc
-  }, {})
-
-  // Columnas adaptadas para logística con todos los campos requeridos
+  // Columnas para la tabla de pedidos
   const columns = [
-    // {
-    //   key: "sequence",
-    //   header: "Número de pedido",
-    //   render: (value) => <span className="font-medium">{value || "N/A"}</span>,
-    //   sortable: true,
-    // },
     {
       key: "orderId",
       header: "ID del pedido",
@@ -107,9 +93,9 @@ export default function LogisticsView({ orders, isLoading }) {
       key: "shippingAddress",
       header: "Dirección de envío",
       render: (_, row) => {
-        if (!row.shippingData || !row.shippingData.address) return "N/A";
-        const addr = row.shippingData.address;
-        return `${addr.street || ""} ${addr.number || ""}, ${addr.neighborhood || ""}`;
+        if (!row.shippingData || !row.shippingData.address) return "N/A"
+        const addr = row.shippingData.address
+        return `${addr.street || ""} ${addr.number || ""}, ${addr.neighborhood || ""}`
       },
     },
     {
@@ -121,9 +107,8 @@ export default function LogisticsView({ orders, isLoading }) {
       key: "clientEmail",
       header: "Correo electrónico",
       render: (_, row) => {
-        const email = row.clientProfileData?.email || "";
-        // Eliminar el sufijo de VTEX si existe
-        return email.split("-")[0] || "N/A";
+        const email = row.clientProfileData?.email || ""
+        return email.split("-")[0] || "N/A"
       },
     },
     {
@@ -131,9 +116,9 @@ export default function LogisticsView({ orders, isLoading }) {
       header: "Método de envío",
       render: (_, row) => {
         if (!row.shippingData || !row.shippingData.logisticsInfo || row.shippingData.logisticsInfo.length === 0) {
-          return "N/A";
+          return "N/A"
         }
-        return row.shippingData.logisticsInfo[0].selectedSla || "N/A";
+        return row.shippingData.logisticsInfo[0].selectedSla || "N/A"
       },
     },
     {
@@ -150,7 +135,7 @@ export default function LogisticsView({ orders, isLoading }) {
       header: "Acciones",
       render: (_, row) => (
         <button
-          onClick={() => setSelectedOrder(row)}
+          onClick={() => handleViewDetails(row)}
           className="px-3 py-1 text-xs rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors"
         >
           Ver detalles
@@ -159,20 +144,79 @@ export default function LogisticsView({ orders, isLoading }) {
     },
   ]
 
+  // Función para mapear los detalles del pedido
+  function mapOrderDetails(raw) {
+    const client = raw.clientProfileData || {}
+    const items = raw.items || []
+    return {
+      ...raw,
+      clientName: `${client.firstName || ""} ${client.lastName || ""}`.trim(),
+      totalValue: raw.value ?? 0,
+      paymentNames:
+        raw.paymentData?.transactions
+          ?.flatMap((t) => t.payments?.map((p) => p.paymentSystemName))
+          .join(", ") || "N/A",
+      items: items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        sellerSku: item.sellerSku || item.id,
+        refId: item.refId || "",
+        imageUrl: item.imageUrl || "",
+        detailUrl: item.detailUrl || "",
+      })),
+    }
+  }
+
+  // Función para obtener y mostrar los detalles del pedido usando el endpoint adecuado según la marca
+  const handleViewDetails = async (order) => {
+    try {
+      setLoadingOrder(true)
+      let endpoint = ""
+      
+      // Usar la prop "brand" pasada desde arriba para determinar el endpoint
+      if (brand === "blanik") {
+        endpoint = `/api/apiVTEXBlanik?orderId=${order.orderId}`
+      } else {
+        endpoint = `/api/apiVTEX?orderId=${order.orderId}`
+      }
+  
+      const response = await fetch(endpoint)
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+      
+      const raw = await response.json()
+      console.log("Order details received:", raw)
+      
+      const mapped = mapOrderDetails(raw)
+      setSelectedOrder(mapped)
+    } catch (error) {
+      console.error("Error al obtener detalles del pedido:", error)
+      alert("No se pudo cargar la información completa del pedido.")
+    } finally {
+      setLoadingOrder(false)
+    }
+  }
+  
+
   const handleExport = () => {
     if (!orders || orders.length === 0) return
 
     const data = orders.map((order) => {
-      // Obtener datos de envío si existen
-      const shippingAddress = order.shippingData?.address || {};
-      const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
-      const clientProfile = order.clientProfileData || {};
-      
+      const shippingAddress = order.shippingData?.address || {}
+      const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {}
+      const clientProfile = order.clientProfileData || {}
+
       return {
         "Número de pedido": order.sequence || "N/A",
         "ID del pedido": order.orderId || "N/A",
         "Estado del pedido": order.statusDescription || order.status || "N/A",
-        "Fecha del pedido": order.creationDate ? new Date(order.creationDate).toLocaleDateString("es-CL") : "N/A",
+        "Fecha del pedido": order.creationDate
+          ? new Date(order.creationDate).toLocaleDateString("es-CL")
+          : "N/A",
         "DTE": order.invoiceOutput || "N/A",
         "RUT": clientProfile.document || "N/A",
         "Nombre (facturación)": clientProfile.firstName || "N/A",
@@ -180,8 +224,10 @@ export default function LogisticsView({ orders, isLoading }) {
         "Teléfono (facturación)": clientProfile.phone || "N/A",
         "Correo electrónico": clientProfile.email ? clientProfile.email.split("-")[0] : "N/A",
         "Nombre (envío)": shippingAddress.receiverName ? shippingAddress.receiverName.split(" ")[0] : "N/A",
-        "Apellidos (envío)": shippingAddress.receiverName ? 
-          shippingAddress.receiverName.split(" ").slice(1).join(" ") : "N/A",
+        "Apellidos (envío)":
+          shippingAddress.receiverName
+            ? shippingAddress.receiverName.split(" ").slice(1).join(" ")
+            : "N/A",
         "Dirección de envío": `${shippingAddress.street || ""} ${shippingAddress.number || ""}`,
         "N° Dirección": shippingAddress.number || "N/A",
         "N° Dpto": shippingAddress.complement || "N/A",
@@ -190,7 +236,9 @@ export default function LogisticsView({ orders, isLoading }) {
         "Título del método de envío": logisticsInfo.selectedSla || "N/A",
         "Transportista": logisticsInfo.deliveryCompany || "N/A",
         "Importe total del pedido": formatCurrency(order.totalValue ? order.totalValue / 100 : 0),
-        "Última Actualización": order.lastChange ? new Date(order.lastChange).toLocaleDateString("es-CL") : "N/A",
+        "Última Actualización": order.lastChange
+          ? new Date(order.lastChange).toLocaleDateString("es-CL")
+          : "N/A",
       }
     })
 
@@ -201,7 +249,6 @@ export default function LogisticsView({ orders, isLoading }) {
     <div className="space-y-6 m-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white">Vista de Logística</h2>
-
         <motion.button
           onClick={handleExport}
           disabled={isLoading || orders.length === 0}
@@ -363,10 +410,6 @@ export default function LogisticsView({ orders, isLoading }) {
                 <div className="md:col-span-1">
                   <h4 className="text-lg font-medium text-white mb-4">Información del Pedido</h4>
                   <div className="bg-gray-800/50 rounded-lg p-4 space-y-3">
-                    {/* <div>
-                      <p className="text-sm text-gray-400">Número de Pedido</p>
-                      <p className="text-white">{selectedOrder.sequence || "N/A"}</p>
-                    </div> */}
                     <div>
                       <p className="text-sm text-gray-400">ID del Pedido</p>
                       <p className="text-white font-mono text-sm">{selectedOrder.orderId || "N/A"}</p>
@@ -417,14 +460,14 @@ export default function LogisticsView({ orders, isLoading }) {
                       <p className="text-sm text-gray-400">RUT</p>
                       <p className="text-white">{selectedOrder.clientProfileData?.document || "N/A"}</p>
                     </div>
-                    <div>
+                    {/* <div>
                       <p className="text-sm text-gray-400">Email</p>
                       <p className="text-white">
                         {selectedOrder.clientProfileData?.email
                           ? selectedOrder.clientProfileData.email.split("-")[0]
                           : "N/A"}
                       </p>
-                    </div>
+                    </div> */}
                     <div>
                       <p className="text-sm text-gray-400">Teléfono</p>
                       <p className="text-white">{selectedOrder.clientProfileData?.phone || "N/A"}</p>
@@ -529,10 +572,12 @@ export default function LogisticsView({ orders, isLoading }) {
                 </div>
               </div>
               
-              {/* Productos (si están disponibles) */}
-              {selectedOrder.items && selectedOrder.items.length > 0 && (
+              {/* Sección de Productos con tabla mejorada */}
+              {selectedOrder.items && selectedOrder.items.length > 0 ? (
                 <div>
-                  <h4 className="text-lg font-medium text-white mb-4">Productos</h4>
+                  <h4 className="text-lg font-medium text-white mb-4">
+                    Productos ({selectedOrder.items.length})
+                  </h4>
                   <div className="bg-gray-800/50 rounded-lg p-4">
                     <table className="w-full text-sm">
                       <thead>
@@ -540,23 +585,56 @@ export default function LogisticsView({ orders, isLoading }) {
                           <th className="text-left py-2 text-gray-400">SKU</th>
                           <th className="text-left py-2 text-gray-400">Producto</th>
                           <th className="text-center py-2 text-gray-400">Cantidad</th>
-                          <th className="text-right py-2 text-gray-400">Precio</th>
+                          <th className="text-right py-2 text-gray-400">Precio Unit.</th>
+                          <th className="text-right py-2 text-gray-400">Total</th>
                         </tr>
                       </thead>
                       <tbody>
                         {selectedOrder.items.map((item, index) => (
                           <tr key={index} className="border-b border-gray-700/50">
                             <td className="py-2 text-white">{item.sellerSku || item.id || "N/A"}</td>
-                            <td className="py-2 text-white">{item.name || "N/A"}</td>
+                            <td className="py-2 text-white">
+                              <div className="flex items-center">
+                                {item.imageUrl && (
+                                  <img 
+                                    src={item.imageUrl} 
+                                    alt={item.name} 
+                                    className="w-10 h-10 object-contain mr-2 bg-white rounded" 
+                                  />
+                                )}
+                                <div>
+                                  {item.name || "N/A"}
+                                  {item.refId && (
+                                    <span className="text-xs text-gray-400 ml-2">({item.refId})</span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
                             <td className="py-2 text-center text-white">{item.quantity || 1}</td>
                             <td className="py-2 text-right text-white">
                               {formatCurrency(item.price ? item.price / 100 : 0)}
+                            </td>
+                            <td className="py-2 text-right text-white font-medium">
+                              {formatCurrency((item.price ? item.price / 100 : 0) * (item.quantity || 1))}
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
+                </div>
+              ) : (
+                <div className="bg-gray-800/50 rounded-lg p-6 text-center">
+                  {loadingOrder ? (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                      <p className="text-gray-400">Cargando productos...</p>
+                    </div>
+                  ) : (
+                    <p className="text-gray-400">
+                      No hay información de productos disponible para este pedido.
+                    </p>
+                  )}
                 </div>
               )}
             </div>
