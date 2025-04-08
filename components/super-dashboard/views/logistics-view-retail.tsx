@@ -202,48 +202,108 @@ export default function LogisticsView({ orders, isLoading, brand }) {
   }
   
 
-  const handleExport = () => {
-    if (!orders || orders.length === 0) return
-
-    const data = orders.map((order) => {
-      const shippingAddress = order.shippingData?.address || {}
-      const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {}
-      const clientProfile = order.clientProfileData || {}
-
-      return {
-        "Número de pedido": order.sequence || "N/A",
-        "ID del pedido": order.orderId || "N/A",
-        "Estado del pedido": order.statusDescription || order.status || "N/A",
-        "Fecha del pedido": order.creationDate
-          ? new Date(order.creationDate).toLocaleDateString("es-CL")
-          : "N/A",
-        "DTE": order.invoiceOutput || "N/A",
-        "RUT": clientProfile.document || "N/A",
-        "Nombre (facturación)": clientProfile.firstName || "N/A",
-        "Apellidos (facturación)": clientProfile.lastName || "N/A",
-        "Teléfono (facturación)": clientProfile.phone || "N/A",
-        "Correo electrónico": clientProfile.email ? clientProfile.email.split("-")[0] : "N/A",
-        "Nombre (envío)": shippingAddress.receiverName ? shippingAddress.receiverName.split(" ")[0] : "N/A",
-        "Apellidos (envío)":
-          shippingAddress.receiverName
-            ? shippingAddress.receiverName.split(" ").slice(1).join(" ")
+  const handleExport = async () => {
+    if (!orders || orders.length === 0) return;
+    
+    console.log(`Iniciando exportación a Excel. Cantidad de órdenes recibidas: ${orders.length}`);
+    
+    // Para cada orden, si no tiene la información de productos, se solicitará detalle.
+    const detailedOrders = await Promise.all(
+      orders.map(async (order) => {
+        if (!order.items || order.items.length === 0) {
+          console.log(`La orden ${order.orderId} no trae productos, se solicitarán detalles.`);
+          try {
+            let endpoint =
+              brand === "blanik"
+                ? `/api/apiVTEXBlanik?orderId=${order.orderId}`
+                : `/api/apiVTEX?orderId=${order.orderId}`;
+            const response = await fetch(endpoint);
+            if (!response.ok) {
+              console.error(`Error al obtener detalles de la orden ${order.orderId}. Status: ${response.status}`);
+              return order;
+            }
+            const raw = await response.json();
+            const mapped = mapOrderDetails(raw);
+            console.log(`Orden ${order.orderId} detallada. Productos encontrados: ${mapped.items.length}`);
+            return mapped;
+          } catch (error) {
+            console.error(`Error al obtener detalle para la orden ${order.orderId}:`, error);
+            return order;
+          }
+        } else {
+          console.log(`La orden ${order.orderId} ya trae información de productos.`);
+          return order;
+        }
+      })
+    );
+    
+    // Construir arreglo de datos para exportar: se crea una línea por cada producto (SKU)
+    const data = [];
+    detailedOrders.forEach((order) => {
+      const shippingAddress = order.shippingData?.address || {};
+      const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
+      const clientProfile = order.clientProfileData || {};
+    
+      if (order.items && order.items.length > 0) {
+        order.items.forEach((item) => {
+          data.push({
+            "Número de pedido": order.sequence || "N/A",
+            "ID del pedido": order.orderId || "N/A",
+            "Estado del pedido": order.statusDescription || order.status || "N/A",
+            "Fecha del pedido": order.creationDate
+              ? new Date(order.creationDate).toLocaleDateString("es-CL")
+              : "N/A",
+            "RUT": clientProfile.document || "N/A",
+            "Nombre (facturación)": clientProfile.firstName || "N/A",
+            "Apellidos (facturación)": clientProfile.lastName || "N/A",
+            "Correo electrónico": clientProfile.email
+              ? clientProfile.email.split("-")[0]
+              : "N/A",
+            "Transportista": logisticsInfo.deliveryCompany || "N/A",
+            // Información específica del producto:
+            "SKU VTEX": item.sellerSku || item.id || "N/A",
+            "SKU Local": item.refId || "N/A", // Se utiliza refId para el SKU local
+            "Producto": item.name || "N/A",
+            "Cantidad": item.quantity || 1,
+            "Precio Unitario": formatCurrency(
+              item.price && !isNaN(item.price) ? item.price / 100 : 0
+            ),
+            "Precio Total": formatCurrency(
+              item.price && item.quantity ? (item.price * item.quantity) / 100 : 0
+            ),
+          });
+        });
+      } else {
+        // Si la orden no tiene productos, se crea una fila "vacía" para productos.
+        data.push({
+          "Número de pedido": order.sequence || "N/A",
+          "ID del pedido": order.orderId || "N/A",
+          "Estado del pedido": order.statusDescription || order.status || "N/A",
+          "Fecha del pedido": order.creationDate
+            ? new Date(order.creationDate).toLocaleDateString("es-CL")
             : "N/A",
-        "Dirección de envío": `${shippingAddress.street || ""} ${shippingAddress.number || ""}`,
-        "N° Dirección": shippingAddress.number || "N/A",
-        "N° Dpto": shippingAddress.complement || "N/A",
-        "Provincia (envío)": shippingAddress.state || "N/A",
-        "Ciudad (envío)": shippingAddress.neighborhood || "N/A",
-        "Título del método de envío": logisticsInfo.selectedSla || "N/A",
-        "Transportista": logisticsInfo.deliveryCompany || "N/A",
-        "Importe total del pedido": formatCurrency(order.totalValue ? order.totalValue / 100 : 0),
-        "Última Actualización": order.lastChange
-          ? new Date(order.lastChange).toLocaleDateString("es-CL")
-          : "N/A",
+          "RUT": clientProfile.document || "N/A",
+          "Nombre (facturación)": clientProfile.firstName || "N/A",
+          "Apellidos (facturación)": clientProfile.lastName || "N/A",
+          "Correo electrónico": clientProfile.email
+            ? clientProfile.email.split("-")[0]
+            : "N/A",
+          "Transportista": logisticsInfo.deliveryCompany || "N/A",
+          "SKU VTEX": "N/A",
+          "SKU Local": "N/A",
+          "Producto": "N/A",
+          "Cantidad": "N/A",
+          "Precio Unitario": "N/A",
+          "Precio Total": "N/A",
+        });
       }
-    })
-
-    exportToExcel(data, "reporte_logistica")
-  }
+    });
+    
+    console.log(`Exportación completada. Filas generadas para Excel: ${data.length}`);
+    exportToExcel(data, "reporte_productos");
+  };
+  
+  
 
   return (
     <div className="space-y-6 m-8">
@@ -460,14 +520,14 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                       <p className="text-sm text-gray-400">RUT</p>
                       <p className="text-white">{selectedOrder.clientProfileData?.document || "N/A"}</p>
                     </div>
-                    <div>
+                    {/* <div>
                       <p className="text-sm text-gray-400">Email</p>
                       <p className="text-white">
                         {selectedOrder.clientProfileData?.email
                           ? selectedOrder.clientProfileData.email.split("-")[0]
                           : "N/A"}
                       </p>
-                    </div>
+                    </div> */}
                     <div>
                       <p className="text-sm text-gray-400">Teléfono</p>
                       <p className="text-white">{selectedOrder.clientProfileData?.phone || "N/A"}</p>
