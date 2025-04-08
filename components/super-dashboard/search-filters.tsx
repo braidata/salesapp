@@ -47,7 +47,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     { value: "Starken", label: "Starken" },
     { value: "Retiro en tienda", label: "Retiro en tienda" },
     { value: "Transportadora estándar", label: "99 Minutos" },
-    
+
   ]
 
   // Opciones de método de pago (paymentType)
@@ -107,7 +107,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
   const presets = {
     starken: {
       dateRange: { start: null, end: null },
-      daysBack: 7, // Última semana
+      daysBack: 14, // Última semana
       status: "handling", // En preparación
       courier: "Starken",
       paymentType: "",
@@ -115,7 +115,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     },
     localPickup: {
       dateRange: { start: null, end: null },
-      daysBack: 7, // Última semana
+      daysBack: 14, // Última semana
       status: "handling", // En preparación
       courier: "Retiro en tienda",
       paymentType: "",
@@ -123,23 +123,39 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     },
     santiagoDelivery: {
       dateRange: { start: null, end: null },
-      daysBack: 7, // Última semana
+      daysBack: 14, // Última semana
       status: "handling", // En preparación
       courier: "Despacho RM",
       paymentType: "",
       deliveryType: "delivery" // Despacho a domicilio
     },
-    "99Min": {
+    NoventayNueveMin: {
       dateRange: { start: null, end: null },
-      daysBack: 30, // Última semana
+      daysBack: 7, // Última semana
       status: "handling", // En preparación
-      courier: "Transportadora estándar",
-      paymentType: "",
+      courier: "99MinSameday",
+      paymentType: "Webpay",
       deliveryType: "delivery" // Despacho a domicilio
+    },
+    NoventayNueveMinNext: {
+      dateRange: { start: null, end: null },
+      daysBack: 7, // Última semana
+      status: "handling", // En preparación
+      courier: "99MinNextday",
+      paymentType: "Webpay",
+      deliveryType: "delivery" // Despacho a domicilio
+    },
+    retail: {
+      dateRange: { start: null, end: null },
+      daysBack: 31, // Último mes
+      status: "handling",
+      courier: "",
+      paymentType: "Webpay",
+      deliveryType: ""
     },
     all: {
       dateRange: { start: null, end: null },
-      daysBack: 30, // Último mes
+      daysBack: 31, // Último mes
       status: "",
       courier: "",
       paymentType: "",
@@ -148,7 +164,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
   }
 
   // Aplicar un preset
-  const applyPreset = (presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | '99Min'| 'all') => {
+  const applyPreset = (presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | 'NoventayNueveMin' | 'NoventayNueveMinNext' | 'retail' | 'all') => {
     onFilterChange(presets[presetName])
     setActiveTimeFilter("days") // Asegurarse de que el filtro activo sea el correcto
   }
@@ -174,14 +190,6 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               Starken
             </motion.button>
             <motion.button
-              onClick={() => applyPreset('99Min')}
-              className="px-4 py-1.5 rounded-full text-sm bg-green-500/20 text-green-300 border border-green-400/40 hover:bg-green-500/30 shadow-sm shadow-green-400/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              99 Minutos
-            </motion.button>
-            <motion.button
               onClick={() => applyPreset('localPickup')}
               className="px-4 py-1.5 rounded-full text-sm bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600/30 shadow-sm shadow-red-500/20"
               whileHover={{ scale: 1.03 }}
@@ -205,6 +213,31 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             >
               Todo
             </motion.button>
+            <motion.button
+              onClick={() => applyPreset('NoventayNueveMin')}
+              className="px-4 py-1.5 rounded-full text-sm bg-green-300/20 text-green-300 border border-green-200/40 hover:bg-green-300/30 shadow-sm shadow-green-300/20"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              99 Min Sameday
+            </motion.button>
+            <motion.button
+              onClick={() => applyPreset('NoventayNueveMinNext')}
+              className="px-4 py-1.5 rounded-full text-sm bg-green-300/20 text-green-300 border border-green-200/40 hover:bg-green-300/30 shadow-sm shadow-green-300/20"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              99 Min Nextday
+            </motion.button>
+            <motion.button
+              onClick={() => applyPreset('retail')}
+              className="px-4 py-1.5 rounded-full text-sm bg-purple-600/20 text-purple-400 border border-purple-500/40 hover:bg-purple-600/30 shadow-sm shadow-purple-500/20"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Todo Retail
+            </motion.button>
+
           </div>
         </div>
       </div>
