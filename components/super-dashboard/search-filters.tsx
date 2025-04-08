@@ -47,7 +47,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     { value: "Starken", label: "Starken" },
     { value: "Retiro en tienda", label: "Retiro en tienda" },
     { value: "Transportadora estándar", label: "99 Minutos" },
-    
+
   ]
 
   // Opciones de método de pago (paymentType)
@@ -137,6 +137,14 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       paymentType: "",
       deliveryType: "delivery" // Despacho a domicilio
     },
+    retail: {
+      dateRange: { start: null, end: null },
+      daysBack: 30, // Último mes
+      status: "handling",
+      courier: "",
+      paymentType: "Webpay",
+      deliveryType: ""
+    },
     all: {
       dateRange: { start: null, end: null },
       daysBack: 30, // Último mes
@@ -148,7 +156,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
   }
 
   // Aplicar un preset
-  const applyPreset = (presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | '99Min'| 'all') => {
+  const applyPreset = (presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | '99Min' | 'retail' | 'all') => {
     onFilterChange(presets[presetName])
     setActiveTimeFilter("days") // Asegurarse de que el filtro activo sea el correcto
   }
@@ -204,6 +212,14 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               whileTap={{ scale: 0.97 }}
             >
               Todo
+            </motion.button>
+            <motion.button
+              onClick={() => applyPreset('retail')}
+              className="px-4 py-1.5 rounded-full text-sm bg-purple-600/20 text-purple-400 border border-purple-500/40 hover:bg-purple-600/30 shadow-sm shadow-purple-500/20"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Retail
             </motion.button>
           </div>
         </div>
