@@ -207,24 +207,29 @@ export default function LogisticsView({ orders, isLoading, brand }) {
     
     console.log(`Iniciando exportación a Excel. Cantidad de órdenes recibidas: ${orders.length}`);
     
-    // Para cada orden, si no tiene la información de productos, se solicitará detalle.
+    // Paso 1: Asegurarse de que cada orden tenga la información de productos.
     const detailedOrders = await Promise.all(
       orders.map(async (order) => {
+        // Si la orden no tiene ítems, se solicita el detalle.
         if (!order.items || order.items.length === 0) {
-          console.log(`La orden ${order.orderId} no trae productos, se solicitarán detalles.`);
+          console.log(`La orden ${order.orderId} no trae productos; se solicitarán detalles.`);
           try {
-            let endpoint =
+            const endpoint = 
               brand === "blanik"
                 ? `/api/apiVTEXBlanik?orderId=${order.orderId}`
                 : `/api/apiVTEX?orderId=${order.orderId}`;
             const response = await fetch(endpoint);
             if (!response.ok) {
-              console.error(`Error al obtener detalles de la orden ${order.orderId}. Status: ${response.status}`);
+              console.error(
+                `Error al obtener detalles para la orden ${order.orderId}. Status: ${response.status}`
+              );
               return order;
             }
             const raw = await response.json();
             const mapped = mapOrderDetails(raw);
-            console.log(`Orden ${order.orderId} detallada. Productos encontrados: ${mapped.items.length}`);
+            console.log(
+              `Orden ${order.orderId} detallada. Productos encontrados: ${mapped.items.length}`
+            );
             return mapped;
           } catch (error) {
             console.error(`Error al obtener detalle para la orden ${order.orderId}:`, error);
@@ -237,32 +242,84 @@ export default function LogisticsView({ orders, isLoading, brand }) {
       })
     );
     
-    // Construir arreglo de datos para exportar: se crea una línea por cada producto (SKU)
+    // Paso 2: Construir el arreglo "data" para exportar.
+    // Se genera una fila por cada producto en cada orden, y se incluyen los campos generales.
     const data = [];
     detailedOrders.forEach((order) => {
+      const clientProfile = order.clientProfileData || {};
       const shippingAddress = order.shippingData?.address || {};
       const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
-      const clientProfile = order.clientProfileData || {};
-    
+      
+      // Formateo de fechas
+      const creationDateStr = order.creationDate
+        ? new Date(order.creationDate).toLocaleDateString("es-CL")
+        : "N/A";
+      const lastChangeStr = order.lastChange
+        ? new Date(order.lastChange).toLocaleDateString("es-CL")
+        : "N/A";
+      
+      // Datos de facturación
+      const billingFirstName = clientProfile.firstName || "N/A";
+      const billingLastName = clientProfile.lastName || "N/A";
+      const billingPhone = clientProfile.phone || "N/A";
+      
+      // Datos de envío basados en receiverName
+      let shippingFullName = shippingAddress.receiverName || "N/A";
+      let shippingName = "N/A";
+      let shippingLastName = "N/A";
+      if (shippingFullName !== "N/A") {
+        const split = shippingFullName.trim().split(" ");
+        shippingName = split[0] || "N/A";
+        shippingLastName = split.slice(1).join(" ") || "N/A";
+      }
+      
+      // Construir dirección completa
+      const street = shippingAddress.street || "";
+      const number = shippingAddress.number || "";
+      const complement = shippingAddress.complement || "";
+      const addressLine = street 
+        ? `${street} ${number}${complement ? `, ${complement}` : ""}`
+        : "N/A";
+      const province = shippingAddress.state || "N/A";
+      const city = shippingAddress.neighborhood || "N/A";
+      const postalCode = shippingAddress.postalCode || "N/A";
+      
+      // Otros datos generales
+      const shippingMethodTitle = logisticsInfo.selectedSla || "N/A";
+      const courier = logisticsInfo.deliveryCompany || "N/A";
+      const totalValue = typeof order.value === "number" ? order.value / 100 : 0;
+      const dteValue = order.invoiceOutput || "N/A";
+      
+      // Si la orden tiene productos
       if (order.items && order.items.length > 0) {
         order.items.forEach((item) => {
           data.push({
             "Número de pedido": order.sequence || "N/A",
             "ID del pedido": order.orderId || "N/A",
             "Estado del pedido": order.statusDescription || order.status || "N/A",
-            "Fecha del pedido": order.creationDate
-              ? new Date(order.creationDate).toLocaleDateString("es-CL")
-              : "N/A",
+            "Fecha del pedido": creationDateStr,
+            "DTE": dteValue,
             "RUT": clientProfile.document || "N/A",
-            "Nombre (facturación)": clientProfile.firstName || "N/A",
-            "Apellidos (facturación)": clientProfile.lastName || "N/A",
+            "Nombre (facturación)": billingFirstName,
+            "Apellidos (facturación)": billingLastName,
+            "Teléfono (facturación)": billingPhone,
             "Correo electrónico": clientProfile.email
               ? clientProfile.email.split("-")[0]
               : "N/A",
-            "Transportista": logisticsInfo.deliveryCompany || "N/A",
-            // Información específica del producto:
+            "Nombre (envío)": shippingName,
+            "Apellidos (envío)": shippingLastName,
+            "Dirección de envío": addressLine,
+            "N° Dirección": number || "N/A",
+            "N° Dpto": complement || "N/A",
+            "Provincia (envío)": province,
+            "Ciudad (envío)": city,
+            "Título del método de envío": shippingMethodTitle,
+            "Transportista": courier,
+            "Importe total del pedido": formatCurrency(totalValue),
+            "Última Actualización": lastChangeStr,
+            // Datos del producto:
             "SKU VTEX": item.sellerSku || item.id || "N/A",
-            "SKU Local": item.refId || "N/A", // Se utiliza refId para el SKU local
+            "SKU Local": item.refId || "N/A",
             "Producto": item.name || "N/A",
             "Cantidad": item.quantity || 1,
             "Precio Unitario": formatCurrency(
@@ -274,21 +331,32 @@ export default function LogisticsView({ orders, isLoading, brand }) {
           });
         });
       } else {
-        // Si la orden no tiene productos, se crea una fila "vacía" para productos.
+        // Si la orden no trae productos, genera una fila "vacía" para la parte de ítems.
         data.push({
           "Número de pedido": order.sequence || "N/A",
           "ID del pedido": order.orderId || "N/A",
           "Estado del pedido": order.statusDescription || order.status || "N/A",
-          "Fecha del pedido": order.creationDate
-            ? new Date(order.creationDate).toLocaleDateString("es-CL")
-            : "N/A",
+          "Fecha del pedido": creationDateStr,
+          "DTE": dteValue,
           "RUT": clientProfile.document || "N/A",
-          "Nombre (facturación)": clientProfile.firstName || "N/A",
-          "Apellidos (facturación)": clientProfile.lastName || "N/A",
+          "Nombre (facturación)": billingFirstName,
+          "Apellidos (facturación)": billingLastName,
+          "Teléfono (facturación)": billingPhone,
           "Correo electrónico": clientProfile.email
             ? clientProfile.email.split("-")[0]
             : "N/A",
-          "Transportista": logisticsInfo.deliveryCompany || "N/A",
+          "Nombre (envío)": shippingName,
+          "Apellidos (envío)": shippingLastName,
+          "Dirección de envío": addressLine,
+          "N° Dirección": number || "N/A",
+          "N° Dpto": complement || "N/A",
+          "Provincia (envío)": province,
+          "Ciudad (envío)": city,
+          "Título del método de envío": shippingMethodTitle,
+          "Transportista": courier,
+          "Importe total del pedido": formatCurrency(totalValue),
+          "Última Actualización": lastChangeStr,
+          // Campos de producto vacíos:
           "SKU VTEX": "N/A",
           "SKU Local": "N/A",
           "Producto": "N/A",
@@ -302,6 +370,7 @@ export default function LogisticsView({ orders, isLoading, brand }) {
     console.log(`Exportación completada. Filas generadas para Excel: ${data.length}`);
     exportToExcel(data, "reporte_productos");
   };
+  
   
   
 
