@@ -2,9 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
+import { useSession } from "next-auth/react"
+
+// Importa tu método para verificar permisos
+import { checkPermissions } from "@/lib/permissions"
+
 import DateRangePicker from "./ui/date-range-picker"
 import Select from "./ui/select"
-// session for next auth
+import { DateTime } from "mssql"
+import { now } from "lodash"
 
 interface SearchFiltersProps {
   filters: any
@@ -12,12 +18,38 @@ interface SearchFiltersProps {
 }
 
 export default function SearchFilters({ filters, onFilterChange }: SearchFiltersProps) {
+  // 1. Obtenemos la sesión
+  const { data: session, status } = useSession()
+
+  // 2. Estados relacionados con permisos
+  const [loadingPermissions, setLoadingPermissions] = useState(true)
+  const [isAccounting, setIsAccounting] = useState(false)
+
+  // 3. useEffect para verificar permisos cuando el usuario está autenticado
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      (async () => {
+        // Obtenemos el email desde session.session
+        const email = session.session.user.email
+        // Verificamos si es contabilidad
+        const hasAccounting = await checkPermissions({
+          email,
+          roles: ["accounting", "contabilidad"]
+        })
+        setIsAccounting(hasAccounting)
+        setLoadingPermissions(false)
+      })()
+    } else {
+      setLoadingPermissions(false)
+    }
+  }, [session, status])
+
+  // 4. Estados internos del componente (filtros, etc.)
   const [isExpanded, setIsExpanded] = useState(false)
   const [activeTimeFilter, setActiveTimeFilter] = useState<"days" | "range">(
     filters.dateRange.start && filters.dateRange.end ? "range" : "days"
   )
 
-  // Sincronizar el estado activeTimeFilter con los filtros actuales
   useEffect(() => {
     if (filters.dateRange.start && filters.dateRange.end) {
       setActiveTimeFilter("range")
@@ -25,6 +57,11 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       setActiveTimeFilter("days")
     }
   }, [filters])
+
+  // 5. Si aún estamos cargando los permisos, retornamos un mensaje
+  if (loadingPermissions) {
+    return <div className="m-8">Cargando permisos...</div>
+  }
 
   // Opciones de estado (status) de la orden
   const statusOptions = [
@@ -48,7 +85,6 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     { value: "Starken", label: "Starken" },
     { value: "Retiro en tienda", label: "Retiro en tienda" },
     { value: "Transportadora estándar", label: "99 Minutos" },
-
   ]
 
   // Opciones de método de pago (paymentType)
@@ -99,7 +135,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       setActiveTimeFilter("days")
       onFilterChange({
         dateRange: { start: null, end: null },
-        daysBack: 15, // Valor por defecto, ajusta según tu necesidad
+        daysBack: 15, // Valor por defecto
       })
     }
   }
@@ -108,47 +144,47 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
   const presets = {
     starken: {
       dateRange: { start: null, end: null },
-      daysBack: 14, // Última semana
-      status: "handling", // En preparación
+      daysBack: 14,
+      status: "handling",
       courier: "Starken",
       paymentType: "",
-      deliveryType: "delivery" // Despacho a domicilio
+      deliveryType: "delivery"
     },
     localPickup: {
       dateRange: { start: null, end: null },
-      daysBack: 14, // Última semana
-      status: "handling", // En preparación
+      daysBack: 14,
+      status: "handling",
       courier: "Retiro en tienda",
       paymentType: "",
-      deliveryType: "pickup-in-point" // Retiro en tienda
+      deliveryType: "pickup-in-point"
     },
     santiagoDelivery: {
       dateRange: { start: null, end: null },
-      daysBack: 14, // Última semana
-      status: "handling", // En preparación
+      daysBack: 14,
+      status: "handling",
       courier: "Despacho RM",
       paymentType: "",
-      deliveryType: "delivery" // Despacho a domicilio
+      deliveryType: "delivery"
     },
     NoventayNueveMin: {
       dateRange: { start: null, end: null },
-      daysBack: 7, // Última semana
-      status: "handling", // En preparación
+      daysBack: 7,
+      status: "handling",
       courier: "99MinSameday",
       paymentType: "Webpay",
-      deliveryType: "delivery" // Despacho a domicilio
+      deliveryType: "delivery"
     },
     NoventayNueveMinNext: {
       dateRange: { start: null, end: null },
-      daysBack: 7, // Última semana
-      status: "handling", // En preparación
+      daysBack: 7,
+      status: "handling",
       courier: "99MinNextday",
       paymentType: "Webpay",
-      deliveryType: "delivery" // Despacho a domicilio
+      deliveryType: "delivery"
     },
     retail: {
       dateRange: { start: null, end: null },
-      daysBack: 31, // Último mes
+      daysBack: 31,
       status: "handling",
       courier: "",
       paymentType: "Webpay",
@@ -156,18 +192,29 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     },
     all: {
       dateRange: { start: null, end: null },
-      daysBack: 31, // Último mes
+      daysBack: 31,
       status: "",
       courier: "",
       paymentType: "",
       deliveryType: ""
+    },
+    webpay: {
+      //set today
+      dateRange: { start: new Date(), end: null },
+      daysBack: 7,
+      status: "",
+      courier: "",
+      paymentType: "Webpay",
+      deliveryType: ""
     }
   }
 
-  // Aplicar un preset
-  const applyPreset = (presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | 'NoventayNueveMin' | 'NoventayNueveMinNext' | 'retail' | 'all') => {
+  // Función para aplicar un preset
+  const applyPreset = (
+    presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | 'NoventayNueveMin' | 'NoventayNueveMinNext' | 'retail' | 'all' | 'webpay'
+  ) => {
     onFilterChange(presets[presetName])
-    setActiveTimeFilter("days") // Asegurarse de que el filtro activo sea el correcto
+    setActiveTimeFilter("days") // Asegurarnos de que el filtro activo sea "days" tras aplicar un preset
   }
 
   return (
@@ -182,70 +229,95 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
         <div className="mb-3 border-b border-gray-700/30 pb-3">
           <h3 className="text-sm text-gray-300 mb-2">Presets rápidos:</h3>
           <div className="flex flex-wrap gap-2">
-            <motion.button
-              onClick={() => applyPreset('starken')}
-              className="px-4 py-1.5 rounded-full text-sm bg-green-600/20 text-green-400 border border-green-500/40 hover:bg-green-600/30 shadow-sm shadow-green-500/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Starken
-            </motion.button>
-            <motion.button
-              onClick={() => applyPreset('localPickup')}
-              className="px-4 py-1.5 rounded-full text-sm bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600/30 shadow-sm shadow-red-500/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Retiro en Local
-            </motion.button>
-            <motion.button
-              onClick={() => applyPreset('santiagoDelivery')}
-              className="px-4 py-1.5 rounded-full text-sm bg-blue-600/20 text-blue-400 border border-blue-500/40 hover:bg-blue-600/30 shadow-sm shadow-blue-500/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Despacho Santiago
-            </motion.button>
-            <motion.button
-              onClick={() => applyPreset('all')}
-              className="px-4 py-1.5 rounded-full text-sm bg-orange-600/20 text-orange-400 border border-orange-500/40 hover:bg-orange-600/30 shadow-sm shadow-orange-500/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Todo
-            </motion.button>
-            <motion.button
-              onClick={() => applyPreset('NoventayNueveMin')}
-              className="px-4 py-1.5 rounded-full text-sm bg-green-300/20 text-green-300 border border-green-200/40 hover:bg-green-300/30 shadow-sm shadow-green-300/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              99 Min Sameday
-            </motion.button>
-            <motion.button
-              onClick={() => applyPreset('NoventayNueveMinNext')}
-              className="px-4 py-1.5 rounded-full text-sm bg-green-300/20 text-green-300 border border-green-200/40 hover:bg-green-300/30 shadow-sm shadow-green-300/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              99 Min Nextday
-            </motion.button>
-            <motion.button
-              onClick={() => applyPreset('retail')}
-              className="px-4 py-1.5 rounded-full text-sm bg-purple-600/20 text-purple-400 border border-purple-500/40 hover:bg-purple-600/30 shadow-sm shadow-purple-500/20"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Todo Retail
-            </motion.button>
-
+            {/* 
+              6. Si el usuario tiene permiso de contabilidad (isAccounting === true),
+                 solo mostramos el preset "Webpay". De lo contrario, mostramos todos.
+            */}
+            {isAccounting ? (
+              <motion.button
+                onClick={() => applyPreset('webpay')}
+                className="px-4 py-1.5 rounded-full text-sm bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600/30 shadow-sm shadow-red-500/20"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                Webpay
+              </motion.button>
+            ) : (
+              <>
+                <motion.button
+                  onClick={() => applyPreset('starken')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-green-600/20 text-green-400 border border-green-500/40 hover:bg-green-600/30 shadow-sm shadow-green-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Starken
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('localPickup')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600/30 shadow-sm shadow-red-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Retiro en Local
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('santiagoDelivery')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-blue-600/20 text-blue-400 border border-blue-500/40 hover:bg-blue-600/30 shadow-sm shadow-blue-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Despacho Santiago
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('all')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-orange-600/20 text-orange-400 border border-orange-500/40 hover:bg-orange-600/30 shadow-sm shadow-orange-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Todo
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('webpay')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600/30 shadow-sm shadow-red-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Webpay
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('NoventayNueveMin')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-green-300/20 text-green-300 border border-green-200/40 hover:bg-green-300/30 shadow-sm shadow-green-300/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  99 Min Sameday
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('NoventayNueveMinNext')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-green-300/20 text-green-300 border border-green-200/40 hover:bg-green-300/30 shadow-sm shadow-green-300/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  99 Min Nextday
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('retail')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-purple-600/20 text-purple-400 border border-purple-500/40 hover:bg-purple-600/30 shadow-sm shadow-purple-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Todo Retail
+                </motion.button>
+              </>
+            )}
           </div>
         </div>
       </div>
 
+      {/* Controles de filtros principales */}
       <div className="px-4 py-4">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
-          {/* Filtro de días atrás */}
+          {/* Días atrás */}
           <div className="flex-1">
             <label className="block text-sm text-gray-400 mb-1">
               {activeTimeFilter === "days"
@@ -265,7 +337,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             )}
           </div>
 
-          {/* Filtro de estado */}
+          {/* Estado */}
           <div className="flex-1">
             <label className="block text-sm text-gray-400 mb-1">Estado</label>
             <Select
@@ -275,7 +347,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             />
           </div>
 
-          {/* Filtro de transportista */}
+          {/* Transportista */}
           <div className="flex-1">
             <label className="block text-sm text-gray-400 mb-1">Transportista</label>
             <Select
@@ -285,7 +357,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             />
           </div>
 
-          {/* Nuevo filtro: Buscar por ID */}
+          {/* Búsqueda por ID */}
           <div className="flex-1">
             <label className="block text-sm text-gray-400 mb-1">Buscar por ID</label>
             <input
@@ -297,7 +369,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             />
           </div>
 
-          {/* Botón para mostrar/ocultar más filtros */}
+          {/* Botón para expandir/contraer más filtros */}
           <div className="flex items-end">
             <motion.button
               onClick={() => setIsExpanded(!isExpanded)}
@@ -307,7 +379,9 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`h-5 w-5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isExpanded ? "rotate-180" : ""
+                }`}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -322,6 +396,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
           </div>
         </div>
 
+        {/* Filtros adicionales (fecha personalizada, método de pago, tipo de entrega) */}
         {isExpanded && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -350,7 +425,9 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
 
               {/* Método de pago */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Método de pago</label>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Método de pago
+                </label>
                 <Select
                   options={paymentOptions}
                   value={filters.paymentType}
@@ -374,7 +451,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
         )}
       </div>
 
-      {/* Barra inferior con "chips" de filtros activos y botón de limpiar */}
+      {/* Barra inferior con "chips" de filtros y botón de limpiar */}
       <div className="bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-blue-600/20 p-4 flex flex-wrap items-center justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm text-gray-300">Filtros aplicados:</span>

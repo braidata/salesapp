@@ -11,14 +11,22 @@ import AnalyticsView from "./views/analytics-view"
 import LoadingOverlay from "./ui/loading-overlay"
 import Pagination from "./ui/pagination"
 import { fetchAllOrders } from "@/lib/api"
+import { useSession } from "next-auth/react"
+import { checkPermissions } from "@/lib/permissions"
 
 type ViewType = "logistics" | "accounting" | "products" | "analytics"
 
 export default function DashboardContainer() {
+  // Estados para permisos usando session.session y checkPermissions
+  const { data: session, status } = useSession()
+  const [permissions, setPermissions] = useState({ logistics: false, accounting: false })
+  const [loadingPermissions, setLoadingPermissions] = useState(true)
+
+  // Estado para la vista actual (preestablecer según el rol)
   const [view, setView] = useState<ViewType>("logistics")
   const [isLoading, setIsLoading] = useState(false)
-  const [allOrders, setAllOrders] = useState([]) // Almacena todos los pedidos
-  const [displayOrders, setDisplayOrders] = useState([]) // Pedidos filtrados para mostrar
+  const [allOrders, setAllOrders] = useState([])      // Lista completa de pedidos
+  const [displayOrders, setDisplayOrders] = useState([]) // Pedidos que se mostrarán (filtrados)
   const [error, setError] = useState("")
   const [retryCount, setRetryCount] = useState(0)
   const [filters, setFilters] = useState({
@@ -29,7 +37,7 @@ export default function DashboardContainer() {
     paymentType: "",
     deliveryType: "",
   })
-  
+
   // Estado para la paginación local
   const [pagination, setPagination] = useState({
     page: 1,
@@ -38,44 +46,70 @@ export default function DashboardContainer() {
     pages: 10
   })
 
-  // Ref para almacenar el timeout de reintento y poder limpiarlo
+  // Ref para almacenar timeout en caso de reintentos
   const retryTimeoutRef = useRef(null)
 
-  // Función para cargar todos los pedidos de una vez
+  // 1. Verificamos permisos con checkPermissions usando session.session
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      (async () => {
+        const email = session.session.user.email
+        const hasLogistics = await checkPermissions({
+          email,
+          roles: ["logistics"],
+        })
+        const hasAccounting = await checkPermissions({
+          email,
+          roles: ["accounting", "contabilidad"],
+        })
+
+        setPermissions({ logistics: hasLogistics, accounting: hasAccounting })
+        setLoadingPermissions(false)
+
+        // Preseleccionamos la vista según el permiso:
+        // Si tiene permisos de contabilidad, se fija la vista en Accounting.
+        if (hasAccounting) {
+          setView("accounting")
+        } else if (hasLogistics) {
+          setView("logistics")
+        }
+        // Se puede extender para otros roles según necesidades.
+      })()
+    } else {
+      setLoadingPermissions(false)
+    }
+  }, [session, status])
+
+  // 2. Función para cargar todos los pedidos (se invoca automáticamente cuando cambien filtros o vista)
   const loadAllOrders = useCallback(async () => {
     setIsLoading(true)
     setError("")
 
     try {
-      // Preparar parámetros para la API
-      const apiParams = {
+      const apiParams: any = {
         view: view === "logistics" ? "logistica" : view === "accounting" ? "contabilidad" : "todos",
         status: filters.status,
         courier: filters.courier,
         paymentType: filters.paymentType,
         deliveryType: filters.deliveryType,
-      };
-      
-      // Manejo optimizado de fechas
-      if (filters.dateRange && filters.dateRange.start && filters.dateRange.end) {
-        console.log("Usando filtrado por rango de fechas personalizado:", filters.dateRange);
-        apiParams.dateStart = filters.dateRange.start;
-        apiParams.dateEnd = filters.dateRange.end;
-        // Si hay fechas específicas, no usamos daysBack
-      } else if (filters.daysBack) {
-        console.log("Usando filtrado por días atrás:", filters.daysBack);
-        apiParams.daysBack = filters.daysBack;
       }
-      
-      console.log("Loading all orders with params:", apiParams);
-      
-      const data = await fetchAllOrders(apiParams);
+
+      if (filters.dateRange && filters.dateRange.start && filters.dateRange.end) {
+        console.log("Usando filtrado por rango de fechas personalizado:", filters.dateRange)
+        apiParams.dateStart = filters.dateRange.start
+        apiParams.dateEnd = filters.dateRange.end
+      } else if (filters.daysBack) {
+        console.log("Usando filtrado por días atrás:", filters.daysBack)
+        apiParams.daysBack = filters.daysBack
+      }
+
+      console.log("Loading all orders with params:", apiParams)
+      const data = await fetchAllOrders(apiParams)
 
       if (data && data.list) {
         setAllOrders(data.list)
         console.log(`Loaded ${data.list.length} orders successfully`)
-        
-        // Aplicar paginación local
+        // Aplicamos la paginación local
         applyPagination(data.list, pagination.page, pagination.perPage)
       } else {
         console.warn("API returned data without list property:", data)
@@ -89,7 +123,7 @@ export default function DashboardContainer() {
           (err.message ? `(${err.message})` : "")
       )
 
-      // Si aún no se han realizado 3 reintentos, programa un nuevo intento
+      // Reintento automático si retryCount es menor a 3
       if (retryCount < 3) {
         console.log(`Retrying... Attempt ${retryCount + 1}`)
         retryTimeoutRef.current = setTimeout(() => {
@@ -101,13 +135,12 @@ export default function DashboardContainer() {
     }
   }, [filters, view, retryCount, pagination.perPage])
 
-  // Función para aplicar paginación local
+  // 3. Función para aplicar la paginación local
   const applyPagination = (orders, page, perPage) => {
     const startIndex = (page - 1) * perPage
     const endIndex = startIndex + perPage
-    
+
     setDisplayOrders(orders.slice(startIndex, endIndex))
-    
     setPagination(prev => ({
       ...prev,
       page,
@@ -117,10 +150,10 @@ export default function DashboardContainer() {
     }))
   }
 
+  // 4. Efecto para cargar pedidos automáticamente cada vez que cambien los parámetros
   useEffect(() => {
     loadAllOrders()
 
-    // Limpiar el timeout al desmontar o antes de ejecutar de nuevo el efecto
     return () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current)
@@ -128,61 +161,51 @@ export default function DashboardContainer() {
     }
   }, [loadAllOrders])
 
-  // Cuando cambia la página o perPage, aplicar paginación local
+  // 5. Actualizar la paginación local cuando cambie la página o el límite
   useEffect(() => {
     if (allOrders.length > 0) {
       applyPagination(allOrders, pagination.page, pagination.perPage)
     }
   }, [pagination.page, pagination.perPage])
 
-  // Manejar cambios en los filtros
+  // 6. Manejar cambios en los filtros.
+  // Al actualizar el estado de filters, el efecto (4) disparará la carga automática.
   const handleFilterChange = (newFilters) => {
-    console.log("Filtros cambiados:", newFilters);
-    
-    // Lógica especial para manejar el cambio entre daysBack y rango de fechas personalizado
+    console.log("Filtros cambiados:", newFilters)
     if (newFilters.hasOwnProperty('daysBack')) {
-      // Si se seleccionó un nuevo daysBack, resetear el rango de fechas
       if (newFilters.daysBack) {
-        console.log("Cambiando a filtro por días atrás:", newFilters.daysBack);
-        newFilters.dateRange = { start: null, end: null };
+        console.log("Cambiando a filtro por días atrás:", newFilters.daysBack)
+        newFilters.dateRange = { start: null, end: null }
       }
-    } 
-    else if (newFilters.hasOwnProperty('dateRange') && 
-             newFilters.dateRange && 
-             newFilters.dateRange.start && 
-             newFilters.dateRange.end) {
-      // Si se seleccionó un rango de fechas, resetear daysBack
-      console.log("Cambiando a filtro por rango de fechas personalizado");
-      newFilters.daysBack = null;
+    } else if (newFilters.hasOwnProperty('dateRange') &&
+               newFilters.dateRange &&
+               newFilters.dateRange.start &&
+               newFilters.dateRange.end) {
+      console.log("Cambiando a filtro por rango de fechas personalizado")
+      newFilters.daysBack = null
     }
     
-    // Actualizar el estado con los nuevos filtros
-    setFilters((prev) => ({ ...prev, ...newFilters }));
-    
-    // Resetear la paginación
-    setPagination(prev => ({ ...prev, page: 1 }));
-    
-    // Reiniciar contador de reintentos
-    setRetryCount(0);
+    setFilters(prev => ({ ...prev, ...newFilters }))
+    setPagination(prev => ({ ...prev, page: 1 }))
+    setRetryCount(0)
   }
 
-  // Método para cambiar de página
+  // 7. Manejadores para cambios de página y límite
   const handlePageChange = (newPage: number) => {
     setPagination(prev => ({ ...prev, page: newPage }))
   }
 
-  // Método para cambiar el límite de elementos por página
   const handlePerPageChange = (newPerPage: number) => {
     setPagination(prev => ({ ...prev, page: 1, perPage: newPerPage }))
   }
 
   const handleRetry = () => {
-    setRetryCount(0) // Reiniciar contador para forzar una nueva carga
+    setRetryCount(0)
   }
 
+  // 8. Renderizado de la vista según el valor de "view"
   const renderView = () => {
     const props = { orders: displayOrders, isLoading }
-
     switch (view) {
       case "logistics":
         return <LogisticsView {...props} />
@@ -231,8 +254,7 @@ export default function DashboardContainer() {
             ) : (
               <>
                 {renderView()}
-                
-                {/* Componente de paginación */}
+
                 {displayOrders.length > 0 && (
                   <div className="mt-6 mx-8">
                     <Pagination 
