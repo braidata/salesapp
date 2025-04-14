@@ -10,7 +10,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 export default function AccountingView({ orders, isLoading }) {
   // Calculate statistics
   const totalRevenue = orders.reduce((sum, order) => {
-    const value = order.value || order.totalValue
+    const value = order.value || order.totalValue || 0
     return sum + (typeof value === "number" && !isNaN(value) ? value / 100 : 0)
   }, 0)
   const totalTax = orders.reduce((sum, order) => {
@@ -19,6 +19,49 @@ export default function AccountingView({ orders, isLoading }) {
   }, 0)
 
   const averageOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0
+  
+  // Debug: Verificar estructura detallada de los primeros pedidos
+  if (orders.length > 0) {
+    const order = orders[0];
+    
+    //console.log("===== DEPURACIÓN DETALLADA DEL PRIMER PEDIDO =====");
+    //console.log("ID del pedido:", order.orderId);
+    
+    if (order.paymentData) {
+      //console.log("✓ paymentData encontrado");
+      
+      if (order.paymentData.transactions && order.paymentData.transactions.length > 0) {
+        //console.log("✓ transactions[0] encontrado");
+        const transaction = order.paymentData.transactions[0];
+        
+        if (transaction.payments && transaction.payments.length > 0) {
+          //console.log("✓ payments[0] encontrado");
+          const payment = transaction.payments[0];
+          
+          //console.log("Método de pago:", payment.paymentSystemName);
+          //console.log("Valor del pago:", payment.value);
+          //console.log("Cuotas:", payment.installments);
+          
+          if (payment.connectorResponses) {
+            //console.log("✓ connectorResponses encontrado");
+            //console.log("authId:", payment.connectorResponses.authId);
+            //console.log("Tid:", payment.connectorResponses.Tid);
+            //console.log("acquirer:", payment.connectorResponses.acquirer);
+          } else {
+            //console.log("✗ connectorResponses NO encontrado");
+          }
+        } else {
+          //console.log("✗ payments[0] NO encontrado");
+        }
+      } else {
+        //console.log("✗ transactions[0] NO encontrado");
+      }
+    } else {
+      //console.log("✗ paymentData NO encontrado");
+    }
+    
+    //console.log("================================================");
+  }
 
   // Group by payment method
   const paymentMethodStats = orders.reduce((acc, order) => {
@@ -30,7 +73,10 @@ export default function AccountingView({ orders, isLoading }) {
       }
     }
     acc[paymentMethod].count++
-    acc[paymentMethod].value += order.value / 100
+    
+    const value = order.value || order.totalValue || 0
+    acc[paymentMethod].value += (typeof value === "number" && !isNaN(value) ? value / 100 : 0)
+    
     return acc
   }, {})
 
@@ -41,104 +87,315 @@ export default function AccountingView({ orders, isLoading }) {
 
   const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0088FE"]
 
+  // Función para obtener el código de autorización directamente de connectorResponses
+  const getAuthorizationCode = (order) => {
+    //console.log("Obteniendo código de autorización para:", order?.orderId);
+    
+    // Seguimos la ruta exacta: ROOT > paymentData > transactions > 0 > payments > 0 > connectorResponses
+    const transaction = order?.paymentData?.transactions?.[0];
+    if (!transaction) {
+      //console.log("No se encontró transaction");
+      return "";
+    }
+    else  {
+      //console.log("transaction encontrado",order.paymentData, transaction);
+    }
+    
+    const payment = transaction.payments?.[0];
+    if (!payment) {
+      //console.log("No se encontró payment");
+      return "";
+    } else {
+      //console.log("payment encontrado", payment);
+    }
+    
+    // Vamos directamente a connectorResponses por el Tid
+    const connectorResponses = payment.connectorResponses;
+    if (connectorResponses) {
+      //console.log("connectorResponses encontrado, Tid:",connectorResponses, connectorResponses.Tid);
+      return connectorResponses.Tid || "";
+    }
+    
+    //console.log("No se encontró connectorResponses");
+    return "";
+  }
+
+  // Función para obtener el tipo de pago directamente de connectorResponses
+  const getTipoPago = (order) => {
+    //console.log("Evaluando TIPO PAGO para pedido:", order?.orderId);
+    
+    // Verificar si tenemos datos del pago completos
+    if (!order?.paymentData?.transactions?.[0]?.payments?.[0]) {
+      //console.log("No hay información de pago completa");
+      return "Otro";
+    }
+    
+    const payment = order.paymentData.transactions[0].payments[0];
+    
+    // ENFOQUE NUEVO: Primero verificamos si podemos obtener información específica
+    // 1. Si el grupo contiene información explícita sobre el tipo de tarjeta
+    if (payment.group) {
+      //console.log("Verificando grupo de pago:", payment.group);
+      const groupLower = payment.group.toLowerCase();
+      
+      if (groupLower.includes("debit")) {
+        return "TD Tarjeta Débito";
+      }
+      
+      if (groupLower.includes("credit")) {
+        return "TC Tarjeta Crédito";
+      }
+    }
+    
+    // 2. Si el connectorResponses tiene información sobre el adquirente
+    if (payment.connectorResponses && payment.connectorResponses.acquirer) {
+      const acquirer = payment.connectorResponses.acquirer.toLowerCase();
+      //console.log("Verificando acquirer:", acquirer);
+      
+      if (acquirer.includes("vd")){
+        return "TD Tarjeta Débito";
+      }
+
+      if (acquirer.includes("vp")){
+        return "TP Tarjeta Prepago";
+      }
+
+      if (acquirer.includes("si")){
+        return "TC Sin Interés";
+      }
+
+
+      if (acquirer.includes("vc") || acquirer.includes("vn") || acquirer.includes("s1") || acquirer.includes("s2")|| acquirer.includes("nc")){
+        return "TC Tarjeta Crédito";
+      }
+    }
+    
+    // 3. Verificar datos de la tarjeta misma (Si hay firstDigits, podríamos identificar por BIN)
+    if (payment.firstDigits) {
+      //console.log("Verificando primeros dígitos de la tarjeta:", payment.firstDigits);
+      // Identificar por primeros dígitos (BIN)
+      // Ejemplo: Visa Débito suele comenzar con 4, Mastercard Débito con 5, etc.
+      // Esta lógica depende de las reglas específicas del país/banco
+    }
+    
+    // 4. Verificar mensajes de respuesta
+    if (payment.connectorResponses && payment.connectorResponses.Message) {
+      const message = payment.connectorResponses.Message.toLowerCase();
+      //console.log("Verificando mensaje:", message);
+      
+      if (message.includes("debit") || message.includes("debito") || message.includes("débito") || message.includes("td")) {
+        return "TD Tarjeta Débito";
+      }
+      
+      if (message.includes("credit") || message.includes("credito") || message.includes("crédito") || message.includes("tc")) {
+        return "TC Tarjeta Crédito";
+      }
+    }
+    
+    // Si nada de lo anterior funciona, verificamos por último el método de pago
+    // pero sin hacer suposiciones sobre Webpay
+    const paymentMethod = payment.paymentSystemName || "";
+    const pmLower = paymentMethod.toLowerCase();
+    //console.log("Como último recurso, verificando método de pago:", pmLower);
+    
+    // Solo asignamos un tipo si está EXPLÍCITAMENTE mencionado
+    if (pmLower.includes("visa debit") || pmLower.includes("mastercard debit") || pmLower.includes("tarjeta debito") || pmLower.includes("tarjeta débito") || pmLower.includes("td")) {
+      return "TD Tarjeta Débito";
+    }
+    
+    if (pmLower.includes("visa credit") || pmLower.includes("mastercard credit") || pmLower.includes("tarjeta credito") || pmLower.includes("tarjeta crédito") || pmLower.includes("tc")) {
+      return "TC Tarjeta Crédito";
+    }
+    
+    // Si llegamos hasta aquí y no podemos determinar con certeza, devolvemos "Otro"
+    //console.log("No se pudo determinar el tipo de pago con certeza");
+    return "Otro";
+  }
+
+  // Función para obtener el valor del pago directamente
+  const getPaymentValue = (order) => {
+    //console.log("Obteniendo valor del pago para:", order?.orderId);
+    
+    // Intentamos obtener el valor del pago directamente
+    const payment = order?.paymentData?.transactions?.[0]?.payments?.[0];
+    
+    if (payment && typeof payment.value === "number") {
+      //console.log("Valor del pago encontrado:", payment.value);
+      return payment.value / 100;
+    }
+    
+    // Si no encontramos el valor del pago, usamos el valor del pedido
+    //console.log("Valor del pago no encontrado, usando valor del pedido:", order?.value);
+    const orderValue = order?.value || order?.totalValue || 0;
+    return (typeof orderValue === "number") ? orderValue / 100 : 0;
+  }
+
+  // Columnas actualizadas para incluir todos los campos requeridos
   const columns = [
     {
       key: "orderId",
-      header: "ID Pedido",
+      header: "ID VTEX",
       render: (value) => <span className="font-medium">{value}</span>,
       sortable: true,
     },
     {
       key: "creationDate",
       header: "Fecha",
-      render: (value) => new Date(value).toLocaleDateString("es-CL"),
+      render: (value) => {
+        try {
+          const dateObj = new Date(value)
+          if (!isNaN(dateObj.getTime())) {
+            return `${dateObj.toLocaleDateString("es-CL")} ${dateObj.toLocaleTimeString("es-CL")}`
+          }
+          return ""
+        } catch (e) {
+          console.error("Error al formatear fecha:", e)
+          return ""
+        }
+      },
       sortable: true,
     },
     {
-      key: "clientName",
-      header: "Cliente",
-      render: (_, row) => `${row.clientProfileData?.firstName} ${row.clientProfileData?.lastName}`,
+      key: "rut",
+      header: "Rut Cliente",
+      render: (_, row) => row.clientProfileData?.document || "",
       sortable: true,
     },
     {
-      key: "paymentMethod",
-      header: "Método de Pago",
+      key: "rutEmpresa",
+      header: "Rut Empresa",
+      render: (_, row) => row.clientProfileData?.corporateDocument || "",
+      sortable: true,
+    },
+    {
+      key: "nombre",
+      header: "Nombre",
+      render: (_, row) => {
+        const nombre = row.clientProfileData?.firstName || "";
+        return <span className="font-medium">{nombre}</span>
+      },
+      sortable: true,
+    },
+    {
+      key: "apellidos",
+      header: "Apellidos",
+      render: (_, row) => {
+        const apellidos = row.clientProfileData?.lastName || "";
+        return <span className="font-medium">{apellidos}</span>
+      },
+      sortable: true,
+    },
+    {
+      key: "metodoPago",
+      header: "Método de pago",
       render: (_, row) => row.paymentData?.transactions?.[0]?.payments?.[0]?.paymentSystemName || "No disponible",
       sortable: true,
     },
     {
-      key: "status",
-      header: "Estado de Pago",
-      render: (_, row) => {
-        const paymentStatus = row.paymentData?.transactions?.[0]?.payments?.[0]?.status || "unknown"
-        let color = "gray"
-        switch (paymentStatus) {
-          case "approved":
-            color = "green"
-            break
-          case "pending":
-            color = "yellow"
-            break
-          case "denied":
-            color = "red"
-            break
-        }
-        return (
-          <span className={`px-2 py-1 rounded-full text-xs bg-${color}-500/20 text-${color}-300`}>{paymentStatus}</span>
-        )
-      },
+      key: "codigoAutorizacion",
+      header: "Código de Autorización",
+      render: (_, row) => getAuthorizationCode(row),
       sortable: true,
     },
     {
-      key: "subtotal",
-      header: "Subtotal",
-      render: (_, row) => {
-        const itemsTotal = row.totals?.find((t) => t.id === "Items")?.value || 0
-        return formatCurrency(itemsTotal / 100)
-      },
+      key: "tipoPago",
+      header: "Tipo de Pago",
+      render: (_, row) => getTipoPago(row),
       sortable: true,
     },
     {
-      key: "tax",
-      header: "Impuestos",
-      render: (_, row) => {
-        const taxTotal = row.totals?.find((t) => t.id === "Tax")?.value || 0
-        return formatCurrency(taxTotal / 100)
-      },
+      key: "cuotas",
+      header: "Cuotas",
+      render: (_, row) => row.paymentData?.transactions?.[0]?.payments?.[0]?.installments || "",
       sortable: true,
     },
     {
       key: "value",
       header: "Total",
-      render: (value) => {
-        const numericValue = typeof value === "number" && !isNaN(value) ? value / 100 : 0
-        return formatCurrency(numericValue)
-      },
+      render: (_, row) => formatCurrency(getPaymentValue(row)),
       sortable: true,
     },
     {
       key: "invoiceNumber",
-      header: "Factura",
-      render: (_, row) => row.packageAttachment?.packages?.[0]?.invoiceNumber || "No facturado",
+      header: "Tipo DTE",
+      render: (_, row) => {
+        // Si el cliente es corporativo y tiene corporateDocument, se asume que es Factura
+        // De lo contrario, es Boleta
+        return (row.clientProfileData?.isCorporate === true && 
+                row.clientProfileData?.corporateDocument) 
+               ? "Factura" : "Boleta"
+      },
       sortable: true,
     },
   ]
 
+  // Función de exportación actualizada para incluir todos los campos requeridos
   const handleExport = () => {
+    //console.log("Exportando datos de", orders.length, "pedidos");
+    
     const data = orders.map((order) => {
-      const itemsTotal = order.totals?.find((t) => t.id === "Items")?.value || 0
-      const taxTotal = order.totals?.find((t) => t.id === "Tax")?.value || 0
+      // Para debugging
+      //console.log("Procesando pedido:", order.orderId);
+      
+      // Fecha con hora formateada para mostrar en "Fecha del pedido"
+      let fechaConHora = "";
+      try {
+        if (order.creationDate) {
+          const dateObj = new Date(order.creationDate);
+          if (!isNaN(dateObj.getTime())) {
+            fechaConHora = `${dateObj.toLocaleDateString("es-CL")} ${dateObj.toLocaleTimeString("es-CL")}`;
+          }
+        }
+      } catch (e) {
+        console.error("Error al formatear fecha:", e);
+      }
+
+      // Datos del cliente para facturación
+      const clientData = order.clientProfileData || {};
+      const rutCliente = clientData.document || "";
+      const rutEmpresa = clientData.corporateDocument || "";
+      const nombreFacturacion = clientData.firstName || "";
+      const apellidosFacturacion = clientData.lastName || "";
+
+      // Datos del pago siguiendo la estructura exacta
+      let metodoPago = "No disponible";
+      let cuotas = "";
+      
+      // Seguimos la ruta exacta: ROOT > paymentData > transactions > 0 > payments > 0
+      if (order.paymentData && order.paymentData.transactions && order.paymentData.transactions.length > 0) {
+        const transaction = order.paymentData.transactions[0];
+        
+        if (transaction.payments && transaction.payments.length > 0) {
+          const payment = transaction.payments[0];
+          metodoPago = payment.paymentSystemName || "No disponible";
+          cuotas = payment.installments || "";
+        }
+      }
+      
+      const codigoAutorizacion = getAuthorizationCode(order);
+      const tipoPago = getTipoPago(order);
+
+      // Valor del pedido (usando la función helper)
+      const importeTotal = formatCurrency(getPaymentValue(order));
+
+      // Documento Tributario: ahora basado en si es cliente corporativo
+      const tipoDocumento = (order.clientProfileData?.isCorporate === true && 
+                            order.clientProfileData?.corporateDocument) 
+                           ? "Factura" : "Boleta";
 
       return {
-        "ID Pedido": order.orderId,
-        Fecha: new Date(order.creationDate).toLocaleDateString("es-CL"),
-        Cliente: `${order.clientProfileData?.firstName} ${order.clientProfileData?.lastName}`,
-        "Método de Pago": order.paymentData?.transactions?.[0]?.payments?.[0]?.paymentSystemName || "No disponible",
-        "Estado de Pago": order.paymentData?.transactions?.[0]?.payments?.[0]?.status || "unknown",
-        Subtotal: formatCurrency(itemsTotal / 100),
-        Impuestos: formatCurrency(taxTotal / 100),
-        Total: formatCurrency(order.value / 100),
-        Factura: order.packageAttachment?.packages?.[0]?.invoiceNumber || "No facturado",
+        "ID del pedido": order.orderId || "",
+        "Fecha del pedido": fechaConHora,
+        "RUT": rutCliente,
+        "Rut Empresa": rutEmpresa,
+        "Nombre (facturación)": nombreFacturacion,
+        "Apellidos (facturación)": apellidosFacturacion,
+        "Título del método de pago": metodoPago,
+        "Código de Autorización": codigoAutorizacion,
+        "TIPO PAGO": tipoPago,
+        "Cuotas": cuotas,
+        "Importe total del pedido": importeTotal,
+        "Documento Tributario": tipoDocumento,
       }
     })
 
@@ -267,73 +524,17 @@ export default function AccountingView({ orders, isLoading }) {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card title="Transacciones" isLoading={isLoading}>
-            <div className="data-table-container">
-              <DataTable
-                data={orders}
-                columns={columns}
-                emptyMessage="No hay transacciones que coincidan con los filtros seleccionados"
-              />
-            </div>
-          </Card>
-        </div>
-
-        <div>
-          <Card title="Distribución por Método de Pago" isLoading={isLoading}>
-            {paymentChartData.length > 0 ? (
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={paymentChartData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {paymentChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value) => formatCurrency(value)}
-                      contentStyle={{
-                        backgroundColor: "rgba(22, 27, 34, 0.9)",
-                        border: "1px solid #30363d",
-                        borderRadius: "8px",
-                        color: "#fff",
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <p className="text-center text-gray-400">No hay datos disponibles</p>
-            )}
-
-            <div className="mt-4 space-y-2">
-              {Object.entries(paymentMethodStats).map(([method, data], index) => (
-                <div key={method} className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                    ></div>
-                    <span className="text-gray-300">{method}</span>
-                  </div>
-                  <span className="text-white">{formatCurrency(data.value)}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
+      <div className="grid grid-cols-1 gap-6">
+        <Card title="Transacciones" isLoading={isLoading}>
+          <div className="data-table-container">
+            <DataTable
+              data={orders}
+              columns={columns}
+              emptyMessage="No hay transacciones que coincidan con los filtros seleccionados"
+            />
+          </div>
+        </Card>
       </div>
     </div>
   )
 }
-
