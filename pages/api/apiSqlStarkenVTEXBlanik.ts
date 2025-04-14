@@ -55,7 +55,7 @@ async function processStarkenOrder(
     console.log(`[Starken] Datos formateados para externalCode ${externalCode}:`, formattedData);
 
     // Paso 2: Enviar datos a Starken
-    const endpoint2 = `${baseUrl}api/starken/emisionAPIVTEX`;
+    const endpoint2 = `${baseUrl}api/starken/emisionAPIVTEXBL`;
     console.log(`[Starken] Enviando datos a Starken para externalCode ${externalCode} a: ${endpoint2}`);
     const res2 = await fetch(endpoint2, {
       method: 'POST',
