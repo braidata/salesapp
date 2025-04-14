@@ -1,8 +1,10 @@
 "use client"
+
 import { useState, useEffect, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import DashboardHeader from "./dashboard-header"
 import SearchFilters from "./search-filters"
+// Importar la vista de logística retail y las demás vistas
 import LogisticsView from "./views/logistics-view-retail"
 import AccountingView from "./views/accounting-view"
 import ProductsView from "./views/products-view"
@@ -10,14 +12,22 @@ import AnalyticsView from "./views/analytics-view"
 import LoadingOverlay from "./ui/loading-overlay"
 import Pagination from "./ui/pagination"
 import { fetchAllOrders } from "@/lib/api"
+import { useSession } from "next-auth/react"
+import { checkPermissions } from "@/lib/permissions"
 
 type ViewType = "logistics" | "accounting" | "products" | "analytics"
 
 export default function DashboardContainer() {
+  // Estado de la sesión y verificación de permisos usando session.session
+  const { data: session, status } = useSession()
+  const [permissions, setPermissions] = useState({ logistics: false, accounting: false })
+  const [loadingPermissions, setLoadingPermissions] = useState(true)
+
+  // Estado de la vista actual
   const [view, setView] = useState<ViewType>("logistics")
   const [isLoading, setIsLoading] = useState(false)
-  const [allOrders, setAllOrders] = useState([]) // Almacena todos los pedidos
-  const [displayOrders, setDisplayOrders] = useState([]) // Pedidos filtrados para mostrar
+  const [allOrders, setAllOrders] = useState([])       // Lista completa de pedidos
+  const [displayOrders, setDisplayOrders] = useState([]) // Pedidos filtrados (para mostrar)
   const [error, setError] = useState("")
   const [retryCount, setRetryCount] = useState(0)
   const [filters, setFilters] = useState({
@@ -27,7 +37,7 @@ export default function DashboardContainer() {
     courier: "",
     paymentType: "",
     deliveryType: "",
-    brand: "blanik", // Agregado para la selección de marca: "" para la marca por defecto o "blanik"
+    brand: "blanik", // Para seleccionar la marca; "" para la marca por defecto o "blanik"
     orderId: "",
   })
 
@@ -39,16 +49,44 @@ export default function DashboardContainer() {
     pages: 10,
   })
 
-  // Ref para almacenar el timeout de reintento y poder limpiarlo
+  // Ref para almacenar timeout de reintentos
   const retryTimeoutRef = useRef(null)
 
-  // Función para cargar todos los pedidos de una vez
+  // 1. Verificar permisos usando checkPermissions (si está autenticado, se extrae el email de session.session.user)
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      (async () => {
+        const email = session.session.user.email
+        const hasLogistics = await checkPermissions({
+          email,
+          roles: ["logistics"],
+        })
+        const hasAccounting = await checkPermissions({
+          email,
+          roles: ["accounting", "contabilidad"],
+        })
+        setPermissions({ logistics: hasLogistics, accounting: hasAccounting })
+        setLoadingPermissions(false)
+
+        // Preseleccionar la vista según el permiso:
+        if (hasAccounting) {
+          setView("accounting")
+        } else if (hasLogistics) {
+          setView("logistics")
+        }
+        // Puedes agregar más casos según otros roles (por ej. products o analytics)
+      })()
+    } else {
+      setLoadingPermissions(false)
+    }
+  }, [session, status])
+
+  // 2. Función para cargar todos los pedidos (se usa la API y se envían los filtros, incluyendo el parámetro 'brand')
   const loadAllOrders = useCallback(async () => {
     setIsLoading(true)
     setError("")
-  
+
     try {
-      // Preparar parámetros para la API, incluyendo el parámetro brand
       const apiParams: any = {
         view: view === "logistics" ? "logistica" : view === "accounting" ? "contabilidad" : "todos",
         status: filters.status,
@@ -57,8 +95,8 @@ export default function DashboardContainer() {
         deliveryType: filters.deliveryType,
         brand: filters.brand,
       }
-  
-      // Manejo optimizado de fechas
+
+      // Manejo de fechas
       if (filters.dateRange && filters.dateRange.start && filters.dateRange.end) {
         console.log("Usando filtrado por rango de fechas personalizado:", filters.dateRange)
         apiParams.dateStart = filters.dateRange.start
@@ -67,24 +105,22 @@ export default function DashboardContainer() {
         console.log("Usando filtrado por días atrás:", filters.daysBack)
         apiParams.daysBack = filters.daysBack
       }
-  
+
       console.log("Loading all orders with params:", apiParams)
-  
       const data = await fetchAllOrders(apiParams)
-  
+
       if (data && data.list) {
         let ordersList = data.list
-  
-        // Si se ha ingresado un id para buscar, filtrar la lista
+
+        // Filtrar por orderId si se ingresa un valor
         if (filters.orderId) {
           ordersList = ordersList.filter(order =>
             order.orderId.toString().includes(filters.orderId.toString())
           )
         }
-  
+
         setAllOrders(ordersList)
         console.log(`Loaded ${ordersList.length} orders successfully`)
-  
         // Aplicar paginación local
         applyPagination(ordersList, pagination.page, pagination.perPage)
       } else {
@@ -98,26 +134,24 @@ export default function DashboardContainer() {
         "No se pudieron cargar los pedidos. Por favor, intente nuevamente. " +
           (err.message ? `(${err.message})` : "")
       )
-  
       if (retryCount < 3) {
         console.log(`Retrying... Attempt ${retryCount + 1}`)
         retryTimeoutRef.current = setTimeout(() => {
-          setRetryCount((prev) => prev + 1)
+          setRetryCount(prev => prev + 1)
         }, 2000)
       }
     } finally {
       setIsLoading(false)
     }
   }, [filters, view, retryCount, pagination.perPage])
-  
 
-  // Función para aplicar paginación local
+  // 3. Función para aplicar paginación local sobre la lista de pedidos
   const applyPagination = (orders, page, perPage) => {
     const startIndex = (page - 1) * perPage
     const endIndex = startIndex + perPage
 
     setDisplayOrders(orders.slice(startIndex, endIndex))
-    setPagination((prev) => ({
+    setPagination(prev => ({
       ...prev,
       page,
       perPage,
@@ -126,10 +160,10 @@ export default function DashboardContainer() {
     }))
   }
 
+  // 4. Cada vez que cambien filtros, vista o retryCount, se cargan los pedidos automáticamente (sin debounce)
   useEffect(() => {
     loadAllOrders()
 
-    // Limpiar el timeout al desmontar o antes de ejecutar de nuevo el efecto
     return () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current)
@@ -137,33 +171,28 @@ export default function DashboardContainer() {
     }
   }, [loadAllOrders])
 
-  // Cuando cambia la página o perPage, aplicar paginación local
+  // 5. Actualizar paginación local en caso de cambios de página o límite
   useEffect(() => {
     if (allOrders.length > 0) {
       applyPagination(allOrders, pagination.page, pagination.perPage)
     }
   }, [pagination.page, pagination.perPage])
 
+  // 6. Si cambia el campo orderId, se vuelve a aplicar la paginación filtrando la lista
   useEffect(() => {
     if (allOrders.length > 0) {
-      // Si se ha ingresado un orderId, filtra la lista de pedidos
       let filteredOrders = filters.orderId
         ? allOrders.filter(order =>
             order.orderId.toString().includes(filters.orderId.toString())
           )
         : allOrders
-  
-      // Reaplica la paginación sobre la lista filtrada
       applyPagination(filteredOrders, pagination.page, pagination.perPage)
     }
   }, [filters.orderId, allOrders, pagination.page, pagination.perPage])
-  
 
-  // Manejar cambios en los filtros
+  // 7. Manejador para cambiar los filtros
   const handleFilterChange = (newFilters) => {
     console.log("Filtros cambiados:", newFilters)
-
-    // Lógica especial para manejar el cambio entre daysBack y rango de fechas personalizado
     if (newFilters.hasOwnProperty("daysBack")) {
       if (newFilters.daysBack) {
         console.log("Cambiando a filtro por días atrás:", newFilters.daysBack)
@@ -178,29 +207,25 @@ export default function DashboardContainer() {
       console.log("Cambiando a filtro por rango de fechas personalizado")
       newFilters.daysBack = null
     }
-
-    // Actualizar el estado con los nuevos filtros
-    setFilters((prev) => ({ ...prev, ...newFilters }))
-    // Resetear la paginación
-    setPagination((prev) => ({ ...prev, page: 1 }))
-    // Reiniciar contador de reintentos
+    setFilters(prev => ({ ...prev, ...newFilters }))
+    setPagination(prev => ({ ...prev, page: 1 }))
     setRetryCount(0)
   }
 
-  // Método para cambiar de página
+  // 8. Manejadores de paginación
   const handlePageChange = (newPage: number) => {
-    setPagination((prev) => ({ ...prev, page: newPage }))
+    setPagination(prev => ({ ...prev, page: newPage }))
   }
 
-  // Método para cambiar el límite de elementos por página
   const handlePerPageChange = (newPerPage: number) => {
-    setPagination((prev) => ({ ...prev, page: 1, perPage: newPerPage }))
+    setPagination(prev => ({ ...prev, page: 1, perPage: newPerPage }))
   }
 
   const handleRetry = () => {
-    setRetryCount(0) // Reiniciar contador para forzar una nueva carga
+    setRetryCount(0)
   }
 
+  // 9. Renderizado de la vista según el valor de "view"
   const renderView = () => {
     const props = { orders: displayOrders, isLoading }
     switch (view) {
@@ -216,7 +241,6 @@ export default function DashboardContainer() {
         return <LogisticsView {...props} brand={filters.brand} />
     }
   }
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 p-6 rounded-lg w-full">
@@ -227,7 +251,6 @@ export default function DashboardContainer() {
         className="max-w-[1600px] mx-auto"
       >
         <DashboardHeader activeView={view} onViewChange={setView} />
-
         <SearchFilters filters={filters} onFilterChange={handleFilterChange} />
 
         <AnimatePresence mode="wait">
