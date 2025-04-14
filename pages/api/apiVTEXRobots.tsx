@@ -355,6 +355,7 @@ async function getDetailedOrders(ordersList: any[], shippingMethod?: string, pay
                 paymentSystemName: p.paymentSystemName,
                 value: p.value,
                 installments: p.installments,
+                connectorResponses: p.connectorResponses,
               })),
             })),
           },
