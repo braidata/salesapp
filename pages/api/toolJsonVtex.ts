@@ -71,7 +71,7 @@ export default function handler(req, res) {
       const query = `
         SELECT CodigoInterno2, idpedido, CODIGOEXTERNO, idsap, logcliente, logsap
         FROM EcommerceDB.dbo.VW_REVISION_PEDIDOS
-        WHERE Ecommerce = 'VENTUSCORP_VTEX' AND CODIGOEXTERNO = @idPedido
+        WHERE CODIGOEXTERNO = @idPedido
       `;
 
       const request = new Request(query, (err, rowCount, rows) => {
