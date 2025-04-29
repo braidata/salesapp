@@ -7,7 +7,7 @@ import { formatCurrency } from "@/lib/utils"
 import { exportToExcel } from "@/lib/export-utils"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 
-export default function AccountingView({ orders, isLoading }) {
+export default function AccountingView({ orders, isLoading, brandFilter }) {
   // Calculate statistics
   const totalRevenue = orders.reduce((sum, order) => {
     const value = order.value || order.totalValue || 0
@@ -80,12 +80,42 @@ export default function AccountingView({ orders, isLoading }) {
     return acc
   }, {})
 
+  // Group by brand (new)
+  const brandStats = orders.reduce((acc, order) => {
+    const brand = order.marca || "desconocida";
+    if (!acc[brand]) {
+      acc[brand] = {
+        count: 0,
+        value: 0,
+      }
+    }
+    acc[brand].count++;
+    
+    const value = order.value || order.totalValue || 0;
+    acc[brand].value += (typeof value === "number" && !isNaN(value) ? value / 100 : 0);
+    
+    return acc;
+  }, {});
+
   const paymentChartData = Object.entries(paymentMethodStats).map(([name, data]) => ({
     name,
     value: data.value,
   }))
 
+  // Brand chart data (new)
+  const brandChartData = Object.entries(brandStats).map(([name, data]) => ({
+    name: name === "blanik" ? "Blanik" : name === "bbq" ? "BBQ" : name === "imegab2c" ? "Ventus" : name,
+    value: data.value,
+  }))
+
   const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0088FE"]
+  const BRAND_COLORS = {
+    "blanik": "#8B5CF6", // púrpura para Blanik
+    "bbq": "#E53E3E",    // rojo para BBQ
+    "ventus": "#388DF8", // celeste para Ventus
+    "imegab2c": "#388DF8", // verde para IMEGA (mantuve este color)
+    "desconocida": "#718096" // gris para desconocida
+  }
 
   // Función para obtener el código de autorización directamente de connectorResponses
   const getAuthorizationCode = (order) => {
@@ -230,12 +260,43 @@ export default function AccountingView({ orders, isLoading }) {
     return (typeof orderValue === "number") ? orderValue / 100 : 0;
   }
 
+  // Función para renderizar el componente de marca con color específico
+  const renderBrand = (value) => {
+    let color;
+    switch (value) {
+      case "blanik":
+        color = "purple";
+        break;
+      case "bbq":
+        color = "red";
+        break;
+      case "imegab2c":
+        color = "blue";
+        break;
+      default:
+        color = "gray";
+    }
+    
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs bg-${color}-500/20 text-${color}-300`}>
+        {value === "blanik" ? "Blanik" : value === "bbq" ? "BBQ" : value === "imegab2c" ? "Ventus" : value || "N/A"}
+      </span>
+    );
+  };
+
   // Columnas actualizadas para incluir todos los campos requeridos
   const columns = [
     {
       key: "orderId",
       header: "ID VTEX",
       render: (value) => <span className="font-medium">{value}</span>,
+      sortable: true,
+    },
+    // Nueva columna para mostrar la marca
+    {
+      key: "marca",
+      header: "Marca",
+      render: (value) => renderBrand(value),
       sortable: true,
     },
     {
@@ -383,7 +444,15 @@ export default function AccountingView({ orders, isLoading }) {
                             order.clientProfileData?.corporateDocument) 
                            ? "Factura" : "Boleta";
 
+      // Obtener la marca
+      const marca = order.marca || "desconocida";
+      const marcaNombre = marca === "blanik" ? "Blanik" : 
+                          marca === "bbq" ? "BBQ" : 
+                          marca === "imegab2c" ? "IMEGA b2c" : 
+                          marca;
+
       return {
+        "Marca": marcaNombre,
         "ID del pedido": order.orderId || "",
         "Fecha del pedido": fechaConHora,
         "RUT": rutCliente,
@@ -522,6 +591,65 @@ export default function AccountingView({ orders, isLoading }) {
           }
           trend={{ value: 8, isPositive: true }}
         />
+      </div>
+
+      {/* Nueva sección: Distribución por marca */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card title="Distribución por Método de Pago">
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={paymentChartData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  nameKey="name"
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                >
+                  {paymentChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => formatCurrency(value)} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card title="Distribución por Marca">
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={brandChartData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  nameKey="name"
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                >
+                  {brandChartData.map((entry, index) => {
+                    const brandKey = entry.name === "Blanik" ? "blanik" : 
+                                     entry.name === "BBQ" ? "bbq" : 
+                                     entry.name === "Ventus" ? "imegab2c" : 
+                                     "desconocida";
+                    return (
+                      <Cell key={`cell-${index}`} fill={BRAND_COLORS[brandKey] || COLORS[index % COLORS.length]} />
+                    );
+                  })}
+                </Pie>
+                <Tooltip formatter={(value) => formatCurrency(value)} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
