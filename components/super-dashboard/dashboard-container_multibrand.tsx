@@ -16,6 +16,8 @@ import { useSession } from "next-auth/react"
 import { checkPermissions } from "@/lib/permissions"
 
 type ViewType = "logistics" | "accounting" | "products" | "analytics"
+// Añadir tipo para las marcas
+type BrandType = "" | "blanik" | "bbq" 
 
 export default function DashboardContainer() {
   // Estado de la sesión y verificación de permisos usando session.session
@@ -37,7 +39,7 @@ export default function DashboardContainer() {
     courier: "",
     paymentType: "",
     deliveryType: "",
-    brand: "blanik", // Para seleccionar la marca; "" para la marca por defecto o "blanik"
+    brand: "blanik" as BrandType, // Actualizado para incluir BBQ como opción, default sigue siendo blanik
     orderId: "",
   })
 
