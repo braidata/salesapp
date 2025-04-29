@@ -262,11 +262,11 @@ export default function LogisticsView({ orders, isLoading, brandFilter }) {
             // Usar la marca de la orden para determinar el endpoint correcto
             let endpoint;
             if (order.marca === "blanik") {
-              endpoint = `/api/apiVTEXRobotsBlanik?orderId=${order.orderId}`;
+              endpoint = `/api/apiVTEXBlanik?orderId=${order.orderId}`;
             } else if (order.marca === "bbq") {
-              endpoint = `/api/apiVTEXRobotsBBQ?orderId=${order.orderId}`;
+              endpoint = `/api/apiVTEXBBQ?orderId=${order.orderId}`;
             } else {
-              endpoint = `/api/apiVTEXRobots?orderId=${order.orderId}`;
+              endpoint = `/api/apiVTEX?orderId=${order.orderId}`;
             }
             
             const response = await fetch(endpoint);
