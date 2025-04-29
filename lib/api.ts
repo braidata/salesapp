@@ -9,56 +9,141 @@ interface FetchAllOrdersParams {
   deliveryType?: string;   // selectedDeliveryChannel en logisticsInfo
   dateStart?: string | Date | null;
   dateEnd?: string | Date | null;
-  brand?: string;          // 'blanik' para usar el endpoint de Blanik, de lo contrario se usa el otro
+  brand?: string;          // '' para usar apiVTEXRobots (default), 'blanik' para Blanik, 'bbq' para BBQ, 'all' para ambas (Blanik y BBQ)
 }
 
-// Cache para evitar sobrecargar la API
+// Cache para evitar sobrecargar la API (separado por marca)
 let orderCache = {
-  timestamp: 0,
-  data: null,
-  filters: {},
-  expiryTimeMs: 5 * 60 * 1000, // 5 minutos
+  "": { // Default/imegab2c
+    timestamp: 0,
+    data: null,
+    filters: {},
+    expiryTimeMs: 5 * 60 * 1000, // 5 minutos
+  },
+  blanik: {
+    timestamp: 0,
+    data: null,
+    filters: {},
+    expiryTimeMs: 5 * 60 * 1000,
+  },
+  bbq: {
+    timestamp: 0,
+    data: null,
+    filters: {},
+    expiryTimeMs: 5 * 60 * 1000,
+  },
+  all: { // Combinación de Blanik y BBQ
+    timestamp: 0,
+    data: null,
+    filters: {},
+    expiryTimeMs: 5 * 60 * 1000,
+  }
 };
 
 // Función para obtener los detalles completos de un pedido específico
-// Agregar esta función a tu archivo lib/api.ts
-
 interface FetchOrderDetailsParams {
   orderId: string;
-  brand?: string;  // 'blanik' para usar el endpoint de Blanik
+  brand?: string;  // '' para apiVTEXRobots, 'blanik' para Blanik, 'bbq' para BBQ, 'all' para buscar en todas
 }
 
-export async function fetchOrderDetails({ orderId, brand }: FetchOrderDetailsParams) {
+export async function fetchOrderDetails({ orderId, brand = "" }: FetchOrderDetailsParams) {
   if (!orderId) {
     throw new Error("Se requiere orderId para fetchOrderDetails");
   }
 
   console.log(`Fetching detailed order for ${orderId}, brand: ${brand || 'default'}`);
 
-  // Seleccionar endpoint según el valor de brand
-  const endpoint =
-    brand && brand.toLowerCase() === "blanik"
-      ? "/api/apiVTEXRobotsBlanik"
-      : "/api/apiVTEXRobots";
-
-  try {
-    const response = await fetch(`${endpoint}?orderId=${orderId}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
+  // Si brand es "all", intentamos buscar en todas las APIs
+  if (brand === "all") {
+    try {
+      // Primero intentamos en Blanik
+      const blanikResponse = await fetch(`/api/apiVTEXRobotsBlanik?orderId=${orderId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+      
+      if (blanikResponse.ok) {
+        const data = await blanikResponse.json();
+        if (data && Object.keys(data).length > 0) {
+          console.log(`Found order ${orderId} in Blanik`);
+          // Agregar marca a la respuesta
+          return { ...data, marca: "blanik" };
+        }
+      }
+      
+      // Si no se encontró en Blanik, intentamos en BBQ
+      const bbqResponse = await fetch(`/api/apiVTEXRobotsBBQ?orderId=${orderId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+      
+      if (bbqResponse.ok) {
+        const data = await bbqResponse.json();
+        if (data && Object.keys(data).length > 0) {
+          console.log(`Found order ${orderId} in BBQ`);
+          // Agregar marca a la respuesta
+          return { ...data, marca: "bbq" };
+        }
+      }
+      
+      // Si no se encontró en ninguna de las anteriores, intentamos en default
+      const defaultResponse = await fetch(`/api/apiVTEXRobots?orderId=${orderId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+      
+      if (defaultResponse.ok) {
+        const data = await defaultResponse.json();
+        if (data && Object.keys(data).length > 0) {
+          console.log(`Found order ${orderId} in default (imegab2c)`);
+          // Agregar marca a la respuesta
+          return { ...data, marca: "imegab2c" };
+        }
+      }
+      
+      throw new Error(`No se encontró la orden ${orderId} en ninguna marca`);
+    } catch (error) {
+      console.error(`Error fetching order details for ${orderId}:`, error);
+      throw error;
+    }
+  } else {
+    // Seleccionar endpoint según el valor de brand
+    let endpoint = "/api/apiVTEXRobots"; // Default endpoint (imegab2c)
+    let marcaValue = "imegab2c"; 
     
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+    if (brand) {
+      if (brand.toLowerCase() === "blanik") {
+        endpoint = "/api/apiVTEXRobotsBlanik";
+        marcaValue = "blanik";
+      } else if (brand.toLowerCase() === "bbq") {
+        endpoint = "/api/apiVTEXRobotsBBQ";
+        marcaValue = "bbq";
+      }
     }
     
-    const data = await response.json();
-    console.log(`Fetched detailed order data for ${orderId}: ${JSON.stringify(data)}`);
-    
-    return data;
-  } catch (error) {
-    console.error(`Error fetching order details for ${orderId}:`, error);
-    throw error;
+    try {
+      const response = await fetch(`${endpoint}?orderId=${orderId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log(`Fetched detailed order data for ${orderId} from ${marcaValue}`);
+      
+      // Agregar marca a la respuesta
+      return { ...data, marca: marcaValue };
+    } catch (error) {
+      console.error(`Error fetching order details for ${orderId} from ${brand}:`, error);
+      throw error;
+    }
   }
 }
 
@@ -90,7 +175,6 @@ function areFiltersEqual(filters1: any, filters2: any) {
     "deliveryType",
     "dateStart",
     "dateEnd",
-    "brand", // se incluye brand para que la caché respete la marca
   ];
   for (const key of relevantKeys) {
     if (!(key in filters1) || !(key in filters2)) continue;
@@ -108,67 +192,15 @@ function areFiltersEqual(filters1: any, filters2: any) {
 }
 
 /**
- * Obtiene todos los pedidos usando el nuevo parámetro getAllPages
+ * Construye los parámetros base para una solicitud a la API
  */
-export async function fetchAllOrders(params: FetchAllOrdersParams) {
-  console.log("fetchAllOrders called with params:", params);
-
-  // Para la vista de logística, se requieren datos detallados
+function buildApiParams(params: FetchAllOrdersParams) {
   const needsDetailedData =
     params.view === "logistica" ||
     params.deliveryType ||
     params.paymentType ||
     params.courier;
 
-  // Verificar si podemos usar caché
-  const now = Date.now();
-  const cacheIsValid =
-    orderCache.data !== null &&
-    now - orderCache.timestamp < orderCache.expiryTimeMs &&
-    areFiltersEqual(params, orderCache.filters);
-
-  if (cacheIsValid) {
-    console.log("Using cached orders data");
-    let filteredCacheData = orderCache.data;
-
-    // Filtro manual por courier
-    if (params.courier) {
-      console.log(`Filtering cached data by courier: ${params.courier}`);
-      filteredCacheData = filteredCacheData.filter((order: any) => {
-        if (!order.shippingData?.logisticsInfo?.length) return false;
-        return order.shippingData.logisticsInfo.some((info: any) =>
-          info.deliveryCompany &&
-          info.deliveryCompany.toLowerCase().trim() === params.courier!.toLowerCase().trim()
-        );
-      });
-    }
-
-    // Filtro manual por deliveryType
-    if (params.deliveryType) {
-      console.log(`Filtering cached data by deliveryType: ${params.deliveryType}`);
-      filteredCacheData = filteredCacheData.filter((order: any) => {
-        if (!order.shippingData?.logisticsInfo?.length) return false;
-        return order.shippingData.logisticsInfo.some((info: any) =>
-          info.selectedDeliveryChannel &&
-          info.selectedDeliveryChannel.toLowerCase().trim() === params.deliveryType!.toLowerCase().trim()
-        );
-      });
-    }
-
-    console.log(`Filtered cached data length: ${filteredCacheData.length}`);
-    return {
-      success: true,
-      list: filteredCacheData,
-      pagination: {
-        page: 1,
-        perPage: filteredCacheData.length,
-        total: filteredCacheData.length,
-        pages: 1,
-      },
-    };
-  }
-
-  // Construir parámetros para la API interna
   const baseParams: any = {};
   if (params.status) baseParams["status"] = params.status;
   if (params.paymentType) baseParams["paymentMethod"] = params.paymentType;
@@ -194,22 +226,61 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
   // Configuramos perPage en 100 (máximo) para traer la mayor cantidad de órdenes por request
   baseParams["perPage"] = "100";
 
-  // Construir URL con todos los parámetros
+  return baseParams;
+}
+
+/**
+ * Construye la URL con los parámetros
+ */
+function buildApiUrl(endpoint: string, baseParams: any) {
   const queryParams = new URLSearchParams();
   Object.entries(baseParams).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
       queryParams.append(key, String(value));
     }
   });
+  return `${endpoint}?${queryParams.toString()}`;
+}
 
-  // Seleccionar endpoint según el valor de brand
-  const endpoint =
-    params.brand && params.brand.toLowerCase() === "blanik"
-      ? "/api/apiVTEXRobotsBlanik"
-      : "/api/apiVTEXRobots";
+/**
+ * Aplica filtros manuales a una lista de órdenes
+ */
+function applyManualFilters(orders: any[], params: FetchAllOrdersParams) {
+  let filteredOrders = [...orders];
 
-  const apiUrl = `${endpoint}?${queryParams.toString()}`;
-  console.log("Fetching all orders with single request:", apiUrl);
+  // Filtrado manual por courier
+  if (params.courier) {
+    console.log(`Filtering orders by courier: ${params.courier}`);
+    filteredOrders = filteredOrders.filter((order: any) => {
+      if (!order.shippingData?.logisticsInfo?.length) return false;
+      return order.shippingData.logisticsInfo.some((info: any) =>
+        info.deliveryCompany &&
+        info.deliveryCompany.toLowerCase().trim() === params.courier!.toLowerCase().trim()
+      );
+    });
+  }
+  
+  // Filtrado manual por deliveryType
+  if (params.deliveryType) {
+    console.log(`Filtering orders by deliveryType: ${params.deliveryType}`);
+    filteredOrders = filteredOrders.filter((order: any) => {
+      if (!order.shippingData?.logisticsInfo?.length) return false;
+      return order.shippingData.logisticsInfo.some((info: any) =>
+        info.selectedDeliveryChannel &&
+        info.selectedDeliveryChannel.toLowerCase().trim() === params.deliveryType!.toLowerCase().trim()
+      );
+    });
+  }
+
+  return filteredOrders;
+}
+
+/**
+ * Realiza una solicitud a la API y retorna las órdenes
+ */
+async function fetchOrdersFromApi(endpoint: string, baseParams: any, brandName: string) {
+  const apiUrl = buildApiUrl(endpoint, baseParams);
+  console.log(`Fetching ${brandName} orders with request:`, apiUrl);
 
   try {
     const response = await fetch(apiUrl, {
@@ -223,84 +294,148 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
     }
     
     const data = await response.json();
-    let allOrders = data.list || [];
+    let orders = data.list || [];
     
-    console.log(`Total orders fetched: ${allOrders.length}`);
-
-    // Guardamos en caché los resultados originales, incluyendo brand
-    orderCache = {
-      timestamp: now,
-      data: allOrders,
-      filters: { ...params, courier: null, deliveryType: null },
-      expiryTimeMs: orderCache.expiryTimeMs,
-    };
-
-    // Filtrado manual final por courier
-    if (params.courier) {
-      console.log(`Filtering all orders by courier: ${params.courier}`);
-      allOrders = allOrders.filter((order: any) => {
-        if (!order.shippingData?.logisticsInfo?.length) return false;
-        return order.shippingData.logisticsInfo.some((info: any) =>
-          info.deliveryCompany &&
-          info.deliveryCompany.toLowerCase().trim() === params.courier!.toLowerCase().trim()
-        );
-      });
-    }
+    // Agregar marca a cada orden para identificación
+    orders = orders.map((order: any) => ({ 
+      ...order, 
+      marca: brandName,
+      _sourceBrand: brandName
+    }));
     
-    // Filtrado manual final por deliveryType
-    if (params.deliveryType) {
-      console.log(`Filtering all orders by deliveryType: ${params.deliveryType}`);
-      allOrders = allOrders.filter((order: any) => {
-        if (!order.shippingData?.logisticsInfo?.length) return false;
-        return order.shippingData.logisticsInfo.some((info: any) =>
-          info.selectedDeliveryChannel &&
-          info.selectedDeliveryChannel.toLowerCase().trim() === params.deliveryType!.toLowerCase().trim()
-        );
-      });
-    }
+    console.log(`Total ${brandName} orders fetched: ${orders.length}`);
+    return orders;
+  } catch (error) {
+    console.error(`Error fetching ${brandName} orders:`, error);
+    return [];
+  }
+}
 
-    // Verificar que los datos sean realmente únicos
-    const uniqueOrderIds = new Set(allOrders.map((order: any) => order.orderId));
-    console.log(`Número total de órdenes: ${allOrders.length}`);
-    console.log(`Número de IDs únicos: ${uniqueOrderIds.size}`);
+/**
+ * Obtiene todos los pedidos
+ */
+export async function fetchAllOrders(params: FetchAllOrdersParams) {
+  const brandToUse = params.brand || "";
+  console.log(`fetchAllOrders called with brand: ${brandToUse || 'default'}, params:`, params);
 
-    if (allOrders.length > uniqueOrderIds.size) {
-      console.warn(`¡Atención! Se encontraron ${allOrders.length - uniqueOrderIds.size} órdenes duplicadas`);
-    }
+  // Verificar si podemos usar caché
+  const now = Date.now();
+  const cacheEntry = orderCache[brandToUse] || orderCache[""];
+  const cacheIsValid =
+    cacheEntry.data !== null &&
+    now - cacheEntry.timestamp < cacheEntry.expiryTimeMs &&
+    areFiltersEqual(params, cacheEntry.filters);
 
-    // Información de diagnóstico para verificar la paginación
-    if (allOrders.length > 15) {
-      console.log("Muestra de IDs de órdenes (primeras 5):", allOrders.slice(0, 5).map((o: any) => o.orderId));
-      console.log("Muestra de IDs de órdenes (últimas 5):", allOrders.slice(-5).map((o: any) => o.orderId));
-    }
-
-    // Validar distribución por página
-    const ordersByPage: Record<string, number> = {};
-    allOrders.forEach((order: any) => {
-      if (order._sourcePage) {
-        ordersByPage[order._sourcePage] = (ordersByPage[order._sourcePage] || 0) + 1;
-      }
-    });
-    console.log("Distribución de órdenes por página:", ordersByPage);
-
-    // Deduplicar pedidos por orderId para evitar repeticiones
-    allOrders = Array.from(
-      new Map(allOrders.map((order: any) => [order.orderId, order])).values()
-    );
-    console.log(`After deduplication: ${allOrders.length} orders`);
-
+  if (cacheIsValid) {
+    console.log(`Using cached ${brandToUse || 'default'} orders data`);
+    let filteredCacheData = applyManualFilters(cacheEntry.data, params);
+    console.log(`Filtered cached data length: ${filteredCacheData.length}`);
+    
     return {
       success: true,
-      list: allOrders,
+      list: filteredCacheData,
       pagination: {
         page: 1,
-        perPage: allOrders.length,
-        total: allOrders.length,
+        perPage: filteredCacheData.length,
+        total: filteredCacheData.length,
         pages: 1,
       },
     };
-  } catch (error) {
-    console.error("Error fetching all orders:", error);
-    throw error;
   }
+
+  // Construir parámetros base
+  const baseParams = buildApiParams(params);
+  let allOrders = [];
+
+  if (brandToUse === "all") {
+    // Consultar Blanik y BBQ y combinar resultados
+    console.log("Fetching orders from both Blanik and BBQ");
+    const [blanikOrders, bbqOrders] = await Promise.all([
+      fetchOrdersFromApi("/api/apiVTEXRobotsBlanik", baseParams, "blanik"),
+      fetchOrdersFromApi("/api/apiVTEXRobotsBBQ", baseParams, "bbq")
+    ]);
+    
+    allOrders = [...blanikOrders, ...bbqOrders];
+    console.log(`Combined orders from Blanik and BBQ: ${allOrders.length}`);
+  } else {
+    // Consultar la API correspondiente a la marca especificada
+    let endpoint = "/api/apiVTEXRobots"; // Default endpoint (imegab2c)
+    let marcaValue = "imegab2c";
+    
+    if (brandToUse === "blanik") {
+      endpoint = "/api/apiVTEXRobotsBlanik";
+      marcaValue = "blanik";
+    } else if (brandToUse === "bbq") {
+      endpoint = "/api/apiVTEXRobotsBBQ";
+      marcaValue = "bbq";
+    }
+    
+    allOrders = await fetchOrdersFromApi(endpoint, baseParams, marcaValue);
+  }
+
+  // Verificar duplicados
+  const uniqueOrderIds = new Set(allOrders.map((order: any) => order.orderId));
+  console.log(`Número total de órdenes: ${allOrders.length}`);
+  console.log(`Número de IDs únicos: ${uniqueOrderIds.size}`);
+
+  if (allOrders.length > uniqueOrderIds.size) {
+    console.warn(`¡Atención! Se encontraron ${allOrders.length - uniqueOrderIds.size} órdenes duplicadas`);
+    
+    // Deduplicar pedidos por orderId, priorizando Blanik sobre BBQ y ambos sobre imegab2c
+    const orderMap = new Map();
+    allOrders.forEach((order: any) => {
+      const existingOrder = orderMap.get(order.orderId);
+      
+      if (!existingOrder) {
+        orderMap.set(order.orderId, order);
+      } else if (order.marca === "blanik" && existingOrder.marca !== "blanik") {
+        // Priorizar Blanik sobre otras marcas
+        orderMap.set(order.orderId, order);
+      } else if (order.marca === "bbq" && existingOrder.marca === "imegab2c") {
+        // Priorizar BBQ sobre imegab2c
+        orderMap.set(order.orderId, order);
+      }
+    });
+    
+    allOrders = Array.from(orderMap.values());
+    console.log(`After deduplication: ${allOrders.length} orders`);
+  }
+
+  // Guardar en caché
+  if (orderCache[brandToUse]) {
+    orderCache[brandToUse] = {
+      timestamp: now,
+      data: allOrders,
+      filters: { ...params, courier: null, deliveryType: null },
+      expiryTimeMs: orderCache[brandToUse].expiryTimeMs,
+    };
+  } else {
+    orderCache[""] = {
+      timestamp: now,
+      data: allOrders,
+      filters: { ...params, courier: null, deliveryType: null },
+      expiryTimeMs: orderCache[""].expiryTimeMs,
+    };
+  }
+
+  // Aplicar filtros manuales
+  const filteredOrders = applyManualFilters(allOrders, params);
+  console.log(`Final filtered orders count: ${filteredOrders.length}`);
+
+  // Información de diagnóstico
+  if (filteredOrders.length > 15) {
+    console.log("Muestra de IDs de órdenes (primeras 5):", filteredOrders.slice(0, 5).map((o: any) => o.orderId));
+    console.log("Muestra de IDs de órdenes (últimas 5):", filteredOrders.slice(-5).map((o: any) => o.orderId));
+  }
+  
+  return {
+    success: true,
+    list: filteredOrders,
+    pagination: {
+      page: 1,
+      perPage: filteredOrders.length,
+      total: filteredOrders.length,
+      pages: 1,
+    },
+  };
 }

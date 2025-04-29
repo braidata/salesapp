@@ -111,6 +111,13 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     { value: 365, label: "Último año" },
   ]
 
+  // Opciones de marca (añadiendo BBQ)
+  const brandOptions = [
+    { value: "all", label: "Todas las marcas" },
+    { value: "blanik", label: "Blanik" },
+    { value: "bbq", label: "BBQ" },
+  ]
+
   // Manejar cambios en daysBack
   const handleDaysBackChange = (value: number) => {
     setActiveTimeFilter("days")
@@ -148,7 +155,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "handling",
       courier: "Starken",
       paymentType: "",
-      deliveryType: "delivery"
+      deliveryType: "delivery",
+      brand: filters.brand, // Mantener la marca actual
     },
     localPickup: {
       dateRange: { start: null, end: null },
@@ -156,7 +164,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "handling",
       courier: "Retiro en tienda",
       paymentType: "",
-      deliveryType: "pickup-in-point"
+      deliveryType: "pickup-in-point",
+      brand: filters.brand, // Mantener la marca actual
     },
     santiagoDelivery: {
       dateRange: { start: null, end: null },
@@ -164,7 +173,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "handling",
       courier: "Despacho RM",
       paymentType: "",
-      deliveryType: "delivery"
+      deliveryType: "delivery",
+      brand: filters.brand, // Mantener la marca actual
     },
     NoventayNueveMin: {
       dateRange: { start: null, end: null },
@@ -172,7 +182,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "handling",
       courier: "99MinSameday",
       paymentType: "Webpay",
-      deliveryType: "delivery"
+      deliveryType: "delivery",
+      brand: filters.brand, // Mantener la marca actual
     },
     NoventayNueveMinNext: {
       dateRange: { start: null, end: null },
@@ -180,7 +191,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "handling",
       courier: "99MinNextday",
       paymentType: "Webpay",
-      deliveryType: "delivery"
+      deliveryType: "delivery",
+      brand: filters.brand, // Mantener la marca actual
     },
     retail: {
       dateRange: { start: null, end: null },
@@ -188,7 +200,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "handling",
       courier: "",
       paymentType: "Webpay",
-      deliveryType: ""
+      deliveryType: "",
+      brand: filters.brand, // Mantener la marca actual
     },
     all: {
       dateRange: { start: null, end: null },
@@ -196,7 +209,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "",
       courier: "",
       paymentType: "",
-      deliveryType: ""
+      deliveryType: "",
+      brand: filters.brand, // Mantener la marca actual
     },
     webpay: {
       //set today
@@ -205,7 +219,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       status: "",
       courier: "",
       paymentType: "Webpay",
-      deliveryType: ""
+      deliveryType: "",
+      brand: filters.brand, // Mantener la marca actual
     }
   }
 
@@ -317,6 +332,16 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       {/* Controles de filtros principales */}
       <div className="px-4 py-4">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
+          {/* Selector de Marca (Nuevo) */}
+          <div className="flex-1">
+            <label className="block text-sm text-gray-400 mb-1">Marca</label>
+            <Select
+              options={brandOptions}
+              value={filters.brand}
+              onChange={(value) => onFilterChange({ brand: value })}
+            />
+          </div>
+
           {/* Días atrás */}
           <div className="flex-1">
             <label className="block text-sm text-gray-400 mb-1">
@@ -455,6 +480,11 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       <div className="bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-blue-600/20 p-4 flex flex-wrap items-center justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm text-gray-300">Filtros aplicados:</span>
+          {filters.brand && (
+            <span className="px-2 py-1 text-xs rounded-full bg-amber-500/20 text-amber-300">
+              {brandOptions.find((o) => o.value === filters.brand)?.label || filters.brand}
+            </span>
+          )}
           {activeTimeFilter === "days" && filters.daysBack && (
             <span className="px-2 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-300">
               {daysBackOptions.find((o) => o.value === filters.daysBack)?.label ||
@@ -506,6 +536,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               paymentType: "",
               deliveryType: "",
               orderId: "",
+              brand: filters.brand, // Mantener la marca al limpiar los filtros
             })
           }
           className="px-3 py-1 text-sm rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center gap-1 transition-colors"
