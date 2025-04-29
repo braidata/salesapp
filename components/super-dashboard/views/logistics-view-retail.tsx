@@ -8,7 +8,7 @@ import DataTable from "../ui/data-table"
 import { formatCurrency } from "@/lib/utils"
 import { exportToExcel } from "@/lib/export-utils"
 
-export default function LogisticsView({ orders, isLoading, brand }) {
+export default function LogisticsView({ orders, isLoading, brandFilter }) {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loadingOrder, setLoadingOrder] = useState(false)
 
@@ -25,12 +25,47 @@ export default function LogisticsView({ orders, isLoading, brand }) {
   ).length
   const delivered = orders.filter((order) => order.status === "invoiced").length
 
-  // Columnas para la tabla de pedidos
+  // Estadísticas por marca (contando órdenes por marca)
+  const brandStats = orders.reduce((stats, order) => {
+    const marca = order.marca || "desconocida";
+    stats[marca] = (stats[marca] || 0) + 1;
+    return stats;
+  }, {});
+
+  // Columnas para la tabla de pedidos (agregando columna de marca)
   const columns = [
     {
       key: "orderId",
       header: "ID del pedido",
       render: (value) => value || "N/A",
+      sortable: true,
+    },
+    // Nueva columna para mostrar la marca
+    {
+      key: "marca",
+      header: "Marca",
+      render: (value) => {
+        let color;
+        switch (value) {
+          case "blanik":
+            color = "purple";
+            break;
+          case "bbq":
+            color = "red";
+            break;
+          case "imegab2c":
+            color = "green";
+            break;
+          default:
+            color = "gray";
+        }
+        // Mostrar la marca con un color distinto según el valor
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs bg-${color}-500/20 text-${color}-300`}>
+            {value === "blanik" ? "Blanik" : value === "bbq" ? "BBQ" : value === "imegab2c" ? "IMEGA" : value || "N/A"}
+          </span>
+        );
+      },
       sortable: true,
     },
     {
@@ -145,7 +180,7 @@ export default function LogisticsView({ orders, isLoading, brand }) {
   ]
 
   // Función para mapear los detalles del pedido
-  function mapOrderDetails(raw) {
+  function mapOrderDetails(raw, marca) {
     const client = raw.clientProfileData || {}
     const items = raw.items || []
     return {
@@ -166,6 +201,8 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         imageUrl: item.imageUrl || "",
         detailUrl: item.detailUrl || "",
       })),
+      // Asegurar que el campo marca se mantenga
+      marca: marca || raw.marca
     }
   }
 
@@ -173,33 +210,41 @@ export default function LogisticsView({ orders, isLoading, brand }) {
   const handleViewDetails = async (order) => {
     try {
       setLoadingOrder(true)
-      let endpoint = ""
+      let endpoint = "";
       
-      // Usar la prop "brand" pasada desde arriba para determinar el endpoint
-      if (brand === "blanik") {
-        endpoint = `/api/apiVTEXBlanik?orderId=${order.orderId}`
+      // Usar la marca de la orden si existe, de lo contrario usar el filtro actual
+      const orderMarca = order.marca || brandFilter;
+      
+      // Determinar el endpoint según la marca
+      if (orderMarca === "blanik") {
+        endpoint = `/api/apiVTEXBlanik?orderId=${order.orderId}`;
+      } else if (orderMarca === "bbq") {
+        endpoint = `/api/apiVTEXBBQ?orderId=${order.orderId}`;
       } else {
-        endpoint = `/api/apiVTEX?orderId=${order.orderId}`
+        // Si es "imegab2c" o cualquier otro valor (incluido "all"), usar el endpoint default
+        endpoint = `/api/apiVTEX?orderId=${order.orderId}`;
       }
   
-      const response = await fetch(endpoint)
+      console.log(`Obteniendo detalles para la orden ${order.orderId} desde ${endpoint}`);
+      const response = await fetch(endpoint);
       
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
+        throw new Error(`Error: ${response.status}`);
       }
       
-      const raw = await response.json()
-      console.log("Order details received:", raw)
+      const raw = await response.json();
+      console.log("Order details received:", raw);
       
-      const mapped = mapOrderDetails(raw)
-      setSelectedOrder(mapped)
+      // Preservar la marca al mapear los detalles
+      const mapped = mapOrderDetails(raw, orderMarca);
+      setSelectedOrder(mapped);
     } catch (error) {
-      console.error("Error al obtener detalles del pedido:", error)
-      alert("No se pudo cargar la información completa del pedido.")
+      console.error("Error al obtener detalles del pedido:", error);
+      alert("No se pudo cargar la información completa del pedido.");
     } finally {
-      setLoadingOrder(false)
+      setLoadingOrder(false);
     }
-  }
+  };
   
 
   const handleExport = async () => {
@@ -214,10 +259,16 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         if (!order.items || order.items.length === 0) {
           console.log(`La orden ${order.orderId} no trae productos; se solicitarán detalles.`);
           try {
-            const endpoint = 
-              brand === "blanik"
-                ? `/api/apiVTEXBlanik?orderId=${order.orderId}`
-                : `/api/apiVTEX?orderId=${order.orderId}`;
+            // Usar la marca de la orden para determinar el endpoint correcto
+            let endpoint;
+            if (order.marca === "blanik") {
+              endpoint = `/api/apiVTEXRobotsBlanik?orderId=${order.orderId}`;
+            } else if (order.marca === "bbq") {
+              endpoint = `/api/apiVTEXRobotsBBQ?orderId=${order.orderId}`;
+            } else {
+              endpoint = `/api/apiVTEXRobots?orderId=${order.orderId}`;
+            }
+            
             const response = await fetch(endpoint);
             if (!response.ok) {
               console.error(
@@ -226,7 +277,7 @@ export default function LogisticsView({ orders, isLoading, brand }) {
               return order;
             }
             const raw = await response.json();
-            const mapped = mapOrderDetails(raw);
+            const mapped = mapOrderDetails(raw, order.marca);
             console.log(
               `Orden ${order.orderId} detallada. Productos encontrados: ${mapped.items.length}`
             );
@@ -294,6 +345,8 @@ export default function LogisticsView({ orders, isLoading, brand }) {
       if (order.items && order.items.length > 0) {
         order.items.forEach((item) => {
           data.push({
+            // Agregar campo de marca en la exportación
+            "Marca": order.marca || "N/A",
             "Número de pedido": order.sequence || "N/A",
             "ID del pedido": order.orderId || "N/A",
             "Estado del pedido": order.statusDescription || order.status || "N/A",
@@ -333,6 +386,8 @@ export default function LogisticsView({ orders, isLoading, brand }) {
       } else {
         // Si la orden no trae productos, genera una fila "vacía" para la parte de ítems.
         data.push({
+          // Agregar campo de marca en la exportación
+          "Marca": order.marca || "N/A",
           "Número de pedido": order.sequence || "N/A",
           "ID del pedido": order.orderId || "N/A",
           "Estado del pedido": order.statusDescription || order.status || "N/A",
@@ -371,9 +426,6 @@ export default function LogisticsView({ orders, isLoading, brand }) {
     exportToExcel(data, "reporte_productos");
   };
   
-  
-  
-
   return (
     <div className="space-y-6 m-8">
       <div className="flex justify-between items-center">
@@ -490,6 +542,34 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         />
       </div>
 
+      {/* Tarjeta de resumen por marca (nueva) */}
+      {Object.keys(brandStats).length > 0 && (
+        <div className="grid grid-cols-1 gap-6">
+          <Card title="Distribución por Marca">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {Object.entries(brandStats).map(([marca, count]) => {
+                let color = "gray";
+                if (marca === "blanik") color = "blue";
+                else if (marca === "bbq") color = "red";
+                else if (marca === "imegab2c") color = "green";
+                
+                return (
+                  <div key={marca} className={`bg-${color}-500/10 rounded-lg p-4 flex flex-col items-center`}>
+                    <span className={`text-${color}-400 text-lg font-bold`}>
+                      {marca === "blanik" ? "Blanik" : marca === "bbq" ? "BBQ" : marca === "imegab2c" ? "IMEGA" : marca}
+                    </span>
+                    <span className="text-3xl font-bold text-white mt-2">{count}</span>
+                    <span className="text-sm text-gray-400 mt-1">
+                      {((count / totalOrders) * 100).toFixed(1)}% del total
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-6">
         <Card title="Pedidos" isLoading={isLoading}>
           <div className="data-table-container">
@@ -511,8 +591,22 @@ export default function LogisticsView({ orders, isLoading, brand }) {
             className="bg-gray-900 rounded-xl border border-gray-700 shadow-2xl max-w-5xl w-full max-h-[80vh] overflow-auto"
           >
             <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-bold text-white flex items-center">
                 Detalles del Pedido #{selectedOrder.orderId}
+                {/* Mostrar la marca en el encabezado del modal */}
+                {selectedOrder.marca && (
+                  <span className={`ml-3 px-2 py-1 text-xs rounded-full ${
+                    selectedOrder.marca === "blanik" ? "bg-blue-500/20 text-blue-300" :
+                    selectedOrder.marca === "bbq" ? "bg-red-500/20 text-red-300" :
+                    selectedOrder.marca === "imegab2c" ? "bg-green-500/20 text-green-300" :
+                    "bg-gray-500/20 text-gray-300"
+                  }`}>
+                    {selectedOrder.marca === "blanik" ? "Blanik" : 
+                     selectedOrder.marca === "bbq" ? "BBQ" : 
+                     selectedOrder.marca === "imegab2c" ? "IMEGA" : 
+                     selectedOrder.marca}
+                  </span>
+                )}
               </h3>
               <button
                 onClick={() => setSelectedOrder(null)}
@@ -589,14 +683,14 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                       <p className="text-sm text-gray-400">RUT</p>
                       <p className="text-white">{selectedOrder.clientProfileData?.document || "N/A"}</p>
                     </div>
-                    {/* <div>
+                    <div>
                       <p className="text-sm text-gray-400">Email</p>
                       <p className="text-white">
                         {selectedOrder.clientProfileData?.email
                           ? selectedOrder.clientProfileData.email.split("-")[0]
                           : "N/A"}
                       </p>
-                    </div> */}
+                    </div>
                     <div>
                       <p className="text-sm text-gray-400">Teléfono</p>
                       <p className="text-white">{selectedOrder.clientProfileData?.phone || "N/A"}</p>
@@ -613,6 +707,11 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                         <p className="text-white">{selectedOrder.clientProfileData?.corporateName || "N/A"}</p>
                       </div>
                     )}
+                    {/* Mostrar marca en los detalles del cliente */}
+                    <div>
+                      <p className="text-sm text-gray-400">Marca</p>
+                      <p className="text-white">{selectedOrder.marca || "N/A"}</p>
+                    </div>
                   </div>
                 </div>
 
