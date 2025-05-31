@@ -105,8 +105,8 @@ model payments_validator {
   createdBy          String?
   validatedBy        String?
   editedBy           String?
-  contId             String? @default("sin datos") @db.VarChar(255)
   sapId              String? @default("sin datos") @db.VarChar(255)
+  contId             String? @default("sin datos") @db.VarChar(255)
   posts              posts[]
 }
 
@@ -229,4 +229,186 @@ model UserConversations {
   @@unique([A, B], map: "_UserConversations_AB_unique")
   @@index([B], map: "_UserConversations_B_index")
   @@map("_UserConversations")
+}
+
+model vtex_orders {
+  id                    Int                   @id @default(autoincrement())
+  vtex_order_id         String                @unique @db.VarChar(50)
+  sequence              String?               @db.VarChar(50)
+  status                String?               @db.VarChar(50)
+  status_description    String?               @db.VarChar(100)
+  total_value           Decimal?              @db.Decimal(12, 2)
+  creation_date         DateTime?
+  last_change           DateTime?
+  authorized_date       DateTime?
+  invoiced_date         DateTime?
+  is_completed          Boolean               @default(false)
+  customer_email        String?               @db.VarChar(255)
+  customer_first_name   String?               @db.VarChar(100)
+  customer_last_name    String?               @db.VarChar(100)
+  customer_document     String?               @db.VarChar(50)
+  customer_phone        String?               @db.VarChar(50)
+  customer_is_corporate Boolean               @default(false)
+  shipping_city         String?               @db.VarChar(100)
+  shipping_state        String?               @db.VarChar(100)
+  delivery_company      String?               @db.VarChar(100)
+  raw_vtex_data         Json?
+  created_at            DateTime              @default(now())
+  updated_at            DateTime              @updatedAt
+  vtex_order_items      vtex_order_items[]
+  vtex_order_payments   vtex_order_payments[]
+
+  @@index([creation_date])
+  @@index([status])
+  @@index([customer_email])
+}
+
+model vtex_order_items {
+  id             Int         @id @default(autoincrement())
+  vtex_order_id  Int
+  vtex_unique_id String?     @db.VarChar(100)
+  product_id     String?     @db.VarChar(50)
+  ref_id         String?     @db.VarChar(100)
+  product_name   String?     @db.VarChar(255)
+  brand_name     String?     @db.VarChar(100)
+  quantity       Int?
+  unit_price     Decimal?    @db.Decimal(10, 2)
+  selling_price  Decimal?    @db.Decimal(10, 2)
+  vtex_order     vtex_orders @relation(fields: [vtex_order_id], references: [id])
+
+  @@index([vtex_order_id])
+  @@index([ref_id])
+  @@index([product_id])
+  @@index([brand_name])
+}
+
+model vtex_order_payments {
+  id                  Int         @id @default(autoincrement())
+  vtex_order_id       Int
+  payment_system_name String?     @db.VarChar(100)
+  payment_value       Decimal?    @db.Decimal(10, 2)
+  installments        Int?
+  vtex_order          vtex_orders @relation(fields: [vtex_order_id], references: [id])
+
+  @@index([vtex_order_id])
+  @@index([payment_system_name])
+}
+
+model sap_orders {
+  id                 Int               @id @default(autoincrement())
+  purchase_order     String            @unique @db.VarChar(50)
+  sap_order          String            @unique @db.VarChar(20)
+  customer_code      String            @db.VarChar(20)
+  creation_date      DateTime?
+  status             String?           @db.VarChar(100)
+  status_code        String?           @db.VarChar(10)
+  total_amount       Decimal?          @db.Decimal(12, 2)
+  document_type      String?           @db.VarChar(10)
+  document_type_text String?           @db.VarChar(100)
+  document_number    String?           @db.VarChar(20)
+  febos_fc           String?           @db.VarChar(100)
+  raw_sap_data       Json?
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @updatedAt
+  sap_order_items    sap_order_items[]
+
+  @@index([purchase_order])
+  @@index([sap_order])
+  @@index([customer_code])
+  @@index([creation_date])
+  @@index([status_code])
+}
+
+model sap_order_items {
+  id           Int        @id @default(autoincrement())
+  sap_order_id Int
+  sku          String     @db.VarChar(50)
+  product_name String?    @db.VarChar(255)
+  quantity     Int
+  amount       Decimal    @db.Decimal(10, 2)
+  sap_order    sap_orders @relation(fields: [sap_order_id], references: [id])
+
+  @@index([sap_order_id])
+  @@index([sku])
+  @@index([product_name])
+}
+
+model ga4_daily_metrics {
+  id                  Int      @id @default(autoincrement())
+  date                DateTime @unique
+  property_id         String?  @db.VarChar(50)
+  sessions            Int      @default(0)
+  total_users         Int      @default(0)
+  new_users           Int      @default(0)
+  page_views          Int      @default(0)
+  ecommerce_purchases Int      @default(0)
+  transaction_revenue Decimal? @default(0.00) @db.Decimal(12, 2)
+  conversion_rate     Decimal? @default(0.00) @db.Decimal(5, 2)
+  add_to_carts        Int      @default(0)
+  abandoned_carts     Int      @default(0)
+  abandonment_rate    Decimal? @default(0.00) @db.Decimal(5, 2)
+  raw_ga4_data        Json?
+  created_at          DateTime @default(now())
+
+  @@index([date])
+}
+
+model ga4_traffic_sources {
+  id              Int      @id @default(autoincrement())
+  date            DateTime
+  source          String   @db.VarChar(100)
+  sessions        Int      @default(0)
+  purchases       Int      @default(0)
+  conversion_rate Decimal? @default(0.00) @db.Decimal(5, 2)
+
+  @@unique([date, source])
+  @@index([date])
+  @@index([source])
+}
+
+model ga4_search_terms {
+  id              Int      @id @default(autoincrement())
+  date            DateTime
+  search_term     String   @db.VarChar(255)
+  sessions        Int      @default(0)
+  purchases       Int      @default(0)
+  conversion_rate Decimal? @default(0.00) @db.Decimal(5, 2)
+
+  @@unique([date, search_term])
+  @@index([date])
+  @@index([search_term])
+}
+
+model ga4_product_metrics {
+  id                Int      @id @default(autoincrement())
+  date              DateTime
+  item_name         String?  @db.VarChar(255)
+  item_category     String?  @db.VarChar(100)
+  item_brand        String?  @db.VarChar(100)
+  item_views        Int      @default(0)
+  item_add_to_carts Int      @default(0)
+  item_purchases    Int      @default(0)
+  item_revenue      Decimal? @default(0.00) @db.Decimal(10, 2)
+
+  @@unique([date, item_name])
+  @@index([date])
+  @@index([item_name])
+}
+
+model analytics_summary {
+  id                  Int      @id @default(autoincrement())
+  date                DateTime @unique
+  total_orders_vtex   Int      @default(0)
+  total_orders_sap    Int      @default(0)
+  total_revenue_vtex  Decimal? @default(0.00) @db.Decimal(12, 2)
+  total_revenue_sap   Decimal? @default(0.00) @db.Decimal(12, 2)
+  total_sessions_ga4  Int      @default(0)
+  conversion_rate_ga4 Decimal? @default(0.00) @db.Decimal(5, 2)
+  daily_order_value   Decimal? @default(0.00) @db.Decimal(12, 2)
+  daily_session_value Decimal? @default(0.00) @db.Decimal(8, 2)
+  cross_platform_rate Decimal? @default(0.00) @db.Decimal(5, 2)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@index([date])
 }
