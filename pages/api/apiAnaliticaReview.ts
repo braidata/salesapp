@@ -65,7 +65,7 @@ const API_CONFIG = {
   maxRetries: 3,
   retryDelay: 1000,
   requestTimeout: 30000,
-  maxDaysRange: 60, // Allow longer ranges for analysis
+  maxDaysRange: 100, // Allow longer ranges for analysis
   delayBetweenDates: 200 // 200ms between date checks
 };
 
@@ -283,9 +283,10 @@ async function compareDataCompleteness(dateFrom: string, dateTo: string): Promis
     
     const dbOrderIds = new Set(dbOrders.map(o => o.vtex_order_id));
     
-    // Find missing orders
+    // Find missing orders (excluding canceled orders)
     const missingOrders = vtexOrders.filter(vtexOrder => 
-      !dbOrderIds.has(vtexOrder.orderId)
+      !dbOrderIds.has(vtexOrder.orderId) &&
+      !['canceled', 'cancelled', 'cancel'].includes(vtexOrder.status.toLowerCase())
     );
     
     // Analyze missing orders
@@ -304,22 +305,25 @@ async function compareDataCompleteness(dateFrom: string, dateTo: string): Promis
       });
     }
     
-    // Calculate daily metrics
-    const completenessRate = vtexOrders.length > 0 ? 
-      ((vtexOrders.length - missingOrders.length) / vtexOrders.length) * 100 : 100;
+    // Calculate daily metrics (excluding canceled orders from VTEX count)
+    const activeVtexOrders = vtexOrders.filter(order => 
+      !['canceled', 'cancelled', 'cancel'].includes(order.status.toLowerCase())
+    );
+    const completenessRate = activeVtexOrders.length > 0 ? 
+      ((activeVtexOrders.length - missingOrders.length) / activeVtexOrders.length) * 100 : 100;
     
     dailyBreakdown.push({
       date,
-      vtexCount: vtexOrders.length,
+      vtexCount: activeVtexOrders.length, // Only active orders
       dbCount: dbOrders.length,
       missingCount: missingOrders.length,
       completenessRate: Math.round(completenessRate * 100) / 100
     });
     
-    totalVtexOrders += vtexOrders.length;
+    totalVtexOrders += activeVtexOrders.length; // Only count active orders
     totalDbOrders += dbOrders.length;
     
-    console.log(`📊 ${date}: VTEX=${vtexOrders.length}, DB=${dbOrders.length}, Missing=${missingOrders.length} (${completenessRate.toFixed(1)}%)`);
+    console.log(`📊 ${date}: VTEX=${activeVtexOrders.length} (${vtexOrders.length} total, excluding canceled), DB=${dbOrders.length}, Missing=${missingOrders.length} (${completenessRate.toFixed(1)}%)`);
     
     // Delay between dates to be gentle with API
     if (date !== dateRange[dateRange.length - 1]) {
@@ -348,8 +352,9 @@ async function compareDataCompleteness(dateFrom: string, dateTo: string): Promis
   const missingOrderIds = allMissingOrders.map(order => order.orderId);
   
   console.log(`✅ Comparison completed in ${totalProcessingTime}ms`);
-  console.log(`📊 Summary: ${allMissingOrders.length}/${totalVtexOrders} orders missing (${overallCompletenessRate.toFixed(2)}% complete)`);
+  console.log(`📊 Summary: ${allMissingOrders.length}/${totalVtexOrders} active orders missing (${overallCompletenessRate.toFixed(2)}% complete)`);
   console.log(`📋 Missing order IDs ready for batch processing: [${missingOrderIds.slice(0, 3).join(', ')}${missingOrderIds.length > 3 ? '...' : ''}]`);
+  console.log(`🚫 Canceled orders excluded from analysis`);
   
   return {
     success: true,
@@ -494,128 +499,3 @@ export default async function handler(
   }
 }
 
-/* 
-=== DATA COMPARATOR API ===
-
-PURPOSE:
-Compare VTEX API data against your database to identify missing orders.
-Returns a simple array of missing order IDs ready for batchOrderProcessor.
-
-=== USAGE EXAMPLES ===
-
-// Compare last 7 days
-GET /api/dataComparator?dateFrom=2025-05-24&dateTo=2025-05-31
-
-// Compare specific month
-GET /api/dataComparator?dateFrom=2025-04-01&dateTo=2025-04-30
-
-// Compare single day
-GET /api/dataComparator?dateFrom=2025-05-31&dateTo=2025-05-31
-
-=== RESPONSE EXAMPLE ===
-{
-  "success": true,
-  "summary": {
-    "dateRange": { 
-      "from": "2025-05-24", 
-      "to": "2025-05-31", 
-      "daysAnalyzed": 8 
-    },
-    "vtexApiTotal": 156,
-    "databaseTotal": 142,
-    "missingInDatabase": 14,
-    "completenessRate": 91.03
-  },
-  "missingOrders": [
-    {
-      "orderId": "v12345678abc",
-      "status": "handling",
-      "statusDescription": "Handling shipping",
-      "creationDate": "2025-05-30T14:30:00.000Z",
-      "value": 85.50,
-      "ageInDays": 1,
-      "priority": "critical"
-    }
-    // ... more detailed missing order info
-  ],
-  "dailyBreakdown": [
-    {
-      "date": "2025-05-31",
-      "vtexCount": 23,
-      "dbCount": 21,
-      "missingCount": 2,
-      "completenessRate": 91.30
-    }
-    // ... more daily data
-  ],
-  
-  // Simple array ready for copy-paste to batchOrderProcessor
-  "missingOrderIds": [
-    "v12345678abc",
-    "v87654321def", 
-    "v11223344ghi",
-    "v55667788jkl"
-  ],
-  
-  "metadata": {
-    "processingTime": 3420,
-    "apiCalls": 8,
-    "averageResponseTime": 425
-  }
-}
-
-=== INSTANT WORKFLOW ===
-
-1. **Run Data Comparator**:
-   GET /api/dataComparator?dateFrom=2025-05-24&dateTo=2025-05-31
-
-2. **Copy the missingOrderIds array**
-
-3. **Paste directly to Batch Processor**:
-   POST /api/batchOrderProcessor
-   Content-Type: application/json
-   {
-     "orderIds": ["v12345678abc", "v87654321def", "v11223344ghi", "v55667788jkl"]
-   }
-
-=== SIMPLE AUTOMATION ===
-
-```javascript
-// Get missing orders
-const response = await fetch('/api/dataComparator?dateFrom=2025-05-24&dateTo=2025-05-31')
-  .then(r => r.json());
-
-// Process them immediately if any found
-if (response.missingOrderIds.length > 0) {
-  const result = await fetch('/api/batchOrderProcessor', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      orderIds: response.missingOrderIds
-    })
-  }).then(r => r.json());
-  
-  console.log(`Processed ${result.results.successfullyProcessed} orders`);
-}
-```
-
-=== KEY FEATURES ===
-
-1. **Simple Array**: Just the IDs you need, nothing more
-2. **Copy-Paste Ready**: Direct integration with batchOrderProcessor
-3. **Detailed Analysis**: Still includes full missing order details
-4. **Daily Breakdown**: See completeness rate for each day
-5. **Priority Info**: Detailed analysis in missingOrders array
-
-=== RATE LIMITING ===
-- 30 requests per 10-minute window per IP
-- Maximum 60 days range per request
-- Built-in delays to protect VTEX API
-
-=== USE CASES ===
-
-1. **Quick Recovery**: Get IDs and process immediately
-2. **Daily Monitoring**: Check what's missing each day
-3. **Batch Planning**: See how many orders need processing
-4. **Manual Review**: Detailed info for each missing order
-*/
