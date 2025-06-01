@@ -65,7 +65,7 @@ const API_CONFIG = {
   maxRetries: 3,
   retryDelay: 1000,
   requestTimeout: 30000,
-  maxDaysRange: 60, // Allow longer ranges for analysis
+  maxDaysRange: 100, // Allow longer ranges for analysis
   delayBetweenDates: 200 // 200ms between date checks
 };
 
