@@ -75,47 +75,8 @@ export const kpiCategoryOptions = [
 
 // Define KPI options with categories - ACTUALIZADO con KPIs VTEX
 export const kpiOptions = [
-  // Ventas Integración
-  { id: "ventaDiariaDelMes", label: "Venta Diaria Integración", category: "ventas", icon: <DollarSign size={16} /> },
-  { id: "pedidosDiariosDelMes", label: "Pedidos Diarios Integración", category: "ventas", icon: <ShoppingCart size={16} /> },
-  { id: "ticketPromedioDelMes", label: "Ticket Promedio Integración", category: "ventas", icon: <FileText size={16} /> },
-  { id: "ventaAcumulada", label: "Venta Acumulada Integración", category: "ventas", icon: <TrendingUp size={16} /> },
-  // { id: "comparativos", label: "Comparativos", category: "ventas", icon: <BarChart2 size={16} /> },
 
-  // Productos Integración
-  { id: "kpisDeProductos", label: "KPIs de Productos Integración", category: "productos", icon: <Tag size={16} /> },
-  // { id: "kpisPorCategoria", label: "KPIs por Categoría", category: "productos", icon: <Layers size={16} /> },
-  // { id: "kpisPorMarca", label: "KPIs por Marca", category: "productos", icon: <Tag size={16} /> },
-
-  // Conversión (GA4)
-  { id: "tasaConversionWeb", label: "Tasa de Conversión", category: "conversion", icon: <Percent size={16} /> },
-  // { id: "funnelConversiones", label: "Funnel de Conversiones", category: "conversion", icon: <Filter size={16} /> },
-  {
-    id: "carrosAbandonados",
-    label: "Carritos Abandonados",
-    category: "conversion",
-    icon: <ShoppingCart size={16} />,
-  },
-
-  // Tráfico (GA4)
-  { id: "traficoPorFuente", label: "Tráfico por Fuente", category: "trafico", icon: <Activity size={16} /> },
-  // { id: "audiencia", label: "Audiencia", category: "trafico", icon: <Users size={16} /> },
-  { id: "palabrasBuscadas", label: "Palabras Buscadas", category: "trafico", icon: <Search size={16} /> },
-
-  // Marketing (GA4 + ADS)
-  // { id: "inversionMarketing", label: "Inversión Marketing", category: "marketing", icon: <DollarSign size={16} /> },
-  { id: "campañas", label: "Campañas", category: "marketing", icon: <Zap size={16} /> },
-  // {
-  //   id: "kpiContestabilidadCorus",
-  //   label: "Contestabilidad Corus",
-  //   category: "marketing",
-  //   icon: <HelpCircle size={16} />,
-  // },
-  // { id: "clientesPerdidos", label: "Clientes Perdidos", category: "marketing", icon: <Users size={16} /> },
-  // { id: "tasaAperturaMails", label: "Tasa Apertura Mails", category: "marketing", icon: <Mail size={16} /> },
-  // { id: "sugerenciasMejora", label: "Sugerencias Mejora", category: "marketing", icon: <Zap size={16} /> },
-
-  // ✨ NUEVOS KPIs VTEX
+   // ✨ NUEVOS KPIs VTEX
   // Ventas VTEX
   { 
     id: "vtexVentasDiarias", 
@@ -223,6 +184,47 @@ export const kpiOptions = [
     icon: <AlertCircle size={16} />,
     description: "Métricas de calidad y completitud de datos VTEX"
   },
+  // Ventas Integración
+  // { id: "ventaDiariaDelMes", label: "Venta Diaria Integración", category: "ventas", icon: <DollarSign size={16} /> },
+  // { id: "pedidosDiariosDelMes", label: "Pedidos Diarios Integración", category: "ventas", icon: <ShoppingCart size={16} /> },
+  // { id: "ticketPromedioDelMes", label: "Ticket Promedio Integración", category: "ventas", icon: <FileText size={16} /> },
+  // { id: "ventaAcumulada", label: "Venta Acumulada Integración", category: "ventas", icon: <TrendingUp size={16} /> },
+  // { id: "comparativos", label: "Comparativos", category: "ventas", icon: <BarChart2 size={16} /> },
+
+  // Productos Integración
+  { id: "kpisDeProductos", label: "KPIs de Productos Integración", category: "productos", icon: <Tag size={16} /> },
+  { id: "kpisPorCategoria", label: "KPIs por Categoría", category: "productos", icon: <Layers size={16} /> },
+  { id: "kpisPorMarca", label: "KPIs por Marca", category: "productos", icon: <Tag size={16} /> },
+
+  // Conversión (GA4)
+  { id: "tasaConversionWeb", label: "Tasa de Conversión", category: "conversion", icon: <Percent size={16} /> },
+  // { id: "funnelConversiones", label: "Funnel de Conversiones", category: "conversion", icon: <Filter size={16} /> },
+  {
+    id: "carrosAbandonados",
+    label: "Carritos Abandonados",
+    category: "conversion",
+    icon: <ShoppingCart size={16} />,
+  },
+
+  // Tráfico (GA4)
+  { id: "traficoPorFuente", label: "Tráfico por Fuente", category: "trafico", icon: <Activity size={16} /> },
+  { id: "audiencia", label: "Audiencia", category: "trafico", icon: <Users size={16} /> },
+  { id: "palabrasBuscadas", label: "Palabras Buscadas", category: "trafico", icon: <Search size={16} /> },
+
+  // Marketing (GA4 + ADS)
+  // { id: "inversionMarketing", label: "Inversión Marketing", category: "marketing", icon: <DollarSign size={16} /> },
+  { id: "campañas", label: "Campañas", category: "marketing", icon: <Zap size={16} /> },
+  // {
+  //   id: "kpiContestabilidadCorus",
+  //   label: "Contestabilidad Corus",
+  //   category: "marketing",
+  //   icon: <HelpCircle size={16} />,
+  // },
+  // { id: "clientesPerdidos", label: "Clientes Perdidos", category: "marketing", icon: <Users size={16} /> },
+  // { id: "tasaAperturaMails", label: "Tasa Apertura Mails", category: "marketing", icon: <Mail size={16} /> },
+  // { id: "sugerenciasMejora", label: "Sugerencias Mejora", category: "marketing", icon: <Zap size={16} /> },
+
+ 
 ];
 
 // Helper function para obtener KPIs por categoría

@@ -156,85 +156,96 @@ export const useVtexService = () => {
   
   // Función para obtener productos
   const fetchProducts = useCallback(async (options: {
-    categoryId?: string;
-    brandId?: string;
-    page?: number;
-    perPage?: number;
-    forceRefresh?: boolean;
-  } = {}) => {
-    const {
-      categoryId = "",
-      brandId = "",
-      page = 1,
-      perPage = 50,
-      forceRefresh = false
-    } = options;
-    
-    const from = (page - 1) * perPage;
-    const to = from + perPage - 1;
-    
-    const params: Record<string, string> = { from: String(from), to: String(to) };
-    if (categoryId) params.categoryId = categoryId;
-    if (brandId) params.brandId = brandId;
-    
-    const result = await fetchVtexData({
-      endpoints: [{
-        key: 'products',
-        url: '/api/vtex-products',
-        params
-      }],
-      forceRefresh
-    });
-    
-    return result.products || [];
-  }, [fetchVtexData]);
+  categoryId?: string;
+  brandId?: string;
+  page?: number;
+  perPage?: number;
+  forceRefresh?: boolean;
+} = {}) => {
+  const {
+    categoryId = "",
+    brandId = "",
+    page = 1,
+    perPage = 50,
+    forceRefresh = false
+  } = options;
+
+  const result = await fetchVtexData({
+    endpoints: [{
+      key: 'products',
+      url: '/api/vtex-products-db', // Nueva API para productos desde DB
+      params: {
+        page: String(page),
+        perPage: String(perPage),
+        categoryId,
+        brandId
+      }
+    }],
+    forceRefresh
+  });
+
+  return result.products?.data || [];
+}, [fetchVtexData]);
   
   // Función para obtener órdenes
-  const fetchOrders = useCallback(async (options: {
-    startDate: string;
-    endDate: string;
-    page?: number;
-    perPage?: number;
-    forceRefresh?: boolean;
-  }) => {
-    const {
-      startDate,
-      endDate,
-      page = 1,
-      perPage = 20,
-      forceRefresh = false
-    } = options;
-    
-    const result = await fetchVtexData({
-      endpoints: [{
-        key: 'orders',
-        url: '/api/vtex-orders-list',
-        params: {
-          startDate,
-          endDate,
-          page: String(page),
-          perPage: String(perPage)
-        }
-      }],
-      forceRefresh
-    });
-    
-    return result.orders || [];
-  }, [fetchVtexData]);
+  // Actualizar en el vtexService.ts
+const fetchOrders = useCallback(async (options: {
+  startDate: string;
+  endDate: string;
+  page?: number;
+  perPage?: number;
+  forceRefresh?: boolean;
+}) => {
+  const {
+    startDate,
+    endDate,
+    page = 1,
+    perPage = 20,
+    forceRefresh = false
+  } = options;
+
+  const result = await fetchVtexData({
+    endpoints: [{
+      key: 'orders',
+      url: '/api/vtex-orders-db', // Cambiado de vtex-orders-list a vtex-orders-db
+      params: {
+        startDate,
+        endDate,
+        page: String(page),
+        perPage: String(perPage),
+        includeItems: 'true',
+        includePayments: 'true'
+      }
+    }],
+    forceRefresh
+  });
+
+  return result.orders?.data || [];
+}, [fetchVtexData]);
   
   // Función para obtener una orden específica
-  const fetchOrderDetails = useCallback(async (orderId: string, forceRefresh = false) => {
-    const result = await fetchVtexData({
-      endpoints: [{
-        key: 'orderDetails',
-        url: '/api/vtex-order',
-        params: { orderId }
-      }],
-      forceRefresh
-    });
-    
-    return result.orderDetails;
-  }, [fetchVtexData]);
+const fetchOrderDetails = useCallback(async (orderId: string, forceRefresh = false) => {
+  const result = await fetchVtexData({
+    endpoints: [{
+      key: 'orderDetails',
+      url: '/api/vtex-orders-db', // Cambiado a la nueva API
+      params: { 
+        orderId,
+        includeItems: 'true',
+        includePayments: 'true',
+        includeTotals: 'true'
+      }
+    }],
+    forceRefresh
+  });
+
+  // Si recibimos un array, tomamos el primer resultado
+  if (Array.isArray(result.orderDetails?.data)) {
+    return result.orderDetails.data[0];
+  }
+  
+  return result.orderDetails;
+}, [fetchVtexData]);
   
   return {
     isLoading,

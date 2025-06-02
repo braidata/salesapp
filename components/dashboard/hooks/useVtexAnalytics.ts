@@ -86,7 +86,7 @@ export interface VtexOrderItem {
     additionalInfo: {
         brandName: string;
         brandId: string;
-        categories: Array<{id: number, name: string}>;
+        categories: Array<{ id: number; name: string }>;
         dimension: {
             weight: number;
             height: number;
@@ -134,35 +134,59 @@ export interface VtexFilters {
 }
 
 // Date utility
-const convertRelativeDateToISO = (relativeDate: string): string => {
+const convertRelativeDateToISO = (relativeDate: string, isEndDate = false): string => {
     const today = new Date();
-    
+    today.setHours(0, 0, 0, 0); // Start at beginning of day
+
+    const getDateWithBoundary = (date: Date): string => {
+        const d = new Date(date);
+        if (isEndDate) {
+            d.setHours(23, 59, 59, 999); // End of day
+        } else {
+            d.setHours(0, 0, 0, 0); // Start of day
+        }
+        return d.toISOString();
+    };
+
     switch (relativeDate) {
         case 'today':
-            return today.toISOString().split('T')[0];
-        case 'yesterday':
+            return getDateWithBoundary(today);
+        case 'yesterday': {
             const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
-            return yesterday.toISOString().split('T')[0];
-        case '7daysAgo':
+            return getDateWithBoundary(yesterday);
+        }
+        case '7daysAgo': {
             const sevenDays = new Date(today);
             sevenDays.setDate(sevenDays.getDate() - 7);
-            return sevenDays.toISOString().split('T')[0];
-        case '30daysAgo':
+            return getDateWithBoundary(sevenDays);
+        }
+        case '30daysAgo': {
             const thirtyDays = new Date(today);
             thirtyDays.setDate(thirtyDays.getDate() - 30);
-            return thirtyDays.toISOString().split('T')[0];
+            return getDateWithBoundary(thirtyDays);
+        }
         case '2025-01-01':
-            return '2025-01-01';
         case '2020-01-01':
-            return '2020-01-01';
+            return getDateWithBoundary(new Date(relativeDate));
         default:
-            // Si ya es una fecha ISO, devolverla tal como está
             if (relativeDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                return relativeDate;
+                return getDateWithBoundary(new Date(relativeDate));
             }
-            // Fallback para fechas desconocidas
-            return today.toISOString().split('T')[0];
+            return getDateWithBoundary(today);
+    }
+};
+
+const adjustTimeZone = (dateString: string): string => {
+    if (!dateString) return dateString;
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString;
+        date.setHours(date.getHours() - 4);
+        return date.toISOString();
+    } catch (error) {
+        console.warn('Error adjusting timezone:', error);
+        return dateString;
     }
 };
 
@@ -179,7 +203,7 @@ const formatCurrency = (value: number): string => {
 // VTEX Service
 const useVtexService = () => {
     const baseUrl = '/api';
-    
+
     const fetchOrdersList = async (params: {
         startDate: string;
         endDate: string;
@@ -190,92 +214,137 @@ const useVtexService = () => {
             startDate: params.startDate,
             endDate: params.endDate,
             page: (params.page || 1).toString(),
-            perPage: (params.perPage || 50).toString()
+            perPage: (params.perPage || 50).toString(),
+            includeItems: 'true',
+            includePayments: 'true'
         });
-        
-        const url = `${baseUrl}/vtex-orders-list?${queryParams.toString()}`;
-        console.log('🔗 Calling your API:', url);
-        
+
+        const url = `${baseUrl}/vtex-orders-db?${queryParams.toString()}`;
+        console.log('🔗 Calling DB API:', url);
+
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             }
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            throw new Error(`Orders API Error: ${response.status} ${response.statusText}`);
+            console.error('DB API Error Response:', errorText);
+            throw new Error(`Orders DB API Error: ${response.status} ${response.statusText}`);
         }
-        
-        const data = await response.json();
-        console.log('✅ Orders API Response:', {
-            isArray: Array.isArray(data),
-            length: Array.isArray(data) ? data.length : 'not array',
-            firstItem: Array.isArray(data) ? data[0]?.orderId : 'no data'
+
+        const result = await response.json();
+
+        // Adjust timezone in the response data
+        if (result.data) {
+            result.data = result.data.map((order: any) => ({
+                ...order,
+                creationDate: adjustTimeZone(order.creationDate),
+                lastChange: adjustTimeZone(order.lastChange),
+                authorizedDate: adjustTimeZone(order.authorizedDate),
+                invoicedDate: adjustTimeZone(order.invoicedDate)
+            }));
+        }
+
+        console.log('✅ Orders DB API Response:', {
+            success: result.success,
+            count: result.data?.length || 0,
+            metadata: result.metadata
         });
-        
-        return Array.isArray(data) ? data : [];
+
+        return result.data || [];
     };
-    
+
     const fetchOrderDetails = async (orderId: string) => {
-        const url = `${baseUrl}/vtex-order?orderId=${encodeURIComponent(orderId)}`;
-        console.log('🔗 Calling order details API:', url);
-        
+        const url = `${baseUrl}/vtex-orders-db?orderId=${encodeURIComponent(orderId)}`;
+        console.log('🔗 Calling order details from DB:', url);
+
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             }
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Order Details API Error Response:', errorText);
-            throw new Error(`Order details API Error: ${response.status} ${response.statusText}`);
+            console.error('Order Details DB Error Response:', errorText);
+            throw new Error(`Order details DB Error: ${response.status} ${response.statusText}`);
         }
-        
-        const data = await response.json();
-        console.log('✅ Order Details API Response:', {
-            orderId: data?.orderId,
-            hasItems: !!data?.items,
-            itemsCount: data?.items?.length || 0
+
+        const result = await response.json();
+
+        // Adjust timezone in the order details
+        if (result.data?.[0]) {
+            const order = result.data[0];
+            result.data[0] = {
+                ...order,
+                creationDate: adjustTimeZone(order.creationDate),
+                lastChange: adjustTimeZone(order.lastChange),
+                authorizedDate: adjustTimeZone(order.authorizedDate),
+                invoicedDate: adjustTimeZone(order.invoicedDate)
+            };
+        }
+
+        const order = result.data?.[0];
+
+        if (!order) {
+            throw new Error(`Order ${orderId} not found in database`);
+        }
+
+        console.log('✅ Order Details DB Response:', {
+            orderId: order.orderId,
+            hasItems: !!order.items,
+            itemsCount: order.items?.length || 0
         });
-        
-        return data;
+
+        return order;
     };
-    
+
     const fetchProducts = async (params: {
         from?: number;
         to?: number;
+        categoryId?: string;
+        brandId?: string;
     } = {}) => {
-        const { from = 0, to = 50 } = params;
-        const url = `${baseUrl}/vtex-products?from=${from}&to=${to}`;
-        console.log('🔗 Calling products API:', url);
-        
+        const { from = 0, to = 50, categoryId, brandId } = params;
+
+        const queryParams = new URLSearchParams({
+            page: String(Math.floor(from / 50) + 1),
+            perPage: '50'
+        });
+
+        if (categoryId) queryParams.append('categoryId', categoryId);
+        if (brandId) queryParams.append('brandId', brandId);
+
+        const url = `${baseUrl}/vtex-products-db?${queryParams.toString()}`;
+        console.log('🔗 Calling products from DB:', url);
+
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             }
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Products API Error Response:', errorText);
-            throw new Error(`Products API Error: ${response.status} ${response.statusText}`);
+            console.error('Products DB Error Response:', errorText);
+            throw new Error(`Products DB Error: ${response.status} ${response.statusText}`);
         }
-        
-        const data = await response.json();
-        console.log('✅ Products API Response:', {
-            isArray: Array.isArray(data),
-            length: Array.isArray(data) ? data.length : 'not array'
+
+        const result = await response.json();
+        console.log('✅ Products DB Response:', {
+            success: result.success,
+            count: result.data?.length || 0,
+            metadata: result.metadata
         });
-        
-        return Array.isArray(data) ? data : [];
+
+        return result.data || [];
     };
-    
+
     return {
         fetchOrdersList,
         fetchOrderDetails,
@@ -291,25 +360,25 @@ export const useVtexAnalytics = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState(0);
-    
+
     // Services
     const vtexService = useVtexService();
-    
+
     // Cache
     const cacheRef = useRef<Record<string, {
         data: VtexOrdersData;
         timestamp: number;
         ttl: number;
     }>>({});
-    
+
     const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
-    
+
     // Cache management
     const clearCache = useCallback(() => {
         console.log('🗑️ Clearing VTEX cache');
         cacheRef.current = {};
     }, []);
-    
+
     const clearExpiredCache = useCallback(() => {
         const now = Date.now();
         let clearedCount = 0;
@@ -323,7 +392,7 @@ export const useVtexAnalytics = () => {
             console.log(`🗑️ Cleared ${clearedCount} expired VTEX cache entries`);
         }
     }, []);
-    
+
     // Main fetch function
     const fetchOrders = useCallback(async (
         startDate: string,
@@ -339,11 +408,9 @@ export const useVtexAnalytics = () => {
             forceRefresh = false,
             includeDetails = false
         } = options;
-        
-        // Generar cache key
+
         const cacheKey = `vtex-orders-${startDate}-${endDate}-${maxOrders}-${includeDetails ? 'detailed' : 'basic'}`;
-        
-        // Check cache
+
         clearExpiredCache();
         if (!forceRefresh && cacheRef.current[cacheKey]) {
             const cachedData = cacheRef.current[cacheKey].data;
@@ -353,28 +420,27 @@ export const useVtexAnalytics = () => {
             setError(null);
             return cachedData;
         }
-        
+
         try {
             setLoading(true);
             setError(null);
             setProgress(10);
-            
-            // Convertir fechas relativas a ISO
-            const startDateISO = convertRelativeDateToISO(startDate);
-            const endDateISO = convertRelativeDateToISO(endDate);
-            
-            // Validar que no se consulten más de 30 días
+
+            const startDateISO = convertRelativeDateToISO(startDate, false);
+            const endDateISO = convertRelativeDateToISO(endDate, true);
+
             const startDateObj = new Date(startDateISO);
             const endDateObj = new Date(endDateISO);
-            const daysDifference = Math.ceil((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24));
-            
+            const daysDifference = Math.ceil(
+                (endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)
+            );
             if (daysDifference > 30) {
-                const error = 'No se pueden consultar más de 30 días de datos VTEX por razones de performance y límites de API';
-                setError(error);
-                throw new Error(error);
+                const errorMsg = 'No se pueden consultar más de 30 días de datos VTEX por razones de performance y límites de API';
+                setError(errorMsg);
+                throw new Error(errorMsg);
             }
-            
-            console.log('📦 Fetching VTEX orders via your API:', { 
+
+            console.log('📦 Fetching VTEX orders via your API:', {
                 original: { startDate, endDate },
                 converted: { startDateISO, endDateISO },
                 daysDifference,
@@ -382,8 +448,7 @@ export const useVtexAnalytics = () => {
                 includeDetails,
                 cacheKey
             });
-            
-            // Step 1: Get basic orders list
+
             setProgress(20);
             const ordersList = await vtexService.fetchOrdersList({
                 startDate: startDateISO,
@@ -391,76 +456,70 @@ export const useVtexAnalytics = () => {
                 perPage: maxOrders,
                 page: 1
             });
-            
+
             console.log(`📦 Received ${ordersList?.length || 0} orders from your API`);
-            
-            // Validar respuesta
             if (!Array.isArray(ordersList)) {
                 throw new Error(`Invalid response from your API - expected array, got ${typeof ordersList}`);
             }
-            
+
             setProgress(50);
             let processedOrders = ordersList;
-            
-            // Step 2: Get detailed information if requested
+
             if (includeDetails && ordersList.length > 0) {
                 console.log('📦 Fetching detailed order information...');
-                const detailedOrders = [];
-                const batchSize = 5; // Batch processing para evitar sobrecargar la API
-                
+                const detailedOrders: VtexOrder[] = [];
+                const batchSize = 5;
+
                 for (let i = 0; i < ordersList.length; i += batchSize) {
                     const batch = ordersList.slice(i, i + batchSize);
-                    
+
                     const batchPromises = batch.map(async (basicOrder) => {
                         try {
                             const detailed = await vtexService.fetchOrderDetails(
                                 basicOrder.orderId || basicOrder.sequence
                             );
                             return detailed || basicOrder;
-                        } catch (error) {
-                            console.warn(`Failed to get details for ${basicOrder.orderId}:`, error);
+                        } catch (err) {
+                            console.warn(`Failed to get details for ${basicOrder.orderId}:`, err);
                             return basicOrder;
                         }
                     });
-                    
+
                     const batchResults = await Promise.allSettled(batchPromises);
                     const successfulResults = batchResults
-                        .filter(result => result.status === 'fulfilled')
-                        .map(result => (result as PromiseFulfilledResult<any>).value)
+                        .filter(r => r.status === 'fulfilled')
+                        .map(r => (r as PromiseFulfilledResult<any>).value)
                         .filter(Boolean);
-                    
+
                     detailedOrders.push(...successfulResults);
-                    
-                    // Update progress
+
                     const currentProgress = 50 + Math.round(((i + batchSize) / ordersList.length) * 30);
                     setProgress(Math.min(currentProgress, 80));
-                    
-                    // Delay entre batches para no sobrecargar la API
+
                     if (i + batchSize < ordersList.length) {
                         await new Promise(resolve => setTimeout(resolve, 200));
                     }
                 }
-                
+
                 processedOrders = detailedOrders;
                 console.log(`📦 Processed ${processedOrders.length}/${ordersList.length} orders with details`);
             }
-            
+
             setProgress(80);
-            
-            // Calculate summary statistics
+
             const totalValue = processedOrders.reduce((sum, order) => {
                 const value = order.value || 0;
                 return sum + value;
             }, 0);
-            
+
             const averageOrderValue = processedOrders.length > 0 ? totalValue / processedOrders.length : 0;
-            
+
             const statusBreakdown = processedOrders.reduce((acc, order) => {
                 const status = order.statusDescription || order.status || 'Unknown';
                 acc[status] = (acc[status] || 0) + 1;
                 return acc;
             }, {} as Record<string, number>);
-            
+
             const paymentMethodBreakdown = processedOrders.reduce((acc, order) => {
                 if (order.paymentData?.transactions) {
                     order.paymentData.transactions.forEach(transaction => {
@@ -474,7 +533,7 @@ export const useVtexAnalytics = () => {
                 }
                 return acc;
             }, {} as Record<string, number>);
-            
+
             const vtexData: VtexOrdersData = {
                 orders: processedOrders,
                 summary: {
@@ -485,25 +544,24 @@ export const useVtexAnalytics = () => {
                         endDate: endDateISO
                     },
                     stats: {
-                        totalValue: totalValue / 100, // Convert to pesos
-                        averageOrderValue: averageOrderValue / 100, // Convert to pesos
+                        totalValue: totalValue / 100,
+                        averageOrderValue: averageOrderValue / 100,
                         statusBreakdown,
                         paymentMethodBreakdown
                     }
                 },
                 lastFetch: new Date().toISOString()
             };
-            
-            // Cache result
+
             cacheRef.current[cacheKey] = {
                 data: vtexData,
                 timestamp: Date.now(),
                 ttl: CACHE_TTL
             };
-            
+
             setData(vtexData);
             setProgress(100);
-            
+
             console.log('📦 VTEX fetch completed successfully:', {
                 totalOrders: vtexData.orders.length,
                 daysPeriod: daysDifference,
@@ -512,9 +570,8 @@ export const useVtexAnalytics = () => {
                 statusBreakdown: Object.keys(vtexData.summary.stats.statusBreakdown),
                 paymentMethods: Object.keys(vtexData.summary.stats.paymentMethodBreakdown)
             });
-            
+
             return vtexData;
-            
         } catch (err: any) {
             const errorMessage = err.message || 'Failed to fetch VTEX orders from your API';
             setError(errorMessage);
@@ -531,46 +588,46 @@ export const useVtexAnalytics = () => {
             setProgress(0);
         }
     }, [vtexService, clearExpiredCache]);
-    
+
     // Filter orders
     const getFilteredOrders = useCallback((filters?: VtexFilters): VtexOrder[] => {
         if (!data?.orders) return [];
-        
+
         let filteredOrders = [...data.orders];
-        
+
         if (filters) {
             if (filters.status?.length) {
-                filteredOrders = filteredOrders.filter(order => 
+                filteredOrders = filteredOrders.filter(order =>
                     filters.status!.includes(order.status)
                 );
             }
-            
+
             if (filters.dateFrom) {
                 const fromDate = convertRelativeDateToISO(filters.dateFrom);
-                filteredOrders = filteredOrders.filter(order => 
+                filteredOrders = filteredOrders.filter(order =>
                     order.creationDate >= fromDate
                 );
             }
-            
+
             if (filters.dateTo) {
                 const toDate = convertRelativeDateToISO(filters.dateTo);
-                filteredOrders = filteredOrders.filter(order => 
+                filteredOrders = filteredOrders.filter(order =>
                     order.creationDate <= toDate
                 );
             }
-            
+
             if (filters.minValue !== undefined) {
-                filteredOrders = filteredOrders.filter(order => 
+                filteredOrders = filteredOrders.filter(order =>
                     (order.value / 100) >= filters.minValue!
                 );
             }
-            
+
             if (filters.maxValue !== undefined) {
-                filteredOrders = filteredOrders.filter(order => 
+                filteredOrders = filteredOrders.filter(order =>
                     (order.value / 100) <= filters.maxValue!
                 );
             }
-            
+
             if (filters.paymentMethod?.length) {
                 filteredOrders = filteredOrders.filter(order => {
                     if (!order.paymentData?.transactions) return false;
@@ -581,7 +638,7 @@ export const useVtexAnalytics = () => {
                     );
                 });
             }
-            
+
             if (filters.seller?.length) {
                 filteredOrders = filteredOrders.filter(order =>
                     order.sellers?.some(seller =>
@@ -589,7 +646,7 @@ export const useVtexAnalytics = () => {
                     )
                 );
             }
-            
+
             if (filters.customer) {
                 const customerFilter = filters.customer.toLowerCase();
                 filteredOrders = filteredOrders.filter(order =>
@@ -599,49 +656,46 @@ export const useVtexAnalytics = () => {
                     order.clientProfileData?.document?.includes(customerFilter)
                 );
             }
-            
+
             if (filters.hasTracking !== undefined) {
                 filteredOrders = filteredOrders.filter(order => {
-                    const hasTracking = order.packageAttachment?.packages?.some(pkg => 
+                    const hasTracking = order.packageAttachment?.packages?.some(pkg =>
                         pkg.trackingNumber || pkg.trackingUrl
                     );
                     return filters.hasTracking ? hasTracking : !hasTracking;
                 });
             }
         }
-        
+
         return filteredOrders;
     }, [data]);
-    
+
     // Get analytics data
     const getAnalytics = useCallback(() => {
         if (!data?.orders.length) {
             console.log('📦 No orders available for analytics');
             return null;
         }
-        
+
         const orders = data.orders;
         console.log(`📦 Generating analytics for ${orders.length} orders`);
-        
-        // Sales by date
+
         const salesByDate = orders.reduce((acc, order) => {
             const date = order.creationDate.split('T')[0];
-            const value = (order.value || 0) / 100; // Convert to pesos
+            const value = (order.value || 0) / 100;
             acc[date] = (acc[date] || 0) + value;
             return acc;
         }, {} as Record<string, number>);
-        
-        // Orders by date
+
         const ordersByDate = orders.reduce((acc, order) => {
             const date = order.creationDate.split('T')[0];
             acc[date] = (acc[date] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
-        
-        // Top products
+
         const productStats = orders.reduce((acc, order) => {
             if (!order.items || !Array.isArray(order.items)) return acc;
-            
+
             order.items.forEach(item => {
                 const key = item.refId || item.id || `unknown-${Math.random()}`;
                 if (!acc[key]) {
@@ -659,7 +713,7 @@ export const useVtexAnalytics = () => {
             });
             return acc;
         }, {} as Record<string, any>);
-        
+
         const topProducts = Object.values(productStats)
             .map((product: any) => ({
                 ...product,
@@ -667,7 +721,7 @@ export const useVtexAnalytics = () => {
             }))
             .sort((a: any, b: any) => b.total - a.total)
             .slice(0, 20);
-        
+
         const analytics = {
             salesByDate: Object.entries(salesByDate)
                 .map(([fecha, valor]) => ({ fecha, valor }))
@@ -678,37 +732,28 @@ export const useVtexAnalytics = () => {
             topProducts,
             summary: data.summary
         };
-        
+
         console.log('📦 Analytics generated:', {
             salesDays: analytics.salesByDate.length,
             ordersDays: analytics.ordersByDate.length,
             topProductsCount: analytics.topProducts.length,
             period: `${data.summary.dateRange.startDate} to ${data.summary.dateRange.endDate}`
         });
-        
+
         return analytics;
     }, [data]);
-    
+
     return {
-        // Data
         data,
         loading,
         error,
         progress,
-        
-        // Actions
         fetchOrders,
         clearCache,
-        
-        // Utilities
         getFilteredOrders,
         getAnalytics,
         formatCurrency,
-        
-        // Raw VTEX service access
         vtexService,
-        
-        // Debug
         _debug: {
             cache: Object.keys(cacheRef.current),
             cacheCount: Object.keys(cacheRef.current).length,
