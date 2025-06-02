@@ -58,7 +58,7 @@ export const dateRangeOptions = [
   { id: "7daysAgo", label: "Últimos 7 días", endDate: "today" },
   { id: "30daysAgo", label: "Últimos 30 días", endDate: "today" },
   { id: "2025-01-01", label: "Este año", endDate: "today" },
-  { id: "2020-01-01", label: "Últimos 5 años", endDate: "today" },
+  // { id: "2020-01-01", label: "Últimos 5 años", endDate: "today" },
   { id: "custom", label: "Personalizado", endDate: "custom" },
 ];
 
@@ -163,10 +163,10 @@ export const kpiOptions = [
   // Clientes VTEX
   { 
     id: "vtexClientesCorporativos", 
-    label: "Clientes Corporativos VTEX", 
+    label: "Clientes Empresa VTEX", 
     category: "vtex", 
     icon: <Users size={16} />,
-    description: "Análisis de clientes B2B desde VTEX"
+    description: "Análisis de clientes Empresa desde VTEX"
   },
   { 
     id: "vtexGeografia", 
@@ -185,14 +185,14 @@ export const kpiOptions = [
     description: "Métricas de calidad y completitud de datos VTEX"
   },
   // Ventas Integración
-  // { id: "ventaDiariaDelMes", label: "Venta Diaria Integración", category: "ventas", icon: <DollarSign size={16} /> },
-  // { id: "pedidosDiariosDelMes", label: "Pedidos Diarios Integración", category: "ventas", icon: <ShoppingCart size={16} /> },
-  // { id: "ticketPromedioDelMes", label: "Ticket Promedio Integración", category: "ventas", icon: <FileText size={16} /> },
-  // { id: "ventaAcumulada", label: "Venta Acumulada Integración", category: "ventas", icon: <TrendingUp size={16} /> },
+  { id: "ventaDiariaDelMes", label: "Venta Diaria SAP", category: "ventas", icon: <DollarSign size={16} /> },
+  { id: "pedidosDiariosDelMes", label: "Pedidos Diarios SAP", category: "ventas", icon: <ShoppingCart size={16} /> },
+  { id: "ticketPromedioDelMes", label: "Ticket Promedio SAP", category: "ventas", icon: <FileText size={16} /> },
+  { id: "ventaAcumulada", label: "Venta Acumulada SAP", category: "ventas", icon: <TrendingUp size={16} /> },
   // { id: "comparativos", label: "Comparativos", category: "ventas", icon: <BarChart2 size={16} /> },
 
-  // Productos Integración
-  { id: "kpisDeProductos", label: "KPIs de Productos Integración", category: "productos", icon: <Tag size={16} /> },
+  // Productos SAP
+  { id: "kpisDeProductos", label: "KPIs de Productos SAP", category: "productos", icon: <Tag size={16} /> },
   { id: "kpisPorCategoria", label: "KPIs por Categoría", category: "productos", icon: <Layers size={16} /> },
   { id: "kpisPorMarca", label: "KPIs por Marca", category: "productos", icon: <Tag size={16} /> },
 

@@ -404,7 +404,7 @@ export const useVtexAnalytics = () => {
         } = {}
     ) => {
         const {
-            maxOrders = 1000,
+            maxOrders = 5000,
             forceRefresh = false,
             includeDetails = false
         } = options;
@@ -434,7 +434,7 @@ export const useVtexAnalytics = () => {
             const daysDifference = Math.ceil(
                 (endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)
             );
-            if (daysDifference > 30) {
+            if (daysDifference > 180) {
                 const errorMsg = 'No se pueden consultar más de 30 días de datos VTEX por razones de performance y límites de API';
                 setError(errorMsg);
                 throw new Error(errorMsg);

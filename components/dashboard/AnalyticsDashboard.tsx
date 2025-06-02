@@ -29,8 +29,8 @@ import { useVtexAnalytics } from './hooks/useVtexAnalytics';
 import { getDefaultChartType } from "./services/dataServices";
 
 // Enhanced error component
-const ErrorDisplay: React.FC<{ error: string; kpiKey: string; onRetry?: () => void }> = ({ 
-  error, kpiKey, onRetry 
+const ErrorDisplay: React.FC<{ error: string; kpiKey: string; onRetry?: () => void }> = ({
+  error, kpiKey, onRetry
 }) => (
   <div className="flex items-center justify-center h-full">
     <div className="text-center p-6 rounded-lg" style={{ backgroundColor: `${colors.glass}80` }}>
@@ -97,24 +97,24 @@ const EmptyState: React.FC<{ kpiKey: string; onRefresh?: () => void }> = ({ kpiK
 // Enhanced data source indicator
 const DataSourceIndicator: React.FC<{ kpiKey: string; dataLength: number }> = ({ kpiKey, dataLength }) => {
   const dataSource = getKpiDataSource(kpiKey);
-  
+
   const sourceColors = {
-    sql: colors.accent,
-    ga4: '#4CAF50', 
-    vtex: '#FF6B35',
+    sql: '#0C7ECF', //colors.accent,
+    ga4: '#FFA500',
+    vtex: '#CF3476', //MAGENTA VTEX = 
     ads: '#FF9800'
   };
-  
+
   const sourceLabels = {
-    sql: 'SQL',
+    sql: 'SAP',
     ga4: 'GA4',
     vtex: 'VTEX',
     ads: 'ADS'
   };
-  
+
   return (
     <div className="flex items-center gap-2 text-xs opacity-70">
-      <div 
+      <div
         className="w-2 h-2 rounded-full"
         style={{ backgroundColor: sourceColors[dataSource] }}
       />
@@ -157,7 +157,7 @@ export default function AnalyticsDashboard() {
     formatChartData,
     convertRelativeDateToISO,
     formatCurrency,
-    sqlLoading, 
+    sqlLoading,
     sqlError,
     refreshData,
     _debug
@@ -171,14 +171,14 @@ export default function AnalyticsDashboard() {
   // VTEX Chart Data Conversion Function
   const getVtexChartData = useCallback((kpiKey: string): DataPoint[] => {
     const analytics = vtexAnalytics.getAnalytics();
-    
+
     if (!analytics) {
       console.log('🛒 No VTEX analytics data available');
       return [];
     }
-    
+
     console.log('🛒 Processing VTEX data for KPI:', kpiKey, analytics);
-    
+
     switch (kpiKey) {
       case 'vtexVentasDiarias':
         return analytics.salesByDate?.map(item => ({
@@ -186,7 +186,7 @@ export default function AnalyticsDashboard() {
           value: item.valor,
           label: formatCurrency(item.valor)
         })) || [];
-        
+
       case 'vtexVentaAcumulada':
         // Calcular venta acumulada
         if (!analytics.salesByDate) return [];
@@ -199,29 +199,29 @@ export default function AnalyticsDashboard() {
             label: formatCurrency(acumulado)
           };
         });
-        
+
       case 'vtexPedidosDiarios':
         return analytics.ordersByDate?.map(item => ({
           date: item.fecha,
           value: item.valor,
           label: `${item.valor} pedidos`
         })) || [];
-        
+
       case 'vtexTicketPromedio':
         // Calcular ticket promedio por día
         if (!analytics.salesByDate || !analytics.ordersByDate) return [];
-        
+
         return analytics.salesByDate.map(ventaItem => {
           const pedidoItem = analytics.ordersByDate?.find(p => p.fecha === ventaItem.fecha);
           const ticketPromedio = pedidoItem?.valor ? ventaItem.valor / pedidoItem.valor : 0;
-          
+
           return {
             date: ventaItem.fecha,
             value: ticketPromedio,
             label: formatCurrency(ticketPromedio)
           };
         }).filter(item => item.value > 0);
-        
+
       case 'vtexProductosTop':
         return analytics.topProducts?.slice(0, 20).map(item => ({
           name: item.sku,
@@ -229,7 +229,7 @@ export default function AnalyticsDashboard() {
           quantity: item.cantidad,
           label: `${item.nombre || item.sku} - ${formatCurrency(item.total)}`
         })) || [];
-        
+
       case 'vtexCategoriasTop':
         // Agrupar productos por categoría (simulado)
         if (!analytics.topProducts) return [];
@@ -241,15 +241,15 @@ export default function AnalyticsDashboard() {
           acc[categoria].total += product.total;
           acc[categoria].cantidad += product.cantidad;
           return acc;
-        }, {} as Record<string, {total: number, cantidad: number}>);
-        
+        }, {} as Record<string, { total: number, cantidad: number }>);
+
         return Object.entries(categorias).map(([categoria, data]) => ({
           name: categoria,
           value: data.total,
           quantity: data.cantidad,
           label: `${categoria} - ${formatCurrency(data.total)}`
         }));
-        
+
       case 'vtexMarcasTop':
         // Similar a categorías, pero por marcas
         if (!analytics.topProducts) return [];
@@ -261,15 +261,15 @@ export default function AnalyticsDashboard() {
           acc[marca].total += product.total;
           acc[marca].cantidad += product.cantidad;
           return acc;
-        }, {} as Record<string, {total: number, cantidad: number}>);
-        
+        }, {} as Record<string, { total: number, cantidad: number }>);
+
         return Object.entries(marcas).map(([marca, data]) => ({
           name: marca,
           value: data.total,
           quantity: data.cantidad,
           label: `${marca} - ${formatCurrency(data.total)}`
         }));
-        
+
       case 'vtexEstadosPedidos':
         // Análisis de estados (requiere datos del hook)
         if (!vtexAnalytics.data?.orders) return [];
@@ -278,21 +278,21 @@ export default function AnalyticsDashboard() {
           acc[estado] = (acc[estado] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
-        
+
         return Object.entries(estados).map(([estado, cantidad]) => ({
           name: estado,
           value: cantidad,
           label: `${estado}: ${cantidad} pedidos`
         }));
-        
+
       case 'vtexMetodosPago':
         // Análisis de métodos de pago
         if (!vtexAnalytics.data?.orders) return [];
         const metodosPago = vtexAnalytics.data.orders.reduce((acc, order) => {
-          const metodos = order.paymentData?.transactions?.flatMap(t => 
+          const metodos = order.paymentData?.transactions?.flatMap(t =>
             t.payments?.map(p => p.paymentSystemName) || []
           ) || ['Sin método'];
-          
+
           metodos.forEach(metodo => {
             if (metodo) {
               acc[metodo] = (acc[metodo] || 0) + 1;
@@ -300,13 +300,13 @@ export default function AnalyticsDashboard() {
           });
           return acc;
         }, {} as Record<string, number>);
-        
+
         return Object.entries(metodosPago).map(([metodo, cantidad]) => ({
           name: metodo,
           value: cantidad,
           label: `${metodo}: ${cantidad} usos`
         }));
-        
+
       case 'vtexEnvios':
         // Análisis de empresas de envío
         if (!vtexAnalytics.data?.orders) return [];
@@ -315,13 +315,13 @@ export default function AnalyticsDashboard() {
           acc[empresa] = (acc[empresa] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
-        
+
         return Object.entries(empresasEnvio).map(([empresa, cantidad]) => ({
           name: empresa,
           value: cantidad,
           label: `${empresa}: ${cantidad} envíos`
         }));
-        
+
       case 'vtexGeografia':
         // Análisis geográfico por región
         if (!vtexAnalytics.data?.orders) return [];
@@ -330,13 +330,13 @@ export default function AnalyticsDashboard() {
           acc[region] = (acc[region] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
-        
+
         return Object.entries(regiones).map(([region, cantidad]) => ({
           name: region,
           value: cantidad,
           label: `${region}: ${cantidad} pedidos`
         }));
-        
+
       case 'vtexClientesCorporativos':
         // Análisis de clientes B2B vs B2C
         if (!vtexAnalytics.data?.orders) return [];
@@ -345,13 +345,13 @@ export default function AnalyticsDashboard() {
           acc[tipo] = (acc[tipo] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
-        
+
         return Object.entries(tiposCliente).map(([tipo, cantidad]) => ({
           name: tipo,
           value: cantidad,
           label: `${tipo}: ${cantidad} pedidos`
         }));
-        
+
       case 'vtexTiemposEntrega':
         // Análisis de tiempos de entrega estimados
         if (!vtexAnalytics.data?.orders) return [];
@@ -360,49 +360,49 @@ export default function AnalyticsDashboard() {
           acc[tiempo] = (acc[tiempo] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
-        
+
         return Object.entries(tiemposEntrega).map(([tiempo, cantidad]) => ({
           name: tiempo,
           value: cantidad,
           label: `${tiempo}: ${cantidad} pedidos`
         }));
-        
+
       case 'vtexCalidadDatos':
         // Métricas de calidad de datos
         if (!vtexAnalytics.data?.orders) return [];
         const metricas = [
-          { 
-            name: 'Pedidos con tracking', 
-            value: vtexAnalytics.data.orders.filter(o => 
+          {
+            name: 'Pedidos con tracking',
+            value: vtexAnalytics.data.orders.filter(o =>
               o.packageAttachment?.packages?.some(p => p.trackingNumber)
-            ).length 
+            ).length
           },
-          { 
-            name: 'Pedidos con factura', 
-            value: vtexAnalytics.data.orders.filter(o => 
+          {
+            name: 'Pedidos con factura',
+            value: vtexAnalytics.data.orders.filter(o =>
               o.packageAttachment?.packages?.some(p => p.invoiceUrl)
-            ).length 
+            ).length
           },
-          { 
-            name: 'Datos completos cliente', 
-            value: vtexAnalytics.data.orders.filter(o => 
+          {
+            name: 'Datos completos cliente',
+            value: vtexAnalytics.data.orders.filter(o =>
               o.clientProfileData?.email && o.clientProfileData?.phone
-            ).length 
+            ).length
           },
-          { 
-            name: 'Dirección completa', 
-            value: vtexAnalytics.data.orders.filter(o => 
+          {
+            name: 'Dirección completa',
+            value: vtexAnalytics.data.orders.filter(o =>
               o.shippingData?.address?.street && o.shippingData?.address?.city
-            ).length 
+            ).length
           }
         ];
-        
+
         return metricas.map(metrica => ({
           name: metrica.name,
           value: metrica.value,
           label: `${metrica.name}: ${metrica.value} pedidos`
         }));
-        
+
       default:
         console.warn('🛒 Unknown VTEX KPI:', kpiKey);
         return [];
@@ -411,25 +411,25 @@ export default function AnalyticsDashboard() {
 
   // Enhanced data fetching with VTEX support
   // Enhanced data fetching with VTEX support - FIXED
-useEffect(() => {
-  console.log(`🔄 Effect triggered for KPI: ${activeKpi}, dateRange:`, dateRange);
-  
-  if (isVtexKpi(activeKpi)) {
-    // Para KPIs VTEX, usar el hook vtexAnalytics
-    console.log('🛒 Fetching VTEX data for:', activeKpi);
-    vtexAnalytics.fetchOrders(dateRange.startDate, dateRange.endDate, {
-      includeDetails: true,
-      forceRefresh: false
-    }).catch(err => {
-      console.error('VTEX fetchOrders failed:', err);
-    });
-  } else {
-    // Para otros KPIs, usar el hook analytics normal
-    fetchData(activeKpi, dateRange).catch(err => {
-      console.error('fetchData failed in effect:', err);
-    });
-  }
-}, [activeKpi, dateRange.startDate, dateRange.endDate, fetchData]); // ✅ FIJO: Solo dependencias estables
+  useEffect(() => {
+    console.log(`🔄 Effect triggered for KPI: ${activeKpi}, dateRange:`, dateRange);
+
+    if (isVtexKpi(activeKpi)) {
+      // Para KPIs VTEX, usar el hook vtexAnalytics
+      console.log('🛒 Fetching VTEX data for:', activeKpi);
+      vtexAnalytics.fetchOrders(dateRange.startDate, dateRange.endDate, {
+        includeDetails: true,
+        forceRefresh: false
+      }).catch(err => {
+        console.error('VTEX fetchOrders failed:', err);
+      });
+    } else {
+      // Para otros KPIs, usar el hook analytics normal
+      fetchData(activeKpi, dateRange).catch(err => {
+        console.error('fetchData failed in effect:', err);
+      });
+    }
+  }, [activeKpi, dateRange.startDate, dateRange.endDate, fetchData]); // ✅ FIJO: Solo dependencias estables
 
   // Debug logging
   useEffect(() => {
@@ -456,7 +456,7 @@ useEffect(() => {
     if (!sortOptions[kpiKey]) {
       const defaultSort = [
         "ventaDiariaDelMes",
-        "pedidosDiariosDelMes", 
+        "pedidosDiariosDelMes",
         "ticketPromedioDelMes",
         "vtexVentasDiarias",
         "vtexPedidosDiarios",
@@ -477,7 +477,7 @@ useEffect(() => {
   const getViewMode = (kpiKey: string): ViewMode => {
     const tableDefaultKpis = [
       "tasaConversionWeb",
-      "funnelConversiones", 
+      "funnelConversiones",
       "kpisDeProductos",
       "vtexProductosTop",
       "kpisPorCategoria",
@@ -533,56 +533,56 @@ useEffect(() => {
     const viewMode = getViewMode(kpiKey);
 
     // Enhanced data retrieval with comprehensive logging
-   // Enhanced data retrieval with comprehensive logging
-console.group(`📊 Rendering chart for ${kpiKey}`);
+    // Enhanced data retrieval with comprehensive logging
+    console.group(`📊 Rendering chart for ${kpiKey}`);
 
-const isVtex = isVtexKpi(kpiKey);
-let chartData: DataPoint[] = [];
+    const isVtex = isVtexKpi(kpiKey);
+    let chartData: DataPoint[] = [];
 
-if (isVtex) {
-  console.log('🛒 Getting VTEX chart data');
-  chartData = getVtexChartData(kpiKey);
-} else {
-  console.log('📈 Getting regular analytics data');
-  chartData = getKpiData(kpiKey);
-}
+    if (isVtex) {
+      console.log('🛒 Getting VTEX chart data');
+      chartData = getVtexChartData(kpiKey);
+    } else {
+      console.log('📈 Getting regular analytics data');
+      chartData = getKpiData(kpiKey);
+    }
 
-console.log('Chart data retrieved:', {
-  isVtex,
-  length: chartData?.length || 0,
-  firstItem: chartData?.[0],
-  isArray: Array.isArray(chartData),
-  type: typeof chartData
-});
-    
+    console.log('Chart data retrieved:', {
+      isVtex,
+      length: chartData?.length || 0,
+      firstItem: chartData?.[0],
+      isArray: Array.isArray(chartData),
+      type: typeof chartData
+    });
+
     // Validate and sort data
     // Validate and sort data
-let sortedData: DataPoint[] = [];
-let dataError = null;
+    let sortedData: DataPoint[] = [];
+    let dataError = null;
 
-try {
-  if (!chartData || !Array.isArray(chartData)) {
-    if (isVtex && vtexAnalytics.loading) {
-      console.log('🛒 VTEX data is still loading...');
-      sortedData = [];
-    } else {
-      throw new Error(`Invalid data format: expected array, got ${typeof chartData}`);
+    try {
+      if (!chartData || !Array.isArray(chartData)) {
+        if (isVtex && vtexAnalytics.loading) {
+          console.log('🛒 VTEX data is still loading...');
+          sortedData = [];
+        } else {
+          throw new Error(`Invalid data format: expected array, got ${typeof chartData}`);
+        }
+      } else if (chartData.length === 0) {
+        if (isVtex && vtexAnalytics.loading) {
+          console.log('🛒 VTEX data is loading, showing empty state temporarily');
+        } else {
+          console.log('No data available for KPI');
+        }
+        sortedData = [];
+      } else {
+        sortedData = applySorting(chartData, kpiKey, sortOption);
+        console.log('Data sorted successfully:', sortedData.length, 'items');
+      }
+    } catch (err: any) {
+      console.error('Error processing chart data:', err);
+      dataError = err.message;
     }
-  } else if (chartData.length === 0) {
-    if (isVtex && vtexAnalytics.loading) {
-      console.log('🛒 VTEX data is loading, showing empty state temporarily');
-    } else {
-      console.log('No data available for KPI');
-    }
-    sortedData = [];
-  } else {
-    sortedData = applySorting(chartData, kpiKey, sortOption);
-    console.log('Data sorted successfully:', sortedData.length, 'items');
-  }
-} catch (err: any) {
-  console.error('Error processing chart data:', err);
-  dataError = err.message;
-}
 
     // Export handlers with error handling
     const handleExportToXLSX = () => {
@@ -592,7 +592,7 @@ try {
         console.error('Export to XLSX failed:', err);
       }
     };
-    
+
     const handleExportToPDF = () => {
       try {
         const kpiLabel = kpiOptions.find((opt) => opt.id === kpiKey)?.label || kpiKey;
@@ -766,9 +766,8 @@ try {
                 {sortTypeOptions.map((option) => (
                   <button
                     key={option.id}
-                    className={`p-1.5 rounded-md transition-all duration-200 flex items-center ${
-                      sortOption === option.id ? "bg-opacity-80" : "bg-opacity-20 hover:bg-opacity-40"
-                    }`}
+                    className={`p-1.5 rounded-md transition-all duration-200 flex items-center ${sortOption === option.id ? "bg-opacity-80" : "bg-opacity-20 hover:bg-opacity-40"
+                      }`}
                     style={{
                       backgroundColor: sortOption === option.id ? colors.accent : colors.glass,
                       color: sortOption === option.id ? colors.secondary : colors.text,
@@ -817,7 +816,7 @@ try {
             <p className="text-sm mb-3" style={{ color: colors.text }}>
               {getKpiDescription(kpiKey)}
             </p>
-            
+
             {/* Additional debug info in development */}
             {process.env.NODE_ENV === 'development' && (
               <details className="mt-3">
@@ -827,7 +826,7 @@ try {
                   <div>Sorted Length: {sortedData.length}</div>
                   <div>Has Error: {dataError ? 'Yes' : 'No'}</div>
                   <div>Loading: {loading ? 'Yes' : 'No'}</div>
-                  <div>SQL Loading: {sqlLoading ? 'Yes' : 'No'}</div>
+                  <div>SAP Loading: {sqlLoading ? 'Yes' : 'No'}</div>
                   <div>VTEX Loading: {vtexAnalytics.loading ? 'Yes' : 'No'}</div>
                 </div>
               </details>
@@ -845,7 +844,7 @@ try {
                   style={{ borderColor: `${colors.accent} transparent ${colors.accent} transparent` }}
                 />
                 <p className="text-sm">
-                  {sqlLoading ? "Cargando datos SQL..." : vtexAnalytics.loading ? "Cargando datos VTEX..." : "Cargando datos GA4..."}
+                  {sqlLoading ? "Cargando datos SAP..." : vtexAnalytics.loading ? "Cargando datos VTEX..." : "Cargando datos GA4..."}
                 </p>
                 <p className="text-xs opacity-70 mt-1">
                   {kpiKey}
@@ -853,8 +852,8 @@ try {
               </div>
             </div>
           ) : error || sqlError || vtexAnalytics.error || dataError ? (
-            <ErrorDisplay 
-              error={error || sqlError || vtexAnalytics.error || dataError || 'Error desconocido'} 
+            <ErrorDisplay
+              error={error || sqlError || vtexAnalytics.error || dataError || 'Error desconocido'}
               kpiKey={kpiKey}
               onRetry={() => {
                 console.log('🔄 Retry triggered from error display');
@@ -867,7 +866,7 @@ try {
               }}
             />
           ) : sortedData.length === 0 ? (
-            <EmptyState 
+            <EmptyState
               kpiKey={kpiKey}
               onRefresh={() => {
                 console.log('🔄 Refresh triggered from empty state');
@@ -886,7 +885,7 @@ try {
                 ? renderChart(kpiKey, chartType, sortedData, activeTooltipIndex, setActiveTooltipIndex)
                 : renderDataTable(sortedData, kpiKey)
               }
-              
+
               {/* Data summary footer */}
               <div className="mt-4 p-2 rounded" style={{ backgroundColor: `${colors.glass}40` }}>
                 <div className="flex justify-between items-center text-xs opacity-70">
@@ -1017,18 +1016,18 @@ try {
               <p className="text-sm opacity-70">
                 {data?.metadata?.periodo.startDate} — {data?.metadata?.periodo.endDate}
               </p>
-              
+
               {/* Enhanced status indicators */}
               <div className="flex items-center gap-2">
                 {(sqlLoading || loading || vtexAnalytics.loading) && (
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
                     <span className="text-xs opacity-50">
-                      {sqlLoading ? 'Cargando SQL...' : vtexAnalytics.loading ? 'Cargando VTEX...' : 'Cargando GA4...'}
+                      {sqlLoading ? 'Cargando SAP...' : vtexAnalytics.loading ? 'Cargando VTEX...' : 'Cargando GA4...'}
                     </span>
                   </div>
                 )}
-                
+
                 {(sqlError || error || vtexAnalytics.error) && (
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-red-400 rounded-full" />
@@ -1037,7 +1036,7 @@ try {
                     </span>
                   </div>
                 )}
-                
+
                 {!loading && !sqlLoading && !vtexAnalytics.loading && !error && !sqlError && !vtexAnalytics.error && (
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-400 rounded-full" />
@@ -1061,7 +1060,7 @@ try {
                   dateRange.startDate !== "30daysAgo" &&
                   dateRange.startDate !== "2025-01-01" &&
                   dateRange.startDate !== "2020-01-01");
-                  
+
               return (
                 <button
                   key={option.id}
@@ -1072,9 +1071,8 @@ try {
                       setDateRange({ startDate: option.id, endDate: option.endDate });
                     }
                   }}
-                  className={`px-3 py-1 text-sm rounded transition-all duration-300 ${
-                    isActive ? "bg-opacity-90 shadow-lg" : "bg-opacity-20 hover:bg-opacity-40"
-                  }`}
+                  className={`px-3 py-1 text-sm rounded transition-all duration-300 ${isActive ? "bg-opacity-90 shadow-lg" : "bg-opacity-20 hover:bg-opacity-40"
+                    }`}
                   style={{
                     backgroundColor: isActive ? colors.accent : colors.glass,
                     color: isActive ? colors.secondary : colors.text,
@@ -1121,9 +1119,8 @@ try {
                 <button
                   key={category.id}
                   onClick={() => setKpiCategories(category.id)}
-                  className={`px-2 py-1 text-xs rounded-md transition-all duration-300 flex items-center gap-1 ${
-                    kpiCategories === category.id ? "bg-opacity-90" : "bg-opacity-20 hover:bg-opacity-40"
-                  }`}
+                  className={`px-2 py-1 text-xs rounded-md transition-all duration-300 flex items-center gap-1 ${kpiCategories === category.id ? "bg-opacity-90" : "bg-opacity-20 hover:bg-opacity-40"
+                    }`}
                   style={{
                     backgroundColor: kpiCategories === category.id ? colors.accent : colors.glass,
                     color: kpiCategories === category.id ? colors.secondary : colors.text,
@@ -1143,9 +1140,8 @@ try {
                   <button
                     key={option.id}
                     onClick={() => setActiveKpi(option.id)}
-                    className={`p-3 rounded-md text-left transition-all duration-300 flex items-center ${
-                      activeKpi === option.id ? "bg-opacity-20 shadow-inner" : "bg-opacity-5 hover:bg-opacity-10"
-                    }`}
+                    className={`p-3 rounded-md text-left transition-all duration-300 flex items-center focus:text-black active:text-black ${activeKpi === option.id ? "bg-opacity-20 shadow-inner" : "bg-opacity-5 hover:bg-opacity-10"
+                      }`}
                     style={{
                       backgroundColor: activeKpi === option.id ? colors.accent : "transparent",
                       boxShadow:
@@ -1164,15 +1160,16 @@ try {
                       <div>{option.label}</div>
                       {activeKpi === option.id && (
                         <div className="text-xs opacity-70 mt-1">
-                          <DataSourceIndicator 
-                            kpiKey={option.id} 
-                            dataLength={isVtexKpi(option.id) ? getVtexChartData(option.id).length : getKpiData(option.id).length} 
+                          <DataSourceIndicator
+                            kpiKey={option.id}
+                            dataLength={isVtexKpi(option.id) ? getVtexChartData(option.id).length : getKpiData(option.id).length}
                           />
                         </div>
                       )}
                     </div>
                   </button>
-                ))}
+                ))
+              }
             </div>
 
             {/* Enhanced system status */}
@@ -1203,7 +1200,7 @@ try {
                     </span>
                   )}
                 </div>
-                
+
                 {/* Debug info for development */}
                 {process.env.NODE_ENV === 'development' && (_debug || vtexAnalytics._debug) && (
                   <div className="mt-2 text-xs opacity-50">
@@ -1235,13 +1232,12 @@ try {
                       : summary?.status === "warning"
                         ? colors.warning
                         : colors.accent,
-                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 2px ${
-                    summary?.status === "error"
+                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 2px ${summary?.status === "error"
                       ? colors.danger
                       : summary?.status === "warning"
                         ? colors.warning
                         : colors.accent
-                  }40`,
+                    }40`,
                 }}
               >
                 <h3 className="text-sm font-semibold opacity-70">{summary?.title}</h3>
@@ -1267,9 +1263,8 @@ try {
                 style={{
                   backgroundColor: colors.glass,
                   borderColor: error || sqlError || vtexAnalytics.error ? colors.danger : colors.accent,
-                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 2px ${
-                    error || sqlError || vtexAnalytics.error ? colors.danger : colors.accent
-                  }40`,
+                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 2px ${error || sqlError || vtexAnalytics.error ? colors.danger : colors.accent
+                    }40`,
                 }}
               >
                 <h3 className="text-sm font-semibold opacity-70">Estado del Sistema</h3>
@@ -1283,7 +1278,7 @@ try {
                 </div>
                 <div className="text-sm mt-1 opacity-70">
                   {loading || sqlLoading || vtexAnalytics.loading
-                    ? (sqlLoading ? "Obteniendo datos SQL..." : vtexAnalytics.loading ? "Obteniendo datos VTEX..." : "Obteniendo datos GA4...")
+                    ? (sqlLoading ? "Obteniendo datos SAP..." : vtexAnalytics.loading ? "Obteniendo datos VTEX..." : "Obteniendo datos GA4...")
                     : error || sqlError || vtexAnalytics.error
                       ? `Error: ${(error || sqlError || vtexAnalytics.error)?.substring(0, 30)}...`
                       : `${data?.metadata?.kpisExitosos || 0} KPIs activos`}
@@ -1344,9 +1339,9 @@ try {
                   {kpiOptions.find((opt) => opt.id === activeKpi)?.label || "Gráfico"}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <DataSourceIndicator 
-                    kpiKey={activeKpi} 
-                    dataLength={isVtexKpi(activeKpi) ? getVtexChartData(activeKpi).length : getKpiData(activeKpi).length} 
+                  <DataSourceIndicator
+                    kpiKey={activeKpi}
+                    dataLength={isVtexKpi(activeKpi) ? getVtexChartData(activeKpi).length : getKpiData(activeKpi).length}
                   />
                 </div>
               </div>
