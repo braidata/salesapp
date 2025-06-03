@@ -115,20 +115,20 @@ export const kpiOptions = [
     icon: <Tag size={16} />,
     description: "Productos más vendidos según datos VTEX"
   },
-  { 
-    id: "vtexCategoriasTop", 
-    label: "Top Categorías VTEX", 
-    category: "vtex", 
-    icon: <Layers size={16} />,
-    description: "Categorías más vendidas desde VTEX"
-  },
-  { 
-    id: "vtexMarcasTop", 
-    label: "Top Marcas VTEX", 
-    category: "vtex", 
-    icon: <Tag size={16} />,
-    description: "Marcas más vendidas desde VTEX"
-  },
+  // { 
+  //   id: "vtexCategoriasTop", 
+  //   label: "Top Categorías VTEX", 
+  //   category: "vtex", 
+  //   icon: <Layers size={16} />,
+  //   description: "Categorías más vendidas desde VTEX"
+  // },
+  // { 
+  //   id: "vtexMarcasTop", 
+  //   label: "Top Marcas VTEX", 
+  //   category: "vtex", 
+  //   icon: <Tag size={16} />,
+  //   description: "Marcas más vendidas desde VTEX"
+  // },
 
   // Operacional VTEX
   { 
@@ -145,20 +145,20 @@ export const kpiOptions = [
     icon: <CreditCard size={16} />,
     description: "Análisis de métodos de pago desde VTEX"
   },
-  { 
-    id: "vtexEnvios", 
-    label: "Análisis de Envíos VTEX", 
-    category: "vtex", 
-    icon: <Truck size={16} />,
-    description: "Métricas de envío y logística desde VTEX"
-  },
-  { 
-    id: "vtexTiemposEntrega", 
-    label: "Tiempos de Entrega VTEX", 
-    category: "vtex", 
-    icon: <Clock size={16} />,
-    description: "Análisis de tiempos de entrega desde VTEX"
-  },
+  // { 
+  //   id: "vtexEnvios", 
+  //   label: "Análisis de Envíos VTEX", 
+  //   category: "vtex", 
+  //   icon: <Truck size={16} />,
+  //   description: "Métricas de envío y logística desde VTEX"
+  // },
+  // { 
+  //   id: "vtexTiemposEntrega", 
+  //   label: "Tiempos de Entrega VTEX", 
+  //   category: "vtex", 
+  //   icon: <Clock size={16} />,
+  //   description: "Análisis de tiempos de entrega desde VTEX"
+  // },
 
   // Clientes VTEX
   { 
@@ -168,22 +168,22 @@ export const kpiOptions = [
     icon: <Users size={16} />,
     description: "Análisis de clientes Empresa desde VTEX"
   },
-  { 
-    id: "vtexGeografia", 
-    label: "Análisis Geográfico VTEX", 
-    category: "vtex", 
-    icon: <MapPin size={16} />,
-    description: "Distribución geográfica de pedidos VTEX"
-  },
+  // { 
+  //   id: "vtexGeografia", 
+  //   label: "Análisis Geográfico VTEX", 
+  //   category: "vtex", 
+  //   icon: <MapPin size={16} />,
+  //   description: "Distribución geográfica de pedidos VTEX"
+  // },
 
-  // Calidad de Datos VTEX
-  { 
-    id: "vtexCalidadDatos", 
-    label: "Calidad de Datos VTEX", 
-    category: "vtex", 
-    icon: <AlertCircle size={16} />,
-    description: "Métricas de calidad y completitud de datos VTEX"
-  },
+  // // Calidad de Datos VTEX
+  // { 
+  //   id: "vtexCalidadDatos", 
+  //   label: "Calidad de Datos VTEX", 
+  //   category: "vtex", 
+  //   icon: <AlertCircle size={16} />,
+  //   description: "Métricas de calidad y completitud de datos VTEX"
+  // },
   // Ventas Integración
   { id: "ventaDiariaDelMes", label: "Venta Diaria SAP", category: "ventas", icon: <DollarSign size={16} /> },
   { id: "pedidosDiariosDelMes", label: "Pedidos Diarios SAP", category: "ventas", icon: <ShoppingCart size={16} /> },

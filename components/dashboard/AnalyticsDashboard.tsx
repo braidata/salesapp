@@ -23,6 +23,8 @@ import {
   exportToXLSX, exportToPDF, copyChartAsImage
 } from "./ui/chartComponents";
 
+import DataTable from "./ui/DataTable";
+
 // Enhanced hook imports
 import { useAnalyticsData } from "./hooks/useAnalyticsData";
 import { useVtexAnalytics } from './hooks/useVtexAnalytics';
@@ -143,6 +145,9 @@ export default function AnalyticsDashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  
+  
+
 
   // Enhanced hook usage with debug info
   const {
@@ -341,7 +346,7 @@ export default function AnalyticsDashboard() {
         // Análisis de clientes B2B vs B2C
         if (!vtexAnalytics.data?.orders) return [];
         const tiposCliente = vtexAnalytics.data.orders.reduce((acc, order) => {
-          const tipo = order.clientProfileData?.isCorporate ? 'Corporativo' : 'Individual';
+          const tipo = order.clientProfileData?.isCorporate ? 'Empresas' : 'Particulares';
           acc[tipo] = (acc[tipo] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
@@ -883,7 +888,18 @@ export default function AnalyticsDashboard() {
               {/* Render chart or table based on view mode */}
               {viewMode === "chart"
                 ? renderChart(kpiKey, chartType, sortedData, activeTooltipIndex, setActiveTooltipIndex)
-                : renderDataTable(sortedData, kpiKey)
+                : (
+      <DataTable 
+          data={sortedData} 
+          // Define las columnas según la estructura de tus datos. Por ejemplo:
+          columns={Object.keys(sortedData[0]).map(key => ({
+              key,
+              label: key,
+              sortable: true
+          }))}
+          kpiKey={kpiKey} 
+      />
+    )
               }
 
               {/* Data summary footer */}
