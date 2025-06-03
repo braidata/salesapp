@@ -1,6 +1,6 @@
 'use client';
 // components/Dashboard/ui/chartComponents.tsx
-import React from 'react';
+import { React, useState } from 'react';
 import DataTable from './DataTable';
 import {
     BarChart,
@@ -36,6 +36,9 @@ import html2canvas from "html2canvas";
 import { colors, tooltipStyle } from '../constants/colors';
 import { formatCurrency } from '../services/dataServices';
 import { Table2 } from 'lucide-react';
+
+
+
 
 // Custom tooltip for pie charts
 export const renderCustomizedPieTooltip = ({ active, payload }: any) => {
@@ -166,59 +169,59 @@ export const exportToXLSX = (chartData: any[], kpiKey: string) => {
 
 // Export chart as PDF
 export const exportToPDF = (kpiKey: string, kpiLabel: string) => {
-  const chartContainer = document.getElementById(`chart-${kpiKey}`);
-  if (!chartContainer) {
-    alert("No se pudo encontrar el gráfico para exportar");
-    return;
-  }
+    const chartContainer = document.getElementById(`chart-${kpiKey}`);
+    if (!chartContainer) {
+        alert("No se pudo encontrar el gráfico para exportar");
+        return;
+    }
 
-  try {
-    // Opciones para asegurar que se capture el fondo oscuro
-    const options = {
-      backgroundColor: colors.secondary,
-      useCORS: true,
-      scale: 2,
-      removeContainer: false,
-      onclone: (clonedDocument: any) => {
-        const clonedElement = clonedDocument.getElementById(`chart-${kpiKey}`);
-        if (clonedElement) {
-          clonedElement.style.backgroundColor = colors.secondary;
-          clonedElement.style.padding = '20px';
-          clonedElement.style.borderRadius = '8px';
-        }
-      }
-    };
+    try {
+        // Opciones para asegurar que se capture el fondo oscuro
+        const options = {
+            backgroundColor: colors.secondary,
+            useCORS: true,
+            scale: 2,
+            removeContainer: false,
+            onclone: (clonedDocument: any) => {
+                const clonedElement = clonedDocument.getElementById(`chart-${kpiKey}`);
+                if (clonedElement) {
+                    clonedElement.style.backgroundColor = colors.secondary;
+                    clonedElement.style.padding = '20px';
+                    clonedElement.style.borderRadius = '8px';
+                }
+            }
+        };
 
-    html2canvas(chartContainer, options).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "mm",
-        format: "a4",
-      });
+        html2canvas(chartContainer, options).then((canvas) => {
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF({
+                orientation: "landscape",
+                unit: "mm",
+                format: "a4",
+            });
 
-      pdf.setFillColor(25, 43, 50);
-      pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight(), 'F');
-      
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            pdf.setFillColor(25, 43, 50);
+            pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight(), 'F');
 
-      pdf.setFontSize(16);
-      pdf.setTextColor(224, 231, 255);
-      pdf.text(`${kpiLabel || kpiKey}`, 14, 15);
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.setFontSize(10);
-      pdf.setTextColor(224, 231, 255);
-      pdf.text(`Generado: ${new Date().toLocaleString()}`, 14, 22);
+            pdf.setFontSize(16);
+            pdf.setTextColor(224, 231, 255);
+            pdf.text(`${kpiLabel || kpiKey}`, 14, 15);
 
-      pdf.addImage(imgData, "PNG", 10, 30, pdfWidth - 20, pdfHeight - 20);
-      pdf.save(`${kpiKey}_${new Date().toISOString().split("T")[0]}.pdf`);
-    });
-  } catch (error) {
-    console.error("Error al exportar a PDF:", error);
-    alert("Error al exportar a PDF. Consulta la consola para más detalles.");
-  }
+            pdf.setFontSize(10);
+            pdf.setTextColor(224, 231, 255);
+            pdf.text(`Generado: ${new Date().toLocaleString()}`, 14, 22);
+
+            pdf.addImage(imgData, "PNG", 10, 30, pdfWidth - 20, pdfHeight - 20);
+            pdf.save(`${kpiKey}_${new Date().toISOString().split("T")[0]}.pdf`);
+        });
+    } catch (error) {
+        console.error("Error al exportar a PDF:", error);
+        alert("Error al exportar a PDF. Consulta la consola para más detalles.");
+    }
 };
 
 // Copy chart as image
@@ -250,8 +253,18 @@ export const copyChartAsImage = (kpiKey: string) => {
     }
 };
 
+
 // Render data as table
 export const renderDataTable = (chartData: any[], kpiKey: string) => {
+    const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' } | null>(null);
+    const sortedData = sortConfig ? [...chartData].sort((a, b) => {
+        const aValue = a[sortConfig.column];
+        const bValue = b[sortConfig.column];
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    }) : chartData;
+
     if (chartData.length === 0) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -272,51 +285,21 @@ export const renderDataTable = (chartData: any[], kpiKey: string) => {
                         {columns.map((column) => (
                             <th
                                 key={column}
-                                className="p-2 text-left border-b sticky top-0 z-10"
+                                className="p-2 text-left border-b sticky top-0 z-10 cursor-pointer"
                                 style={{
                                     borderColor: colors.accent,
                                     backgroundColor: colors.secondary,
                                 }}
+                                onClick={() => {
+                                    let direction: 'asc' | 'desc' = 'asc';
+                                    if (sortConfig?.column === column && sortConfig.direction === 'asc') {
+                                        direction = 'desc';
+                                    }
+                                    setSortConfig({ column, direction });
+                                }}
                             >
-                                {column === "date" ? "Fecha"
-                                    : column === "value" ? "Valor"
-                                    : column === "name" ? "Nombre"
-                                    : column === "percentage" ? "Porcentaje"
-                                    : column === "average" ? "Promedio"
-                                    : column === "impressions" ? "Total carritos"
-                                    : column === "clicks" ? "Compras completadas"
-                                    : column === "ctr" ? "Tasa abandono"
-                                    : column === "addToCarts" ? "Añadidos al carrito"
-                                    : column === "purchases" ? "Compras"
-                                    : column === "abandoned" ? "Abandonados"
-                                    : column === "revenue" ? "Ingresos"
-                                    : column === "fullMark" ? "Valor máximo"
-                                    : column === "actual" ? "Actual"
-                                    : column === "anterior" ? "Anterior"
-                                    : column === "variacion" ? "Variación %"
-                                    : column === "tasaConversion" ? "Tasa Conversión %"
-                                    : column === "compras" ? "Compras"
-                                    : column === "abandonmentRate" ? "Tasa Abandono %"
-                                    : column === "responses" ? "Respuestas"
-                                    : column === "openRate" ? "Tasa Apertura %"
-                                    : column === "clickRate" ? "Tasa Clics %"
-                                    : column === "conversions" ? "Conversiones"
-                                    : column === "campaign" ? "Campaña"
-                                    : column === "sessions" ? "Sesiones"
-                                    : column === "area" ? "Área"
-                                    : column === "métrica" ? "Métrica"
-                                    : column === "sugerencia" ? "Sugerencia"
-                                    : column === "impactoEstimado" ? "Impacto Estimado"
-                                    : column === "producto" ? "Producto"
-                                    : column === "categoria" ? "Categoría"
-                                    : column === "marca" ? "Marca"
-                                    : column === "vistas" ? "Vistas"
-                                    : column === "eventos" ? "Eventos"
-                                    : column === "ingresos" ? "Ingresos"
-                                    : column === "nombre" ? "Nombre"
-                                    : column === "valor" ? "Valor"
-                                    : column === "tasa" ? "Tasa %"
-                                    : column}
+                                {column}
+                                {sortConfig?.column === column ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : null}
                             </th>
                         ))}
                     </tr>
@@ -636,11 +619,17 @@ export const renderChart = (kpiKey: string, chartType: string, chartData: any[],
             );
 
         case "pie":
+            const total = chartData.reduce((sum, entry) => sum + entry.value, 0);
+            const dataWithPercentages = chartData.map(entry => ({
+                ...entry,
+                percentage: `${((entry.value / total) * 100).toFixed(1)}%`
+            }));
+
             return (
                 <ResponsiveContainer width="100%" height={400} {...chartProps}>
                     <PieChart>
                         <Pie
-                            data={chartData}
+                            data={dataWithPercentages}
                             dataKey="value"
                             nameKey="name"
                             cx="50%"
@@ -653,8 +642,11 @@ export const renderChart = (kpiKey: string, chartType: string, chartData: any[],
                             animationDuration={500}
                             onClick={(_, index) => setActiveTooltipIndex(index === activeTooltipIndex ? null : index)}
                         >
-                            {chartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={colors.chartColors[index % colors.chartColors.length]} />
+                            {dataWithPercentages.map((entry, index) => (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={colors.chartColors[index % colors.chartColors.length]}
+                                />
                             ))}
                         </Pie>
                         <Tooltip content={renderCustomizedPieTooltip} {...tooltipStyle} />

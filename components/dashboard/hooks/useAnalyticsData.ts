@@ -296,7 +296,7 @@ export const useAnalyticsData = () => {
             valueIsNaN: isNaN(item?.value),
             actualValue: item?.value
         });
-        
+
         const isValid = (
             typeof item === 'object' &&
             item !== null &&
@@ -304,7 +304,7 @@ export const useAnalyticsData = () => {
             typeof item.value === 'number' &&
             !isNaN(item.value)
         );
-        
+
         console.log('🔍 Validation result:', isValid);
         return isValid;
     }, []);
@@ -315,25 +315,25 @@ export const useAnalyticsData = () => {
     const formatGA4Data = useCallback((kpiKey: string, ga4Response: any): DataPoint[] => {
         console.group(`🔍 formatGA4Data for ${kpiKey}`);
         console.log('Raw GA4 response:', ga4Response);
-        
+
         if (!ga4Response) {
             console.log('No GA4 response');
             console.groupEnd();
             return [];
         }
-        
+
         // Handle error responses from your API
         if (ga4Response.error) {
             console.error('GA4 error:', ga4Response.error);
             console.groupEnd();
             return [];
         }
-        
+
         // Tu API devuelve directamente la estructura GA4
         const rows = ga4Response.rows || [];
         const dimensionHeaders = ga4Response.dimensionHeaders || [];
         const metricHeaders = ga4Response.metricHeaders || [];
-        
+
         console.log('Processing GA4 structure:', {
             kpiKey,
             dimensions: dimensionHeaders.map(h => h.name),
@@ -341,62 +341,78 @@ export const useAnalyticsData = () => {
             rowsCount: rows.length,
             firstRowSample: rows[0]
         });
-        
+
         if (!rows || !Array.isArray(rows) || rows.length === 0) {
             console.log('No rows to process');
             console.groupEnd();
             return [];
         }
-        
+
         const result = rows.map((row: any, index: number) => {
             const dimensions = row.dimensionValues || [];
             const metrics = row.metricValues || [];
-            
+
+            let skipRow = false;
+
             console.log(`Processing row ${index}:`, {
                 dimensions: dimensions.map(d => d.value),
                 metrics: metrics.map(m => m.value)
             });
-            
+
             const dataPoint: DataPoint = {
                 value: 0,
                 label: `Item ${index + 1}`
             };
-            
+
             // Process dimensions
             dimensionHeaders.forEach((header: any, idx: number) => {
                 if (idx >= dimensions.length) return;
-                
+
                 const dimensionName = header.name;
                 const dimensionValue = dimensions[idx]?.value || '';
-                
+
                 console.log(`Dimension ${dimensionName}:`, dimensionValue);
-                
+
+                let processedDimension = dimensionValue;
+
+                if (kpiKey === 'palabrasBuscadas' || kpiKey === 'traficoPorFuente') {
+                    // if (dimensionName === 'sessionSource' && dimensionValue.toLowerCase() === 'google') {
+                    //     // En vez de descartar la fila, le asignamos un valor alternativo, por ejemplo "Otros"
+                    //     processedDimension = 'Otros';
+                    // }
+                    if (dimensionName === 'searchTerm' && dimensionValue.trim().toLowerCase() === 'búsqueda vacía') {
+                        // Recortamos el término, dejándolo en blanco o asignándole "Sin búsqueda"
+                        processedDimension = '';
+                    }
+                }
+
                 switch (dimensionName) {
                     case 'date':
-                        // Convert GA4 date format (20250508) to standard format (2025-05-08)
-                        if (dimensionValue.length === 8) {
-                            const year = dimensionValue.substring(0, 4);
-                            const month = dimensionValue.substring(4, 6);
-                            const day = dimensionValue.substring(6, 8);
+                        if (processedDimension.length === 8) {
+                            const year = processedDimension.substring(0, 4);
+                            const month = processedDimension.substring(4, 6);
+                            const day = processedDimension.substring(6, 8);
                             dataPoint.date = `${year}-${month}-${day}`;
                         } else {
-                            dataPoint.date = dimensionValue;
+                            dataPoint.date = processedDimension;
                         }
                         break;
                     case 'searchTerm':
-                        dataPoint.name = dimensionValue || 'Búsqueda vacía';
+                        dataPoint.name = processedDimension;
                         break;
                     case 'sessionSource':
-                        dataPoint.name = dimensionValue;
+                        dataPoint.name = processedDimension;
                         break;
                     default:
-                        dataPoint.name = dimensionValue;
+                        dataPoint.name = processedDimension;
                 }
             });
-            
+
+            if (skipRow) return null;
+
             // Process metrics - LÓGICA ESPECÍFICA POR KPI
             let primaryValue = 0;
-            
+
             if (metricHeaders && metrics.length > 0) {
                 switch (kpiKey) {
                     case 'carrosAbandonados':
@@ -406,7 +422,7 @@ export const useAnalyticsData = () => {
                         const purchases = Number(metrics[1]?.value || 0);
                         const abandoned = addToCarts - purchases;
                         const abandonmentRate = addToCarts > 0 ? (abandoned / addToCarts) * 100 : 0;
-                        
+
                         dataPoint.value = abandoned; // Número de carritos abandonados
                         dataPoint.impressions = addToCarts; // Total carritos
                         dataPoint.clicks = purchases; // Compras realizadas
@@ -415,7 +431,7 @@ export const useAnalyticsData = () => {
                         dataPoint.purchases = purchases;
                         dataPoint.abandonmentRate = abandonmentRate;
                         dataPoint.label = `${abandoned} abandonados (${abandonmentRate.toFixed(1)}%)`;
-                        
+
                         console.log(`Carritos abandonados calculation:`, {
                             addToCarts,
                             purchases,
@@ -423,41 +439,51 @@ export const useAnalyticsData = () => {
                             abandonmentRate
                         });
                         break;
-                        
+
                     case 'tasaConversionWeb':
                         // metrics[0] = ecommercePurchases, metrics[1] = sessions
                         const conversions = Number(metrics[0]?.value || 0);
                         const sessions = Number(metrics[1]?.value || 0);
                         const conversionRate = sessions > 0 ? (conversions / sessions) * 100 : 0;
-                        
+
                         dataPoint.value = conversionRate;
                         dataPoint.clicks = conversions;
                         dataPoint.sessions = sessions;
                         dataPoint.label = `${conversionRate.toFixed(2)}%`;
                         break;
-                        
+
                     case 'palabrasBuscadas':
                         // metrics[0] = sessions, metrics[1] = ecommercePurchases
                         const searchSessions = Number(metrics[0]?.value || 0);
                         const searchPurchases = Number(metrics[1]?.value || 0);
-                        
-                        dataPoint.value = searchSessions; // Usar sesiones como valor principal
+
+                        // Si el término de búsqueda es vacío o "búsqueda vacía", asignar valor 0
+                        if (dataPoint.name && dataPoint.name.toLowerCase() === 'búsqueda vacía' || !dataPoint.name.trim()) {
+                            dataPoint.value = 0;
+                        } else {
+                            dataPoint.value = searchSessions;
+                        }
                         dataPoint.sessions = searchSessions;
                         dataPoint.clicks = searchPurchases;
                         dataPoint.label = `${searchSessions} sesiones`;
                         break;
-                        
+
                     case 'traficoPorFuente':
                         // metrics[0] = sessions, metrics[1] = ecommercePurchases
                         const sourceSessions = Number(metrics[0]?.value || 0);
                         const sourcePurchases = Number(metrics[1]?.value || 0);
-                        
-                        dataPoint.value = sourceSessions; // Usar sesiones como valor principal
+
+                        // Si la fuente es "google", asignar valor 0
+                        if (dataPoint.name && dataPoint.name.toLowerCase() === 'google') {
+                            dataPoint.value = 0;
+                        } else {
+                            dataPoint.value = sourceSessions;
+                        }
                         dataPoint.sessions = sourceSessions;
                         dataPoint.clicks = sourcePurchases;
                         dataPoint.label = `${sourceSessions} sesiones`;
                         break;
-                        
+
                     case 'ventaDiariaDelMes':
                     case 'pedidosDiariosDelMes':
                         // metrics[0] = ecommercePurchases
@@ -465,18 +491,18 @@ export const useAnalyticsData = () => {
                         dataPoint.value = primaryValue;
                         dataPoint.label = `${primaryValue} ${kpiKey.includes('venta') ? 'compras' : 'pedidos'}`;
                         break;
-                        
+
                     default:
                         // Para otros KPIs, usar el primer metric como valor principal
                         primaryValue = Number(metrics[0]?.value || 0);
                         dataPoint.value = primaryValue;
                         dataPoint.label = primaryValue.toLocaleString();
-                        
+
                         // Mapear métricas adicionales
                         metricHeaders.forEach((header: any, idx: number) => {
                             const metricName = header.name;
                             const metricValue = Number(metrics[idx]?.value || 0);
-                            
+
                             switch (metricName) {
                                 case 'sessions':
                                     dataPoint.sessions = metricValue;
@@ -491,11 +517,11 @@ export const useAnalyticsData = () => {
                         });
                 }
             }
-            
+
             console.log(`Final dataPoint for row ${index}:`, dataPoint);
             return dataPoint;
         });
-        
+
         // Filtrar solo puntos de datos válidos
         const validResult = result.filter(item => {
             const isValid = validateDataPoint(item);
@@ -504,14 +530,14 @@ export const useAnalyticsData = () => {
             }
             return isValid;
         });
-        
+
         console.log('formatGA4Data final result:', {
             totalRows: rows.length,
             processedRows: result.length,
             validRows: validResult.length,
             sampleData: validResult.slice(0, 2)
         });
-        
+
         console.groupEnd();
         return validResult;
     }, [formatCurrency, validateDataPoint]);
@@ -519,30 +545,30 @@ export const useAnalyticsData = () => {
     const convertToDataPoints = useCallback((rawData: any, kpiKey: string): DataPoint[] => {
         console.group(`🔍 convertToDataPoints for ${kpiKey}`);
         console.log('Raw data:', rawData);
-        
+
         if (!rawData) {
             console.log('No raw data');
             console.groupEnd();
             return [];
         }
-        
+
         // If already DataPoint array
         if (Array.isArray(rawData) && rawData.every(validateDataPoint)) {
             console.log('Already valid DataPoint array');
             console.groupEnd();
             return rawData;
         }
-        
+
         // If array of objects, try to convert
         if (Array.isArray(rawData)) {
             const converted = rawData.map((item, index) => {
                 if (validateDataPoint(item)) return item;
-                
+
                 // Try to extract value from different properties
                 const value = item.value || item.total || item.count || item.amount || 0;
                 const name = item.name || item.label || item.key || `Item ${index + 1}`;
                 const date = item.date || item.fecha || item.timestamp;
-                
+
                 return {
                     value: Number(value) || 0,
                     name: String(name),
@@ -550,12 +576,12 @@ export const useAnalyticsData = () => {
                     label: String(value)
                 };
             }).filter(validateDataPoint);
-            
+
             console.log('Converted array:', converted.slice(0, 3));
             console.groupEnd();
             return converted;
         }
-        
+
         // If single object, try to convert to single item array
         if (typeof rawData === 'object') {
             const value = rawData.value || rawData.total || rawData.count || 0;
@@ -570,7 +596,7 @@ export const useAnalyticsData = () => {
                 return result;
             }
         }
-        
+
         console.warn('Could not convert data to DataPoints');
         console.groupEnd();
         return [];
@@ -579,24 +605,24 @@ export const useAnalyticsData = () => {
     const detectAndProcessData = useCallback((kpiKey: string, rawData: any): UnifiedKPIData => {
         console.group(`🔍 detectAndProcessData for ${kpiKey}`);
         console.log('Raw input:', rawData);
-        
+
         if (!rawData) {
             console.log('No data provided');
             console.groupEnd();
             return { type: 'unknown', data: [], error: 'No data available' };
         }
-        
+
         // Handle error responses
         if (rawData.error) {
             console.log('Error in data:', rawData.error);
             console.groupEnd();
             return { type: 'unknown', data: [], error: rawData.error };
         }
-        
+
         // Detect data type and process accordingly
         let processedData: DataPoint[] = [];
         let dataType: UnifiedKPIData['type'] = 'unknown';
-        
+
         // Check if it's GA4 data
         if (rawData.reports || rawData.dimensionHeaders || rawData.metricHeaders) {
             dataType = 'ga4';
@@ -612,21 +638,21 @@ export const useAnalyticsData = () => {
             dataType = 'unknown';
             processedData = convertToDataPoints(rawData, kpiKey);
         }
-        
+
         const result: UnifiedKPIData = {
             type: dataType,
             data: processedData,
             rawData: rawData,
             error: processedData.length === 0 ? 'No valid data points found' : undefined
         };
-        
+
         console.log('Detection result:', {
             type: result.type,
             dataLength: result.data.length,
             hasError: !!result.error
         });
         console.groupEnd();
-        
+
         return result;
     }, [convertToDataPoints, formatGA4Data, validateDataPoint]);
 
@@ -634,28 +660,28 @@ export const useAnalyticsData = () => {
         console.group(`🔍 applySorting for ${kpiKey}`);
         console.log('Input data:', dataArr);
         console.log('Sort option:', sortOption);
-        
+
         if (!Array.isArray(dataArr)) {
             console.error('applySorting: data is not array:', typeof dataArr);
             console.groupEnd();
             return [];
         }
-        
+
         const validData = dataArr.filter(validateDataPoint);
         if (validData.length !== dataArr.length) {
             console.warn(`applySorting: Filtered ${dataArr.length - validData.length} invalid items from ${kpiKey}`);
         }
-        
+
         if (validData.length === 0) {
             console.log('No valid data to sort');
             console.groupEnd();
             return [];
         }
-        
+
         const sortedData = [...validData];
-        
+
         console.log('Sorting by:', sortOption);
-        
+
         switch (sortOption) {
             case 'date':
                 sortedData.sort((a, b) => {
@@ -667,7 +693,7 @@ export const useAnalyticsData = () => {
                     return 0;
                 });
                 break;
-                
+
             case 'value':
                 sortedData.sort((a, b) => {
                     const valueComparison = b.value - a.value;
@@ -677,7 +703,7 @@ export const useAnalyticsData = () => {
                     return valueComparison;
                 });
                 break;
-                
+
             case 'alphabetical':
                 sortedData.sort((a, b) => {
                     const nameA = a.name || a.date || '';
@@ -689,11 +715,11 @@ export const useAnalyticsData = () => {
                     return alphaComparison;
                 });
                 break;
-                
+
             default:
                 console.log('No sorting applied (unknown sort option)');
         }
-        
+
         console.log('Sorted result:', {
             originalCount: dataArr.length,
             validCount: validData.length,
@@ -702,7 +728,7 @@ export const useAnalyticsData = () => {
             firstItem: sortedData[0],
             lastItem: sortedData[sortedData.length - 1]
         });
-        
+
         // Log específico para carritos abandonados
         if (kpiKey === 'carrosAbandonados') {
             console.log('🛒 Carritos Abandonados sorted data:');
@@ -715,7 +741,7 @@ export const useAnalyticsData = () => {
                 });
             });
         }
-        
+
         console.groupEnd();
         return sortedData;
     }, [validateDataPoint]);
@@ -723,45 +749,45 @@ export const useAnalyticsData = () => {
     // Enhanced GA4 data fetching
     const fetchGA4Data = useCallback(async (startDate: string, endDate: string) => {
         const cacheKey = `ga4-${startDate}-${endDate}`;
-        
+
         clearExpiredCache();
-        
+
         const cached = cacheRef.current[cacheKey];
         if (cached && (Date.now() - cached.timestamp) < cached.ttl) {
             console.log('Using cached GA4 data for:', cacheKey);
             return cached.data;
         }
-        
+
         try {
-                console.log('Fetching GA4 data:', { startDate, endDate });
-                
-                const response = await fetch(
-                    `/api/analitica/ga4-data?startDate=${startDate}&endDate=${endDate}`
-                );
-                
-                if (!response.ok) {
-                    throw new Error(`GA4 API Error: ${response.status} ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                console.log('🔍 GA4 Response received:', {
-                    hasData: !!result.data,
-                    dataKeys: result.data ? Object.keys(result.data) : [],
-                    metadata: result.metadata
-                });
-                
-                cacheRef.current[cacheKey] = {
-                    data: result,
-                    timestamp: Date.now(),
-                    ttl: CACHE_TTL
-                };
-                
-                return result;
-            } catch (err: any) {
-                console.error('GA4 fetch error:', err);
-                throw err;
+            console.log('Fetching GA4 data:', { startDate, endDate });
+
+            const response = await fetch(
+                `/api/analitica/ga4-data?startDate=${startDate}&endDate=${endDate}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`GA4 API Error: ${response.status} ${response.statusText}`);
             }
-        }, [clearExpiredCache]);
+
+            const result = await response.json();
+            console.log('🔍 GA4 Response received:', {
+                hasData: !!result.data,
+                dataKeys: result.data ? Object.keys(result.data) : [],
+                metadata: result.metadata
+            });
+
+            cacheRef.current[cacheKey] = {
+                data: result,
+                timestamp: Date.now(),
+                ttl: CACHE_TTL
+            };
+
+            return result;
+        } catch (err: any) {
+            console.error('GA4 fetch error:', err);
+            throw err;
+        }
+    }, [clearExpiredCache]);
 
     // ---------------------------------------------------------
     // fetchSqlData → fetchSapData: obtiene pedidos SAP y cachea
@@ -975,42 +1001,42 @@ export const useAnalyticsData = () => {
     // ---------------------------------------------------------
     const getKpiData = useCallback((kpiKey: string): DataPoint[] => {
         console.group(`🔍 getKpiData for ${kpiKey}`);
-        
+
         if (!data || !data.data) {
             console.log('No data available in state');
             console.groupEnd();
             return [];
         }
-        
+
         const rawKpiData = data.data[kpiKey];
         console.log('Raw KPI data:', rawKpiData);
         console.log('Raw KPI data type:', typeof rawKpiData);
         console.log('Is array?', Array.isArray(rawKpiData));
-        
+
         if (!rawKpiData) {
             console.log('No data for this KPI');
             console.groupEnd();
             return [];
         }
-        
+
         // Handle error responses
         if (typeof rawKpiData === 'object' && rawKpiData.error) {
             console.error(`KPI ${kpiKey} has error:`, rawKpiData.error);
             console.groupEnd();
             return [];
         }
-        
+
         // Lista de KPIs que usan datos SAP
         const sapKpis = [
-            "ticketPromedioDelMes", 
-            "ventaDiariaDelMes", 
-            "pedidosDiariosDelMes", 
-            "ventaAcumulada", 
+            "ticketPromedioDelMes",
+            "ventaDiariaDelMes",
+            "pedidosDiariosDelMes",
+            "ventaAcumulada",
             "kpisDeProductos"
         ];
-        
+
         let processedData: DataPoint[] = [];
-        
+
         if (sapKpis.includes(kpiKey)) {
             // Para KPIs SAP: los datos ya deberían estar procesados como DataPoint[]
             console.log('Processing as SAP KPI');
@@ -1023,7 +1049,7 @@ export const useAnalyticsData = () => {
         } else {
             // Para KPIs GA4: procesar la estructura GA4
             console.log('Processing as GA4 KPI');
-            
+
             // Verificar si tiene la estructura GA4 esperada
             if (rawKpiData.dimensionHeaders || rawKpiData.metricHeaders || rawKpiData.rows) {
                 console.log('GA4 structure detected:', {
@@ -1032,11 +1058,11 @@ export const useAnalyticsData = () => {
                     hasRows: !!rawKpiData.rows,
                     rowsCount: rawKpiData.rows?.length || 0
                 });
-                
+
                 try {
                     processedData = formatGA4Data(kpiKey, rawKpiData);
                     console.log('GA4 data processed:', processedData.length, 'items');
-                    
+
                     // Log específico para carritos abandonados
                     if (kpiKey === 'carrosAbandonados') {
                         console.log('🛒 Carritos Abandonados processed data:', processedData);
@@ -1051,7 +1077,7 @@ export const useAnalyticsData = () => {
                             });
                         });
                     }
-                    
+
                 } catch (err) {
                     console.error('Error processing GA4 data:', err);
                     processedData = [];
@@ -1062,15 +1088,15 @@ export const useAnalyticsData = () => {
                 processedData = convertToDataPoints(rawKpiData, kpiKey);
             }
         }
-        
+
         // Validación final
         const validData = processedData.filter(validateDataPoint);
         const invalidCount = processedData.length - validData.length;
-        
+
         if (invalidCount > 0) {
             console.warn(`Filtered out ${invalidCount} invalid data points`);
         }
-        
+
         console.log('Final getKpiData result:', {
             kpiKey,
             rawDataType: typeof rawKpiData,
@@ -1078,7 +1104,7 @@ export const useAnalyticsData = () => {
             validCount: validData.length,
             sampleData: validData.slice(0, 2)
         });
-        
+
         console.groupEnd();
         return validData;
     }, [data, validateDataPoint, formatGA4Data, convertToDataPoints]);
@@ -1088,10 +1114,10 @@ export const useAnalyticsData = () => {
     // ---------------------------------------------------------
     const getSummary = useCallback((kpiKey: string) => {
         console.log(`🔍 getSummary for ${kpiKey}`);
-        
+
         try {
             const kpiData = getKpiData(kpiKey);
-            
+
             if (!kpiData || !Array.isArray(kpiData) || kpiData.length === 0) {
                 return {
                     title: 'Sin datos',
@@ -1100,7 +1126,7 @@ export const useAnalyticsData = () => {
                     status: 'warning' as const
                 };
             }
-            
+
             const validData = kpiData.filter(validateDataPoint);
             if (validData.length === 0) {
                 return {
@@ -1110,13 +1136,13 @@ export const useAnalyticsData = () => {
                     status: 'error' as const
                 };
             }
-            
+
             const total = validData.reduce((sum, d) => sum + d.value, 0);
             const avg = total / validData.length;
-            
+
             const formatValue = (value: number, kpiKey: string): string => {
                 if (isNaN(value) || !isFinite(value)) return '0';
-                
+
                 if (kpiKey.includes('venta') || kpiKey.includes('ticket')) {
                     return formatCurrency(value);
                 }
@@ -1128,16 +1154,16 @@ export const useAnalyticsData = () => {
                 }
                 return value.toLocaleString();
             };
-            
+
             const kpiLabel = kpiKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-            
+
             return {
                 title: kpiLabel,
                 value: formatValue(total, kpiKey),
                 subValue: `Promedio: ${formatValue(avg, kpiKey)} | ${validData.length} puntos`,
                 status: 'success' as const
             };
-            
+
         } catch (err) {
             console.error(`getSummary error for ${kpiKey}:`, err);
             return {
@@ -1154,12 +1180,12 @@ export const useAnalyticsData = () => {
     // ---------------------------------------------------------
     const formatChartData = useCallback((kpiKey: string, data: KPIResponse): DataPoint[] => {
         console.log(`🔍 formatChartData for ${kpiKey}`);
-        
+
         if (!data || !data.data || !data.data[kpiKey]) {
             console.log('formatChartData: No data available');
             return [];
         }
-        
+
         return getKpiData(kpiKey);
     }, [getKpiData]);
 
@@ -1168,11 +1194,11 @@ export const useAnalyticsData = () => {
     // ---------------------------------------------------------
     const refreshData = useCallback((forceToday = false) => {
         console.log('🔄 Refreshing data, forceToday:', forceToday);
-        
+
         // Clear all caches
         cacheRef.current = {};
         setPedidos([]);
-        
+
         if (forceToday) {
             // Force refresh with today's data will be handled by component
             console.log('Force refresh requested');
@@ -1211,27 +1237,27 @@ export const useAnalyticsData = () => {
         loading,
         error,
         pedidos,
-        
+
         // Core functions
         fetchData,
         refreshData,
         clearSqlCache,
         getKpiData,
         getSummary,
-        
+
         // Data processing
         applySorting,
         formatChartData,
         formatGA4Data,
         detectAndProcessData,
-        
+
         // Utilities
         convertRelativeDateToISO,
         formatCurrency,
-        
+
         // Validation
         validateDataPoint,
-        
+
         // Enhanced debugging
         _debug: {
             cache: cacheRef.current,
