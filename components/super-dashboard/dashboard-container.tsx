@@ -205,7 +205,7 @@ export default function DashboardContainer() {
 
   // 8. Renderizado de la vista según el valor de "view"
   const renderView = () => {
-    const props = { orders: displayOrders, isLoading }
+    const props = { orders: displayOrders, isLoading, filters }
     switch (view) {
       case "logistics":
         return <LogisticsView {...props} />
