@@ -139,7 +139,7 @@ async function processOrders(): Promise<
       pedidos_externos.Ecommerce = 'VENTUSCORP_VTEX'
       AND ISNULL(pedidos_externos_estado.estado_envio, 0) = 0
       AND pedidos_externos.deliveryCompany = 'Starken'
-      AND pedidos_externos_estado.estado = 'T'
+      AND pedidos_externos_estado.estado = 'I'
     GROUP BY 
       pedidos_externos_estado.idpedido,
       pedidos_externos.FechaPedido, 
