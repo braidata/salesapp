@@ -8,13 +8,12 @@ import DataTable from "../ui/data-table"
 import { formatCurrency } from "@/lib/utils"
 import { exportToExcel } from "@/lib/export-utils"
 
-export default function LogisticsView({ orders, isLoading, brand }) {
+export default function LogisticsView({ orders, isLoading, brand, filters }) {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loadingOrder, setLoadingOrder] = useState(false)
 
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
-
 
   const [labelPreview, setLabelPreview] = useState<{
     message: string;
@@ -25,6 +24,17 @@ export default function LogisticsView({ orders, isLoading, brand }) {
 
   const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null);
   const [pdfBlobUrls, setPdfBlobUrls] = useState<{ [key: string]: string }>({});
+
+  // NUEVO: Filtrado por ID de pedido
+  const filteredOrders = orders.filter(order => {
+    if (!filters?.orderId) return true; // Si no hay filtro, mostrar todos
+
+    const orderId = order.orderId?.toLowerCase() || '';
+    const sequence = order.sequence?.toLowerCase() || '';
+    const searchTerm = filters.orderId.toLowerCase();
+
+    return orderId.includes(searchTerm) || sequence.includes(searchTerm);
+  });
 
   const viewDocument = async (id: string) => {
     try {
@@ -126,18 +136,19 @@ export default function LogisticsView({ orders, isLoading, brand }) {
     });
     setIsLabelModalOpen(true);
   };
-  // Estadísticas básicas
-  const totalOrders = orders.length
-  const pendingShipment = orders.filter(
+
+  // ACTUALIZADO: Usar filteredOrders en lugar de orders para las estadísticas
+  const totalOrders = filteredOrders.length
+  const pendingShipment = filteredOrders.filter(
     (order) => order.status === "ready-for-handling"
   ).length
-  const inTransit = orders.filter(
+  const inTransit = filteredOrders.filter(
     (order) =>
       order.status === "shipped" ||
       order.status === "out-for-delivery" ||
       order.status === "handling"
   ).length
-  const delivered = orders.filter((order) => order.status === "invoiced").length
+  const delivered = filteredOrders.filter((order) => order.status === "invoiced").length
 
   // Columnas para la tabla de pedidos
   const columns = [
@@ -387,13 +398,13 @@ export default function LogisticsView({ orders, isLoading, brand }) {
     }
   };
 
-
+  // ACTUALIZADO: Usar filteredOrders para la exportación
   const handleExport = async () => {
-    if (!orders || orders.length === 0) return;
+    if (!filteredOrders || filteredOrders.length === 0) return;
 
     try {
-      // Primero, obtener los datos de SAP para todas las órdenes
-      const sapDataPromises = orders.map(order => fetchSAPData(order.orderId));
+      // Primero, obtener los datos de SAP para todas las órdenes filtradas
+      const sapDataPromises = filteredOrders.map(order => fetchSAPData(order.orderId));
       const sapDataResults = await Promise.all(sapDataPromises);
 
       // Crear un mapa para acceder fácilmente a los datos de SAP por orderId
@@ -404,7 +415,7 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         return acc;
       }, {});
 
-      const data = orders.map((order) => {
+      const data = filteredOrders.map((order) => {
         const shippingAddress = order.shippingData?.address || {};
         const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
         const clientProfile = order.clientProfileData || {};
@@ -459,7 +470,7 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         <h2 className="text-2xl font-bold text-white">Vista de Logística</h2>
         <motion.button
           onClick={handleExport}
-          disabled={isLoading || orders.length === 0}
+          disabled={isLoading || filteredOrders.length === 0}
           className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600/30 to-purple-600/30 text-white border border-blue-500/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -481,6 +492,15 @@ export default function LogisticsView({ orders, isLoading, brand }) {
           Exportar a Excel
         </motion.button>
       </div>
+
+      {/* NUEVO: Mostrar información sobre el filtro activo */}
+      {filters?.orderId && (
+        <div className="bg-blue-600/10 border border-blue-500/30 rounded-lg p-3">
+          <p className="text-blue-300 text-sm">
+            🔍 Mostrando {filteredOrders.length} pedido(s) que coinciden con: "{filters.orderId}"
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
@@ -573,13 +593,17 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         <Card title="Pedidos" isLoading={isLoading}>
           <div className="data-table-container">
             <DataTable
-              data={orders.map(order => ({
+              data={filteredOrders.map(order => ({
                 ...order,
                 sapData: order.sapData || {}, // Asegurarnos que sapData existe
                 sapOrder: order.sapData?.sapOrder || order.sapOrder || "N/A" // Intentar ambas rutas
               }))}
               columns={columns}
-              emptyMessage="No hay pedidos que coincidan con los filtros seleccionados"
+              emptyMessage={
+                filters?.orderId
+                  ? `No hay pedidos que coincidan con "${filters.orderId}"`
+                  : "No hay pedidos que coincidan con los filtros seleccionados"
+              }
             />
           </div>
         </Card>
@@ -786,18 +810,42 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                 </div>
               </div>
 
-
               <div>
                 <h4 className="text-lg font-medium text-white mb-4">Información de Seguimiento</h4>
                 <div className="bg-gray-800/50 rounded-lg p-4 space-y-3">
                   <div>
                     <p className="text-sm text-gray-400">N° de Seguimiento</p>
-                    <p className="text-white">{selectedOrder.sapData?.otDeliveryCompany || "N/A"}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-white">{selectedOrder.sapData?.otDeliveryCompany || "N/A"}</p>
+                      {selectedOrder.sapData?.otDeliveryCompany && (
+                        <button
+                          onClick={() => handleLabelPreview(selectedOrder.sapData.otDeliveryCompany)}
+                          className="px-3 py-1 text-sm rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-1"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M6 2L2 6v14a2 2 0 002 2h16a2 2 0 002-2V6l-4-4H6z" />
+                            <path d="M6 2v4h12V2" />
+                            <path d="M8 12h8" />
+                            <path d="M8 16h8" />
+                          </svg>
+                          Ver Etiqueta
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400">ID Febos</p>
+                    <p className="text-sm text-gray-400">Ver Factura</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-white">{selectedOrder.sapData?.FebosFC || "N/A"}</p>
+                      {/* <p className="text-white">{selectedOrder.sapData?.FebosFC || "N/A"}</p> */}
                       {selectedOrder.sapData?.FebosFC && (
                         <button
                           onClick={() => viewDocument(selectedOrder.sapData.FebosFC)}
@@ -836,33 +884,6 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                     </div>
                   )}
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <p className="text-white">{selectedOrder.sapData?.otDeliveryCompany || "N/A"}</p>
-                {selectedOrder.sapData?.otDeliveryCompany && (
-                  <button
-                    onClick={() => handleLabelPreview(selectedOrder.sapData.otDeliveryCompany)}
-                    className="px-3 py-1 text-sm rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-1"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M6 2L2 6v14a2 2 0 002 2h16a2 2 0 002-2V6l-4-4H6z" />
-                      <path d="M6 2v4h12V2" />
-                      <path d="M8 12h8" />
-                      <path d="M8 16h8" />
-                    </svg>
-                    Ver Etiqueta
-                  </button>
-                )}
               </div>
 
               {/* Sección de Productos con tabla mejorada */}
@@ -944,6 +965,7 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         </div>
       )}
 
+      {/* Modal de Etiquetas */}
       {isLabelModalOpen && labelPreview && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-2xl max-w-4xl w-full h-[80vh]">
@@ -983,8 +1005,8 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                     await loadPdfAsBlob(url);
                   }}
                   className={`p-2 rounded ${selectedPdfUrl === url
-                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/50'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/50'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                     }`}
                 >
                   Etiqueta {index + 1}
