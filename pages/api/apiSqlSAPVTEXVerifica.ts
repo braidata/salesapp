@@ -35,32 +35,67 @@ export default async function handler(
     return res.status(405).json({ message: `Método ${req.method} no permitido` });
   }
 
+  // Obtener fechas del query string
+  const { fechaInicio, fechaFin } = req.query;
+
+  // Validar que las fechas existan
+  if (!fechaInicio || !fechaFin) {
+    return res.status(400).json({
+      message: 'Se requieren los parámetros fechaInicio y fechaFin (formato: YYYY-MM-DD)'
+    });
+  }
+
   try {
     await sql.connect(config);
     const query = `
-      SELECT 
-        p.ID AS internalId,
-        p.CodigoExterno,
-        p.deliveryCompany,
-        p.otDeliveryCompany,
-        p.urlDeliveryCompany,
-        s.estado,
-        s.estado_envio,
-        s.time_notificado
-      FROM qa_pedidos_externos p
-      INNER JOIN qa_pedidos_externos_estado s ON p.ID = s.idpedido
-      ORDER BY p.ID DESC;
+    SELECT 
+      pedidos_externos_estado.idpedido AS internalId,
+      pedidos_externos.FechaPedido, 
+      pedidos_externos.CodigoExterno AS externalCode,
+      pedidos_externos.deliveryCompany,
+      pedidos_externos.otDeliveryCompany
+    FROM 
+      pedidos_externos_estado
+    INNER JOIN 
+      pedidos_externos 
+        ON pedidos_externos.ID = pedidos_externos_estado.idpedido
+    WHERE 
+      pedidos_externos.Ecommerce = 'VENTUSCORP_VTEX'
+      AND ISNULL(pedidos_externos_estado.estado_envio, 0) = 0
+      AND pedidos_externos.deliveryCompany = 'Starken'
+      AND pedidos_externos_estado.estado = 'I'
+      AND pedidos_externos.FechaPedido >= @fechaInicio
+      AND pedidos_externos.FechaPedido <= @fechaFin
+
+    GROUP BY 
+      pedidos_externos_estado.idpedido,
+      pedidos_externos.FechaPedido, 
+      pedidos_externos.CodigoExterno
+    , pedidos_externos.deliveryCompany,
+      pedidos_externos.otDeliveryCompany
+    ORDER BY 
+      pedidos_externos.FechaPedido DESC
     `;
-    
-    const result = await sql.query(query);
-    
+
+
+    const request = new sql.Request();
+
+    // Agregar parámetros de fecha
+    request.input('fechaInicio', sql.DateTime, new Date(fechaInicio as string));
+    request.input('fechaFin', sql.DateTime, new Date(fechaFin as string + 'T23:59:59'));
+
+    const result = await request.query(query);
+
     res.status(200).json({
       message: 'Consulta realizada con éxito',
       data: result.recordset
     });
   } catch (error: any) {
     console.error('Error en la consulta:', error);
-    res.status(500).json({ message: 'Error al consultar los pedidos', error: error.message });
+    res.status(500).json({
+      message: 'Error al consultar los pedidos',
+      error: error.message
+    });
   } finally {
     await sql.close();
   }
