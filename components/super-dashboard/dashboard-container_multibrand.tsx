@@ -39,14 +39,14 @@ export default function DashboardContainer() {
     courier: "",
     paymentType: "",
     deliveryType: "",
-    brand: "blanik" as BrandType, // Actualizado para incluir BBQ como opción, default sigue siendo blanik
+    brand: "all" as BrandType, // Actualizado para incluir BBQ como opción, default sigue siendo blanik
     orderId: "",
   })
 
   // Estado para la paginación local
   const [pagination, setPagination] = useState({
     page: 1,
-    perPage: 100,
+    perPage: 300,
     total: 110,
     pages: 10,
   })
