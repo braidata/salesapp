@@ -16,6 +16,16 @@ export default function LogisticsView({ orders, isLoading, brand }) {
   const [exportProgress, setExportProgress] = useState(0);
 
 
+  const [labelPreview, setLabelPreview] = useState<{
+    message: string;
+    data: string[];
+    status: number;
+  } | null>(null);
+  const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null);
+  const [pdfBlobUrls, setPdfBlobUrls] = useState<{ [key: string]: string }>({});
+
   const viewDocument = async (id: string) => {
     try {
       const response = await fetch(`/api/febos?id=${id}`);
@@ -24,6 +34,97 @@ export default function LogisticsView({ orders, isLoading, brand }) {
     } catch (error) {
       console.error('Error al obtener el documento de Febos:', error);
     }
+  };
+
+  const loadPdfAsBlob = async (url: string) => {
+    if (pdfBlobUrls[url]) return pdfBlobUrls[url];
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Basic ${Buffer.from('crm:crm2019').toString('base64')}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Error al cargar PDF');
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      setPdfBlobUrls(prev => ({ ...prev, [url]: blobUrl }));
+      return blobUrl;
+    } catch (error) {
+      console.error('Error al cargar PDF:', error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      // Limpiar todas las URLs de blob al desmontar
+      Object.values(pdfBlobUrls).forEach(url => {
+        window.URL.revokeObjectURL(url);
+      });
+    };
+  }, [pdfBlobUrls]);
+
+  const handleLabelPreview = async (ordenFlete: string) => {
+    try {
+      const response = await fetch('/api/starken/etiquetaAPI', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${Buffer.from('crm:crm2019').toString('base64')}`
+        },
+        body: JSON.stringify({
+          ordenFlete,
+          tipoSalida: 4 // Formato PDF
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener etiqueta');
+      }
+
+      const data = await response.json();
+      setLabelPreview(data);
+      setIsLabelModalOpen(true);
+    } catch (error) {
+      console.error('Error al obtener etiqueta:', error);
+      alert('No se pudo obtener la etiqueta');
+    }
+  };
+
+  const downloadPDF = async (url: string, index: number) => {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Basic ${Buffer.from('crm:crm2019').toString('base64')}`
+        }
+      });
+      const blob = await response.blob();
+      const pdfUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `etiqueta_${index + 1}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(pdfUrl);
+    } catch (error) {
+      console.error('Error al descargar la etiqueta:', error);
+      alert('Error al descargar la etiqueta');
+    }
+  };
+
+  // Función para imprimir múltiples etiquetas
+  const printLabels = (urls: string[]) => {
+    setLabelPreview({
+      message: "Etiquetas PDF",
+      data: urls,
+      status: 200
+    });
+    setIsLabelModalOpen(true);
   };
   // Estadísticas básicas
   const totalOrders = orders.length
@@ -125,16 +226,16 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         return email.split("-")[0] || "N/A"
       },
     },
-    {
-      key: "shippingMethod",
-      header: "Método de envío",
-      render: (_, row) => {
-        if (!row.shippingData || !row.shippingData.logisticsInfo || row.shippingData.logisticsInfo.length === 0) {
-          return "N/A"
-        }
-        return row.shippingData.logisticsInfo[0].selectedSla || "N/A"
-      },
-    },
+    // {
+    //   key: "shippingMethod",
+    //   header: "Método de envío",
+    //   render: (_, row) => {
+    //     if (!row.shippingData || !row.shippingData.logisticsInfo || row.shippingData.logisticsInfo.length === 0) {
+    //       return "N/A"
+    //     }
+    //     return row.shippingData.logisticsInfo[0].selectedSla || "N/A"
+    //   },
+    // },
     {
       key: "totalValue",
       header: "Importe total",
@@ -737,6 +838,33 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                 </div>
               </div>
 
+              <div className="flex items-center gap-2">
+                <p className="text-white">{selectedOrder.sapData?.otDeliveryCompany || "N/A"}</p>
+                {selectedOrder.sapData?.otDeliveryCompany && (
+                  <button
+                    onClick={() => handleLabelPreview(selectedOrder.sapData.otDeliveryCompany)}
+                    className="px-3 py-1 text-sm rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-1"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M6 2L2 6v14a2 2 0 002 2h16a2 2 0 002-2V6l-4-4H6z" />
+                      <path d="M6 2v4h12V2" />
+                      <path d="M8 12h8" />
+                      <path d="M8 16h8" />
+                    </svg>
+                    Ver Etiqueta
+                  </button>
+                )}
+              </div>
+
               {/* Sección de Productos con tabla mejorada */}
               {selectedOrder.items && selectedOrder.items.length > 0 ? (
                 <div>
@@ -813,6 +941,142 @@ export default function LogisticsView({ orders, isLoading, brand }) {
               </button>
             </div>
           </motion.div>
+        </div>
+      )}
+
+      {isLabelModalOpen && labelPreview && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-2xl max-w-4xl w-full h-[80vh]">
+            <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+              <h3 className="text-lg font-medium text-white">
+                Etiquetas Disponibles ({labelPreview.data.length})
+              </h3>
+              <button
+                onClick={() => {
+                  setIsLabelModalOpen(false);
+                  setSelectedPdfUrl(null);
+                }}
+                className="p-1 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-4 grid grid-cols-4 gap-4 border-b border-gray-700">
+              {labelPreview.data.map((url, index) => (
+                <button
+                  key={index}
+                  onClick={async () => {
+                    setSelectedPdfUrl(url);
+                    await loadPdfAsBlob(url);
+                  }}
+                  className={`p-2 rounded ${selectedPdfUrl === url
+                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/50'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                >
+                  Etiqueta {index + 1}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex-1 h-[calc(80vh-220px)] p-4">
+              {selectedPdfUrl ? (
+                <div className="relative w-full h-full bg-white rounded-lg overflow-hidden">
+                  {pdfBlobUrls[selectedPdfUrl] ? (
+                    <iframe
+                      src={pdfBlobUrls[selectedPdfUrl]}
+                      className="w-full h-full"
+                      style={{
+                        border: 'none',
+                        backgroundColor: 'white'
+                      }}
+                      title="PDF Viewer"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  Selecciona una etiqueta para visualizarla
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-gray-700 flex justify-between items-center">
+              <div className="flex gap-2">
+                {selectedPdfUrl && (
+                  <button
+                    onClick={() => {
+                      const index = labelPreview.data.indexOf(selectedPdfUrl);
+                      if (index >= 0) downloadPDF(selectedPdfUrl, index);
+                    }}
+                    className="px-4 py-2 rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors flex items-center gap-2"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Descargar Etiqueta Actual
+                  </button>
+                )}
+                <button
+                  onClick={() => labelPreview.data.forEach((url, index) => downloadPDF(url, index))}
+                  className="px-4 py-2 rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Descargar Todas
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  setIsLabelModalOpen(false);
+                  setSelectedPdfUrl(null);
+                }}
+                className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
