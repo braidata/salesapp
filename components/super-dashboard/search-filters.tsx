@@ -208,7 +208,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       daysBack: 31,
       status: "",
       courier: "",
-      paymentType: "",
+      paymentType: "Webpay",
       deliveryType: "",
       brand: filters.brand, // Mantener la marca actual
     },
