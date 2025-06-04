@@ -12,6 +12,19 @@ export default function LogisticsView({ orders, isLoading, brand }) {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loadingOrder, setLoadingOrder] = useState(false)
 
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+
+
+  const viewDocument = async (id: string) => {
+    try {
+      const response = await fetch(`/api/febos?id=${id}`);
+      const data = await response.json();
+      window.open(data.imagenLink, '_blank');
+    } catch (error) {
+      console.error('Error al obtener el documento de Febos:', error);
+    }
+  };
   // Estadísticas básicas
   const totalOrders = orders.length
   const pendingShipment = orders.filter(
@@ -33,6 +46,7 @@ export default function LogisticsView({ orders, isLoading, brand }) {
       render: (value) => value || "N/A",
       sortable: true,
     },
+
     {
       key: "status",
       header: "Estado del pedido",
@@ -169,81 +183,174 @@ export default function LogisticsView({ orders, isLoading, brand }) {
     }
   }
 
+  const idSapExtractor = async (orderId: string) => {
+    try {
+      const params = new URLSearchParams({
+        purchaseOrder: orderId,
+        includeItems: 'false'
+      });
+
+      const response = await fetch(`/api/sap-orders-db?${params}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener datos de SAP');
+      }
+
+      const { data } = await response.json();
+      if (!data || data.length === 0) {
+        return null;
+      }
+
+      // Retorna el primer resultado encontrado
+      const sapOrder = data[0];
+      return {
+        sapOrder: sapOrder.sapOrder || null,
+        febosFC: sapOrder.febosFC || null,
+        status: sapOrder.status || null,
+        documentType: sapOrder.documentType || null,
+        document: sapOrder.document || null
+      };
+    } catch (error) {
+      console.error('Error extracting SAP ID:', error);
+      return null;
+    }
+  };
+
+  const fetchSAPData = async (orderId: string) => {
+    try {
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+
+      const params = new URLSearchParams({
+        from: thirtyDaysAgo.toISOString().split('T')[0],
+        to: today.toISOString().split('T')[0],
+        ecommerce: 'VENTUSCORP_VTEX'
+      });
+
+      const response = await fetch(`/api/sqlConnectorSimply?${params}`);
+      if (!response.ok) throw new Error('Error al obtener datos de SAP');
+
+      const { pedidos } = await response.json();
+      // Buscar el pedido por CodigoExterno que coincida con orderId
+      return pedidos.find((p: any) => p.CodigoExterno === orderId);
+    } catch (error) {
+      console.error('Error fetching SAP data:', error);
+      return null;
+    }
+  };
+
   // Función para obtener y mostrar los detalles del pedido usando el endpoint adecuado según la marca
   const handleViewDetails = async (order) => {
     try {
-      setLoadingOrder(true)
-      let endpoint = ""
-      
-      // Usar la prop "brand" pasada desde arriba para determinar el endpoint
-      if (brand === "blanik") {
-        endpoint = `/api/apiVTEXBlanik?orderId=${order.orderId}`
-      } else {
-        endpoint = `/api/apiVTEX?orderId=${order.orderId}`
+      setLoadingOrder(true);
+
+      // Obtener datos de VTEX
+      let endpoint = brand === "blanik"
+        ? `/api/apiVTEXBlanik?orderId=${order.orderId}`
+        : `/api/apiVTEX?orderId=${order.orderId}`;
+
+      const [vtexResponse, sapData, sapOrderData] = await Promise.all([
+        fetch(endpoint),
+        fetchSAPData(order.orderId),
+        idSapExtractor(order.orderId)
+      ]);
+
+      if (!vtexResponse.ok) {
+        throw new Error(`Error: ${vtexResponse.status}`);
       }
-  
-      const response = await fetch(endpoint)
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
-      }
-      
-      const raw = await response.json()
-      console.log("Order details received:", raw)
-      
-      const mapped = mapOrderDetails(raw)
-      setSelectedOrder(mapped)
+
+      const vtexData = await vtexResponse.json();
+      console.log("VTEX details received:", vtexData);
+      console.log("SAP details received:", sapData);
+
+      // Combinar datos de VTEX y SAP
+      const mappedData = mapOrderDetails({
+        ...vtexData,
+        sapData: {
+          otDeliveryCompany: sapData?.otDeliveryCompany || 'N/A',
+          FebosFC: sapData?.FebosFC || sapOrderData?.febosFC || 'N/A',
+          urlDeliveryCompany: sapData?.urlDeliveryCompany || null,
+          sapOrder: sapOrderData?.sapOrder || 'N/A',
+          status: sapOrderData?.status || 'N/A',
+          documentType: sapOrderData?.documentType || 'N/A',
+          document: sapOrderData?.document || 'N/A'
+        }
+      });
+
+      setSelectedOrder(mappedData);
     } catch (error) {
-      console.error("Error al obtener detalles del pedido:", error)
-      alert("No se pudo cargar la información completa del pedido.")
+      console.error("Error al obtener detalles del pedido:", error);
+      alert("No se pudo cargar la información completa del pedido.");
     } finally {
-      setLoadingOrder(false)
+      setLoadingOrder(false);
     }
-  }
-  
+  };
 
-  const handleExport = () => {
-    if (!orders || orders.length === 0) return
 
-    const data = orders.map((order) => {
-      const shippingAddress = order.shippingData?.address || {}
-      const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {}
-      const clientProfile = order.clientProfileData || {}
+  const handleExport = async () => {
+    if (!orders || orders.length === 0) return;
 
-      return {
-        "Número de pedido": order.sequence || "N/A",
-        "ID del pedido": order.orderId || "N/A",
-        "Estado del pedido": order.statusDescription || order.status || "N/A",
-        "Fecha del pedido": order.creationDate
-          ? new Date(order.creationDate).toLocaleDateString("es-CL")
-          : "N/A",
-        "DTE": order.invoiceOutput || "N/A",
-        "RUT": clientProfile.document || "N/A",
-        "Nombre (facturación)": clientProfile.firstName || "N/A",
-        "Apellidos (facturación)": clientProfile.lastName || "N/A",
-        "Teléfono (facturación)": clientProfile.phone || "N/A",
-        "Correo electrónico": clientProfile.email ? clientProfile.email.split("-")[0] : "N/A",
-        "Nombre (envío)": shippingAddress.receiverName ? shippingAddress.receiverName.split(" ")[0] : "N/A",
-        "Apellidos (envío)":
-          shippingAddress.receiverName
-            ? shippingAddress.receiverName.split(" ").slice(1).join(" ")
+    try {
+      // Primero, obtener los datos de SAP para todas las órdenes
+      const sapDataPromises = orders.map(order => fetchSAPData(order.orderId));
+      const sapDataResults = await Promise.all(sapDataPromises);
+
+      // Crear un mapa para acceder fácilmente a los datos de SAP por orderId
+      const sapDataMap = sapDataResults.reduce((acc, sapData) => {
+        if (sapData) {
+          acc[sapData.CodigoExterno] = sapData;
+        }
+        return acc;
+      }, {});
+
+      const data = orders.map((order) => {
+        const shippingAddress = order.shippingData?.address || {};
+        const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
+        const clientProfile = order.clientProfileData || {};
+        const sapData = sapDataMap[order.orderId] || {};
+
+        return {
+          "Número de pedido": order.sequence || "N/A",
+          "ID del pedido": order.orderId || "N/A",
+          "ID SAP": sapData?.sapOrder || "N/A",
+          "Estado del pedido": order.statusDescription || order.status || "N/A",
+          "Fecha del pedido": order.creationDate
+            ? new Date(order.creationDate).toLocaleDateString("es-CL")
             : "N/A",
-        "Dirección de envío": `${shippingAddress.street || ""} ${shippingAddress.number || ""}`,
-        "N° Dirección": shippingAddress.number || "N/A",
-        "N° Dpto": shippingAddress.complement || "N/A",
-        "Provincia (envío)": shippingAddress.state || "N/A",
-        "Ciudad (envío)": shippingAddress.neighborhood || "N/A",
-        "Título del método de envío": logisticsInfo.selectedSla || "N/A",
-        "Transportista": logisticsInfo.deliveryCompany || "N/A",
-        "Importe total del pedido": formatCurrency(order.totalValue ? order.totalValue / 100 : 0),
-        "Última Actualización": order.lastChange
-          ? new Date(order.lastChange).toLocaleDateString("es-CL")
-          : "N/A",
-      }
-    })
+          "DTE": order.invoiceOutput || "N/A",
+          "RUT": clientProfile.document || "N/A",
+          "Nombre (facturación)": clientProfile.firstName || "N/A",
+          "Apellidos (facturación)": clientProfile.lastName || "N/A",
+          "Teléfono (facturación)": clientProfile.phone || "N/A",
+          "Correo electrónico": clientProfile.email ? clientProfile.email.split("-")[0] : "N/A",
+          "Nombre (envío)": shippingAddress.receiverName ? shippingAddress.receiverName.split(" ")[0] : "N/A",
+          "Apellidos (envío)":
+            shippingAddress.receiverName
+              ? shippingAddress.receiverName.split(" ").slice(1).join(" ")
+              : "N/A",
+          "Dirección de envío": `${shippingAddress.street || ""} ${shippingAddress.number || ""}`,
+          "N° Dirección": shippingAddress.number || "N/A",
+          "N° Dpto": shippingAddress.complement || "N/A",
+          "Provincia (envío)": shippingAddress.state || "N/A",
+          "Ciudad (envío)": shippingAddress.neighborhood || "N/A",
+          "Título del método de envío": logisticsInfo.selectedSla || "N/A",
+          "Transportista": logisticsInfo.deliveryCompany || "N/A",
+          "Importe total del pedido": formatCurrency(order.totalValue ? order.totalValue / 100 : 0),
+          "N° Seguimiento": sapData.otDeliveryCompany || "N/A",
+          "ID Febos": sapData.FebosFC || "N/A",
+          "URL Seguimiento": sapData.urlDeliveryCompany || "N/A",
+          "Última Actualización": order.lastChange
+            ? new Date(order.lastChange).toLocaleDateString("es-CL")
+            : "N/A",
+        }
+      })
 
-    exportToExcel(data, "reporte_logistica")
-  }
+      exportToExcel(data, "reporte_logistica");
+    } catch (error) {
+      console.error("Error al exportar datos:", error);
+      alert("Hubo un error al exportar los datos. Por favor, intente nuevamente.");
+    }
+  };
 
   return (
     <div className="space-y-6 m-8">
@@ -365,7 +472,11 @@ export default function LogisticsView({ orders, isLoading, brand }) {
         <Card title="Pedidos" isLoading={isLoading}>
           <div className="data-table-container">
             <DataTable
-              data={orders || []}
+              data={orders.map(order => ({
+                ...order,
+                sapData: order.sapData || {}, // Asegurarnos que sapData existe
+                sapOrder: order.sapData?.sapOrder || order.sapOrder || "N/A" // Intentar ambas rutas
+              }))}
               columns={columns}
               emptyMessage="No hay pedidos que coincidan con los filtros seleccionados"
             />
@@ -413,6 +524,10 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                     <div>
                       <p className="text-sm text-gray-400">ID del Pedido</p>
                       <p className="text-white font-mono text-sm">{selectedOrder.orderId || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">ID SAP</p>
+                      <p className="text-white font-mono text-sm">{selectedOrder.sapData?.sapOrder || "N/A"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-400">Estado</p>
@@ -498,12 +613,10 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                       <p className="text-sm text-gray-400">Dirección</p>
                       <p className="text-white">
                         {selectedOrder.shippingData?.address ? (
-                          `${selectedOrder.shippingData.address.street || ""} ${
-                            selectedOrder.shippingData.address.number || ""
-                          }${
-                            selectedOrder.shippingData.address.complement
-                              ? `, ${selectedOrder.shippingData.address.complement}`
-                              : ""
+                          `${selectedOrder.shippingData.address.street || ""} ${selectedOrder.shippingData.address.number || ""
+                          }${selectedOrder.shippingData.address.complement
+                            ? `, ${selectedOrder.shippingData.address.complement}`
+                            : ""
                           }`
                         ) : (
                           "N/A"
@@ -571,7 +684,59 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                   </div>
                 </div>
               </div>
-              
+
+
+              <div>
+                <h4 className="text-lg font-medium text-white mb-4">Información de Seguimiento</h4>
+                <div className="bg-gray-800/50 rounded-lg p-4 space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-400">N° de Seguimiento</p>
+                    <p className="text-white">{selectedOrder.sapData?.otDeliveryCompany || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">ID Febos</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-white">{selectedOrder.sapData?.FebosFC || "N/A"}</p>
+                      {selectedOrder.sapData?.FebosFC && (
+                        <button
+                          onClick={() => viewDocument(selectedOrder.sapData.FebosFC)}
+                          className="px-3 py-1 text-sm rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors flex items-center gap-1"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                          </svg>
+                          Ver Factura
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {selectedOrder.sapData?.urlDeliveryCompany && (
+                    <div>
+                      <p className="text-sm text-gray-400">Seguimiento</p>
+                      <a
+                        href={selectedOrder.sapData.urlDeliveryCompany}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300"
+                      >
+                        Ver seguimiento →
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Sección de Productos con tabla mejorada */}
               {selectedOrder.items && selectedOrder.items.length > 0 ? (
                 <div>
@@ -596,10 +761,10 @@ export default function LogisticsView({ orders, isLoading, brand }) {
                             <td className="py-2 text-white">
                               <div className="flex items-center">
                                 {item.imageUrl && (
-                                  <img 
-                                    src={item.imageUrl} 
-                                    alt={item.name} 
-                                    className="w-10 h-10 object-contain mr-2 bg-white rounded" 
+                                  <img
+                                    src={item.imageUrl}
+                                    alt={item.name}
+                                    className="w-10 h-10 object-contain mr-2 bg-white rounded"
                                   />
                                 )}
                                 <div>
