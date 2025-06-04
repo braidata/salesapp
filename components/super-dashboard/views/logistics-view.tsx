@@ -8,18 +8,97 @@ import DataTable from "../ui/data-table"
 import { formatCurrency } from "@/lib/utils"
 import { exportToExcel } from "@/lib/export-utils"
 
-export default function LogisticsView({ orders, isLoading, brand, filters }) {
-  const [selectedOrder, setSelectedOrder] = useState(null)
+interface Order {
+  orderId?: string;
+  sequence?: string;
+  status?: string;
+  statusDescription?: string;
+  creationDate?: string;
+  lastChange?: string;
+  totalValue?: number;
+  value?: number;
+  invoiceOutput?: string;
+  clientProfileData?: {
+    document?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    email?: string;
+    isCorporate?: boolean;
+    corporateName?: string;
+  };
+  shippingData?: {
+    address?: {
+      receiverName?: string;
+      street?: string;
+      number?: string;
+      complement?: string;
+      neighborhood?: string;
+      state?: string;
+      postalCode?: string;
+    };
+    logisticsInfo?: Array<{
+      selectedSla?: string;
+      deliveryCompany?: string;
+    }>;
+  };
+  paymentData?: {
+    transactions?: Array<{
+      payments?: Array<{
+        paymentSystemName?: string;
+      }>;
+    }>;
+  };
+  paymentApprovedDate?: string;
+  items?: Array<{
+    id?: string;
+    name?: string;
+    price?: number;
+    quantity?: number;
+    sellerSku?: string;
+    refId?: string;
+    imageUrl?: string;
+    detailUrl?: string;
+  }>;
+  sapData?: {
+    otDeliveryCompany?: string;
+    FebosFC?: string;
+    urlDeliveryCompany?: string;
+    sapOrder?: string;
+    status?: string;
+    documentType?: string;
+    document?: string;
+  };
+  clientName?: string;
+  paymentNames?: string;
+}
+
+interface Filters {
+  orderId?: string;
+  [key: string]: any;
+}
+
+interface LabelPreview {
+  message: string;
+  data: string[];
+  status: number;
+}
+
+interface LogisticsViewProps {
+  orders: Order[];
+  isLoading: boolean;
+  brand?: string;
+  filters?: Filters;
+}
+
+export default function LogisticsView({ orders, isLoading, brand, filters }: LogisticsViewProps) {
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [loadingOrder, setLoadingOrder] = useState(false)
 
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
 
-  const [labelPreview, setLabelPreview] = useState<{
-    message: string;
-    data: string[];
-    status: number;
-  } | null>(null);
+  const [labelPreview, setLabelPreview] = useState<LabelPreview | null>(null);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
 
   const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null);
@@ -27,13 +106,34 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
 
   // NUEVO: Filtrado por ID de pedido
   const filteredOrders = orders.filter(order => {
-    if (!filters?.orderId) return true; // Si no hay filtro, mostrar todos
+    // DEBUG: Agregar logs para diagnosticar
+    console.log('🔍 Filters recibidos:', filters);
+    console.log('🔍 orders.length:', orders.length);
+
+    if (!filters?.orderId) {
+      console.log('✅ No hay filtro de ID, mostrando todos los pedidos');
+      return true; // Si no hay filtro, mostrar todos
+    }
 
     const orderId = order.orderId?.toLowerCase() || '';
     const sequence = order.sequence?.toLowerCase() || '';
     const searchTerm = filters.orderId.toLowerCase();
 
+    console.log('🔍 Comparando:', {
+      orderId,
+      sequence,
+      searchTerm,
+      matches: orderId.includes(searchTerm) || sequence.includes(searchTerm)
+    });
+
     return orderId.includes(searchTerm) || sequence.includes(searchTerm);
+  });
+
+  // DEBUG: Log del resultado del filtrado
+  console.log('📊 Resultado del filtrado:', {
+    totalOrders: orders.length,
+    filteredOrders: filteredOrders.length,
+    filterValue: filters?.orderId
   });
 
   const viewDocument = async (id: string) => {
@@ -46,7 +146,7 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
     }
   };
 
-  const loadPdfAsBlob = async (url: string) => {
+  const loadPdfAsBlob = async (url: string): Promise<string | null> => {
     if (pdfBlobUrls[url]) return pdfBlobUrls[url];
 
     try {
@@ -155,14 +255,13 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
     {
       key: "orderId",
       header: "ID del pedido",
-      render: (value) => value || "N/A",
+      render: (value: any) => value || "N/A",
       sortable: true,
     },
-
     {
       key: "status",
       header: "Estado del pedido",
-      render: (value, row) => {
+      render: (value: any, row: Order) => {
         let color = "gray"
         switch (value) {
           case "handling":
@@ -200,25 +299,25 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
     {
       key: "creationDate",
       header: "Fecha del pedido",
-      render: (value) => (value ? new Date(value).toLocaleDateString("es-CL") : "N/A"),
+      render: (value: any) => (value ? new Date(value).toLocaleDateString("es-CL") : "N/A"),
       sortable: true,
     },
     {
       key: "clientDocument",
       header: "RUT",
-      render: (_, row) => row.clientProfileData?.document || "N/A",
+      render: (_: any, row: Order) => row.clientProfileData?.document || "N/A",
       sortable: true,
     },
     {
       key: "clientName",
       header: "Nombre completo",
-      render: (value) => value || "N/A",
+      render: (value: any) => value || "N/A",
       sortable: true,
     },
     {
       key: "shippingAddress",
       header: "Dirección de envío",
-      render: (_, row) => {
+      render: (_: any, row: Order) => {
         if (!row.shippingData || !row.shippingData.address) return "N/A"
         const addr = row.shippingData.address
         return `${addr.street || ""} ${addr.number || ""}, ${addr.neighborhood || ""}`
@@ -227,30 +326,20 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
     {
       key: "shippingCity",
       header: "Ciudad de envío",
-      render: (_, row) => row.shippingData?.address?.neighborhood || "N/A",
+      render: (_: any, row: Order) => row.shippingData?.address?.neighborhood || "N/A",
     },
     {
       key: "clientEmail",
       header: "Correo electrónico",
-      render: (_, row) => {
+      render: (_: any, row: Order) => {
         const email = row.clientProfileData?.email || ""
         return email.split("-")[0] || "N/A"
       },
     },
-    // {
-    //   key: "shippingMethod",
-    //   header: "Método de envío",
-    //   render: (_, row) => {
-    //     if (!row.shippingData || !row.shippingData.logisticsInfo || row.shippingData.logisticsInfo.length === 0) {
-    //       return "N/A"
-    //     }
-    //     return row.shippingData.logisticsInfo[0].selectedSla || "N/A"
-    //   },
-    // },
     {
       key: "totalValue",
       header: "Importe total",
-      render: (value) => {
+      render: (value: any) => {
         const numericValue = typeof value === "number" && !isNaN(value) ? value / 100 : 0
         return formatCurrency(numericValue)
       },
@@ -259,7 +348,7 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
     {
       key: "actions",
       header: "Acciones",
-      render: (_, row) => (
+      render: (_: any, row: Order) => (
         <button
           onClick={() => handleViewDetails(row)}
           className="px-3 py-1 text-xs rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors"
@@ -271,7 +360,7 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
   ]
 
   // Función para mapear los detalles del pedido
-  function mapOrderDetails(raw) {
+  function mapOrderDetails(raw: any): Order {
     const client = raw.clientProfileData || {}
     const items = raw.items || []
     return {
@@ -280,9 +369,9 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
       totalValue: raw.value ?? 0,
       paymentNames:
         raw.paymentData?.transactions
-          ?.flatMap((t) => t.payments?.map((p) => p.paymentSystemName))
+          ?.flatMap((t: any) => t.payments?.map((p: any) => p.paymentSystemName))
           .join(", ") || "N/A",
-      items: items.map((item) => ({
+      items: items.map((item: any) => ({
         id: item.id,
         name: item.name,
         price: item.price,
@@ -352,7 +441,7 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
   };
 
   // Función para obtener y mostrar los detalles del pedido usando el endpoint adecuado según la marca
-  const handleViewDetails = async (order) => {
+  const handleViewDetails = async (order: Order) => {
     try {
       setLoadingOrder(true);
 
@@ -363,8 +452,8 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
 
       const [vtexResponse, sapData, sapOrderData] = await Promise.all([
         fetch(endpoint),
-        fetchSAPData(order.orderId),
-        idSapExtractor(order.orderId)
+        fetchSAPData(order.orderId!),
+        idSapExtractor(order.orderId!)
       ]);
 
       if (!vtexResponse.ok) {
@@ -402,13 +491,14 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
   const handleExport = async () => {
     if (!filteredOrders || filteredOrders.length === 0) return;
 
+    setIsExporting(true); // Activar estado de exportación
     try {
       // Primero, obtener los datos de SAP para todas las órdenes filtradas
-      const sapDataPromises = filteredOrders.map(order => fetchSAPData(order.orderId));
+      const sapDataPromises = filteredOrders.map(order => fetchSAPData(order.orderId!));
       const sapDataResults = await Promise.all(sapDataPromises);
 
       // Crear un mapa para acceder fácilmente a los datos de SAP por orderId
-      const sapDataMap = sapDataResults.reduce((acc, sapData) => {
+      const sapDataMap = sapDataResults.reduce((acc: any, sapData) => {
         if (sapData) {
           acc[sapData.CodigoExterno] = sapData;
         }
@@ -419,7 +509,7 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
         const shippingAddress = order.shippingData?.address || {};
         const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
         const clientProfile = order.clientProfileData || {};
-        const sapData = sapDataMap[order.orderId] || {};
+        const sapData = sapDataMap[order.orderId!] || {};
 
         return {
           "Número de pedido": order.sequence || "N/A",
@@ -461,6 +551,8 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
     } catch (error) {
       console.error("Error al exportar datos:", error);
       alert("Hubo un error al exportar los datos. Por favor, intente nuevamente.");
+    } finally {
+      setIsExporting(false); // Desactivar estado de exportación
     }
   };
 
@@ -470,26 +562,35 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
         <h2 className="text-2xl font-bold text-white">Vista de Logística</h2>
         <motion.button
           onClick={handleExport}
-          disabled={isLoading || filteredOrders.length === 0}
+          disabled={isLoading || filteredOrders.length === 0 || isExporting}
           className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600/30 to-purple-600/30 text-white border border-blue-500/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Exportar a Excel
+          {isExporting ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+              Exportando...
+            </>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Exportar a Excel
+            </>
+          )}
         </motion.button>
       </div>
 
@@ -590,13 +691,13 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <Card title="Pedidos" isLoading={isLoading}>
+        <Card title="Pedidos" isLoading={isLoading || isExporting}>
           <div className="data-table-container">
             <DataTable
               data={filteredOrders.map(order => ({
                 ...order,
-                sapData: order.sapData || {}, // Asegurarnos que sapData existe
-                sapOrder: order.sapData?.sapOrder || order.sapOrder || "N/A" // Intentar ambas rutas
+                sapData: order.sapData || {},
+                sapOrder: order.sapData?.sapOrder || order.sapOrder || "N/A"
               }))}
               columns={columns}
               emptyMessage={
@@ -819,7 +920,7 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
                       <p className="text-white">{selectedOrder.sapData?.otDeliveryCompany || "N/A"}</p>
                       {selectedOrder.sapData?.otDeliveryCompany && (
                         <button
-                          onClick={() => handleLabelPreview(selectedOrder.sapData.otDeliveryCompany)}
+                          onClick={() => handleLabelPreview(selectedOrder.sapData!.otDeliveryCompany!)}
                           className="px-3 py-1 text-sm rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-1"
                         >
                           <svg
@@ -840,15 +941,30 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
                           Ver Etiqueta
                         </button>
                       )}
+
+
                     </div>
                   </div>
+                  {selectedOrder.sapData?.urlDeliveryCompany && (
+                    <div>
+                      <p className="text-sm text-gray-400">Seguimiento</p>
+                      <a
+                        href={selectedOrder.sapData.urlDeliveryCompany}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 w-36 text-sm rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-1"
+                      >
+                        Ver seguimiento →
+                      </a>
+                    </div>
+                  )}
                   <div>
-                    <p className="text-sm text-gray-400">Ver Factura</p>
+                    <p className="text-sm text-gray-400">Ver DTE</p>
                     <div className="flex items-center gap-2">
                       {/* <p className="text-white">{selectedOrder.sapData?.FebosFC || "N/A"}</p> */}
                       {selectedOrder.sapData?.FebosFC && (
                         <button
-                          onClick={() => viewDocument(selectedOrder.sapData.FebosFC)}
+                          onClick={() => viewDocument(selectedOrder.sapData!.FebosFC!)}
                           className="px-3 py-1 text-sm rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors flex items-center gap-1"
                         >
                           <svg
@@ -870,19 +986,7 @@ export default function LogisticsView({ orders, isLoading, brand, filters }) {
                       )}
                     </div>
                   </div>
-                  {selectedOrder.sapData?.urlDeliveryCompany && (
-                    <div>
-                      <p className="text-sm text-gray-400">Seguimiento</p>
-                      <a
-                        href={selectedOrder.sapData.urlDeliveryCompany}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300"
-                      >
-                        Ver seguimiento →
-                      </a>
-                    </div>
-                  )}
+
                 </div>
               </div>
 
