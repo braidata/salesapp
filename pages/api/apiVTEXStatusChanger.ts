@@ -1,8 +1,8 @@
-// pages/api/apiVTEXStatusChanger.ts
+// pages/api/apiVTEXAuth.ts
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const VTEX_ACCOUNT = 'imegab2c'
-const VTEX_ENVIRONMENT = 'myvtex.com'
+const VTEX_ENVIRONMENT = 'myvtex.com' // para endpoints del OMS
 const API_VTEX_KEY = process.env.API_VTEX_KEY || ''
 const API_VTEX_TOKEN = process.env.API_VTEX_TOKEN || ''
 
@@ -34,7 +34,7 @@ async function parseVtexResponse(response: Response) {
  * Consulta los detalles de la orden desde el OMS de VTEX.
  */
 async function getOrderDetails(orderId: string): Promise<any> {
-  const url = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}/api/oms/pvt/orders/${orderId}`
+  const url = `https://${VTEX_ACCOUNT}.myvtex.com/api/oms/pvt/orders/${orderId}`
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -48,19 +48,20 @@ async function getOrderDetails(orderId: string): Promise<any> {
 
 /**
  * getPaymentId
- * Extrae el paymentId de la orden.
+ * Extrae el paymentId de la orden (ubicado en paymentData.transactions[0].payments[0].id).
  */
 async function getPaymentId(orderId: string): Promise<string> {
   const order = await getOrderDetails(orderId)
-  const transactions = order.paymentData?.transactions
-  if (!transactions || transactions.length === 0) {
-    throw new Error(`No se encontró información de transacciones en la orden ${orderId}`)
+  if (
+    !order.paymentData ||
+    !order.paymentData.transactions ||
+    order.paymentData.transactions.length === 0 ||
+    !order.paymentData.transactions[0].payments ||
+    order.paymentData.transactions[0].payments.length === 0
+  ) {
+    throw new Error(`No se encontró información de pagos en la orden ${orderId}`)
   }
-  const payments = transactions[0].payments
-  if (!payments || payments.length === 0) {
-    throw new Error(`No se encontró payments en la orden ${orderId}`)
-  }
-  const paymentId = payments[0].id
+  const paymentId = order.paymentData.transactions[0].payments[0].id
   if (!paymentId) {
     throw new Error(`No se encontró paymentId en la orden ${orderId}`)
   }
@@ -68,67 +69,24 @@ async function getPaymentId(orderId: string): Promise<string> {
 }
 
 /**
- * findAuthorizationCodeInOrder
- * Busca el código de autorización en múltiples ubicaciones dentro de la orden.
- */
-function findAuthorizationCodeInOrder(order: any): string | null {
-  const transaction = order.paymentData?.transactions?.[0]
-  const payment = transaction?.payments?.[0]
-  if (!transaction || !payment) return null
-
-  // 1. En connectorResponses.authId
-  if (payment.connectorResponses?.authId) {
-    return payment.connectorResponses.authId
-  }
-  // 2. En connectorResponses.authorizationCode
-  if (payment.connectorResponses?.authorizationCode) {
-    return payment.connectorResponses.authorizationCode
-  }
-  // 3. En authorizationId del payment
-  if (payment.authorizationId) {
-    return payment.authorizationId
-  }
-  // 4. En fields de la transacción
-  if (transaction.fields && Array.isArray(transaction.fields)) {
-    const posibles = [
-      'authorizationCode',
-      'authorisationCode',
-      'authCode',
-      'webpayAuthCode',
-      'authorizationId',
-      'authId',
-    ]
-    for (const name of posibles) {
-      const field = transaction.fields.find((f: any) => f.name === name)
-      if (field?.value) {
-        return field.value
-      }
-    }
-  }
-  // 5. Otras ubicaciones comunes
-  return (
-    payment.authorizationCode ||
-    payment.paymentResponse?.authorizationCode ||
-    payment.webpayResponse?.authorizationCode ||
-    transaction.authorizationCode ||
-    null
-  )
-}
-
-/**
  * sendAuthorizationCode
  * Envía el authorizationCode a la transacción en VTEX Payments.
+ * Se usa el transactionId obtenido de la orden.
+ * El payload se envía como un arreglo:
+ * [
+ *   {
+ *     "name": "authorizationCode",
+ *     "value": "<authorizationCode>"
+ *   }
+ * ]
  */
-async function sendAuthorizationCode(
-  transactionId: string,
-  authorizationCode: string
-): Promise<any> {
+async function sendAuthorizationCode(transactionId: string, authorizationCode: string): Promise<any> {
   const url = `https://${VTEX_ACCOUNT}.vtexpayments.com.br/api/pvt/transactions/${transactionId}/additional-data`
   const payload = [
     {
-      name: 'authorizationCode',
-      value: authorizationCode,
-    },
+      name: "authorizationCode",
+      value: authorizationCode
+    }
   ]
   const response = await fetch(url, {
     method: 'POST',
@@ -147,7 +105,7 @@ async function sendAuthorizationCode(
  * Notifica a VTEX que el pago fue aprobado.
  */
 async function notifyPaymentApproved(orderId: string, paymentId: string): Promise<any> {
-  const url = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}/api/oms/pvt/orders/${orderId}/payments/${paymentId}/payment-notification`
+  const url = `https://${VTEX_ACCOUNT}.myvtex.com/api/oms/pvt/orders/${orderId}/payments/${paymentId}/payment-notification`
   const payload = { paymentStatus: 'approved' }
   const response = await fetch(url, {
     method: 'POST',
@@ -164,10 +122,10 @@ async function notifyPaymentApproved(orderId: string, paymentId: string): Promis
 
 /**
  * startHandling
- * Cambia el estado de la orden a "ready-for-handling" / "handling".
+ * Cambia el estado de la orden a "handling".
  */
 async function startHandling(orderId: string): Promise<any> {
-  const url = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}/api/oms/pvt/orders/${orderId}/start-handling`
+  const url = `https://${VTEX_ACCOUNT}.myvtex.com/api/oms/pvt/orders/${orderId}/start-handling`
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -180,7 +138,15 @@ async function startHandling(orderId: string): Promise<any> {
 }
 
 /**
- * Handler principal
+ * Handler principal:
+ * 1. Recibe orderId y authorizationCode por POST.
+ * 2. Obtiene los detalles de la orden y extrae:
+ *    - transactionId (de paymentData.transactions[0].transactionId)
+ *    - paymentId (de paymentData.transactions[0].payments[0].id)
+ * 3. Envía el authorizationCode a la transacción.
+ * 4. Notifica a VTEX que el pago fue aprobado.
+ * 5. Espera hasta que la orden alcance el estado "payment-approved" o "ready-for-handling".
+ * 6. Si el estado es "payment-approved", llama a startHandling para avanzar a "ready-for-handling".
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -192,160 +158,56 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!orderId || typeof orderId !== 'string') {
     return res.status(400).json({ message: 'Falta el parámetro "orderId"' })
   }
-
-  if (authorizationCode && typeof authorizationCode !== 'string') {
-    return res.status(400).json({ message: 'El parámetro "authorizationCode" debe ser un string' })
+  if (!authorizationCode || typeof authorizationCode !== 'string') {
+    return res.status(400).json({ message: 'Falta el parámetro "authorizationCode"' })
   }
 
   try {
-    console.log(`🔍 Consultando orden: ${orderId}`)
+    // 1. Obtener detalles de la orden
     const order = await getOrderDetails(orderId)
-    console.log(`📊 Estado actual: ${order.status}`)
-
-    const transactions = order.paymentData?.transactions
-    if (!transactions || transactions.length === 0) {
+    if (!order.paymentData || !order.paymentData.transactions || order.paymentData.transactions.length === 0) {
       throw new Error(`No se encontró información de transacciones en la orden ${orderId}`)
     }
-    const transaction = transactions[0]
-    if (!transaction.transactionId) {
+
+    // 2. Extraer transactionId y paymentId
+    const transactionId = order.paymentData.transactions[0].transactionId
+    if (!transactionId) {
       throw new Error(`No se encontró transactionId en la orden ${orderId}`)
     }
-    const payment = transaction.payments?.[0] || {}
-    const existingAuthCode = findAuthorizationCodeInOrder(order)
-    const isAlreadyAuthorized =
-      payment.status === 'approved' ||
-      payment.status === 'authorized' ||
-      ['payment-approved', 'ready-for-handling', 'invoiced'].includes(order.status)
-
-    console.log(`🔐 Estado del pago: ${payment.status || 'sin status'}`)
-    console.log(`✅ ¿Ya autorizado?: ${isAlreadyAuthorized}`)
-
-    // Si ya está autorizado o en ready-for-handling/invoiced, no hacer nada adicional
-    if (isAlreadyAuthorized) {
-      if (order.status === 'payment-approved') {
-        console.log('🚀 Moviendo de payment-approved a ready-for-handling')
-        const handlingResponse = await startHandling(orderId)
-        const updatedOrder = await getOrderDetails(orderId)
-        return res.status(200).json({
-          message: 'Orden aprobada previamente. Se movió a ready-for-handling.',
-          originalStatus: order.status,
-          finalStatus: updatedOrder.status,
-          handlingResponse,
-          authorizationCode: existingAuthCode || 'N/A',
-        })
-      }
-      return res.status(200).json({
-        message: 'La orden ya está en un estado válido para fulfillment.',
-        currentStatus: order.status,
-        authorizationCode: existingAuthCode || 'N/A',
-        noActionNeeded: true,
-      })
-    }
-
-    // Si está en payment-pending o pending, intentamos salto directo
-    if (['payment-pending', 'pending'].includes(order.status)) {
-      console.log('🐛 BUG VTEX: Pedido en payment-pending con pago confirmado en Transbank/Webpay.')
-      console.log(`📅 Autorizado en: ${order.authorizedDate}`)
-      console.log(`🔍 Código encontrado: ${existingAuthCode}`)
-
-      const paymentId = await getPaymentId(orderId)
-      let authResult = null
-      let handlingResponse = null
-      let finalStatus = order.status
-
-      // Intentamos reenviar código si lo tenemos
-      const codeToUse = authorizationCode?.trim() || existingAuthCode
-      if (codeToUse) {
-        try {
-          console.log(`📤 Enviando authorizationCode: ${codeToUse}`)
-          authResult = await sendAuthorizationCode(transaction.transactionId, codeToUse)
-          console.log('✅ Código enviado exitosamente')
-        } catch (authError) {
-          console.log(`⚠️ Error enviando código (continuando): ${authError.message}`)
-        }
-      }
-
-      // Ejecutamos startHandling directamente (salto a ready-for-handling)
-      try {
-        console.log('🚀 Ejecutando startHandling() desde payment-pending...')
-        handlingResponse = await startHandling(orderId)
-        console.log('✅ StartHandling ejecutado!')
-        const finalOrder = await getOrderDetails(orderId)
-        finalStatus = finalOrder.status
-        console.log(`🎯 Estado final: ${finalStatus}`)
-      } catch (handlingError) {
-        console.log(`❌ Error en startHandling directo: ${handlingError.message}`)
-        finalStatus = order.status
-      }
-
-      const wasSuccessful = finalStatus === 'ready-for-handling'
-      return res.status(200).json({
-        message: `INTENTO DIRECTO payment-pending → ready-for-handling: ${
-          wasSuccessful ? '🎉 ÉXITO!' : '❌ FALLÓ'
-        }`,
-        originalStatus: order.status,
-        finalStatus,
-        codeUsed: codeToUse || 'Sin código',
-        codeSource: authorizationCode?.trim() ? 'Usuario' : existingAuthCode ? 'VTEX' : 'Ninguno',
-        operations: {
-          authCodeSent: !!authResult,
-          directStartHandling: !!handlingResponse,
-        },
-        responses: {
-          authResult,
-          handlingResponse: handlingResponse || null,
-        },
-        connectorResponses: payment.connectorResponses || null,
-      })
-    }
-
-    // Si no está aprobado y no estaba en pending, procedemos con flujo normal
-    console.log('🔄 Pago no autorizado, procediendo con flujo estándar')
     const paymentId = await getPaymentId(orderId)
-    let authResult: any = null
-    const codeToUse = authorizationCode?.trim() || existingAuthCode
 
-    if (codeToUse) {
-      console.log(`📤 Enviando authorizationCode: ${codeToUse}`)
-      authResult = await sendAuthorizationCode(transaction.transactionId, codeToUse)
-    }
+    // 3. Enviar el authorizationCode a la transacción
+    const authResult = await sendAuthorizationCode(transactionId, authorizationCode)
 
-    console.log('🔔 Notificando pago aprobado...')
+    // 4. Notificar a VTEX que el pago fue aprobado
     await notifyPaymentApproved(orderId, paymentId)
 
-    // Esperamos hasta 5 ciclos de 3s para ver cambio a payment-approved o ready-for-handling
+    // 5. Esperar a que la orden alcance "payment-approved" o "ready-for-handling"
     let attempts = 0
-    let currentStatus = order.status
-    while (
-      !['payment-approved', 'ready-for-handling'].includes(currentStatus) &&
-      attempts < 5
-    ) {
-      console.log(`⏳ Intento ${attempts + 1}/5 - Estado: ${currentStatus}`)
-      await new Promise((r) => setTimeout(r, 3000))
-      const checkOrder = await getOrderDetails(orderId)
-      currentStatus = checkOrder.status
+    let status = (await getOrderDetails(orderId)).status
+    while (status !== 'payment-approved' && status !== 'ready-for-handling' && attempts < 10) {
+      await new Promise(resolve => setTimeout(resolve, 5000)) // Espera 5 segundos
+      status = (await getOrderDetails(orderId)).status
       attempts++
     }
+    if (status !== 'payment-approved' && status !== 'ready-for-handling') {
+      throw new Error(`La orden no llegó a "payment-approved" o "ready-for-handling". Último estado: ${status}`)
+    }
 
-    let handlingResponse: any = {}
-    if (currentStatus === 'payment-approved') {
-      console.log('🚀 Moviendo a ready-for-handling...')
+    // 6. Si el estado es "payment-approved", llamar a startHandling para avanzar a "ready-for-handling"
+    let handlingResponse = {}
+    if (status === 'payment-approved') {
       handlingResponse = await startHandling(orderId)
-      currentStatus = 'ready-for-handling'
     }
 
     return res.status(200).json({
-      message: 'Flujo de pago procesado correctamente',
-      finalStatus: currentStatus,
-      authorizationCodeSent: codeToUse || 'No enviado',
-      codeSource: authorizationCode?.trim() ? 'Usuario' : existingAuthCode ? 'VTEX' : 'Ninguno',
-      wasAlreadyAuthorized: false,
-      attemptsUsed: attempts,
+      message: 'AuthorizationCode enviado y flujo de pago actualizado correctamente',
+      finalStatus: status,
       handlingResponse,
       authResult,
     })
   } catch (error) {
-    console.error('❌ Error en la actualización del pedido:', error)
+    console.error('Error en la actualización del pedido:', error)
     return res.status(500).json({
       message: 'Error en la actualización del pedido',
       error: (error as Error).message,
