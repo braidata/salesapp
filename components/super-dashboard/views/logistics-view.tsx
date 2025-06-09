@@ -104,9 +104,11 @@ export default function LogisticsView({
   brand,
   filters,
 }: LogisticsViewProps) {
+  const [allUrl, setAllUrl] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [loadingOrder, setLoadingOrder] = useState(false)
   const [isLoadingLabel, setIsLoadingLabel] = useState(false);
+  const [isLoadingAllLabels, setIsLoadingAllLabels] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [exportProgress, setExportProgress] = useState(0)
 
@@ -271,6 +273,32 @@ export default function LogisticsView({
       alert('Error al descargar etiquetas');
     }
   };
+
+  useEffect(() => {
+    if (!labelPreview) return;
+
+    (async () => {
+
+      try {
+        setIsLoadingAllLabels(true)
+        const res = await fetch('/api/starken/processEtiqueta', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ordenFlete: selectedOrder!.sapData.otDeliveryCompany,
+            tipoSalida: 3,
+            combineAll: true
+          })
+        });
+        const json = await res.json();
+        setAllUrl(json.data[0]);      // guardo el único data-URI
+      } catch {
+        setAllUrl(null);
+      } finally {
+        setIsLoadingAllLabels(false);
+      }
+    })();
+  }, [labelPreview]);
 
   const downloadPDF = async (url: string, index: number) => {
     try {
@@ -999,29 +1027,41 @@ export default function LogisticsView({
                         {selectedOrder.sapData?.otDeliveryCompany || "N/A"}
                       </p>
                       {selectedOrder.sapData?.otDeliveryCompany && (
-                        <button
+                        <motion.button
                           onClick={() =>
                             handleLabelPreview(selectedOrder.sapData!.otDeliveryCompany!)
                           }
-                          className="px-3 py-1 text-sm rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-1"
+                          disabled={isLoadingLabel}
+                          className="px-3 py-1 text-sm rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                          whileHover={{ scale: isLoadingLabel ? 1 : 1.02 }}
+                          whileTap={{ scale: isLoadingLabel ? 1 : 0.98 }}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M6 2L2 6v14a2 2 0 002 2h16a2 2 0 002-2V6l-4-4H6z" />
-                            <path d="M6 2v4h12V2" />
-                            <path d="M8 12h8" />
-                            <path d="M8 16h8" />
-                          </svg>
-                          Ver Etiqueta
-                        </button>
+                          {isLoadingLabel ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-400"></div>
+                              Cargando...
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M6 2L2 6v14a2 2 0 002 2h16a2 2 0 002-2V6l-4-4H6z" />
+                                <path d="M6 2v4h12V2" />
+                                <path d="M8 12h8" />
+                                <path d="M8 16h8" />
+                              </svg>
+                              Ver Etiqueta
+                            </>
+                          )}
+                        </motion.button>
                       )}
                     </div>
                   </div>
@@ -1182,16 +1222,45 @@ export default function LogisticsView({
             </div>
 
             <div className="p-4 grid grid-cols-4 gap-4 border-b border-gray-700">
+              {isLoadingAllLabels ? (
+                // 🔄 SKELETON LOADING - Aparece mientras carga
+                <div className="p-2 rounded bg-gray-800 animate-pulse">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-400"></div>
+                    <div className="h-4 bg-gray-600 rounded w-20 animate-pulse"></div>
+                  </div>
+                </div>
+              ) : allUrl ? (
+                // ✅ BOTÓN REAL - Aparece cuando ya cargó
+                <button
+                  onClick={async () => {
+                    setSelectedPdfUrl(allUrl);
+                    await loadPdfAsBlob(allUrl);
+                  }}
+                  className={`p-2 rounded ${selectedPdfUrl === allUrl
+                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/50'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                >
+                  Todas las Etiquetas
+                </button>
+              ) : (
+                // ❌ ESTADO DE ERROR - Si falló la carga
+                <div className="p-2 rounded bg-gray-800/50 text-gray-500 text-center">
+                  No disponible
+                </div>
+              )}
+
               {labelPreview.data.map((url, index) => (
                 <button
                   key={index}
                   onClick={async () => {
-                    setSelectedPdfUrl(url)
-                    await loadPdfAsBlob(url)
+                    setSelectedPdfUrl(url);
+                    await loadPdfAsBlob(url);
                   }}
                   className={`p-2 rounded ${selectedPdfUrl === url
-                    ? "bg-blue-600/20 text-blue-400 border border-blue-500/50"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/50'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                     }`}
                 >
                   Etiqueta {index + 1}
@@ -1199,18 +1268,19 @@ export default function LogisticsView({
               ))}
             </div>
 
-            <div className="flex-1 h-[calc(80vh-220px)] p-4">
+            <div className="flex-1 h-[calc(80vh-420px)] p-4">
               {selectedPdfUrl ? (
-                <div className="relative w-full h-full bg-white rounded-lg overflow-hidden">
+                <div className="relative w-full h-full bg-white rounded-lg overflow-y-scroll">
                   {pdfBlobUrls[selectedPdfUrl] ? (
                     <iframe
                       src={pdfBlobUrls[selectedPdfUrl]}
-                      className="w-full h-full"
+                      className="w-full h-full absolute inset-0"
                       style={{
                         border: "none",
-                        backgroundColor: "white",
+                        backgroundColor: "gray",
                       }}
                       title="PDF Viewer"
+
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
@@ -1225,7 +1295,7 @@ export default function LogisticsView({
               )}
             </div>
 
-            <div className="p-4 border-t border-gray-700 flex justify-between items-center">
+            <div className="p-4 border-t border-gray-700 flex justify-between items-center shrink-0">
               <div className="flex gap-2">
                 {selectedPdfUrl && (
                   <button
