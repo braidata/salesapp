@@ -20,7 +20,7 @@ export default function Pagination({
   onLimitChange,
 }: PaginationProps) {
   // Opciones para el número de elementos por página
-  const limitOptions = [15, 25, 50, 100, 150, 200, 300]
+  const limitOptions = [15, 25, 50, 100, 150, 200, 300, 450, 600, 750]
 
   // Calcular los números de página a mostrar
   const getPageNumbers = () => {
