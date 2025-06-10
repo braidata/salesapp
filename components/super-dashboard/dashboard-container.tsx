@@ -41,7 +41,7 @@ export default function DashboardContainer() {
   // Estado para la paginación local
   const [pagination, setPagination] = useState({
     page: 1,
-    perPage: 100,
+    perPage: 400,
     total: 110,
     pages: 10
   })
