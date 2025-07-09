@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import OrdersVentusComp from "../components/ordersVentusComp";
 import Febos from "../components/febos";
 import ConsultaStockComponent from "../components/ConsultaStockSAPTable";
+import Zinvoiced from "../components/zinvoiced";
 
 const Testeo = () => {
   const {data: session} = useSession()
@@ -90,6 +91,8 @@ const Testeo = () => {
         <FedEx />
         <OrdersVentusComp />
         <SyncFramer />
+        <Zinvoiced />
+        
         {/* <Febos/> */}
     </div>
   );
