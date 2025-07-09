@@ -1,5 +1,6 @@
 
 'use client';
+
 import React, { useState, useMemo, useEffect } from "react";
 import { Search, Filter, Download, RefreshCw, Calendar, Clock, TrendingUp, AlertCircle, ChevronUp, ChevronDown } from "lucide-react";
 
@@ -89,6 +90,7 @@ export const OrderSyncDiff: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sapStatusFilter, setSapStatusFilter] = useState("all");
+  const [statusSAPFilter, setStatusSAPFilter] = useState("Transporte Finalizado"); // Nuevo filtro por status SAP externo
   
   // Ordenamiento
   const [sortField, setSortField] = useState<string>("creation_date");
@@ -180,8 +182,9 @@ export const OrderSyncDiff: React.FC = () => {
                            (order.sap?.sap_order || "").toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === "all" || order.status === statusFilter;
       const matchesSapStatus = sapStatusFilter === "all" || (order.sap?.status || "") === sapStatusFilter;
+      const matchesStatusSAP = statusSAPFilter === "all" || (order.status_SAP?.DESCP_STATUS || "") === statusSAPFilter;
       
-      return matchesSearch && matchesStatus && matchesSapStatus;
+      return matchesSearch && matchesStatus && matchesSapStatus && matchesStatusSAP;
     });
 
     // Ordenamiento
@@ -246,7 +249,7 @@ export const OrderSyncDiff: React.FC = () => {
     });
 
     return filtered;
-  }, [orders, searchTerm, statusFilter, sapStatusFilter, sortField, sortDirection, mounted]);
+  }, [orders, searchTerm, statusFilter, sapStatusFilter, statusSAPFilter, sortField, sortDirection, mounted]);
 
   // Cálculo de métricas
   const metrics = useMemo(() => {
@@ -299,6 +302,7 @@ export const OrderSyncDiff: React.FC = () => {
   // Opciones únicas para filtros
   const statusOptions = [...new Set(orders.map(o => o.status))];
   const sapStatusOptions = [...new Set(orders.map(o => o.sap?.status).filter(Boolean))];
+  const statusSAPOptions = [...new Set(orders.map(o => o.status_SAP?.DESCP_STATUS).filter(Boolean))];
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -331,9 +335,9 @@ export const OrderSyncDiff: React.FC = () => {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-emerald-400 mb-2">
-            MONITOR DE PROCESAMIENTO PEDIDOS VTEX-SAP VENTUS
+            DIFERENCIAS DE SINCRONIZACIÓN VTEX/SAP
           </h1>
-          <p className="text-slate-400">Monitoreo en tiempo real de proceso de pedidos</p>
+          <p className="text-slate-400">Monitoreo en tiempo real de sincronización de pedidos</p>
         </div>
 
         {/* Controles de fecha */}
@@ -458,6 +462,17 @@ export const OrderSyncDiff: React.FC = () => {
                   <option key={status} value={status}>{status}</option>
                 ))}
               </select>
+
+              <select
+                value={statusSAPFilter}
+                onChange={e => setStatusSAPFilter(e.target.value)}
+                className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:border-emerald-400 focus:outline-none"
+              >
+                <option value="all">Todos los Status SAP</option>
+                {statusSAPOptions.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
             </div>
 
             {/* Controles */}
@@ -482,9 +497,17 @@ export const OrderSyncDiff: React.FC = () => {
                 Exportar CSV
               </button>
               
-              <button className="flex-1 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors">
+              <button 
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("all");
+                  setSapStatusFilter("all");
+                  setStatusSAPFilter("all");
+                }}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded flex items-center justify-center gap-2 transition-colors"
+              >
                 <Filter className="w-4 h-4" />
-                Filtros
+                Limpiar Filtros
               </button>
             </div>
           </div>
