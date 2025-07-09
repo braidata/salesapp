@@ -33,9 +33,7 @@ export default async function handler(
       endDate,
       status,
       page = '1',
-      perPage = '1000',
-      includeItems = 'true',
-      includePayments = 'true'
+      perPage = '1000'
     } = req.query;
 
     // Validate dates
@@ -62,12 +60,13 @@ export default async function handler(
     // Get total count for pagination
     const totalOrders = await prisma.vtex_orders.count({ where });
 
-    // Get paginated orders with relations
+    // Get paginated orders, only select needed fields
     const orders = await prisma.vtex_orders.findMany({
       where,
-      include: {
-        vtex_order_items: includeItems === 'true',
-        vtex_order_payments: includePayments === 'true'
+      select: {
+        vtex_order_id: true,
+        creation_date: true,
+        status: true
       },
       skip: (parseInt(page as string) - 1) * parseInt(perPage as string),
       take: parseInt(perPage as string),
@@ -76,55 +75,11 @@ export default async function handler(
       }
     });
 
-    // Transform data to match VTEX API format
+    // Transform data to minimal format
     const transformedOrders = orders.map(order => ({
       orderId: order.vtex_order_id,
-      sequence: order.sequence,
-      status: order.status,
-      statusDescription: order.status_description,
-      value: Number(order.total_value) * 100, // Convert to cents
       creationDate: order.creation_date?.toISOString(),
-      lastChange: order.last_change?.toISOString(),
-      authorizedDate: order.authorized_date?.toISOString(),
-      invoicedDate: order.invoiced_date?.toISOString(),
-      isCompleted: order.is_completed,
-
-      clientProfileData: {
-        email: order.customer_email,
-        firstName: order.customer_first_name,
-        lastName: order.customer_last_name,
-        document: order.customer_document,
-        phone: order.customer_phone,
-        isCorporate: order.customer_is_corporate
-      },
-
-      items: order.vtex_order_items?.map(item => ({
-        uniqueId: item.vtex_unique_id,
-        id: item.product_id,
-        productId: item.product_id,
-        name: item.product_name,
-        refId: item.ref_id,
-        quantity: item.quantity,
-        price: Number(item.unit_price) * 100, // Convert to cents
-        listPrice: Number(item.unit_price) * 100,
-        sellingPrice: Number(item.selling_price) * 100,
-        additionalInfo: {
-          brandName: item.brand_name
-        }
-      })),
-
-      paymentData: {
-        transactions: [{
-          payments: order.vtex_order_payments?.map(payment => ({
-            paymentSystemName: payment.payment_system_name,
-            value: Number(payment.payment_value) * 100, // Convert to cents
-            installments: payment.installments
-          }))
-        }]
-      },
-
-      // Include raw data if available
-      raw_vtex_data: order.raw_vtex_data
+      status: order.status
     }));
 
     const processingTime = Date.now() - startTime;

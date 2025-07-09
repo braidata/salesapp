@@ -200,7 +200,7 @@ const fetchOrders = useCallback(async (options: {
     startDate,
     endDate,
     page = 1,
-    perPage = 20,
+    perPage = 2000,
     forceRefresh = false
   } = options;
 
