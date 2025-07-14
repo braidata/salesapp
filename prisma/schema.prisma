@@ -412,3 +412,31 @@ model analytics_summary {
 
   @@index([date])
 }
+
+model sap_client {
+  id                       Int       @id @default(autoincrement())
+  client_rut               String    @unique @db.VarChar(50)
+  client_nombre            String    @db.VarChar(255)
+  client_apellido_paterno  String?   @db.VarChar(255)
+  client_apellido_materno  String?   @db.VarChar(255)
+  client_sexo              String?   @default("") @db.VarChar(255)
+  client_celular           String?   @db.VarChar(50)
+  client_telefono          String?   @db.VarChar(50)
+  client_email             String?   @db.VarChar(255)
+  client_calle             String?   @db.VarChar(255)
+  client_numero_calle      String?   @db.VarChar(255)
+  client_numero_casa_depto String?   @db.VarChar(255)
+  client_region            String?   @db.VarChar(255)
+  client_ciudad            String?   @db.VarChar(255)
+  client_comuna            String?   @db.VarChar(255)
+  client_owner_id          Int?
+  creation_response        String?   @db.VarChar(255)
+  created_by               String?   @db.VarChar(255)
+  authorized_by            String?   @db.VarChar(255)
+  updated_by               String?   @db.VarChar(255)
+  created_at               DateTime  @default(now())
+  authorized_at            DateTime?
+  updated_at               DateTime  @updatedAt
+
+  @@index([client_rut])
+}
