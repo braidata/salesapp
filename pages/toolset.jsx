@@ -13,6 +13,7 @@ import OrdersVentusComp from "../components/ordersVentusComp";
 import Febos from "../components/febos";
 import ConsultaStockComponent from "../components/ConsultaStockSAPTable";
 import Zinvoiced from "../components/zinvoiced";
+import SapOrderViewer from "../components/sapOrdersViewer";
 
 const Testeo = () => {
   const {data: session} = useSession()
@@ -83,6 +84,7 @@ const Testeo = () => {
   return (
     <div className="w-96 ml-8 lg:w-full flex min-h-screen flex-col items-center justify-center py-2">
         
+        <SapOrderViewer />
         <SapO2/>
         <MeliTable />
         <MeliTools />
