@@ -34,7 +34,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
         // Verificamos si es contabilidad
         const hasAccounting = await checkPermissions({
           email,
-          roles: ["accounting", "contabilidad"]
+          roles: ["accounting", "payments"]
         })
         setIsAccounting(hasAccounting)
         setLoadingPermissions(false)
@@ -116,6 +116,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     { value: "all", label: "Todas las marcas" },
     { value: "blanik", label: "Blanik" },
     { value: "bbq", label: "BBQ" },
+    { value: "imegab2c", label: "Ventus" },
   ]
 
   // Manejar cambios en daysBack
@@ -221,12 +222,22 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       paymentType: "Webpay",
       deliveryType: "",
       brand: filters.brand, // Mantener la marca actual
+    },
+    transferencia: {
+      //set today
+      dateRange: { start: new Date(), end: null },
+      daysBack: 7,
+      status: "",
+      courier: "",
+      paymentType: "Promissory",
+      deliveryType: "",
+      brand: filters.brand, // Mantener la marca actual
     }
   }
 
   // Función para aplicar un preset
   const applyPreset = (
-    presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | 'NoventayNueveMin' | 'NoventayNueveMinNext' | 'retail' | 'all' | 'webpay'
+    presetName: 'starken' | 'localPickup' | 'santiagoDelivery' | 'NoventayNueveMin' | 'NoventayNueveMinNext' | 'retail' | 'all' | 'webpay' | 'transferencia'
   ) => {
     onFilterChange(presets[presetName])
     setActiveTimeFilter("days") // Asegurarnos de que el filtro activo sea "days" tras aplicar un preset
@@ -249,14 +260,26 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
                  solo mostramos el preset "Webpay". De lo contrario, mostramos todos.
             */}
             {isAccounting ? (
-              <motion.button
-                onClick={() => applyPreset('webpay')}
-                className="px-4 py-1.5 rounded-full text-sm bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600/30 shadow-sm shadow-red-500/20"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                Webpay
-              </motion.button>
+              <>
+                <motion.button
+                  onClick={() => applyPreset('webpay')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600/30 shadow-sm shadow-red-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Webpay
+                </motion.button>
+
+                <motion.button
+                  onClick={() => applyPreset('transferencia')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-green-600/20 text-green-400 border border-green-500/40 hover:bg-green-600/30 shadow-sm shadow-green-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Transferencia
+                </motion.button>
+
+              </>
             ) : (
               <>
                 <motion.button
@@ -298,6 +321,14 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
                   whileTap={{ scale: 0.97 }}
                 >
                   Webpay
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('transferencia')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-green-600/20 text-green-400 border border-green-500/40 hover:bg-green-600/30 shadow-sm shadow-green-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Transferencia
                 </motion.button>
                 <motion.button
                   onClick={() => applyPreset('NoventayNueveMin')}
@@ -404,9 +435,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`h-5 w-5 transition-transform duration-300 ${
-                  isExpanded ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""
+                  }`}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"

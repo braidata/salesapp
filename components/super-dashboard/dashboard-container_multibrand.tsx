@@ -65,7 +65,7 @@ export default function DashboardContainer() {
         })
         const hasAccounting = await checkPermissions({
           email,
-          roles: ["accounting", "contabilidad"],
+          roles: ["accounting", "payments"],
         })
         setPermissions({ logistics: hasLogistics, accounting: hasAccounting })
         setLoadingPermissions(false)
@@ -90,7 +90,7 @@ export default function DashboardContainer() {
 
     try {
       const apiParams: any = {
-        view: view === "logistics" ? "logistica" : view === "accounting" ? "contabilidad" : "todos",
+        view: view === "logistics" ? "logistica" : view === "accounting" ? "payments" : "todos",
         status: filters.status,
         courier: filters.courier,
         paymentType: filters.paymentType,
