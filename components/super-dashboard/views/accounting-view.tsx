@@ -150,6 +150,18 @@ export default function AccountingView({ orders, isLoading, brandFilter }) {
     return "";
   }
 
+  // Función para obtener el valor numérico del acquirer
+  const getAcquirerNumber = (order) => {
+    const acquirer = order?.paymentData?.transactions?.[0]?.payments?.[0]?.connectorResponses?.acquirer;
+    if (acquirer) {
+      // Regex para capturar cualquier código con formato "LETRAS - NUMERO"
+      const regex = /([A-Z]{1,3})\s*-\s*(\d+)/i;
+      const match = acquirer.match(regex);
+      return match ? match[2] : ""; // match[2] es el número
+    }
+    return "";
+  }
+
   // Función para obtener el tipo de pago directamente de connectorResponses
   const getTipoPago = (order) => {
     //console.log("Evaluando TIPO PAGO para pedido:", order?.orderId);
@@ -177,13 +189,17 @@ export default function AccountingView({ orders, isLoading, brandFilter }) {
       }
     }
     
-    // 2. Si el connectorResponses tiene información sobre el adquirente
+    // 2. Si el connectorResponses tiene información sobre el adquirente 
     if (payment.connectorResponses && payment.connectorResponses.acquirer) {
       const acquirer = payment.connectorResponses.acquirer.toLowerCase();
       //console.log("Verificando acquirer:", acquirer);
       
       if (acquirer.includes("vd")){
         return "TD Tarjeta Débito";
+      }
+
+      if (acquirer.includes("-")){
+        console.log(acquirer, "gato");
       }
 
       if (acquirer.includes("vp")){
@@ -367,7 +383,7 @@ export default function AccountingView({ orders, isLoading, brandFilter }) {
     {
       key: "cuotas",
       header: "Cuotas",
-      render: (_, row) => row.paymentData?.transactions?.[0]?.payments?.[0]?.installments || "",
+      render: (_, row) => getAcquirerNumber(row),
       sortable: true,
     },
     {
@@ -429,7 +445,8 @@ export default function AccountingView({ orders, isLoading, brandFilter }) {
         if (transaction.payments && transaction.payments.length > 0) {
           const payment = transaction.payments[0];
           metodoPago = payment.paymentSystemName || "No disponible";
-          cuotas = payment.installments || "";
+          // Ahora usamos el valor numérico del acquirer en lugar de installments
+          cuotas = getAcquirerNumber(order);
         }
       }
       
