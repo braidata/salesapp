@@ -30,7 +30,7 @@ export default function DashboardHeader({ activeView, onViewChange }: DashboardH
           })
           const hasAccounting = await checkPermissions({
             email,
-            roles: ["accounting", "contabilidad"],
+            roles: ["accounting", "validator"],
           })
 
           setPermissions({ logistics: hasLogistics, accounting: hasAccounting })
