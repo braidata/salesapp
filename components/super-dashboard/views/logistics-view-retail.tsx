@@ -62,7 +62,7 @@ export default function LogisticsView({ orders, isLoading, brandFilter }) {
         // Mostrar la marca con un color distinto según el valor
         return (
           <span className={`px-2 py-1 rounded-full text-xs bg-${color}-500/20 text-${color}-300`}>
-            {value === "blanik" ? "Blanik" : value === "bbq" ? "BBQ" : value === "imegab2c" ? "IMEGA" : value || "N/A"}
+            {value === "blanik" ? "Blanik" : value === "bbq" ? "BBQ" : value === "imegab2c" ? "VENTUS" : value || "N/A"}
           </span>
         );
       },
@@ -247,152 +247,147 @@ export default function LogisticsView({ orders, isLoading, brandFilter }) {
   };
   
 
-  const handleExport = async () => {
-    if (!orders || orders.length === 0) return;
-    
-    console.log(`Iniciando exportación a Excel. Cantidad de órdenes recibidas: ${orders.length}`);
-    
-    // Paso 1: Asegurarse de que cada orden tenga la información de productos.
-    const detailedOrders = await Promise.all(
-      orders.map(async (order) => {
-        // Si la orden no tiene ítems, se solicita el detalle.
-        if (!order.items || order.items.length === 0) {
-          console.log(`La orden ${order.orderId} no trae productos; se solicitarán detalles.`);
-          try {
-            // Usar la marca de la orden para determinar el endpoint correcto
-            let endpoint;
-            if (order.marca === "blanik") {
-              endpoint = `/api/apiVTEXBlanik?orderId=${order.orderId}`;
-            } else if (order.marca === "bbq") {
-              endpoint = `/api/apiVTEXBBQ?orderId=${order.orderId}`;
-            } else {
-              endpoint = `/api/apiVTEX?orderId=${order.orderId}`;
-            }
-            
-            const response = await fetch(endpoint);
-            if (!response.ok) {
-              console.error(
-                `Error al obtener detalles para la orden ${order.orderId}. Status: ${response.status}`
-              );
-              return order;
-            }
-            const raw = await response.json();
-            const mapped = mapOrderDetails(raw, order.marca);
-            console.log(
-              `Orden ${order.orderId} detallada. Productos encontrados: ${mapped.items.length}`
-            );
-            return mapped;
-          } catch (error) {
-            console.error(`Error al obtener detalle para la orden ${order.orderId}:`, error);
+// Reemplazar la función handleExport existente con esta versión modificada:
+
+const handleExport = async () => {
+  if (!orders || orders.length === 0) return;
+  
+  console.log(`Iniciando exportación a Excel. Cantidad de órdenes recibidas: ${orders.length}`);
+  
+  // Paso 1: Obtener detalles de VTEX (igual que antes)
+  const detailedOrders = await Promise.all(
+    orders.map(async (order) => {
+      if (!order.items || order.items.length === 0) {
+        console.log(`La orden ${order.orderId} no trae productos; se solicitarán detalles.`);
+        try {
+          let endpoint;
+          if (order.marca === "blanik") {
+            endpoint = `/api/apiVTEXBlanik?orderId=${order.orderId}`;
+          } else if (order.marca === "bbq") {
+            endpoint = `/api/apiVTEXBBQ?orderId=${order.orderId}`;
+          } else {
+            endpoint = `/api/apiVTEX?orderId=${order.orderId}`;
+          }
+          
+          const response = await fetch(endpoint);
+          if (!response.ok) {
+            console.error(`Error al obtener detalles para la orden ${order.orderId}. Status: ${response.status}`);
             return order;
           }
-        } else {
-          console.log(`La orden ${order.orderId} ya trae información de productos.`);
+          const raw = await response.json();
+          const mapped = mapOrderDetails(raw, order.marca);
+          console.log(`Orden ${order.orderId} detallada. Productos encontrados: ${mapped.items.length}`);
+          return mapped;
+        } catch (error) {
+          console.error(`Error al obtener detalle para la orden ${order.orderId}:`, error);
           return order;
         }
-      })
-    );
-    
-    // Paso 2: Construir el arreglo "data" para exportar.
-    // Se genera una fila por cada producto en cada orden, y se incluyen los campos generales.
-    const data = [];
-    detailedOrders.forEach((order) => {
-      const clientProfile = order.clientProfileData || {};
-      const shippingAddress = order.shippingData?.address || {};
-      const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
-      
-      // Formateo de fechas
-      const creationDateStr = order.creationDate
-        ? new Date(order.creationDate).toLocaleDateString("es-CL")
-        : "N/A";
-      const lastChangeStr = order.lastChange
-        ? new Date(order.lastChange).toLocaleDateString("es-CL")
-        : "N/A";
-      
-      // Datos de facturación
-      const billingFirstName = clientProfile.firstName || "N/A";
-      const billingLastName = clientProfile.lastName || "N/A";
-      const billingPhone = clientProfile.phone || "N/A";
-      
-      // Datos de envío basados en receiverName
-      let shippingFullName = shippingAddress.receiverName || "N/A";
-      let shippingName = "N/A";
-      let shippingLastName = "N/A";
-      if (shippingFullName !== "N/A") {
-        const split = shippingFullName.trim().split(" ");
-        shippingName = split[0] || "N/A";
-        shippingLastName = split.slice(1).join(" ") || "N/A";
-      }
-      
-      // Construir dirección completa
-      const street = shippingAddress.street || "";
-      const number = shippingAddress.number || "";
-      const complement = shippingAddress.complement || "";
-      const addressLine = street 
-        ? `${street} ${number}${complement ? `, ${complement}` : ""}`
-        : "N/A";
-      const province = shippingAddress.state || "N/A";
-      const city = shippingAddress.neighborhood || "N/A";
-      const postalCode = shippingAddress.postalCode || "N/A";
-      
-      // Otros datos generales
-      const shippingMethodTitle = logisticsInfo.selectedSla || "N/A";
-      const courier = logisticsInfo.deliveryCompany || "N/A";
-      const totalValue = typeof order.value === "number" ? order.value / 100 : 0;
-      const dteValue = order.invoiceOutput || "N/A";
-      
-      // Si la orden tiene productos
-      if (order.items && order.items.length > 0) {
-        order.items.forEach((item) => {
-          data.push({
-            // Agregar campo de marca en la exportación
-            "Marca": order.marca || "N/A",
-            "Número de pedido": order.sequence || "N/A",
-            "ID del pedido": order.orderId || "N/A",
-            "Estado del pedido": order.statusDescription || order.status || "N/A",
-            "Fecha del pedido": creationDateStr,
-            "DTE": dteValue,
-            "RUT": clientProfile.document || "N/A",
-            "Nombre (facturación)": billingFirstName,
-            "Apellidos (facturación)": billingLastName,
-            "Teléfono (facturación)": billingPhone,
-            "Correo electrónico": clientProfile.email
-              ? clientProfile.email.split("-")[0]
-              : "N/A",
-            "Nombre (envío)": shippingName,
-            "Apellidos (envío)": shippingLastName,
-            "Dirección de envío": addressLine,
-            "N° Dirección": number || "N/A",
-            "N° Dpto": complement || "N/A",
-            "Provincia (envío)": province,
-            "Ciudad (envío)": city,
-            "Título del método de envío": shippingMethodTitle,
-            "Transportista": courier,
-            "Importe total del pedido": formatCurrency(totalValue),
-            "Última Actualización": lastChangeStr,
-            // Datos del producto:
-            "SKU VTEX": item.sellerSku || item.id || "N/A",
-            "SKU Local": item.refId || "N/A",
-            "Producto": item.name || "N/A",
-            "Cantidad": item.quantity || 1,
-            "Precio Unitario": formatCurrency(
-              item.price && !isNaN(item.price) ? item.price / 100 : 0
-            ),
-            "Precio Total": formatCurrency(
-              item.price && item.quantity ? (item.price * item.quantity) / 100 : 0
-            ),
-          });
-        });
       } else {
-        // Si la orden no trae productos, genera una fila "vacía" para la parte de ítems.
+        console.log(`La orden ${order.orderId} ya trae información de productos.`);
+        return order;
+      }
+    })
+  );
+  
+  // Paso 2: Obtener datos de SAP para cada orden (NUEVO)
+  const ordersWithSAP = await Promise.all(
+    detailedOrders.map(async (order) => {
+      try {
+        console.log(`Consultando SAP para orden ${order.orderId}`);
+        const sapResponse = await fetch(`/api/apiSAPSalesEcommerce?limit=1&purchaseOrder=${order.orderId}`);
+        
+        if (!sapResponse.ok) {
+          console.error(`Error al consultar SAP para orden ${order.orderId}`);
+          return { ...order, sapData: null };
+        }
+        
+        const sapResult = await sapResponse.json();
+        
+        if (sapResult.success && sapResult.data && sapResult.data.length > 0) {
+          console.log(`Datos SAP encontrados para orden ${order.orderId}`);
+          return { ...order, sapData: sapResult.data[0] };
+        } else {
+          console.log(`No se encontraron datos SAP para orden ${order.orderId}`);
+          return { ...order, sapData: null };
+        }
+      } catch (error) {
+        console.error(`Error al obtener datos SAP para orden ${order.orderId}:`, error);
+        return { ...order, sapData: null };
+      }
+    })
+  );
+  
+  // Paso 3: Construir el arreglo "data" para exportar (modificado para incluir SAP)
+  const data = [];
+  ordersWithSAP.forEach((order) => {
+    const clientProfile = order.clientProfileData || {};
+    const shippingAddress = order.shippingData?.address || {};
+    const logisticsInfo = order.shippingData?.logisticsInfo?.[0] || {};
+    
+    // Formateo de fechas
+    const creationDateStr = order.creationDate
+      ? new Date(order.creationDate).toLocaleDateString("es-CL")
+      : "N/A";
+    const lastChangeStr = order.lastChange
+      ? new Date(order.lastChange).toLocaleDateString("es-CL")
+      : "N/A";
+    
+    // Datos de facturación
+    const billingFirstName = clientProfile.firstName || "N/A";
+    const billingLastName = clientProfile.lastName || "N/A";
+    const billingPhone = clientProfile.phone || "N/A";
+    
+    // Datos de envío
+    let shippingFullName = shippingAddress.receiverName || "N/A";
+    let shippingName = "N/A";
+    let shippingLastName = "N/A";
+    if (shippingFullName !== "N/A") {
+      const split = shippingFullName.trim().split(" ");
+      shippingName = split[0] || "N/A";
+      shippingLastName = split.slice(1).join(" ") || "N/A";
+    }
+    
+    // Dirección
+    const street = shippingAddress.street || "";
+    const number = shippingAddress.number || "";
+    const complement = shippingAddress.complement || "";
+    const addressLine = street 
+      ? `${street} ${number}${complement ? `, ${complement}` : ""}`
+      : "N/A";
+    const province = shippingAddress.state || "N/A";
+    const city = shippingAddress.neighborhood || "N/A";
+    const postalCode = shippingAddress.postalCode || "N/A";
+    
+    // Otros datos
+    const shippingMethodTitle = logisticsInfo.selectedSla || "N/A";
+    const courier = logisticsInfo.deliveryCompany || "N/A";
+    const totalValue = typeof order.value === "number" ? order.value / 100 : 0;
+    const dteValue = order.invoiceOutput || "N/A";
+    
+    // Datos SAP (NUEVO)
+    const sapOrder = order.sapData?.sapOrder || "N/A";
+    const sapDocument = order.sapData?.document || "N/A";
+    const sapStatus = order.sapData?.status || "N/A";
+    const sapStatusCode = order.sapData?.statusCode || "N/A";
+    const sapDocumentType = order.sapData?.documentTypeText || "N/A";
+    
+    // Si la orden tiene productos
+    if (order.items && order.items.length > 0) {
+      order.items.forEach((item) => {
         data.push({
-          // Agregar campo de marca en la exportación
           "Marca": order.marca || "N/A",
           "Número de pedido": order.sequence || "N/A",
           "ID del pedido": order.orderId || "N/A",
           "Estado del pedido": order.statusDescription || order.status || "N/A",
           "Fecha del pedido": creationDateStr,
           "DTE": dteValue,
+          // Campos SAP (NUEVO)
+          "N° Orden SAP": sapOrder,
+          "N° Documento SAP": sapDocument,
+          "Estado SAP": sapStatus,
+          "Código Estado SAP": sapStatusCode,
+          "Tipo Documento SAP": sapDocumentType,
+          // Resto de campos existentes
           "RUT": clientProfile.document || "N/A",
           "Nombre (facturación)": billingFirstName,
           "Apellidos (facturación)": billingLastName,
@@ -411,20 +406,67 @@ export default function LogisticsView({ orders, isLoading, brandFilter }) {
           "Transportista": courier,
           "Importe total del pedido": formatCurrency(totalValue),
           "Última Actualización": lastChangeStr,
-          // Campos de producto vacíos:
-          "SKU VTEX": "N/A",
-          "SKU Local": "N/A",
-          "Producto": "N/A",
-          "Cantidad": "N/A",
-          "Precio Unitario": "N/A",
-          "Precio Total": "N/A",
+          // Datos del producto
+          "SKU VTEX": item.sellerSku || item.id || "N/A",
+          "SKU Local": item.refId || "N/A",
+          "Producto": item.name || "N/A",
+          "Cantidad": item.quantity || 1,
+          "Precio Unitario": formatCurrency(
+            item.price && !isNaN(item.price) ? item.price / 100 : 0
+          ),
+          "Precio Total": formatCurrency(
+            item.price && item.quantity ? (item.price * item.quantity) / 100 : 0
+          ),
         });
-      }
-    });
-    
-    console.log(`Exportación completada. Filas generadas para Excel: ${data.length}`);
-    exportToExcel(data, "reporte_productos");
-  };
+      });
+    } else {
+      // Si no tiene productos, una fila con datos vacíos
+      data.push({
+        "Marca": order.marca || "N/A",
+        "Número de pedido": order.sequence || "N/A",
+        "ID del pedido": order.orderId || "N/A",
+        "Estado del pedido": order.statusDescription || order.status || "N/A",
+        "Fecha del pedido": creationDateStr,
+        "DTE": dteValue,
+        // Campos SAP (NUEVO)
+        "N° Orden SAP": sapOrder,
+        "N° Documento SAP": sapDocument,
+        "Estado SAP": sapStatus,
+        "Código Estado SAP": sapStatusCode,
+        "Tipo Documento SAP": sapDocumentType,
+        // Resto de campos existentes
+        "RUT": clientProfile.document || "N/A",
+        "Nombre (facturación)": billingFirstName,
+        "Apellidos (facturación)": billingLastName,
+        "Teléfono (facturación)": billingPhone,
+        "Correo electrónico": clientProfile.email
+          ? clientProfile.email.split("-")[0]
+          : "N/A",
+        "Nombre (envío)": shippingName,
+        "Apellidos (envío)": shippingLastName,
+        "Dirección de envío": addressLine,
+        "N° Dirección": number || "N/A",
+        "N° Dpto": complement || "N/A",
+        "Provincia (envío)": province,
+        "Ciudad (envío)": city,
+        "Título del método de envío": shippingMethodTitle,
+        "Transportista": courier,
+        "Importe total del pedido": formatCurrency(totalValue),
+        "Última Actualización": lastChangeStr,
+        // Campos de producto vacíos
+        "SKU VTEX": "N/A",
+        "SKU Local": "N/A",
+        "Producto": "N/A",
+        "Cantidad": "N/A",
+        "Precio Unitario": "N/A",
+        "Precio Total": "N/A",
+      });
+    }
+  });
+  
+  console.log(`Exportación completada. Filas generadas para Excel: ${data.length}`);
+  exportToExcel(data, "reporte_productos_con_sap");
+};
   
   return (
     <div className="space-y-6 m-8">
@@ -556,7 +598,7 @@ export default function LogisticsView({ orders, isLoading, brandFilter }) {
                 return (
                   <div key={marca} className={`bg-${color}-500/10 rounded-lg p-4 flex flex-col items-center`}>
                     <span className={`text-${color}-400 text-lg font-bold`}>
-                      {marca === "blanik" ? "Blanik" : marca === "bbq" ? "BBQ" : marca === "imegab2c" ? "IMEGA" : marca}
+                      {marca === "blanik" ? "Blanik" : marca === "bbq" ? "BBQ" : marca === "imegab2c" ? "VENTUS" : marca}
                     </span>
                     <span className="text-3xl font-bold text-white mt-2">{count}</span>
                     <span className="text-sm text-gray-400 mt-1">
@@ -603,7 +645,7 @@ export default function LogisticsView({ orders, isLoading, brandFilter }) {
                   }`}>
                     {selectedOrder.marca === "blanik" ? "Blanik" : 
                      selectedOrder.marca === "bbq" ? "BBQ" : 
-                     selectedOrder.marca === "imegab2c" ? "IMEGA" : 
+                     selectedOrder.marca === "imegab2c" ? "VENTUS" : 
                      selectedOrder.marca}
                   </span>
                 )}
