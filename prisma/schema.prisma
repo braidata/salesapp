@@ -429,6 +429,7 @@ model sap_client {
   client_region            String?   @db.VarChar(255)
   client_ciudad            String?   @db.VarChar(255)
   client_comuna            String?   @db.VarChar(255)
+  client_giro              String?   @db.VarChar(255)
   client_owner_id          Int?
   creation_response        String?   @db.VarChar(255)
   created_by               String?   @db.VarChar(255)

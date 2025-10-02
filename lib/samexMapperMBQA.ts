@@ -255,7 +255,7 @@ export function mapVtexToSamex(vtexOrder: any) {
     TIPOS_BULTO: tiposBulto,
     
     TIPOS_DOCUMENTO: [
-      { TIPO: 'OC', REFERENCIA: clip(orderId || 'SIN_REF', 50) },
+      { TIPO: 'GD', REFERENCIA: clip(orderId || 'SIN_REF', 50) },
     ],
 
     ENVIO_DEFINITIVO: 'N',
