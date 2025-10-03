@@ -18,6 +18,7 @@ interface ClientRequestBody {
   client_region?: string;
   client_ciudad?: string;
   client_comuna?: string;
+  client_giro?: string;
   client_owner_id?: number;
   created_by?: string;
 }
@@ -55,6 +56,7 @@ export default async function handler(
       client_region,
       client_ciudad,
       client_comuna,
+      client_giro,
       client_owner_id,
       created_by
     }: ClientRequestBody = req.body;
@@ -95,6 +97,7 @@ export default async function handler(
         client_region: client_region || null,
         client_ciudad: client_ciudad || null,
         client_comuna: client_comuna || null,
+        client_giro: client_giro || null,
         client_owner_id: client_owner_id || null,
         created_by: created_by || null,
         creation_response: "PENDING" // Inicialmente pending hasta que se cree en SAP
