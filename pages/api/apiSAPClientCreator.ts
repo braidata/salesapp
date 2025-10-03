@@ -12,6 +12,7 @@ interface SAPClientCreatorRequest {
 interface SAPData {
   Data: {
     RUT: string;
+    SOCIEDAD: string;
     NOMBRE: string;
     APELLIDO_PATERNO: string;
     APELLIDO_MATERNO: string;
@@ -24,6 +25,8 @@ interface SAPData {
     CIUDAD: string;
     COMUNA: string;
     REGION: string;
+    CATEGORY: string;
+    GIRO: string;
   };
 }
 
@@ -79,6 +82,7 @@ export default async function handler(
     const sapData: SAPData = {
       Data: {
         RUT: client.client_rut,
+        SOCIEDAD: "IM01",
         NOMBRE: client.client_nombre,
         APELLIDO_PATERNO: client.client_apellido_paterno || "--",
         APELLIDO_MATERNO: client.client_apellido_materno || "--",
@@ -90,7 +94,9 @@ export default async function handler(
         NUMERO: client.client_numero_calle || "",
         CIUDAD: client.client_ciudad || "",
         COMUNA: client.client_comuna || "",
-        REGION: client.client_region || ""
+        REGION: client.client_region || "",
+        CATEGORY: (client.client_giro && client.client_giro.length > 0) ? "2" : "1",
+        GIRO: client.client_giro || ""
       }
     };
 
