@@ -188,7 +188,7 @@ export function mapVtexToSamex(vtexOrder: any) {
   const orderId = vtexOrder?.orderId || '';
 
   // ---------- Remitente desde ENV ----------
-  const CLIENTE_REMITENTE = process.env.SAMEX_CLIENTE_REMITENTE;
+  const CLIENTE_REMITENTE = process.env.SAMEX_CLIENTE_REMITENTEQA;
   const CENTRO_REMITENTE  = process.env.SAMEX_CENTRO_REMITENTE;
   const NIF_REMITENTE     = process.env.SAMEX_NIF_REMITENTE;
   const NOMBRE_REMITENTE  = process.env.SAMEX_NOMBRE_REMITENTE  || 'IMEGA VENTUS SPA';
