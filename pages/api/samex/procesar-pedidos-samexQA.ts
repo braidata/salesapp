@@ -3,12 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import sql from 'mssql';
 import { getConnectionPool } from '../../../lib/db';
 import { getOrderById } from '../../../lib/vtex';
-import { mapVtexToSamex } from '../../../lib/samexMapper';
+import { mapVtexToSamex } from '../../../lib/samexMapperMBQA';
 
 const baseUrl = process.env.NEXTAUTH_URL || '';
 
 async function emitirSamex(payload: any) {
-  const resp = await fetch(`${baseUrl}api/samex/emitir-envio`, {
+  const resp = await fetch(`${baseUrl}api/samex/emitir-envioQA`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -140,7 +140,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .query(`
             UPDATE pedidos_externos
             SET otDeliveryCompany = @nro,
-                urlDeliveryCompany = CONCAT('https://mysamex.samex.cl/gts/pub/locNumSeguimiento.seam?tipo=E&localizador=', @nro)
+                urlDeliveryCompany = CONCAT('https://seguimiento.samex.cl?ot=', @nro)
             WHERE ID = @orderId
           `);
 
