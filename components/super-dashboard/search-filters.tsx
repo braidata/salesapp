@@ -206,10 +206,19 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     },
     all: {
       dateRange: { start: null, end: null },
-      daysBack: 31,
-      status: "",
+      daysBack: 14,
+      status: "handling",
       courier: "",
       paymentType: "Webpay",
+      deliveryType: "",
+      brand: filters.brand, // Mantener la marca actual
+    },
+    all2: {
+      dateRange: { start: null, end: null },
+      daysBack: 14,
+      status: "handling",
+      courier: "",
+      paymentType: "Promissory",
       deliveryType: "",
       brand: filters.brand, // Mantener la marca actual
     },
