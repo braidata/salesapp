@@ -20,7 +20,6 @@ async function emitirSamex(payload: any) {
   return data;
 }
 
-// Adaptado para la respuesta real de emitir-envio.ts
 function extractSamexData(data: any): { 
   ot: string | number | null; 
   etiquetaUrl: string | null;
@@ -28,9 +27,7 @@ function extractSamexData(data: any): {
   resultado: string | null;
   mensaje: string | null;
 } {
-  // 1. PRIMERO: Buscar en samexExtras (lo que añade emitir-envio.ts)
   if (data?.samexExtras) {
-    // La respuesta original de SAMEX puede estar en el resto del objeto
     const samexOriginal = data.respuestaDocuemtarEnvio || 
                           data.respuestaDocumentarEnvio || 
                           data[0]?.respuestaDocuemtarEnvio ||
@@ -39,15 +36,13 @@ function extractSamexData(data: any): {
     
     return {
       ot: data.samexExtras.ot,
-      etiquetaUrl: data.samexExtras.etiquetaUrl, // URL firmada de S3
-      etiquetaKey: data.samexExtras.etiquetaKey, // Key para re-firmar si expira
+      etiquetaUrl: data.samexExtras.etiquetaUrl,
+      etiquetaKey: data.samexExtras.etiquetaKey,
       resultado: samexOriginal.resultado || 'OK',
       mensaje: samexOriginal.mensaje || null
     };
   }
 
-  // 2. FALLBACK: Si por alguna razón no viene samexExtras 
-  // (por ejemplo, si se llamara directo a SAMEX sin pasar por emitir-envio)
   let d = data;
   if (d && typeof d === 'object' && 'data' in d && d.data) d = d.data;
   if (Array.isArray(d)) d = d[0];
@@ -63,7 +58,7 @@ function extractSamexData(data: any): {
         wrapper?.nroOrdenFlete ?? 
         wrapper?.ot ?? 
         null,
-    etiquetaUrl: null, // No viene URL en respuesta directa
+    etiquetaUrl: null,
     etiquetaKey: null,
     resultado: wrapper?.resultado || null,
     mensaje: wrapper?.mensaje || null
@@ -80,18 +75,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const pool = await getConnectionPool();
+    // AGREGAMOS pe.ecommerce AL SELECT
     const query = `
       SELECT 
         pe_estado.idpedido AS internalId,
         pe.FechaPedido, 
-        pe.CodigoExterno AS externalCode
+        pe.CodigoExterno AS externalCode,
+        pe.ecommerce
       FROM pedidos_externos_estado pe_estado
       INNER JOIN pedidos_externos pe ON pe.ID = pe_estado.idpedido
-      WHERE pe.Ecommerce = 'VENTUSCORP_VTEX'
-        AND ISNULL(pe_estado.estado_envio, 0) = 0
+      WHERE ISNULL(pe_estado.estado_envio, 0) = 0
         AND pe.deliveryCompany = 'SAMEX'
         AND pe_estado.estado = 'T'
-      GROUP BY pe_estado.idpedido, pe.FechaPedido, pe.CodigoExterno
+      GROUP BY pe_estado.idpedido, pe.FechaPedido, pe.CodigoExterno, pe.ecommerce
       ORDER BY pe.FechaPedido DESC
     `;
 
@@ -104,12 +100,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     for (const row of recordset || []) {
       const internalId: number = row.internalId;
       const externalCode: string = row.externalCode;
+      const ecommerce: string = row.ecommerce;
 
       try {
-        console.log(`[PROCESAR-SAMEX] Procesando pedido ${externalCode} (ID: ${internalId})`);
+
         
-        // 1) Traer la orden VTEX y mapear a SAMEX
-        const order = await getOrderById(externalCode);
+        console.log(`[PROCESAR-SAMEX] Procesando pedido ${externalCode} (ID: ${internalId}, Tienda: ${ecommerce})`);
+        
+        // 1) Traer la orden VTEX de la tienda correcta
+        const order = await getOrderById(externalCode, ecommerce);
         const payload = mapVtexToSamex(order);
 
         // 2) Emitir en SAMEX a través de nuestro proxy
@@ -144,43 +143,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             WHERE ID = @orderId
           `);
 
-        // 5) OPCIONAL: Si quieres guardar la URL de la etiqueta en algún campo adicional
-        if (etiquetaUrl && etiquetaKey) {
-          // Podrías guardar estos datos en una tabla de logs o campo adicional
-          // Por ejemplo:
-          /*
-          await pool.request()
-            .input('orderId', sql.Int, internalId)
-            .input('etiquetaUrl', sql.VarChar(500), etiquetaUrl)
-            .input('etiquetaKey', sql.VarChar(200), etiquetaKey)
-            .query(`
-              INSERT INTO pedidos_etiquetas (idpedido, url_firmada, s3_key, fecha_generacion)
-              VALUES (@orderId, @etiquetaUrl, @etiquetaKey, GETDATE())
-            `);
-          */
-        }
-
         results.push({ 
           internalId, 
-          externalCode, 
+          externalCode,
+          ecommerce,
           ot, 
           hasLabel: !!etiquetaUrl,
-          etiquetaUrl, // Incluir URL firmada en la respuesta si existe
+          etiquetaUrl,
           success: true,
           mensaje: mensaje || 'Procesado correctamente'
         });
 
       } catch (err: any) {
-        console.error(`[PROCESAR-SAMEX] Error en pedido ${externalCode}:`, err?.message);
+        console.error(`[PROCESAR-SAMEX] Error en pedido ${externalCode} (${ecommerce}):`, err?.message);
         
         errors.push({ 
           internalId, 
-          externalCode, 
+          externalCode,
+          ecommerce, 
           error: err?.message || 'Error desconocido',
           success: false 
         });
 
-        // Opcional: Marcar el pedido con error para revisión manual
+        // Marcar el pedido con error para revisión manual
         try {
           await pool.request()
             .input('orderId', sql.Int, internalId)
