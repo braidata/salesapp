@@ -165,22 +165,22 @@ export default function LogisticsView({
         return url;
       }
 
-      // Si viene como data:application/pdf;base64
-      if (url.startsWith("data:application/pdf;base64,")) {
-        const base64 = url.split(",")[1];
-        const binary = atob(base64);
-        const len = binary.length;
-        const buf = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-          buf[i] = binary.charCodeAt(i);
-        }
-        const blob = new Blob([buf], { type: "application/pdf" });
-        const blobUrl = window.URL.createObjectURL(blob);
-        setPdfBlobUrls((prev) => ({ ...prev, [url]: blobUrl }));
-        return blobUrl;
+      // Si es una URL de S3 presigned, devolverla directamente
+      if (url.includes('amazonaws.com') ||
+        url.includes('s3.') ||
+        url.includes('X-Amz-Signature') ||
+        url.includes('AWSAccessKeyId')) {
+        // Las URLs presigned de S3 se pueden usar directamente en el iframe
+        return url;
       }
 
-      // Para URLs remotas (este caso ya no debería ocurrir con processEtiqueta)
+      // Si viene como data:application/pdf;base64
+      if (url.startsWith("data:application/pdf;base64,")) {
+        // Ya es un data URL, devolverlo directamente
+        return url;
+      }
+
+      // Para otras URLs remotas (Starken)
       if (!pdfBlobUrls[url]) {
         const response = await fetch(url, {
           headers: {
@@ -188,7 +188,10 @@ export default function LogisticsView({
           },
         });
 
-        if (!response.ok) throw new Error("Error al cargar PDF");
+        if (!response.ok) {
+          throw new Error(`Error al cargar PDF: ${response.status}`);
+        }
+
         const blob = await response.blob();
         const blobUrl = window.URL.createObjectURL(blob);
         setPdfBlobUrls((prev) => ({ ...prev, [url]: blobUrl }));
@@ -210,121 +213,284 @@ export default function LogisticsView({
     }
   }, [pdfBlobUrls])
 
+
   const handleLabelPreview = async (ordenFlete: string) => {
     try {
       setIsLoadingLabel(true);
-      const response = await fetch('/api/starken/processEtiqueta', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ordenFlete,
-          tipoSalida: 3,
-          combineAll: false // Set to true when downloading all
-        }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Error al obtener etiquetas');
+      // Detectar el transportista
+      const transportista = selectedOrder?.shippingData?.logisticsInfo?.[0]?.deliveryCompany?.toLowerCase() || '';
+      const isSamex = transportista.includes('samex') || transportista.includes('alertran');
+
+      if (isSamex) {
+        // LLAMADA A SAMEX con el número de expedición
+        const response = await fetch('/api/samex/etiquetar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            expedicion: ordenFlete, // El número de seguimiento es la expedición
+            // bulto se deja vacío para obtener todas las etiquetas
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener etiquetas de SAMEX');
+        }
+
+        const data = await response.json();
+
+        // Procesar la respuesta de SAMEX según su estructura real
+        let etiquetaData = [];
+
+        // La respuesta tiene la estructura { "0": { respuestaEtiquetar: {...} }, samexExtras: {...} }
+        if (data.samexExtras && data.samexExtras.etiquetaUrl) {
+          // Usar la URL firmada de S3 directamente
+          etiquetaData = [data.samexExtras.etiquetaUrl];
+        } else if (data["0"] && data["0"].respuestaEtiquetar && data["0"].respuestaEtiquetar.etiqueta) {
+          // Si no hay URL firmada, usar el base64
+          const base64Data = data["0"].respuestaEtiquetar.etiqueta;
+          // Convertir base64 a data URL
+          const dataUrl = `data:application/pdf;base64,${base64Data}`;
+          etiquetaData = [dataUrl];
+        } else {
+          throw new Error('No se recibió etiqueta de SAMEX');
+        }
+
+        setLabelPreview({
+          message: `Etiqueta SAMEX - Expedición: ${data["0"]?.respuestaEtiquetar?.expedicion || ordenFlete}`,
+          data: etiquetaData,
+          status: 200,
+          combined: true // SAMEX devuelve una sola etiqueta con todos los bultos
+        });
+
+      } else {
+        // LLAMADA A STARKEN (código original)
+        const response = await fetch('/api/starken/processEtiqueta', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ordenFlete,
+            tipoSalida: 3,
+            combineAll: false
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener etiquetas de Starken');
+        }
+
+        const data = await response.json();
+        setLabelPreview(data);
       }
 
-      const data = await response.json();
-      setLabelPreview(data);
       setIsLabelModalOpen(true);
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al obtener etiquetas');
+      alert(`Error al obtener etiquetas: ${error.message}`);
     } finally {
       setIsLoadingLabel(false);
     }
   };
 
-  // Update the download function
-  const downloadAllLabels = async () => {
-    try {
-      const response = await fetch('/api/starken/processEtiqueta', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ordenFlete: selectedOrder.sapData.otDeliveryCompany,
-          tipoSalida: 3,
-          combineAll: true
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al obtener etiquetas');
-      }
-
-      const data = await response.json();
-
-      // Download the combined PDF
-      const link = document.createElement('a');
-      link.href = data.data[0];
-      link.download = `etiquetas_${selectedOrder.sapData.otDeliveryCompany}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al descargar etiquetas');
-    }
-  };
-
+  // Actualizar el useEffect para "Todas las etiquetas" con SAMEX
   useEffect(() => {
-    if (!labelPreview) return;
+    if (!labelPreview || !selectedOrder) return;
 
     (async () => {
-
       try {
-        setIsLoadingAllLabels(true)
-        const res = await fetch('/api/starken/processEtiqueta', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ordenFlete: selectedOrder!.sapData.otDeliveryCompany,
-            tipoSalida: 3,
-            combineAll: true
-          })
-        });
-        const json = await res.json();
-        setAllUrl(json.data[0]);      // guardo el único data-URI
+        setIsLoadingAllLabels(true);
+
+        const transportista = selectedOrder?.shippingData?.logisticsInfo?.[0]?.deliveryCompany?.toLowerCase() || '';
+        const isSamex = transportista.includes('samex') || transportista.includes('alertran');
+
+        if (isSamex) {
+          // Para SAMEX, la etiqueta ya incluye todos los bultos
+          // Usar la misma URL que ya tenemos
+          setAllUrl(labelPreview.data[0]);
+        } else {
+          // Código original para Starken
+          const res = await fetch('/api/starken/processEtiqueta', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ordenFlete: selectedOrder!.sapData.otDeliveryCompany,
+              tipoSalida: 3,
+              combineAll: true
+            })
+          });
+          const json = await res.json();
+          setAllUrl(json.data[0]);
+        }
       } catch {
         setAllUrl(null);
       } finally {
         setIsLoadingAllLabels(false);
       }
     })();
-  }, [labelPreview]);
+  }, [labelPreview, selectedOrder]);
+
+  // 2. ACTUALIZAR downloadAllLabels para soportar SAMEX
+  const downloadAllLabels = async () => {
+    try {
+      const transportista = selectedOrder?.shippingData?.logisticsInfo?.[0]?.deliveryCompany?.toLowerCase() || '';
+      const isSamex = transportista.includes('samex') || transportista.includes('alertran');
+
+      if (isSamex) {
+        // Para SAMEX, simplemente descargar la etiqueta única
+        const response = await fetch('/api/samex/etiquetar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            expedicion: selectedOrder.sapData.otDeliveryCompany,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener etiqueta de SAMEX');
+        }
+
+        const data = await response.json();
+        const etiquetaUrl = data.samexExtras?.etiquetaUrl;
+
+        if (etiquetaUrl) {
+          // Descargar directamente la URL firmada
+          const link = document.createElement('a');
+          link.href = etiquetaUrl;
+          link.download = `etiqueta_samex_${selectedOrder.sapData.otDeliveryCompany}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      } else {
+        // Código original para Starken
+        const response = await fetch('/api/starken/processEtiqueta', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ordenFlete: selectedOrder.sapData.otDeliveryCompany,
+            tipoSalida: 3,
+            combineAll: true
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener etiquetas');
+        }
+
+        const data = await response.json();
+
+        const link = document.createElement('a');
+        link.href = data.data[0];
+        link.download = `etiquetas_${selectedOrder.sapData.otDeliveryCompany}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al descargar etiquetas');
+    }
+  };
+
+  // useEffect(() => {
+  //   if (!labelPreview) return;
+
+  //   (async () => {
+
+  //     try {
+  //       setIsLoadingAllLabels(true)
+  //       const res = await fetch('/api/starken/processEtiqueta', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify({
+  //           ordenFlete: selectedOrder!.sapData.otDeliveryCompany,
+  //           tipoSalida: 3,
+  //           combineAll: true
+  //         })
+  //       });
+  //       const json = await res.json();
+  //       setAllUrl(json.data[0]);      // guardo el único data-URI
+  //     } catch {
+  //       setAllUrl(null);
+  //     } finally {
+  //       setIsLoadingAllLabels(false);
+  //     }
+  //   })();
+  // }, [labelPreview]);
 
   const downloadPDF = async (url: string, index: number) => {
     try {
-      // Si es data: o blob: lo abrimos directo; si no, bajamos remoto
-      let blobUrl = url
-      if (!url.startsWith("blob:") && !url.startsWith("data:application/pdf")) {
+      const transportista = selectedOrder?.shippingData?.logisticsInfo?.[0]?.deliveryCompany?.toLowerCase() || '';
+      const isSamex = transportista.includes('samex') || transportista.includes('alertran');
+
+      // Si es URL de S3 o data URL, manejar de manera especial
+      if (url.includes('amazonaws.com') ||
+        url.includes('X-Amz-Signature') ||
+        url.includes('AWSAccessKeyId')) {
+        // Abrir en nueva ventana para descargar
+        window.open(url, '_blank');
+        return;
+      }
+
+      if (url.startsWith("data:application/pdf;base64,")) {
+        // Convertir data URL a blob y descargar
+        const base64 = url.split(",")[1];
+        const binary = atob(base64);
+        const len = binary.length;
+        const buffer = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          buffer[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([buffer], { type: "application/pdf" });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = isSamex ?
+          `etiqueta_samex_${selectedOrder?.sapData?.otDeliveryCompany || index}.pdf` :
+          `etiqueta_${index + 1}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+        return;
+      }
+
+      // Código original para otras URLs
+      let blobUrl = url;
+      if (!url.startsWith("blob:")) {
         const response = await fetch(url, {
           headers: {
             Authorization: `Basic ${Buffer.from("crm:crm2019").toString("base64")}`,
           },
-        })
-        const blob = await response.blob()
-        blobUrl = window.URL.createObjectURL(blob)
+        });
+        const blob = await response.blob();
+        blobUrl = window.URL.createObjectURL(blob);
       }
-      const link = document.createElement("a")
-      link.href = blobUrl
-      link.download = `etiqueta_${index + 1}.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      if (blobUrl.startsWith("blob:")) window.URL.revokeObjectURL(blobUrl)
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `etiqueta_${index + 1}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      if (blobUrl.startsWith("blob:")) {
+        window.URL.revokeObjectURL(blobUrl);
+      }
     } catch (error) {
-      console.error("Error al descargar la etiqueta:", error)
-      alert("Error al descargar la etiqueta")
+      console.error("Error al descargar la etiqueta:", error);
+      alert("Error al descargar la etiqueta");
     }
-  }
+  };
 
   // Función para imprimir múltiples etiquetas
   const printLabels = (urls: string[]) => {
@@ -1268,25 +1434,37 @@ export default function LogisticsView({
               ))}
             </div>
 
-            <div className="flex-1 h-[calc(80vh-420px)] p-4">
+            <div className="flex-1 h-[calc(100vh-420px)] p-4">
               {selectedPdfUrl ? (
-                <div className="relative w-full h-full bg-white rounded-lg overflow-y-scroll">
-                  {pdfBlobUrls[selectedPdfUrl] ? (
-                    <iframe
-                      src={pdfBlobUrls[selectedPdfUrl]}
-                      className="w-full h-full absolute inset-0"
-                      style={{
-                        border: "none",
-                        backgroundColor: "gray",
-                      }}
-                      title="PDF Viewer"
+                <div className="relative w-full h-full bg-white rounded-lg">
+                  {(() => {
+                    const isS3Url = selectedPdfUrl.includes('amazonaws.com') ||
+                      selectedPdfUrl.includes('X-Amz-Signature') ||
+                      selectedPdfUrl.includes('AWSAccessKeyId');
+                    const isDataUrl = selectedPdfUrl.startsWith("data:application/pdf");
 
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-                    </div>
-                  )}
+                    // Para S3 y data URLs, usar directamente
+                    if (isS3Url || isDataUrl || pdfBlobUrls[selectedPdfUrl]) {
+                      return (
+                        <iframe
+                          src={pdfBlobUrls[selectedPdfUrl] || selectedPdfUrl}
+                          className="w-full h-full absolute inset-0"
+                          style={{
+                            border: "none",
+                            backgroundColor: "white",
+                          }}
+                          title="PDF Viewer"
+                        />
+                      );
+                    }
+
+                    // Mostrar loading mientras se carga
+                    return (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                      </div>
+                    );
+                  })()}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-400">
