@@ -1,15 +1,19 @@
 // pages/api/samex/etiquetar.ts
-// Next.js API Route - Etiquetar SAMEX (sin modificar PDFs)
-// - Subida a S3 vía /api/uploaderS
-// - Devuelve presigned URL + key
+// Next.js API Route - Etiquetar SAMEX (versión simplificada)
+// Solo recibe: expedicion y bulto
+// Cliente, centro y etiquetar son fijos vía env vars
 //
-// ENV:
+// ENV REQUERIDAS:
+//   SAMEX_CLIENTE_REMITENTE (ej: "832000930")
+//   SAMEX_CENTRO (ej: "01")
 //   SAMEX_BASE_URL (default: https://gtssamexpre.alertran.net/gts/seam/resource/restv1/auth)
 //   SAMEX_USERNAME
 //   SAMEX_PASSWORD
-//   SAMEX_LOG_LEVEL=info|debug|silent (opcional; default info)
 //   AWS_REGION, AWS_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-//   SAMEX_SIGNED_URL_TTL_SECONDS (opcional; default 3600)
+//
+// ENV OPCIONALES:
+//   SAMEX_LOG_LEVEL=info|debug|silent (default: info)
+//   SAMEX_SIGNED_URL_TTL_SECONDS (default: 3600)
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import AWS from 'aws-sdk';
@@ -26,12 +30,33 @@ const LOG_LEVEL = (process.env.SAMEX_LOG_LEVEL || 'info').toLowerCase() as
 const SIGN_TTL =
   parseInt(process.env.SAMEX_SIGNED_URL_TTL_SECONDS || '3600', 10) || 3600;
 
+// ---- Valores fijos desde ENV ----
+const CLIENTE = process.env.SAMEX_CLIENTE_REMITENTE;
+const CENTRO = process.env.SAMEX_CENTRO;
+const FORMATO = 'PDF';
+const ETIQUETAR = 'R'; // Fijo en Reetiquetar
+
+// Validar configuración requerida
+function validateConfig() {
+  const missing = [];
+  if (!CLIENTE) missing.push('SAMEX_CLIENTE_REMITENTE');
+  if (!CENTRO) missing.push('SAMEX_CENTRO');
+  if (!process.env.SAMEX_USERNAME) missing.push('SAMEX_USERNAME');
+  if (!process.env.SAMEX_PASSWORD) missing.push('SAMEX_PASSWORD');
+  if (!process.env.AWS_S3_BUCKET) missing.push('AWS_S3_BUCKET');
+  
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+}
+
 // ---- S3 sólo para firmar GET (el objeto queda privado) ----
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION!,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
 });
+
 function signGetUrl(key: string, ttlSeconds = SIGN_TTL) {
   return s3.getSignedUrlPromise('getObject', {
     Bucket: process.env.AWS_S3_BUCKET!,
@@ -44,18 +69,22 @@ function signGetUrl(key: string, ttlSeconds = SIGN_TTL) {
 function genRequestId() {
   return 'sx_' + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-6);
 }
+
 function logInfo(id: string, ...args: any[]) {
   if (LOG_LEVEL === 'silent') return;
   console.log(`[SAMEX][${id}]`, ...args);
 }
+
 function logDebug(id: string, ...args: any[]) {
   if (LOG_LEVEL !== 'debug') return;
   console.log(`[SAMEX][${id}][debug]`, ...args);
 }
+
 function logError(id: string, ...args: any[]) {
   if (LOG_LEVEL === 'silent') return;
   console.error(`[SAMEX][${id}][error]`, ...args);
 }
+
 function redact(obj: any): any {
   const SENSITIVE = new Set([
     'authorization','password','samex_username','samex_password','email',
@@ -65,9 +94,12 @@ function redact(obj: any): any {
   if (obj == null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(redact);
   const out: Record<string, any> = {};
-  for (const [k, v] of Object.entries(obj)) out[k] = SENSITIVE.has(k.toLowerCase()) ? '***redacted***' : redact(v);
+  for (const [k, v] of Object.entries(obj)) {
+    out[k] = SENSITIVE.has(k.toLowerCase()) ? '***redacted***' : redact(v);
+  }
   return out;
 }
+
 function safePreviewJSON(payload: any, max = 2000): string {
   try {
     const s = JSON.stringify(redact(payload));
@@ -84,6 +116,7 @@ function getAuthHeader() {
   if (!u || !p) throw new Error('Missing SAMEX_USERNAME or SAMEX_PASSWORD env vars');
   return 'Basic ' + Buffer.from(`${u}:${p}`).toString('base64');
 }
+
 async function forwardPost(reqId: string, path: string, body: any, signal?: AbortSignal) {
   const url = `${BASE_URL}${path}`;
   logInfo(reqId, '→ POST', url);
@@ -95,6 +128,7 @@ async function forwardPost(reqId: string, path: string, body: any, signal?: Abor
     body: typeof body === 'string' ? body : JSON.stringify(body),
     signal,
   });
+  
   const ct = resp.headers.get('content-type') || '';
   const isJson = ct.includes('application/json') || ct.includes('+json');
   const data = isJson ? await resp.json().catch(async () => ({ raw: await resp.text() })) : await resp.text();
@@ -109,11 +143,13 @@ async function forwardPost(reqId: string, path: string, body: any, signal?: Abor
 
   return { status: resp.status, ok: resp.ok, data, contentType: ct };
 }
+
 function methodNotAllowed(reqId: string, res: NextApiResponse) {
   logError(reqId, '405 Method Not Allowed');
   res.setHeader('Allow', 'POST');
   return res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
 }
+
 function badRequest(reqId: string, res: NextApiResponse, message: string) {
   logError(reqId, '400 Bad Request:', message);
   return res.status(400).json({ error: message });
@@ -127,10 +163,12 @@ function getSelfBaseUrl(req: NextApiRequest) {
   const host = req.headers.host || 'localhost:3000';
   return `${proto}://${host}/`;
 }
+
 function stripDataPrefix(b64: string) {
   const i = b64.indexOf(',');
   return i >= 0 ? b64.slice(i + 1) : b64;
 }
+
 async function uploadPdfBufferViaUploaderS(
   req: NextApiRequest,
   reqId: string,
@@ -158,18 +196,58 @@ async function uploadPdfBufferViaUploaderS(
   return { key, signedUrl };
 }
 
-// ---- handler ----
+// ---- MAIN HANDLER ----
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const reqId = (req.headers['x-request-id'] as string) || genRequestId();
   logInfo(reqId, `⇢ SAMEX Etiquetar invoked ${req.method}`);
+  
+  // Validar configuración al inicio
+  try {
+    validateConfig();
+  } catch (e: any) {
+    logError(reqId, 'Configuration error:', e.message);
+    return res.status(500).json({ error: e.message });
+  }
+
   if (req.method !== 'POST') return methodNotAllowed(reqId, res);
 
-  let payload: any = req.body;
+  // ---- Parsear body y validar parámetros requeridos ----
+  let inputPayload: any = req.body;
   try {
-    if (typeof payload === 'string') payload = JSON.parse(payload);
+    if (typeof inputPayload === 'string') inputPayload = JSON.parse(inputPayload);
   } catch {
     return badRequest(reqId, res, 'Invalid JSON body');
   }
+
+  // Validar parámetros requeridos
+  const { expedicion, bulto = '' } = inputPayload;
+  
+  if (!expedicion) {
+    return badRequest(reqId, res, 'Missing required parameter: expedicion');
+  }
+
+  // ---- Construir payload SAMEX con valores fijos ----
+  const samexPayload = {
+    ETIQUETAS: {
+      ETIQUETA: [
+        {
+          CLIENTE: CLIENTE,
+          CENTRO: CENTRO,
+          EXPEDICION: String(expedicion),
+          BULTO: bulto ? String(bulto) : '', // Vacío para etiquetar todo
+          FORMATO: FORMATO,
+          ETIQUETAR: ETIQUETAR
+        }
+      ]
+    }
+  };
+
+  logInfo(reqId, 'Request params:', { 
+    expedicion, 
+    bulto: bulto || '(todos)',
+    cliente: CLIENTE,
+    centro: CENTRO 
+  });
 
   try {
     const ac = new AbortController();
@@ -178,15 +256,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ac.abort();
     }, 30000);
 
-    const out = await forwardPost(reqId, '/etiquetarService/etiquetar', payload, ac.signal);
+    const out = await forwardPost(reqId, '/etiquetarService/etiquetar', samexPayload, ac.signal);
     clearTimeout(t);
 
     if (!out.ok) {
       logError(reqId, 'Upstream returned error', out.status);
-      return res.status(out.status).json({ error: 'Upstream error', status: out.status, data: out.data });
+      return res.status(out.status).json({ 
+        error: 'Upstream error', 
+        status: out.status, 
+        data: out.data 
+      });
     }
 
-    // --- Extraer base64 y subir (sin modificar el PDF) ---
+    // ---- Extraer base64 y subir (sin modificar el PDF) ----
     let etiquetaUrl: string | null = null;
     let etiquetaKey: string | null = null;
     let ot: string | number | null = null;
@@ -206,8 +288,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (etiquetaBase64) {
         const pdfBuf = Buffer.from(stripDataPrefix(String(etiquetaBase64)), 'base64');
-        const fileName = `etiqueta-${ot || Date.now()}.pdf`;
-        const uploaded = await uploadPdfBufferViaUploaderS(req, reqId, pdfBuf, fileName, 'samex/etiquetas');
+        const fileName = `etiqueta-${expedicion}-${ot || Date.now()}.pdf`;
+        const uploaded = await uploadPdfBufferViaUploaderS(
+          req, 
+          reqId, 
+          pdfBuf, 
+          fileName, 
+          'samex/etiquetas'
+        );
         etiquetaUrl = uploaded.signedUrl;
         etiquetaKey = uploaded.key;
       } else {
@@ -217,7 +305,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       logError(reqId, 'Fallo procesando etiqueta/OT:', e?.message || e);
     }
 
-    // passthrough si upstream devolvió texto
+    // Passthrough si upstream devolvió texto
     if (typeof out.data === 'string') {
       res.setHeader('Content-Type', out.contentType || 'text/plain');
       if (ot != null) res.setHeader('X-SAMEX-OT', String(ot));
@@ -226,22 +314,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).send(out.data);
     }
 
+    // Respuesta JSON enriquecida
     return res.status(200).json({
       ...out.data,
       samexExtras: {
         ot,
+        expedicion,
+        bulto: bulto || null,
         etiquetaUrl,   // presigned (expira)
         etiquetaKey,   // clave en bucket para re-firmar cuando quieras
         signedTtlSeconds: SIGN_TTL,
-      },
-      // Nota: para “1 etiqueta por hoja”, usa el parámetro que provea SAMEX
-      // en el payload (p.ej. formato/plantilla/tipoImpresion). Aquí lo
-      // pasamos tal cual al endpoint, sin tocar el PDF.
+      }
     });
+    
   } catch (err: any) {
     const message = err?.message || 'Unexpected error';
     const isAbort = message.includes('aborted') || message.includes('The user aborted a request');
     logError(reqId, isAbort ? '504 Gateway Timeout' : '500 Proxy Error', message);
-    return res.status(isAbort ? 504 : 500).json({ error: message, requestId: reqId });
+    return res.status(isAbort ? 504 : 500).json({ 
+      error: message, 
+      requestId: reqId 
+    });
   }
 }
