@@ -73,7 +73,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         p.deliveryCompany,
         p.Estado
       FROM pedidos_externos p
-      WHERE  CAST(DATEADD(HOUR, -4, p.FechaPedido) AS DATE) >= CAST(@from AS DATE)
+      WHERE p.Ecommerce = @ecommerce AND p.deliveryCompany IN ('SAMEX', 'Starken')
+        AND CAST(DATEADD(HOUR, -4, p.FechaPedido) AS DATE) >= CAST(@from AS DATE)
         AND CAST(DATEADD(HOUR, -4, p.FechaPedido) AS DATE) <= CAST(@to AS DATE)
       ORDER BY p.FechaPedido DESC;
     `;
