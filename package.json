@@ -46,6 +46,7 @@
     "@types/bcrypt": "^5.0.2",
     "@unform/web": "^2.1.6",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
+    "@zxing/library": "^0.21.3",
     "ai": "^3.4.33",
     "atob": "^2.1.2",
     "aws-sdk": "^2.1640.0",
