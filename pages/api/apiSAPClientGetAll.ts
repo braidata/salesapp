@@ -112,6 +112,7 @@ export default async function handler(
           client_region: true,
           client_ciudad: true,
           client_comuna: true,
+          client_giro: true,
           client_owner_id: true,
           creation_response: true,
           created_by: true,

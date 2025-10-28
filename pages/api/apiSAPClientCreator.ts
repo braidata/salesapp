@@ -91,7 +91,7 @@ export default async function handler(
         TELEFONO: client.client_telefono || "",
         EMAIL: client.client_email || "",
         CALLE: client.client_calle || "",
-        NUMERO: client.client_numero_calle || "",
+        NUMERO: client.client_numero_calle + " " + client.client_numero_casa_depto || "",
         CIUDAD: client.client_ciudad || "",
         COMUNA: client.client_comuna || "",
         REGION: client.client_region || "",
