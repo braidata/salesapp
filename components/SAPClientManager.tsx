@@ -351,63 +351,58 @@ const SAPClientManager = () => {
   /* ===========================
      Crear cliente (igual)
   =========================== */
-  const createSingleClient = useCallback(async (clientId: number) => {
-    setProcessingIds(prev => new Set(prev).add(clientId));
-    try {
-      const response = await fetch('/api/apiSAPClientCreator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_id: clientId, authorized_by: 'Admin' })
-      });
-      const result: SAPResponse = await response.json();
-      const interpretation = interpretSAPResponse(result.sap_response);
+const createSingleClient = useCallback(async (clientId: number) => {
+  // Optimista: mostrar PENDING al instante
+  setClients(prev => prev.map(c => c.id === clientId ? { ...c, creation_response: "PENDING" } : c));
+  setProcessingIds(prev => new Set(prev).add(clientId));
 
-      if (interpretation.success) {
-        setClients(prev => prev.map(client =>
-          client.id === clientId
-            ? {
-              ...client,
-              creation_response: JSON.stringify(result.sap_response),
-              authorized_at: new Date().toISOString(),
-              authorized_by: 'Admin'
-            }
-            : client
-        ));
-        showNotification('success', interpretation.message);
-      } else {
-        setClients(prev => prev.map(client =>
-          client.id === clientId
-            ? {
-              ...client,
-              creation_response: JSON.stringify(result.sap_response || 'ERROR'),
-              authorized_at: new Date().toISOString(),
-              authorized_by: 'Admin'
-            }
-            : client
-        ));
-        showNotification('error', `Error SAP: ${interpretation.message}`);
-      }
-    } catch (error) {
-      console.error('Error creating client in SAP:', error);
-      setClients(prev => prev.map(client =>
-        client.id === clientId
-          ? {
-            ...client,
-            creation_response: 'ERROR',
+  try {
+    const resp = await fetch("/api/apiSAPClientCreator", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+      body: JSON.stringify({ client_id: clientId, authorized_by: "Admin" })
+    });
+
+    const result: SAPResponse = await resp.json();
+    // Pisar con EXACTO lo que volvió del servidor (que ya guardó en DB)
+    const interpretation = interpretSAPResponse(result.sap_response);
+
+    setClients(prev => prev.map(c =>
+      c.id === clientId
+        ? {
+            ...c,
+            creation_response:
+              result?.sap_response ? JSON.stringify(result.sap_response) :
+              (c.creation_response || "ERROR"),
             authorized_at: new Date().toISOString(),
-            authorized_by: 'Admin'
+            authorized_by: "Admin"
           }
-          : client
-      ));
-      showNotification('error', 'Error de conexión al crear cliente en SAP');
-    } finally {
-      setProcessingIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(clientId);
-        return newSet;
-      });
+        : c
+    ));
+
+    if (interpretation.success) {
+      showNotification("success", interpretation.message || "OK");
+    } else {
+      showNotification("error", interpretation.message || "Error SAP");
     }
-  }, [showNotification, interpretSAPResponse]);
+
+    // Sincronizar duro con la base para evitar “valores pegados”
+    await fetchClients();
+
+  } catch (error) {
+    console.error("Error creating client in SAP:", error);
+    setClients(prev => prev.map(c =>
+      c.id === clientId ? { ...c, creation_response: "ERROR" } : c
+    ));
+    showNotification("error", "Error de conexión al crear cliente en SAP");
+  } finally {
+    setProcessingIds(prev => {
+      const s = new Set(prev);
+      s.delete(clientId);
+      return s;
+    });
+  }
+}, [interpretSAPResponse, showNotification, fetchClients]);
 
   /* ===========================
      Filtros y contadores (igual)
