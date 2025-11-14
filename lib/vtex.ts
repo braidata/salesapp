@@ -1,6 +1,6 @@
 // lib/vtex.ts
 export type VtexOrder = any;
-export type VtexStore = 'imegab2c' | 'blanik' | 'bbqgrill';
+export type VtexStore = 'imegab2c' | 'blanik' | 'bbqgrill' | 'ventusperu';
 
 interface StoreConfig {
   account: string;
@@ -24,6 +24,11 @@ function getStoreConfig(store: VtexStore): StoreConfig {
       account: 'bbqgrill',
       key: process.env.API_VTEX_KEY_BBQ || '',
       token: process.env.API_VTEX_TOKEN_BBQ || ''
+    },
+    ventusperu: {
+      account: 'ventusperu',
+      key: process.env.API_VTEX_KEY_PE || '',
+      token: process.env.API_VTEX_TOKEN_PE || ''
     }
   };
 
@@ -31,7 +36,7 @@ function getStoreConfig(store: VtexStore): StoreConfig {
   if (!config.key || !config.token) {
     throw new Error(`Faltan credenciales para la tienda ${store}`);
   }
-  
+
   return config;
 }
 
@@ -40,8 +45,8 @@ export function mapEcommerceToStore(ecommerce: string): VtexStore | null {
   if (ecommerce === 'VENTUSCORP_VTEX') return 'imegab2c';
   if (ecommerce === 'BLANIK_VTEX') return 'blanik';
   if (ecommerce === 'BBQGRILL_VTEX') return 'bbqgrill';
-  
-  return null; // No se reconoce la tienda
+  if (ecommerce === 'VENTUSPERU_VTEX') return 'ventusperu';
+  return null;
 }
 
 function baseUrl(store: VtexStore): string {
@@ -58,41 +63,77 @@ function authHeaders(store: VtexStore): Record<string, string> {
   };
 }
 
-// Función base para obtener orden de una tienda específica
+// === NUEVO: helper interno para DO (notas) ===
+function doBaseUrl(store: VtexStore): string {
+  const { account } = getStoreConfig(store);
+  return `https://${account}.vtexcommercestable.com.br`;
+}
+
+// === NUEVO: crear nota en la timeline de la orden ===
+export async function createOrderNote(
+  store: VtexStore,
+  orderId: string,
+  description: string
+): Promise<void> {
+  const accountConfig = getStoreConfig(store);
+  const url = `${doBaseUrl(store)}/api/do/notes?target.id=${encodeURIComponent(orderId)}`;
+
+  const body = {
+    target: {
+      id: orderId,
+      type: 'order',
+      url: `https://${accountConfig.account}.myvtex.com/admin/orders/${encodeURIComponent(orderId)}/`
+    },
+    domain: 'oms',
+    description
+  };
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      ...authHeaders(store),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`VTEX createOrderNote [${store}] ${resp.status}: ${text}`);
+  }
+}
+
+// === getOrderByIdFromStore, getOrderById y listOrders se quedan como los tenías ===
+
 async function getOrderByIdFromStore(orderId: string, store: VtexStore): Promise<VtexOrder> {
   const url = `${baseUrl(store)}/api/oms/pvt/orders/${encodeURIComponent(orderId)}`;
   const resp = await fetch(url, { headers: authHeaders(store) });
-  
+
   if (!resp.ok) {
     const text = await resp.text();
     throw new Error(`VTEX getOrderById [${store}] ${resp.status}: ${text}`);
   }
-  
+
   return resp.json();
 }
 
-// Función con sistema de respaldo: intenta primero en la tienda indicada, si falla busca en las demás
 export async function getOrderById(orderId: string, ecommerce?: string): Promise<VtexOrder> {
-  const allStores: VtexStore[] = ['imegab2c', 'blanik', 'bbqgrill'];
+  const allStores: VtexStore[] = ['imegab2c', 'blanik', 'bbqgrill', 'ventusperu'];
   let storesToTry: VtexStore[] = [];
-  
-  // Si viene ecommerce, intentar primero con esa tienda
+
   if (ecommerce) {
     const preferredStore = mapEcommerceToStore(ecommerce);
     if (preferredStore) {
-      // Intentar primero con la tienda indicada, luego las demás
       storesToTry = [preferredStore, ...allStores.filter(s => s !== preferredStore)];
     } else {
-      // Si no se reconoce el ecommerce, probar todas
       storesToTry = allStores;
     }
   } else {
-    // Si no viene ecommerce, probar todas
     storesToTry = allStores;
   }
-  
+
   const errors: string[] = [];
-  
+
   for (const store of storesToTry) {
     try {
       const order = await getOrderByIdFromStore(orderId, store);
@@ -101,9 +142,8 @@ export async function getOrderById(orderId: string, ecommerce?: string): Promise
       errors.push(`${store}: ${error.message}`);
     }
   }
-  
-  // Si no se encontró en ninguna tienda
-  throw new Error(`Orden ${orderId} no encontrada en ninguna tienda`);
+
+  throw new Error(`Orden ${orderId} no encontrada en ninguna tienda. Errores: ${errors.join(' | ')}`);
 }
 
 export async function listOrders(queryString: string, store: VtexStore): Promise<any> {
