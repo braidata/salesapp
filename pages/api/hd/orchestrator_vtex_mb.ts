@@ -241,9 +241,9 @@ function logHdOrderPayloadDebug(
   }
 }
 
-// ==== Mapping VTEX → HD (lineas por SKU, unidad = quantity) ====
+// ==== Mapping VTEX → HD (1 línea por unidad real) ====
 
-// Cada SKU → 1 objeto en "detalle", con "unidad" = quantity del ítem.
+// Cada unidad física de SKU → 1 objeto en "detalle" (unidad = 1).
 function mapItemsToHdDetalle(vtexOrder: any): HdDetalleItem[] {
   const items = Array.isArray(vtexOrder?.items) ? vtexOrder.items : [];
   const detalle: HdDetalleItem[] = [];
@@ -297,28 +297,30 @@ function mapItemsToHdDetalle(vtexOrder: any): HdDetalleItem[] {
     const unitValueRaw = Number(item?.sellingPrice ?? item?.price ?? 0);
     const unitValue = unitValueRaw > 0 ? unitValueRaw / 100 : 0;
 
-    detalle.push({
-      alto: String(Math.max(1, dims.alto)),             // cm
-      ancho: String(Math.max(1, dims.ancho)),
-      largo: String(Math.max(1, dims.largo)),
-      peso: billedUnitKg.toFixed(2),                    // kg POR bulto
-      talla,
-      unidad: quantity,                                 // cantidad de ese SKU (multi-bulto por unidad lo maneja HD)
-      skuDesc: clip(desc, 80),
-      valorRecaudo: "0",
-      codigoProducto: String(skuRef),
-      valorDeclarado: unitValue.toFixed(2),             // valor UNITARIO
-      pesoVolumetrico: volumetricUnitKgSafe.toFixed(2), // volumétrico POR bulto
-    });
+    for (let i = 0; i < quantity; i++) {
+      detalle.push({
+        alto: String(Math.max(1, dims.alto)), // cm
+        ancho: String(Math.max(1, dims.ancho)),
+        largo: String(Math.max(1, dims.largo)),
+        peso: billedUnitKg.toFixed(2), // kg POR bulto
+        talla,
+        unidad: 1, // una línea por cada caja real
+        skuDesc: clip(desc, 80),
+        valorRecaudo: "0",
+        codigoProducto: String(skuRef),
+        valorDeclarado: unitValue.toFixed(2), // valor UNITARIO
+        pesoVolumetrico: volumetricUnitKgSafe.toFixed(2), // volumétrico POR bulto
+      });
+    }
   }
 
   return detalle;
 }
 
-// ==== Mapping VTEX → *varios* payloads HD (1 pedido por SKU) ====
+// ==== Mapping VTEX → *varios* payloads HD (1 pedido por bulto real) ====
 
 // En vez de un solo pedido con todos los "detalle",
-// ahora hacemos UN pedido por SKU:
+// ahora hacemos UN pedido por unidad física (bulto):
 //   - Misma orden_compra (orderId VTEX)
 //   - LPN distinto por bulto: base de orderId sin guiones + "00n"
 //   - Cada payload tiene detalle: [itemSKU]
