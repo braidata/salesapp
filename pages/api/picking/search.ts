@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/prisma'
-import { fetchSAPSalesDetails } from '../apiSAPSales'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -14,17 +13,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Reutilizamos el conector SAP existente para obtener el pedido en línea
-    const sapData = await fetchSAPSalesDetails(sapOrder)
-    const sapPayload: any = sapData?.data ?? sapData
-    const sapResults: any[] = Array.isArray(sapPayload?.results)
-      ? sapPayload.results
-      : Array.isArray(sapPayload?.d?.results)
-      ? sapPayload.d.results
-      : []
+    const sapOrderRecord = await prisma.sap_orders.findUnique({
+      where: { sap_order: sapOrder },
+      include: { sap_order_items: true },
+    })
 
-    if (!sapResults.length) {
-      return res.status(404).json({ message: 'Pedido SAP no encontrado o sin ítems' })
+    if (!sapOrderRecord) {
+      return res.status(404).json({ message: 'Pedido SAP no encontrado en la base local' })
     }
 
     const existingPicking = await prisma.pickings.findUnique({
@@ -38,25 +33,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     })
 
-    const firstItem = sapResults[0]
-
     const response = {
       order: {
-        id: firstItem.SalesOrder || sapOrder,
-        sapOrder: firstItem.SalesOrder || sapOrder,
-        purchaseOrder: firstItem.PurchaseOrder || null,
-        customer: firstItem.SoldToParty || firstItem.Customer || null,
-        status: firstItem.OverallDeliveryStatus || firstItem.Status || null,
-        statusCode: firstItem.OverallDeliveryStatus || firstItem.Status || null,
-        createdAt: firstItem.CreationDate || null,
-        totalAmount: firstItem.TotalNetAmount || null,
+        id: sapOrderRecord.id,
+        sapOrder: sapOrderRecord.sap_order,
+        purchaseOrder: sapOrderRecord.purchase_order,
+        customer: sapOrderRecord.customer_code,
+        status: sapOrderRecord.status,
+        statusCode: sapOrderRecord.status_code,
+        createdAt: sapOrderRecord.creation_date,
+        totalAmount: sapOrderRecord.total_amount,
       },
-      lines: sapResults.map((item, idx) => ({
-        uiId: idx,
-        sapLineId: item.SalesOrderItem?.toString() || `${sapOrder}-${idx + 1}`,
-        sku: item.Product || item.Material,
-        description: item.MaterialName || item.ProductDescription || item.Description,
-        quantity: item.RequestedQuantity || item.OrderQuantity || item.Quantity,
+      lines: sapOrderRecord.sap_order_items.map((item, idx) => ({
+        uiId: item.id ?? idx,
+        sapLineId: item.id?.toString() || `${sapOrderRecord.sap_order}-${idx + 1}`,
+        sku: item.sku,
+        description: item.product_name,
+        quantity: item.quantity,
       })),
       picking: existingPicking
         ? {
