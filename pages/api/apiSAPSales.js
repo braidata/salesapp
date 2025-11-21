@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 // Función separada para obtener los datos de ventas de SAP
-async function fetchSAPSalesDetails(salesOrder, salesOrderItem) {
+export async function fetchSAPSalesDetails(salesOrder, salesOrderItem) {
   const SAP_USER = process.env.SAP_USER;
   const SAP_PASSWORD = process.env.SAP_PASSWORD;
   // Asegúrate de actualizar la URL a la entidad correcta y parámetros para ventas
