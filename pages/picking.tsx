@@ -263,7 +263,7 @@ export default function PickingDashboard() {
 
                   return (
                     <div
-                      key={line.uiId || line.id}
+                      key={line.id ? `picking-${line.id}` : `${line.sapLineId || line.sku}-${line.uiId ?? line.sku}`}
                       className="p-4 rounded-xl border border-white/10 bg-slate-900/80 space-y-3 shadow-inner"
                     >
                       <div className="flex items-start justify-between gap-2">

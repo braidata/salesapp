@@ -109,7 +109,12 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       return res.status(404).json({ message: 'Pedido SAP no encontrado en SAP' })
     }
 
-    const dedupedLines = sapResults
+    const filteredResults = sapResults.filter((item) => !`${item.Material || ''}`.startsWith('600004'))
+    if (!filteredResults.length) {
+      return res.status(400).json({ message: 'El pedido solo contiene servicios de flete (600004) que no se pickean' })
+    }
+
+    const dedupedLines = filteredResults
       .map((item, idx) => ({ item, mapped: mapSapLine(item, idx, sapOrder) }))
       .reduce<{ key: string; mapped: ReturnType<typeof mapSapLine> }[]>((acc, entry) => {
         const key = `${entry.item.SalesOrderItem || entry.mapped.sap_order_line_id}-${entry.item.Material || ''}-${

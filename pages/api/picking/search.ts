@@ -70,6 +70,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ message: 'Pedido SAP no encontrado o sin ítems' })
     }
 
+    const filteredResults = sapResults.filter((item) => !`${item.Material || ''}`.startsWith('600004'))
+    if (!filteredResults.length) {
+      return res.status(404).json({ message: 'El pedido no tiene líneas pickeables (servicios de flete se omiten)' })
+    }
+
     const existingPicking = await prisma.pickings.findUnique({
       where: { sap_order_id: sapOrder },
       include: {
@@ -82,7 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     // Algunos pedidos devuelven posiciones duplicadas en el payload.
-    const dedupedLines = sapResults
+    const dedupedLines = filteredResults
       .map((item, idx) => ({ item, mapped: mapSapLine(item, idx, sapOrder) }))
       .reduce<{ key: string; mapped: ReturnType<typeof mapSapLine> }[]>((acc, entry) => {
         const key = `${entry.item.SalesOrderItem || entry.mapped.sapLineId}-${entry.item.Material || ''}-${entry.item.BillingDocumentItem || ''}`
