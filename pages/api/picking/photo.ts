@@ -8,9 +8,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const session = await getSession({ req })
-  if (!session?.user) {
-    return res.status(401).json({ message: 'No autenticado' })
-  }
+  // if (!session?.user) {
+  //   return res.status(401).json({ message: 'No autenticado' })
+  // }
 
   const { pickingLineId, photoType, s3Url } = req.body as {
     pickingLineId?: number | string

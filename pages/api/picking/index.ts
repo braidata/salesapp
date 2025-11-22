@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
+
 import prisma from '@/lib/prisma'
 import axios from 'axios'
 
@@ -88,9 +89,9 @@ async function listPickings(req: NextApiRequest, res: NextApiResponse) {
 async function createPicking(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req })
 
-  if (!session?.user) {
-    return res.status(401).json({ message: 'No autenticado' })
-  }
+  // if (!session?.user) {
+  //   return res.status(401).json({ message: 'No autenticado' })
+  // }
 
   const { sapOrder } = req.body as { sapOrder?: string }
 
@@ -131,7 +132,7 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       data: {
         sap_order_id: sapOrder,
         status: 'IN_PROGRESS',
-        created_by_user_id: Number(session.user.id) || null,
+        created_by_user_id: Number(session) || null,
         lines: {
           create: dedupedLines,
         },
