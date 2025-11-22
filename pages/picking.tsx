@@ -1,6 +1,6 @@
-import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Head from 'next/head'
-import { CheckCircle, Image as ImageIcon, Loader2, PackageCheck, Search, Upload } from 'lucide-react'
+import { Camera, CheckCircle, Image as ImageIcon, Loader2, PackageCheck, Search, Upload, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
 import { format } from 'date-fns'
@@ -59,6 +59,13 @@ export default function PickingDashboard() {
   const [dashboardPickings, setDashboardPickings] = useState<Picking[]>([])
   const [filters, setFilters] = useState({ status: '', sapOrder: '' })
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [uploadContext, setUploadContext] = useState<
+    { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  | null>(null)
+  const [selectedPicking, setSelectedPicking] = useState<Picking | null>(null)
+
+  const galleryInputRef = useRef<HTMLInputElement | null>(null)
+  const cameraInputRef = useRef<HTMLInputElement | null>(null)
 
   const fetchSearch = async () => {
     if (!search.trim()) return
@@ -117,25 +124,61 @@ export default function PickingDashboard() {
     refreshDashboard()
   }, [filters])
 
-  const handleUpload = async (lineId: number, type: 'PICK' | 'PACK', file: File) => {
+  const handleUpload = async (
+    lineId: number,
+    type: 'PICK' | 'PACK',
+    file: File,
+    lineRef: string,
+    sapOrderOverride?: string,
+  ) => {
+    const sapOrder = sapOrderOverride || picking?.sap_order_id || orderData?.sapOrder
+    if (!sapOrder) {
+      setFeedback('Primero crea el picking antes de subir fotos')
+      return
+    }
+
+    const folder = `picking/${sapOrder}/line-${lineRef}`
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('pickingLineId', lineId.toString())
-    formData.append('photoType', type)
 
     setLoading(true)
     setFeedback(null)
     try {
-      const resp = await fetch('/api/picking/photo', { method: 'POST', body: formData })
+      const uploadResp = await fetch(`/api/uploaderS?folder=${encodeURIComponent(folder)}`, {
+        method: 'POST',
+        body: formData,
+      })
+      const uploadData = await uploadResp.json()
+      if (!uploadResp.ok) throw new Error(uploadData?.error || 'No se pudo subir a S3')
+
+      const photoUrl = uploadData.url || uploadData.presignedUrl
+      if (!photoUrl) throw new Error('No se obtuvo URL de la foto')
+
+      const resp = await fetch('/api/picking/photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pickingLineId: lineId, photoType: type, s3Url: photoUrl }),
+      })
       const data = await resp.json()
-      if (!resp.ok) throw new Error(data?.message || 'Error subiendo foto')
+      if (!resp.ok) throw new Error(data?.message || 'Error guardando evidencia')
       setFeedback(`Foto ${type === 'PICK' ? 'de picking' : 'de embalaje'} guardada`)
       await fetchSearch()
       await refreshDashboard()
+
+      if (sapOrder) {
+        const refreshed = await fetch(`/api/picking/search?sapOrder=${encodeURIComponent(sapOrder)}`)
+        if (refreshed.ok) {
+          const refreshedData = await refreshed.json()
+          if (refreshedData.picking?.sap_order_id === selectedPicking?.sap_order_id) {
+            setSelectedPicking(refreshedData.picking)
+          }
+        }
+      }
     } catch (error: any) {
       setFeedback(error?.message || 'No se pudo subir la foto')
     } finally {
       setLoading(false)
+      setUploadContext(null)
     }
   }
 
@@ -270,6 +313,7 @@ export default function PickingDashboard() {
                   const pickPhoto = photos.find((p: any) => p.photo_type === 'PICK')
                   const packPhoto = photos.find((p: any) => p.photo_type === 'PACK')
                   const status = picked?.status || 'PENDING'
+                  const lineRef = line.sapLineId || (line as any).sap_order_line_id || line.sku || line.id
 
                   return (
                     <div
@@ -293,13 +337,27 @@ export default function PickingDashboard() {
                           label="Foto picking"
                           existingUrl={pickPhoto?.s3_url}
                           disabled={!picking || loading}
-                          onUpload={(file) => handleUpload(picked?.id || line.id, 'PICK', file)}
+                          onUpload={() =>
+                            setUploadContext({
+                              lineId: picked?.id || line.id,
+                              type: 'PICK',
+                              lineRef: String(lineRef),
+                              sapOrder: picking?.sap_order_id || orderData?.sapOrder,
+                            })
+                          }
                         />
                         <PhotoUploader
                           label="Foto embalaje"
                           existingUrl={packPhoto?.s3_url}
                           disabled={!picking || loading}
-                          onUpload={(file) => handleUpload(picked?.id || line.id, 'PACK', file)}
+                          onUpload={() =>
+                            setUploadContext({
+                              lineId: picked?.id || line.id,
+                              type: 'PACK',
+                              lineRef: String(lineRef),
+                              sapOrder: picking?.sap_order_id || orderData?.sapOrder,
+                            })
+                          }
                         />
                       </div>
                     </div>
@@ -373,6 +431,7 @@ export default function PickingDashboard() {
                   <th className="px-4 py-3 text-left">Estado</th>
                   <th className="px-4 py-3 text-left">Líneas</th>
                   <th className="px-4 py-3 text-left">Última actualización</th>
+                  <th className="px-4 py-3 text-left">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -397,6 +456,15 @@ export default function PickingDashboard() {
                       <td className="px-4 py-3 text-slate-400">
                         {p.updated_at ? format(new Date(p.updated_at as any), 'dd MMM yyyy HH:mm') : '—'}
                       </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => setSelectedPicking(p)}
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 border border-white/10 text-slate-100 hover:bg-slate-800"
+                        >
+                          <Camera className="w-4 h-4" />
+                          Editar / aprobar
+                        </button>
+                      </td>
                     </tr>
                   )
                 })}
@@ -404,7 +472,62 @@ export default function PickingDashboard() {
             </table>
           </div>
         </section>
+
+        {uploadContext && (
+          <PhotoCapturePrompt
+            context={uploadContext}
+            onClose={() => setUploadContext(null)}
+            galleryInputRef={galleryInputRef}
+            cameraInputRef={cameraInputRef}
+          />
+        )}
+
+        {selectedPicking && (
+          <ExistingPickingModal
+            picking={selectedPicking}
+            onClose={() => setSelectedPicking(null)}
+            onOpenUpload={(payload) => setUploadContext(payload)}
+          />
+        )}
       </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        ref={galleryInputRef}
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file && uploadContext) {
+            void handleUpload(
+              uploadContext.lineId,
+              uploadContext.type,
+              file,
+              uploadContext.lineRef,
+              uploadContext.sapOrder,
+            )
+          }
+        }}
+      />
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        ref={cameraInputRef}
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file && uploadContext) {
+            void handleUpload(
+              uploadContext.lineId,
+              uploadContext.type,
+              file,
+              uploadContext.lineRef,
+              uploadContext.sapOrder,
+            )
+          }
+        }}
+      />
     </div>
   )
 }
@@ -417,14 +540,9 @@ function PhotoUploader({
 }: {
   label: string
   existingUrl?: string
-  onUpload: (file: File) => void
+  onUpload: () => void
   disabled?: boolean
 }) {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) onUpload(file)
-  }
-
   return (
     <div className="p-3 rounded-lg border border-white/10 bg-slate-950/60">
       <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 mb-2">{label}</p>
@@ -433,18 +551,153 @@ function PhotoUploader({
           <ImageIcon className="w-4 h-4" /> Ver evidencia
         </a>
       ) : (
-        <label className="flex items-center justify-between gap-2 text-slate-200 cursor-pointer">
-          <span>Subir foto</span>
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleChange}
-            disabled={disabled}
-          />
-          <span className="px-2 py-1 rounded-lg bg-sky-600/20 border border-sky-500/40 text-xs">Cargar</span>
-        </label>
+        <button
+          type="button"
+          onClick={onUpload}
+          disabled={disabled}
+          className="w-full inline-flex items-center justify-between gap-2 text-slate-200 px-3 py-2 rounded-lg bg-slate-900/70 border border-sky-700/40 hover:bg-slate-900 disabled:opacity-40"
+        >
+          <span>Tomar / cargar foto</span>
+          <Camera className="w-4 h-4 text-sky-300" />
+        </button>
       )}
+    </div>
+  )
+}
+
+function PhotoCapturePrompt({
+  context,
+  onClose,
+  galleryInputRef,
+  cameraInputRef,
+}: {
+  context: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  onClose: () => void
+  galleryInputRef: React.RefObject<HTMLInputElement>
+  cameraInputRef: React.RefObject<HTMLInputElement>
+}) {
+  return (
+    <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
+      <div className="bg-slate-900/90 border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-xs text-slate-400">Pedido {context.sapOrder}</p>
+            <h3 className="text-lg font-semibold text-white">Selecciona origen de foto</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg border border-white/10 text-slate-200 hover:bg-white/10"
+            aria-label="Cerrar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="space-y-2 text-slate-200 text-sm">
+          <p>Línea: {context.lineRef}</p>
+          <p>Foto: {context.type === 'PICK' ? 'Picking' : 'Embalaje'}</p>
+        </div>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={() => galleryInputRef.current?.click()}
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-sky-700/30 border border-sky-500/40 text-sky-100 hover:bg-sky-700/40"
+          >
+            <ImageIcon className="w-4 h-4" /> Cargar foto
+          </button>
+          <button
+            onClick={() => cameraInputRef.current?.click()}
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-emerald-700/30 border border-emerald-500/40 text-emerald-100 hover:bg-emerald-700/40"
+          >
+            <Camera className="w-4 h-4" /> Tomar foto
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-slate-400">Usa la opción "Tomar foto" para abrir la cámara del dispositivo.</p>
+      </div>
+    </div>
+  )
+}
+
+function ExistingPickingModal({
+  picking,
+  onClose,
+  onOpenUpload,
+}: {
+  picking: Picking
+  onClose: () => void
+  onOpenUpload: (payload: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
+}) {
+  return (
+    <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
+      <div className="bg-slate-950/95 border border-white/10 rounded-3xl w-full max-w-4xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Pedido {picking.sap_order_id}</p>
+            <h3 className="text-2xl font-semibold text-white">Edición y aprobación</h3>
+            <p className="text-slate-300 text-sm">
+              Valida cada etapa para pickings existentes en la tabla. Agrega evidencias o aprueba líneas según corresponda.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg border border-white/10 text-slate-200 hover:bg-white/10"
+            aria-label="Cerrar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {picking.lines?.map((line) => {
+            const pickPhoto = line.photos?.find((p) => p.photo_type === 'PICK')
+            const packPhoto = line.photos?.find((p) => p.photo_type === 'PACK')
+            const lineRef = line.sapLineId || (line as any).sap_order_line_id || line.sku || line.id
+            return (
+              <div key={line.id} className="p-4 rounded-2xl border border-white/10 bg-slate-900/80 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-xs text-slate-400">SKU {line.sapLineId || (line as any).sap_order_line_id}</p>
+                    <h4 className="text-lg font-semibold text-white">{line.sku}</h4>
+                    <p className="text-slate-300 text-sm line-clamp-2">{line.description}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-lg text-[11px] border ${statusBadges[line.status] || statusBadges.PENDING}`}>
+                    {line.status}
+                  </span>
+                </div>
+
+                <p className="text-sm text-slate-200">Cantidad: {line.quantity}</p>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <PhotoUploader
+                    label="Foto picking"
+                    existingUrl={pickPhoto?.s3_url}
+                    disabled={false}
+                    onUpload={() =>
+                      onOpenUpload({
+                        lineId: line.id,
+                        type: 'PICK',
+                        lineRef: String(lineRef),
+                        sapOrder: picking.sap_order_id || '',
+                      })
+                    }
+                  />
+                  <PhotoUploader
+                    label="Foto embalaje"
+                    existingUrl={packPhoto?.s3_url}
+                    disabled={false}
+                    onUpload={() =>
+                      onOpenUpload({
+                        lineId: line.id,
+                        type: 'PACK',
+                        lineRef: String(lineRef),
+                        sapOrder: picking.sap_order_id || '',
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }
