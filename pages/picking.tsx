@@ -65,6 +65,9 @@ export default function PickingDashboard() {
   | null>(null)
   const [selectedPicking, setSelectedPicking] = useState<Picking | null>(null)
   const [previewPhoto, setPreviewPhoto] = useState<{ url: string; title: string } | null>(null)
+  const [cameraCapture, setCameraCapture] = useState<
+    { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  | null>(null)
 
   const galleryInputRef = useRef<HTMLInputElement | null>(null)
   const cameraInputRef = useRef<HTMLInputElement | null>(null)
@@ -496,11 +499,32 @@ export default function PickingDashboard() {
             onClose={() => setUploadContext(null)}
             galleryInputRef={galleryInputRef}
             cameraInputRef={cameraInputRef}
+            onCamera={(ctx) => {
+              setUploadContext(ctx)
+              setCameraCapture(ctx)
+            }}
           />
         )}
 
         {previewPhoto && (
           <FullPhotoPreview photo={previewPhoto} onClose={() => setPreviewPhoto(null)} />
+        )}
+
+        {cameraCapture && (
+          <CameraCaptureModal
+            context={cameraCapture}
+            onClose={() => setCameraCapture(null)}
+            onCapture={async (file) => {
+              await handleUpload(
+                cameraCapture.lineId,
+                cameraCapture.type,
+                file,
+                cameraCapture.lineRef,
+                cameraCapture.sapOrder,
+              )
+              setCameraCapture(null)
+            }}
+          />
         )}
 
         {selectedPicking && (
@@ -634,11 +658,13 @@ function PhotoCapturePrompt({
   onClose,
   galleryInputRef,
   cameraInputRef,
+  onCamera,
 }: {
   context: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
   onClose: () => void
   galleryInputRef: React.RefObject<HTMLInputElement>
   cameraInputRef: React.RefObject<HTMLInputElement>
+  onCamera: (ctx: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
 }) {
   return (
     <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
@@ -662,19 +688,136 @@ function PhotoCapturePrompt({
         </div>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <button
-            onClick={() => galleryInputRef.current?.click()}
+            onClick={() => {
+              onClose()
+              galleryInputRef.current?.click()
+            }}
             className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-sky-700/30 border border-sky-500/40 text-sky-100 hover:bg-sky-700/40"
           >
             <ImageIcon className="w-4 h-4" /> Cargar foto
           </button>
           <button
-            onClick={() => cameraInputRef.current?.click()}
+            onClick={() => {
+              onClose()
+              onCamera(context)
+            }}
             className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-emerald-700/30 border border-emerald-500/40 text-emerald-100 hover:bg-emerald-700/40"
           >
             <Camera className="w-4 h-4" /> Tomar foto
           </button>
         </div>
         <p className="mt-3 text-xs text-slate-400">Usa la opción "Tomar foto" para abrir la cámara del dispositivo.</p>
+      </div>
+    </div>
+  )
+}
+
+function CameraCaptureModal({
+  context,
+  onClose,
+  onCapture,
+}: {
+  context: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  onClose: () => void
+  onCapture: (file: File) => Promise<void>
+}) {
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [capturing, setCapturing] = useState(false)
+
+  useEffect(() => {
+    let activeStream: MediaStream | null = null
+    const start = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        activeStream = stream
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+        }
+      } catch (err: any) {
+        setError('No se pudo acceder a la cámara. Revisa permisos o usa "Cargar foto".')
+      }
+    }
+
+    void start()
+
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach((t) => t.stop())
+      }
+    }
+  }, [])
+
+  const takePhoto = async () => {
+    if (!videoRef.current) return
+    const video = videoRef.current
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth || 1280
+    canvas.height = video.videoHeight || 720
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+    setCapturing(true)
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        setCapturing(false)
+        setError('No se pudo capturar la foto')
+        return
+      }
+      const file = new File([blob], `picking-${context.sapOrder}-${context.lineRef}-${context.type}.jpg`, {
+        type: 'image/jpeg',
+      })
+      await onCapture(file)
+      setCapturing(false)
+      onClose()
+    }, 'image/jpeg', 0.9)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center px-4" onClick={onClose}>
+      <div
+        className="bg-slate-950/95 border border-white/10 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 text-slate-100">
+          <div>
+            <p className="text-xs text-slate-400">Pedido {context.sapOrder}</p>
+            <h3 className="text-lg font-semibold">Toma la foto con la cámara</h3>
+            <p className="text-xs text-slate-400">Línea {context.lineRef} · {context.type === 'PICK' ? 'Picking' : 'Embalaje'}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg border border-white/10 text-slate-200 hover:bg-white/10"
+            aria-label="Cerrar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="bg-black">{/* camera preview */}
+          <video ref={videoRef} autoPlay playsInline className="w-full max-h-[60vh] object-contain bg-black" />
+        </div>
+
+        <div className="p-4 space-y-2">
+          {error && <p className="text-sm text-amber-200">{error}</p>}
+          <div className="flex items-center justify-end gap-3">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-white/10 text-slate-200 hover:bg-white/5"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={takePhoto}
+              disabled={capturing}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-500 disabled:opacity-50"
+            >
+              {capturing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+              Capturar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
