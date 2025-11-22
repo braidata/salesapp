@@ -127,6 +127,8 @@ model users {
   conversations    Conversation[] @relation("UserConversations")
   comments         Comment[]
   posts            posts[]
+  pickingsCreated  pickings[]     @relation("PickingsCreatedBy")
+  pickingPhotos    picking_photos[] @relation("PickingPhotosUploadedBy")
 }
 
 model Notification {
