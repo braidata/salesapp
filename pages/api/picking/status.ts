@@ -2,6 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import prisma from '@/lib/prisma'
 
+const extractUserId = (session: any) =>
+  Number(session?.token?.user?.id || session?.token?.sub || session?.user?.id) || null
+
 const allowedStatuses = ['PENDING', 'IN_PROGRESS', 'PICKED', 'PACKED', 'COMPLETED']
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,7 +13,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const session = await getSession({ req })
-  if (!session?.user) return res.status(401).json({ message: 'No autenticado' })
+  const userId = extractUserId(session)
+
+  if (!session || !userId) return res.status(401).json({ message: 'No autenticado' })
 
   const { pickingId, status } = req.body as { pickingId?: number; status?: string }
   if (!pickingId || !status) return res.status(400).json({ message: 'Datos incompletos' })

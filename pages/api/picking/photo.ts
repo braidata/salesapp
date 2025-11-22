@@ -2,13 +2,18 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import prisma from '@/lib/prisma'
 
+const extractUserId = (session: any) =>
+  Number(session?.token?.user?.id || session?.token?.sub || session?.user?.id) || null
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
   const session = await getSession({ req })
-  if (!session?.user) {
+  const userId = extractUserId(session)
+
+  if (!session || !userId) {
     return res.status(401).json({ message: 'No autenticado' })
   }
 
@@ -41,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         picking_line_id: line.id,
         photo_type: photoType,
         s3_url: s3Url,
-        uploaded_by_user_id: Number(session.user.id) || null,
+        uploaded_by_user_id: userId,
       },
     })
 

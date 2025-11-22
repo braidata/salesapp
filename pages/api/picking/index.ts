@@ -38,6 +38,9 @@ function mapSapLine(item: any, idx: number, sapOrder: string) {
 
 type Method = 'GET' | 'POST'
 
+const extractUserId = (session: any) =>
+  Number(session?.token?.user?.id || session?.token?.sub || session?.user?.id) || null
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method as Method
 
@@ -87,8 +90,9 @@ async function listPickings(req: NextApiRequest, res: NextApiResponse) {
 
 async function createPicking(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req })
+  const userId = extractUserId(session)
 
-  if (!session?.user) {
+  if (!session || !userId) {
     return res.status(401).json({ message: 'No autenticado' })
   }
 
@@ -131,7 +135,7 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       data: {
         sap_order_id: sapOrder,
         status: 'IN_PROGRESS',
-        created_by_user_id: Number(session.user.id) || null,
+        created_by_user_id: userId,
         lines: {
           create: dedupedLines,
         },
