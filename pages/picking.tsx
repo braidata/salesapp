@@ -1,6 +1,7 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import Head from 'next/head'
 import { CheckCircle, Image as ImageIcon, Loader2, PackageCheck, Search, Upload } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 
 import { format } from 'date-fns'
 
@@ -50,6 +51,7 @@ type Picking = {
 }
 
 export default function PickingDashboard() {
+  const { status } = useSession({ required: true })
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
   const [orderData, setOrderData] = useState<any>(null)
@@ -164,6 +166,14 @@ export default function PickingDashboard() {
     if (orderData?.lines) return orderData.lines as SapLine[]
     return []
   }, [picking, orderData])
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <p className="text-slate-300">Validando sesión...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
