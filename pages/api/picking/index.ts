@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getToken } from 'next-auth/jwt'
 import prisma from '@/lib/prisma'
 import axios from 'axios'
 
@@ -37,8 +36,6 @@ function mapSapLine(item: any, idx: number, sapOrder: string) {
 }
 
 type Method = 'GET' | 'POST'
-
-const extractUserId = (token: any) => Number(token?.user?.id || token?.sub || token?.id) || null
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method as Method
@@ -88,14 +85,8 @@ async function listPickings(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function createPicking(req: NextApiRequest, res: NextApiResponse) {
-  const token = await getToken({ req })
-  const userId = extractUserId(token)
-
-  if (!token || !userId) {
-    return res.status(401).json({ message: 'No autenticado' })
-  }
-
-  const { sapOrder } = req.body as { sapOrder?: string }
+  const { sapOrder, userId: providedUserId } = req.body as { sapOrder?: string; userId?: number }
+  const userId = providedUserId ? Number(providedUserId) : null
 
   if (!sapOrder) {
     return res.status(400).json({ message: 'sapOrder es requerido' })
@@ -134,7 +125,7 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       data: {
         sap_order_id: sapOrder,
         status: 'IN_PROGRESS',
-        created_by_user_id: userId,
+        created_by_user_id: userId ?? undefined,
         lines: {
           create: dedupedLines,
         },

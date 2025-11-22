@@ -51,7 +51,7 @@ type Picking = {
 }
 
 export default function PickingDashboard() {
-  const { status } = useSession({ required: true })
+  const { data: session, status } = useSession({ required: true })
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
   const [orderData, setOrderData] = useState<any>(null)
@@ -66,6 +66,15 @@ export default function PickingDashboard() {
 
   const galleryInputRef = useRef<HTMLInputElement | null>(null)
   const cameraInputRef = useRef<HTMLInputElement | null>(null)
+
+  const currentUserId = useMemo(() => {
+    return Number(
+      // common session shapes across the app
+      (session as any)?.token?.sub ||
+        (session as any)?.token?.user?.id ||
+        (session as any)?.token?.token?.user?.id,
+    ) || undefined
+  }, [session])
 
   const fetchSearch = async () => {
     if (!search.trim()) return
@@ -94,7 +103,7 @@ export default function PickingDashboard() {
       const resp = await fetch('/api/picking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sapOrder: orderData.sapOrder }),
+        body: JSON.stringify({ sapOrder: orderData.sapOrder, userId: currentUserId }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'No se pudo crear')
@@ -157,7 +166,12 @@ export default function PickingDashboard() {
       const resp = await fetch('/api/picking/photo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pickingLineId: lineId, photoType: type, s3Url: photoUrl }),
+        body: JSON.stringify({
+          pickingLineId: lineId,
+          photoType: type,
+          s3Url: photoUrl,
+          userId: currentUserId,
+        }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'Error guardando evidencia')
@@ -190,7 +204,7 @@ export default function PickingDashboard() {
       const resp = await fetch('/api/picking/status', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pickingId: picking.id, status: 'COMPLETED' }),
+        body: JSON.stringify({ pickingId: picking.id, status: 'COMPLETED', userId: currentUserId }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'No se pudo completar')

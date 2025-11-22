@@ -1,26 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getToken } from 'next-auth/jwt'
 import prisma from '@/lib/prisma'
-
-const extractUserId = (token: any) => Number(token?.user?.id || token?.sub || token?.id) || null
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
-  const token = await getToken({ req })
-  const userId = extractUserId(token)
-
-  if (!token || !userId) {
-    return res.status(401).json({ message: 'No autenticado' })
-  }
-
-  const { pickingLineId, photoType, s3Url } = req.body as {
+  const { pickingLineId, photoType, s3Url, userId: providedUserId } = req.body as {
     pickingLineId?: number | string
     photoType?: 'PICK' | 'PACK'
     s3Url?: string
+    userId?: number
   }
+  const userId = providedUserId ? Number(providedUserId) : null
 
   if (!pickingLineId || !photoType || !s3Url) {
     return res.status(400).json({ message: 'Datos incompletos' })
@@ -45,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         picking_line_id: line.id,
         photo_type: photoType,
         s3_url: s3Url,
-        uploaded_by_user_id: userId,
+        uploaded_by_user_id: userId ?? undefined,
       },
     })
 
