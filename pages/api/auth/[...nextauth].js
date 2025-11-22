@@ -13,48 +13,51 @@ export default NextAuth({
 
   providers: [
     CredentialsProvider({
-      name: "Credenciales de Acceso",
-      credentials: {
-        useremail: {
-          label: "Correo Electrónico",
-          type: "text",
-          placeholder: "jsanchez@ventuscorp.cl",
-        },
-        password: { label: "Contraseña", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.useremail || !credentials?.password) return null
+          name: "Credenciales de Acceso",
+        //   session: {
+        //     jwt: true,
+        //     maxAge: 30 * 24 * 60 * 60
+    
+        // },
+          credentials: {
 
-        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/mysqlUsers`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+            useremail: {
+              label: "Correo Electrónico",
+              type: "text",
+              placeholder: "jsanchez@ventuscorp.cl",
+            },
+            password: { label: "Contraseña", type: "password" },
           },
-          body: JSON.stringify({
-            useremail: credentials.useremail,
-            password: credentials.password,
-          }),
+
+          
+          async authorize(credentials) {
+
+            //fetch api of users database
+            //if user exists return user data
+            //if not return null
+
+            user = await fetch(`${process.env.NEXTAUTH_URL}/api/mysqlUsers`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                useremail: credentials.useremail,
+                password: credentials.password,
+              }),
+            })
+            const userJson = await user.json()
+
+            if (userJson.user[0].password === credentials.password) {
+              console.log("credentials si ahora: ", userJson.user[0].rol)
+              return  { id: userJson.user[0].id , name: userJson.user[0].name , email: userJson.user[0].email, role: userJson.user[0].rol, permissions: userJson.user[0].permissions, image: userJson.user[0].image}
+            } else {
+              //console.log("credentials no: ", userJson)
+              return null
+            }
+          },
         })
-
-        if (!response.ok) return null
-
-        const userJson = await response.json()
-        const candidate = userJson?.user?.[0]
-
-        if (!candidate || candidate.password !== credentials.password) {
-          return null
-        }
-
-        return {
-          id: candidate.id,
-          name: candidate.name,
-          email: candidate.email,
-          role: candidate.rol,
-          permissions: candidate.permissions,
-          image: candidate.image,
-        }
-      },
-    }),
+      , 
 
     // HubspotProvider({
     //       clientId: process.env.HUBSPOT_ID,
@@ -62,33 +65,30 @@ export default NextAuth({
     //     }),
   ],
 
-  session: {
-    strategy: "jwt",
-  },
 
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
-        token.name = user.name
-        token.email = user.email
-        token.role = user.role
-        token.permissions = user.permissions
-        token.image = user.image
+        token.user = user
       }
-
       return token
     },
-
     async session({ session, token }) {
       session.token = token
       return session
     },
   },
 
+  // A database is optional, but required to persist accounts in a database
+  
+
   theme: {
     colorScheme: "auto", // "auto" | "dark" | "light"
     brandColor: "#72d1db", // Hex color code
-    buttonText: "#83a1cc", // Hex color code
-  },
+    buttonText: "#83a1cc" // Hex color code
+    
+
+
+  }
+
 })
