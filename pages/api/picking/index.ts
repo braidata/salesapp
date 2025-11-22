@@ -1,6 +1,40 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import prisma from '@/lib/prisma'
+import axios from 'axios'
+
+async function fetchSAPSalesDetails(salesOrder: string) {
+  const SAP_USER = process.env.SAP_USER
+  const SAP_PASSWORD = process.env.SAP_PASSWORD
+  const SAP_URL = `https://sapwdp.imega.cl:44300/sap/opu/odata/sap/ZCDS_CUBE_PEDIDOS_CDS/ZCDS_CUBE_PEDIDOS?$filter=SalesOrder%20eq%20%27${salesOrder}%27`
+
+  const response = await axios.get(SAP_URL, {
+    auth: {
+      username: SAP_USER as string,
+      password: SAP_PASSWORD as string,
+    },
+  })
+
+  const payload = response.data
+  if (Array.isArray(payload?.d?.results)) return payload.d.results
+  if (Array.isArray(payload?.data?.results)) return payload.data.results
+  if (Array.isArray(payload?.results)) return payload.results
+
+  return []
+}
+
+function mapSapLine(item: any, idx: number, sapOrder: string) {
+  return {
+    sap_order_line_id: item.SalesOrderItem?.toString() || `${sapOrder}-${idx + 1}`,
+    sku: item.Material || item.Product,
+    description:
+      item.SalesOrderItemText ||
+      item.MaterialName ||
+      item.ProductDescription ||
+      item.Description,
+    quantity: Number(item.ORDERQUANTITY ?? item.OrderQuantity ?? item.RequestedQuantity ?? item.Quantity ?? 0) || 0,
+  }
+}
 
 type Method = 'GET' | 'POST'
 
@@ -70,28 +104,31 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json({ picking: existing, message: 'Picking ya existe' })
     }
 
-    const sapOrderRecord = await prisma.sap_orders.findUnique({
-      where: { sap_order: sapOrder },
-      include: { sap_order_items: true },
-    })
-
-    if (!sapOrderRecord) {
-      return res.status(404).json({ message: 'Pedido SAP no encontrado' })
+    const sapResults: any[] = await fetchSAPSalesDetails(sapOrder)
+    if (!sapResults.length) {
+      return res.status(404).json({ message: 'Pedido SAP no encontrado en SAP' })
     }
+
+    const dedupedLines = sapResults
+      .map((item, idx) => ({ item, mapped: mapSapLine(item, idx, sapOrder) }))
+      .reduce<{ key: string; mapped: ReturnType<typeof mapSapLine> }[]>((acc, entry) => {
+        const key = `${entry.item.SalesOrderItem || entry.mapped.sap_order_line_id}-${entry.item.Material || ''}-${
+          entry.item.BillingDocumentItem || ''
+        }`
+        if (!acc.find((existing) => existing.key === key)) {
+          acc.push({ key, mapped: entry.mapped })
+        }
+        return acc
+      }, [])
+      .map(({ mapped }) => mapped)
 
     const picking = await prisma.pickings.create({
       data: {
         sap_order_id: sapOrder,
-        sap_order_db_id: sapOrderRecord.id,
         status: 'IN_PROGRESS',
         created_by_user_id: Number(session.user.id) || null,
         lines: {
-          create: sapOrderRecord.sap_order_items.map((item, idx) => ({
-            sap_order_line_id: item.id?.toString() || `${sapOrder}-${idx + 1}`,
-            sku: item.sku,
-            description: item.product_name,
-            quantity: item.quantity,
-          })),
+          create: dedupedLines,
         },
       },
       include: {
