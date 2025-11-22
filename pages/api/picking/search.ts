@@ -1,5 +1,55 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/prisma'
+import axios from 'axios'
+
+function parseSapDate(raw: any): string | null {
+  if (!raw) return null
+
+  if (typeof raw === 'string') {
+    const match = raw.match(/\/Date\((\d+)\)\//)
+    if (match) {
+      const timestamp = Number(match[1])
+      return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null
+    }
+  }
+
+  if (raw instanceof Date) return raw.toISOString()
+  return null
+}
+
+async function fetchSAPSalesDetails(salesOrder: string) {
+  const SAP_USER = process.env.SAP_USER
+  const SAP_PASSWORD = process.env.SAP_PASSWORD
+  const SAP_URL = `https://sapwdp.imega.cl:44300/sap/opu/odata/sap/ZCDS_CUBE_PEDIDOS_CDS/ZCDS_CUBE_PEDIDOS?$filter=SalesOrder%20eq%20%27${salesOrder}%27`
+
+  const response = await axios.get(SAP_URL, {
+    auth: {
+      username: SAP_USER as string,
+      password: SAP_PASSWORD as string,
+    },
+  })
+
+  const payload = response.data
+  if (Array.isArray(payload?.d?.results)) return payload.d.results
+  if (Array.isArray(payload?.data?.results)) return payload.data.results
+  if (Array.isArray(payload?.results)) return payload.results
+
+  return []
+}
+
+function mapSapLine(item: any, idx: number, sapOrder: string) {
+  return {
+    uiId: idx,
+    sapLineId: item.SalesOrderItem?.toString() || `${sapOrder}-${idx + 1}`,
+    sku: item.Material || item.Product,
+    description:
+      item.SalesOrderItemText ||
+      item.MaterialName ||
+      item.ProductDescription ||
+      item.Description,
+    quantity: Number(item.ORDERQUANTITY ?? item.OrderQuantity ?? item.RequestedQuantity ?? item.Quantity ?? 0) || null,
+  }
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -13,13 +63,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const sapOrderRecord = await prisma.sap_orders.findUnique({
-      where: { sap_order: sapOrder },
-      include: { sap_order_items: true },
-    })
+    // Reutilizamos el conector SAP existente para obtener el pedido en línea
+    const sapResults: any[] = await fetchSAPSalesDetails(sapOrder)
 
-    if (!sapOrderRecord) {
-      return res.status(404).json({ message: 'Pedido SAP no encontrado en la base local' })
+    if (!sapResults.length) {
+      return res.status(404).json({ message: 'Pedido SAP no encontrado o sin ítems' })
     }
 
     const existingPicking = await prisma.pickings.findUnique({
@@ -33,24 +81,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     })
 
+    // Algunos pedidos devuelven posiciones duplicadas en el payload.
+    const dedupedLines = sapResults
+      .map((item, idx) => ({ item, mapped: mapSapLine(item, idx, sapOrder) }))
+      .reduce<{ key: string; mapped: ReturnType<typeof mapSapLine> }[]>((acc, entry) => {
+        const key = `${entry.item.SalesOrderItem || entry.mapped.sapLineId}-${entry.item.Material || ''}-${entry.item.BillingDocumentItem || ''}`
+        if (!acc.find((existing) => existing.key === key)) {
+          acc.push({ key, mapped: entry.mapped })
+        }
+        return acc
+      }, [])
+      .map(({ mapped }) => mapped)
+
+    const firstItem = sapResults[0]
+
     const response = {
       order: {
-        id: sapOrderRecord.id,
-        sapOrder: sapOrderRecord.sap_order,
-        purchaseOrder: sapOrderRecord.purchase_order,
-        customer: sapOrderRecord.customer_code,
-        status: sapOrderRecord.status,
-        statusCode: sapOrderRecord.status_code,
-        createdAt: sapOrderRecord.creation_date,
-        totalAmount: sapOrderRecord.total_amount,
+        id: firstItem.SalesOrder || sapOrder,
+        sapOrder: firstItem.SalesOrder || sapOrder,
+        purchaseOrder: firstItem.PurchaseOrderByCustomer || firstItem.PurchaseOrder || null,
+        customer:
+          firstItem.SoldToPartyName ||
+          firstItem.SoldToParty ||
+          firstItem.Customer ||
+          firstItem.CustomerName ||
+          null,
+        status:
+          firstItem.SDPROCESSSTATUS_TEXT ||
+          firstItem.SDPROCESSSTATUS ||
+          firstItem.OverallDeliveryStatus ||
+          firstItem.Status ||
+          null,
+        statusCode:
+          firstItem.SDPROCESSSTATUS || firstItem.OverallDeliveryStatus || firstItem.Status || null,
+        createdAt: parseSapDate(firstItem.CreationDate),
+        totalAmount:
+          Number(firstItem.NetAmount ?? firstItem.ItemNetAmountOfBillingDoc ?? firstItem.TOTAL ?? firstItem.TotalNetAmount ?? 0) ||
+          null,
+        currency: firstItem.TransactionCurrency || null,
       },
-      lines: sapOrderRecord.sap_order_items.map((item, idx) => ({
-        uiId: item.id ?? idx,
-        sapLineId: item.id?.toString() || `${sapOrderRecord.sap_order}-${idx + 1}`,
-        sku: item.sku,
-        description: item.product_name,
-        quantity: item.quantity,
-      })),
+      lines: dedupedLines,
       picking: existingPicking
         ? {
             id: existingPicking.id,
