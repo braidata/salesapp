@@ -127,6 +127,8 @@ model users {
   conversations    Conversation[] @relation("UserConversations")
   comments         Comment[]
   posts            posts[]
+  pickingsCreated  pickings[]     @relation("PickingsCreatedBy")
+  pickingPhotos    picking_photos[] @relation("PickingPhotosUploadedBy")
 }
 
 model Notification {
@@ -440,4 +442,71 @@ model sap_client {
   updated_at               DateTime  @updatedAt
 
   @@index([client_rut])
+}
+
+// --- Picking & Packing ---
+
+enum PickingStatus {
+  PENDING
+  IN_PROGRESS
+  PICKED
+  PACKED
+  COMPLETED
+}
+
+enum PickingLineStatus {
+  PENDING
+  PICKED
+  PACKED
+}
+
+enum PickingPhotoType {
+  PICK
+  PACK
+}
+
+model pickings {
+  id                Int             @id @default(autoincrement())
+  sap_order_id      String          @db.VarChar(50)
+  status            PickingStatus   @default(PENDING)
+  created_by_user_id Int?
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+
+  created_by        users?          @relation("PickingsCreatedBy", fields: [created_by_user_id], references: [id])
+  lines             picking_lines[]
+
+  @@unique([sap_order_id])
+  @@index([created_by_user_id])
+}
+
+model picking_lines {
+  id                Int               @id @default(autoincrement())
+  picking_id        Int
+  sap_order_line_id String?           @db.VarChar(100)
+  sku               String            @db.VarChar(255)
+  description       String?           @db.VarChar(512)
+  quantity          Int               @default(0)
+  status            PickingLineStatus @default(PENDING)
+
+  picking           pickings          @relation(fields: [picking_id], references: [id])
+  photos            picking_photos[]
+
+  @@index([picking_id])
+  @@index([sap_order_line_id])
+}
+
+model picking_photos {
+  id                  Int               @id @default(autoincrement())
+  picking_line_id     Int
+  photo_type          PickingPhotoType
+  s3_url              String            @db.Text
+  uploaded_by_user_id Int?
+  uploaded_at         DateTime          @default(now())
+
+  picking_line        picking_lines     @relation(fields: [picking_line_id], references: [id])
+  uploaded_by         users?            @relation("PickingPhotosUploadedBy", fields: [uploaded_by_user_id], references: [id])
+
+  @@index([picking_line_id])
+  @@index([uploaded_by_user_id])
 }
