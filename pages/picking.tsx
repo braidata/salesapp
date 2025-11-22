@@ -235,18 +235,18 @@ export default function PickingDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex justify-center">
       <Head>
-        <title>Picking &amp; Packing | EWM</title>
+        <title>App de registro de picking</title>
       </Head>
-      <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
+      <div className="w-full max-w-6xl px-4 pb-14 pt-20 space-y-10">
         <header className="bg-gradient-to-br from-sky-900/60 via-slate-900 to-slate-950 border border-sky-800/40 rounded-3xl p-8 shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-sky-300/80">EWM Playbook</p>
+              <p className="text-sm uppercase tracking-[0.35em] text-sky-300/80">App de registro de picking</p>
               <h1 className="text-3xl font-bold text-white mt-2">Flujo de Picking y Embalaje</h1>
               <p className="text-slate-300 mt-2 max-w-2xl">
-                Reutiliza la estética del módulo EWM para buscar pedidos SAP, gestionar líneas, tomar evidencias fotográficas y completar trazabilidad.
+                Busca pedidos SAP, gestiona líneas, toma evidencias fotográficas y completa trazabilidad con el flujo de picking y embalaje.
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -322,7 +322,7 @@ export default function PickingDashboard() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {groupedLines.map((line: any) => {
                   const picked = picking?.lines?.find((l) => l.id === line.id) || line
                   const photos = picked?.photos || []
@@ -334,7 +334,7 @@ export default function PickingDashboard() {
                   return (
                     <div
                       key={line.id ? `picking-${line.id}` : `${line.sapLineId || line.sku}-${line.uiId ?? line.sku}`}
-                      className="p-4 rounded-xl border border-white/10 bg-slate-900/80 space-y-3 shadow-inner"
+                      className="p-5 rounded-2xl border border-white/10 bg-slate-900/80 space-y-3 shadow-inner"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
@@ -445,7 +445,6 @@ export default function PickingDashboard() {
               <thead className="bg-slate-950/70 text-slate-200">
                 <tr>
                   <th className="px-4 py-3 text-left">Pedido</th>
-                  <th className="px-4 py-3 text-left">Creador</th>
                   <th className="px-4 py-3 text-left">Estado</th>
                   <th className="px-4 py-3 text-left">Líneas</th>
                   <th className="px-4 py-3 text-left">Última actualización</th>
@@ -463,7 +462,6 @@ export default function PickingDashboard() {
                         <div className="font-semibold text-white">{p.sap_order_id}</div>
                         <div className="text-slate-400 text-xs">ID interno: {p.id}</div>
                       </td>
-                      <td className="px-4 py-3 text-slate-200">{(p as any).created_by?.name || 'N/A'}</td>
                       <td className="px-4 py-3">
                         <span className={`px-3 py-1 rounded-lg border text-xs ${statusBadges[p.status] || statusBadges.PENDING}`}>
                           {p.status}
@@ -570,7 +568,7 @@ function PhotoUploader({
   disabled?: boolean
 }) {
   return (
-    <div className="p-3 rounded-xl border border-white/10 bg-gradient-to-br from-slate-950/80 via-slate-900/80 to-slate-950/60 shadow-inner flex flex-col gap-3">
+    <div className="p-3 rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950/80 via-slate-900/80 to-slate-950/60 shadow-inner flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400">{label}</p>
         <span
@@ -585,23 +583,23 @@ function PhotoUploader({
       </div>
 
       {existingUrl ? (
-        <div className="flex items-start gap-3">
+        <div className="grid grid-cols-[auto,1fr] gap-3 items-start">
           <button
             type="button"
             onClick={() => onPreview?.(existingUrl)}
-            className="group relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/15 bg-slate-900/70 hover:ring-2 hover:ring-sky-400/60 transition"
+            className="group relative aspect-square w-24 sm:w-28 rounded-xl overflow-hidden border border-white/15 bg-slate-900/70 hover:ring-2 hover:ring-sky-400/60 transition"
             aria-label="Ver evidencia"
           >
             <img src={existingUrl} alt="Evidencia" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
               <ImageIcon className="w-5 h-5 text-white" />
             </div>
           </button>
-          <div className="flex-1 flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col gap-2">
             <button
               type="button"
               onClick={() => onPreview?.(existingUrl)}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/80 border border-white/10 text-slate-100 hover:bg-slate-800"
+              className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/80 border border-white/10 text-slate-100 hover:bg-slate-800"
             >
               <ImageIcon className="w-4 h-4" /> Ver grande
             </button>
@@ -695,7 +693,7 @@ function ExistingPickingModal({
 }) {
   return (
     <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
-      <div className="bg-slate-950/95 border border-white/10 rounded-3xl w-full max-w-4xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-950/95 border border-white/10 rounded-3xl w-full max-w-5xl p-7 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Pedido {picking.sap_order_id}</p>
@@ -713,13 +711,13 @@ function ExistingPickingModal({
           </button>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {picking.lines?.map((line) => {
             const pickPhoto = line.photos?.find((p) => p.photo_type === 'PICK')
             const packPhoto = line.photos?.find((p) => p.photo_type === 'PACK')
             const lineRef = line.sapLineId || (line as any).sap_order_line_id || line.sku || line.id
             return (
-              <div key={line.id} className="p-4 rounded-2xl border border-white/10 bg-slate-900/80 space-y-3">
+              <div key={line.id} className="p-5 rounded-2xl border border-white/10 bg-slate-900/85 space-y-3 shadow-inner">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-xs text-slate-400">SKU {line.sapLineId || (line as any).sap_order_line_id}</p>
