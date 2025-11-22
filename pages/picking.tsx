@@ -348,7 +348,7 @@ export default function PickingDashboard() {
                       </div>
                       <p className="text-sm text-slate-200">Cantidad: {line.quantity}</p>
 
-                      <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <PhotoUploader
                           label="Foto picking"
                           existingUrl={pickPhoto?.s3_url}
@@ -456,6 +456,7 @@ export default function PickingDashboard() {
                 {dashboardPickings.map((p) => {
                   const totalLines = p.lines?.length || 0
                   const packed = p.lines?.filter((l) => l.status === 'PACKED').length || 0
+                  const isViewOnly = p.status === 'COMPLETED' || (totalLines > 0 && packed === totalLines)
                   return (
                     <tr key={p.id} className="hover:bg-slate-900/60">
                       <td className="px-4 py-3">
@@ -480,7 +481,7 @@ export default function PickingDashboard() {
                           className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 border border-white/10 text-slate-100 hover:bg-slate-800"
                         >
                           <Camera className="w-4 h-4" />
-                          Editar / aprobar
+                          {isViewOnly ? 'Ver' : 'Editar / aprobar'}
                         </button>
                       </td>
                     </tr>
@@ -569,21 +570,34 @@ function PhotoUploader({
   disabled?: boolean
 }) {
   return (
-    <div className="p-3 rounded-lg border border-white/10 bg-slate-950/60">
-      <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 mb-2 flex items-center justify-between">
-        <span>{label}</span>
-        {existingUrl && (
-          <span className="text-[10px] text-emerald-200 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
-            cargada
-          </span>
-        )}
-      </p>
+    <div className="p-3 rounded-xl border border-white/10 bg-gradient-to-br from-slate-950/80 via-slate-900/80 to-slate-950/60 shadow-inner flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400">{label}</p>
+        <span
+          className={`text-[10px] px-2 py-0.5 rounded-full border ${
+            existingUrl
+              ? 'text-emerald-200 bg-emerald-500/10 border-emerald-500/40'
+              : 'text-slate-300 bg-slate-800/70 border-white/10'
+          }`}
+        >
+          {existingUrl ? 'cargada' : 'pendiente'}
+        </span>
+      </div>
+
       {existingUrl ? (
-        <div className="flex items-center gap-3">
-          <div className="w-16 h-16 rounded-lg overflow-hidden border border-white/10 bg-slate-900/60">
+        <div className="flex items-start gap-3">
+          <button
+            type="button"
+            onClick={() => onPreview?.(existingUrl)}
+            className="group relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/15 bg-slate-900/70 hover:ring-2 hover:ring-sky-400/60 transition"
+            aria-label="Ver evidencia"
+          >
             <img src={existingUrl} alt="Evidencia" className="w-full h-full object-cover" />
-          </div>
-          <div className="flex-1 flex gap-2">
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+              <ImageIcon className="w-5 h-5 text-white" />
+            </div>
+          </button>
+          <div className="flex-1 flex flex-col sm:flex-row gap-2">
             <button
               type="button"
               onClick={() => onPreview?.(existingUrl)}
@@ -601,15 +615,17 @@ function PhotoUploader({
           </div>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={onUpload}
-          disabled={disabled}
-          className="w-full inline-flex items-center justify-between gap-2 text-slate-200 px-3 py-2 rounded-lg bg-slate-900/70 border border-sky-700/40 hover:bg-slate-900 disabled:opacity-40"
-        >
-          <span>Tomar / cargar foto</span>
-          <Camera className="w-4 h-4 text-sky-300" />
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <button
+            type="button"
+            onClick={onUpload}
+            disabled={disabled}
+            className="flex-1 inline-flex items-center justify-between gap-2 text-slate-200 px-3 py-2 rounded-lg bg-slate-900/70 border border-sky-700/40 hover:bg-slate-900 disabled:opacity-40"
+          >
+            <span className="text-left">Tomar / cargar foto</span>
+            <Camera className="w-4 h-4 text-sky-300" />
+          </button>
+        </div>
       )}
     </div>
   )
@@ -717,7 +733,7 @@ function ExistingPickingModal({
 
                 <p className="text-sm text-slate-200">Cantidad: {line.quantity}</p>
 
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   <PhotoUploader
                     label="Foto picking"
                     existingUrl={pickPhoto?.s3_url}
