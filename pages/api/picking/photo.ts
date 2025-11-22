@@ -1,19 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from 'next-auth/react'
+import { getToken } from 'next-auth/jwt'
 import prisma from '@/lib/prisma'
 
-const extractUserId = (session: any) =>
-  Number(session?.token?.user?.id || session?.token?.sub || session?.user?.id) || null
+const extractUserId = (token: any) => Number(token?.user?.id || token?.sub || token?.id) || null
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
-  const session = await getSession({ req })
-  const userId = extractUserId(session)
+  const token = await getToken({ req })
+  const userId = extractUserId(token)
 
-  if (!session || !userId) {
+  if (!token || !userId) {
     return res.status(401).json({ message: 'No autenticado' })
   }
 

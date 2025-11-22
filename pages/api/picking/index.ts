@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from 'next-auth/react'
+import { getToken } from 'next-auth/jwt'
 import prisma from '@/lib/prisma'
 import axios from 'axios'
 
@@ -38,8 +38,7 @@ function mapSapLine(item: any, idx: number, sapOrder: string) {
 
 type Method = 'GET' | 'POST'
 
-const extractUserId = (session: any) =>
-  Number(session?.token?.user?.id || session?.token?.sub || session?.user?.id) || null
+const extractUserId = (token: any) => Number(token?.user?.id || token?.sub || token?.id) || null
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method as Method
@@ -89,10 +88,10 @@ async function listPickings(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function createPicking(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getSession({ req })
-  const userId = extractUserId(session)
+  const token = await getToken({ req })
+  const userId = extractUserId(token)
 
-  if (!session || !userId) {
+  if (!token || !userId) {
     return res.status(401).json({ message: 'No autenticado' })
   }
 
