@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type React from 'react'
 import Head from 'next/head'
 import { Camera, CheckCircle, Image as ImageIcon, Loader2, PackageCheck, Search, Upload, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -51,7 +52,7 @@ type Picking = {
 }
 
 export default function PickingDashboard() {
-  const { status } = useSession({ required: true })
+  const { data: session, status } = useSession({ required: true })
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(false)
   const [orderData, setOrderData] = useState<any>(null)
@@ -63,9 +64,19 @@ export default function PickingDashboard() {
     { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
   | null>(null)
   const [selectedPicking, setSelectedPicking] = useState<Picking | null>(null)
+  const [previewPhoto, setPreviewPhoto] = useState<{ url: string; title: string } | null>(null)
 
   const galleryInputRef = useRef<HTMLInputElement | null>(null)
   const cameraInputRef = useRef<HTMLInputElement | null>(null)
+
+  const currentUserId = useMemo(() => {
+    return Number(
+      // common session shapes across the app
+      (session as any)?.token?.sub ||
+        (session as any)?.token?.user?.id ||
+        (session as any)?.token?.token?.user?.id,
+    ) || undefined
+  }, [session])
 
   const fetchSearch = async () => {
     if (!search.trim()) return
@@ -94,7 +105,7 @@ export default function PickingDashboard() {
       const resp = await fetch('/api/picking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sapOrder: orderData.sapOrder }),
+        body: JSON.stringify({ sapOrder: orderData.sapOrder, userId: currentUserId }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'No se pudo crear')
@@ -157,7 +168,12 @@ export default function PickingDashboard() {
       const resp = await fetch('/api/picking/photo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pickingLineId: lineId, photoType: type, s3Url: photoUrl }),
+        body: JSON.stringify({
+          pickingLineId: lineId,
+          photoType: type,
+          s3Url: photoUrl,
+          userId: currentUserId,
+        }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'Error guardando evidencia')
@@ -190,7 +206,7 @@ export default function PickingDashboard() {
       const resp = await fetch('/api/picking/status', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pickingId: picking.id, status: 'COMPLETED' }),
+        body: JSON.stringify({ pickingId: picking.id, status: 'COMPLETED', userId: currentUserId }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'No se pudo completar')
@@ -345,6 +361,7 @@ export default function PickingDashboard() {
                               sapOrder: picking?.sap_order_id || orderData?.sapOrder,
                             })
                           }
+                          onPreview={(url) => setPreviewPhoto({ url, title: `${line.sku} · Picking` })}
                         />
                         <PhotoUploader
                           label="Foto embalaje"
@@ -358,6 +375,7 @@ export default function PickingDashboard() {
                               sapOrder: picking?.sap_order_id || orderData?.sapOrder,
                             })
                           }
+                          onPreview={(url) => setPreviewPhoto({ url, title: `${line.sku} · Embalaje` })}
                         />
                       </div>
                     </div>
@@ -482,11 +500,16 @@ export default function PickingDashboard() {
           />
         )}
 
+        {previewPhoto && (
+          <FullPhotoPreview photo={previewPhoto} onClose={() => setPreviewPhoto(null)} />
+        )}
+
         {selectedPicking && (
           <ExistingPickingModal
             picking={selectedPicking}
             onClose={() => setSelectedPicking(null)}
             onOpenUpload={(payload) => setUploadContext(payload)}
+            onPreview={(url, title) => setPreviewPhoto({ url, title })}
           />
         )}
       </div>
@@ -536,20 +559,47 @@ function PhotoUploader({
   label,
   existingUrl,
   onUpload,
+  onPreview,
   disabled,
 }: {
   label: string
   existingUrl?: string
   onUpload: () => void
+  onPreview?: (url: string) => void
   disabled?: boolean
 }) {
   return (
     <div className="p-3 rounded-lg border border-white/10 bg-slate-950/60">
-      <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 mb-2">{label}</p>
+      <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 mb-2 flex items-center justify-between">
+        <span>{label}</span>
+        {existingUrl && (
+          <span className="text-[10px] text-emerald-200 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+            cargada
+          </span>
+        )}
+      </p>
       {existingUrl ? (
-        <a href={existingUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-emerald-200">
-          <ImageIcon className="w-4 h-4" /> Ver evidencia
-        </a>
+        <div className="flex items-center gap-3">
+          <div className="w-16 h-16 rounded-lg overflow-hidden border border-white/10 bg-slate-900/60">
+            <img src={existingUrl} alt="Evidencia" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 flex gap-2">
+            <button
+              type="button"
+              onClick={() => onPreview?.(existingUrl)}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/80 border border-white/10 text-slate-100 hover:bg-slate-800"
+            >
+              <ImageIcon className="w-4 h-4" /> Ver grande
+            </button>
+            <button
+              type="button"
+              onClick={onUpload}
+              className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-sky-700/40 border border-sky-500/40 text-sky-50 hover:bg-sky-700/50"
+            >
+              <Camera className="w-4 h-4" /> Reemplazar
+            </button>
+          </div>
+        </div>
       ) : (
         <button
           type="button"
@@ -620,10 +670,12 @@ function ExistingPickingModal({
   picking,
   onClose,
   onOpenUpload,
+  onPreview,
 }: {
   picking: Picking
   onClose: () => void
   onOpenUpload: (payload: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
+  onPreview: (url: string, title: string) => void
 }) {
   return (
     <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
@@ -678,6 +730,7 @@ function ExistingPickingModal({
                         sapOrder: picking.sap_order_id || '',
                       })
                     }
+                    onPreview={(url) => onPreview(url, `${line.sku} · Picking`)}
                   />
                   <PhotoUploader
                     label="Foto embalaje"
@@ -691,11 +744,40 @@ function ExistingPickingModal({
                         sapOrder: picking.sap_order_id || '',
                       })
                     }
+                    onPreview={(url) => onPreview(url, `${line.sku} · Embalaje`)}
                   />
                 </div>
               </div>
             )
           })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function FullPhotoPreview({ photo, onClose }: { photo: { url: string; title: string }; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center px-4" onClick={onClose}>
+      <div
+        className="relative max-w-4xl w-full max-h-[90vh] bg-slate-950/90 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 text-slate-100">
+          <div className="flex items-center gap-2">
+            <Camera className="w-4 h-4 text-sky-300" />
+            <span className="text-sm font-semibold">{photo.title}</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg border border-white/10 text-slate-200 hover:bg-white/10"
+            aria-label="Cerrar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="p-4 bg-black">
+          <img src={photo.url} alt={photo.title} className="w-full max-h-[75vh] object-contain mx-auto" />
         </div>
       </div>
     </div>
