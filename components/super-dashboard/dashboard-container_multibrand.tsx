@@ -17,7 +17,7 @@ import { checkPermissions } from "@/lib/permissions"
 
 type ViewType = "logistics" | "accounting" | "products" | "analytics"
 // Añadir tipo para las marcas
-type BrandType = "" | "blanik" | "bbq" 
+type BrandType = "all" | "blanik" | "bbq" | "imegab2c"
 
 export default function DashboardContainer() {
   // Estado de la sesión y verificación de permisos usando session.session
@@ -39,7 +39,7 @@ export default function DashboardContainer() {
     courier: "",
     paymentType: "",
     deliveryType: "",
-    brand: "all" as BrandType, // Actualizado para incluir BBQ como opción, default sigue siendo blanik
+    brand: "all",
     orderId: "",
   })
 
@@ -232,7 +232,7 @@ export default function DashboardContainer() {
     const props = { orders: displayOrders, isLoading }
     switch (view) {
       case "logistics":
-        return <LogisticsView {...props} brand={filters.brand} />
+        return <LogisticsView {...props} brandFilter={filters.brand} />
       case "accounting":
         return <AccountingView {...props} />
       case "products":
@@ -240,7 +240,7 @@ export default function DashboardContainer() {
       case "analytics":
         return <AnalyticsView {...props} />
       default:
-        return <LogisticsView {...props} brand={filters.brand} />
+        return <LogisticsView {...props} brandFilter={filters.brand} />
     }
   }
 

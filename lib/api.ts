@@ -62,7 +62,7 @@ export async function fetchOrderDetails({ orderId, brand = "" }: FetchOrderDetai
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
       });
-      
+
       if (blanikResponse.ok) {
         const data = await blanikResponse.json();
         if (data && Object.keys(data).length > 0) {
@@ -71,14 +71,14 @@ export async function fetchOrderDetails({ orderId, brand = "" }: FetchOrderDetai
           return { ...data, marca: "blanik" };
         }
       }
-      
+
       // Si no se encontró en Blanik, intentamos en BBQ
       const bbqResponse = await fetch(`/api/apiVTEXRobotsBBQ?orderId=${orderId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
       });
-      
+
       if (bbqResponse.ok) {
         const data = await bbqResponse.json();
         if (data && Object.keys(data).length > 0) {
@@ -87,14 +87,14 @@ export async function fetchOrderDetails({ orderId, brand = "" }: FetchOrderDetai
           return { ...data, marca: "bbq" };
         }
       }
-      
+
       // Si no se encontró en ninguna de las anteriores, intentamos en default
       const defaultResponse = await fetch(`/api/apiVTEXRobots?orderId=${orderId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
       });
-      
+
       if (defaultResponse.ok) {
         const data = await defaultResponse.json();
         if (data && Object.keys(data).length > 0) {
@@ -103,7 +103,7 @@ export async function fetchOrderDetails({ orderId, brand = "" }: FetchOrderDetai
           return { ...data, marca: "imegab2c" };
         }
       }
-      
+
       throw new Error(`No se encontró la orden ${orderId} en ninguna marca`);
     } catch (error) {
       console.error(`Error fetching order details for ${orderId}:`, error);
@@ -112,8 +112,8 @@ export async function fetchOrderDetails({ orderId, brand = "" }: FetchOrderDetai
   } else {
     // Seleccionar endpoint según el valor de brand
     let endpoint = "/api/apiVTEXRobots"; // Default endpoint (imegab2c)
-    let marcaValue = "imegab2c"; 
-    
+    let marcaValue = "imegab2c";
+
     if (brand) {
       if (brand.toLowerCase() === "blanik") {
         endpoint = "/api/apiVTEXRobotsBlanik";
@@ -123,21 +123,21 @@ export async function fetchOrderDetails({ orderId, brand = "" }: FetchOrderDetai
         marcaValue = "bbq";
       }
     }
-    
+
     try {
       const response = await fetch(`${endpoint}?orderId=${orderId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
       });
-      
+
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log(`Fetched detailed order data for ${orderId} from ${marcaValue}`);
-      
+
       // Agregar marca a la respuesta
       return { ...data, marca: marcaValue };
     } catch (error) {
@@ -207,7 +207,7 @@ function buildApiParams(params: FetchAllOrdersParams) {
   if (params.deliveryType) baseParams["shippingMethod"] = params.deliveryType;
   if (params.view) baseParams["view"] = params.view;
   if (needsDetailedData) baseParams["detailed"] = "true";
-  
+
   // Usar el nuevo parámetro getAllPages
   baseParams["getAllPages"] = "true";
 
@@ -259,7 +259,7 @@ function applyManualFilters(orders: any[], params: FetchAllOrdersParams) {
       );
     });
   }
-  
+
   // Filtrado manual por deliveryType
   if (params.deliveryType) {
     console.log(`Filtering orders by deliveryType: ${params.deliveryType}`);
@@ -288,21 +288,21 @@ async function fetchOrdersFromApi(endpoint: string, baseParams: any, brandName: 
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
     });
-    
+
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
-    
+
     const data = await response.json();
     let orders = data.list || [];
-    
+
     // Agregar marca a cada orden para identificación
-    orders = orders.map((order: any) => ({ 
-      ...order, 
+    orders = orders.map((order: any) => ({
+      ...order,
       marca: brandName,
       _sourceBrand: brandName
     }));
-    
+
     console.log(`Total ${brandName} orders fetched: ${orders.length}`);
     return orders;
   } catch (error) {
@@ -330,7 +330,7 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
     console.log(`Using cached ${brandToUse || 'default'} orders data`);
     let filteredCacheData = applyManualFilters(cacheEntry.data, params);
     console.log(`Filtered cached data length: ${filteredCacheData.length}`);
-    
+
     return {
       success: true,
       list: filteredCacheData,
@@ -348,20 +348,21 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
   let allOrders = [];
 
   if (brandToUse === "all") {
-    // Consultar Blanik y BBQ y combinar resultados
-    console.log("Fetching orders from both Blanik and BBQ");
-    const [blanikOrders, bbqOrders] = await Promise.all([
+    // Consultar Blanik, BBQ y Ventus (imegab2c) y combinar resultados
+    console.log("Fetching orders from Blanik, BBQ and Ventus");
+    const [blanikOrders, bbqOrders, ventusOrders] = await Promise.all([
       fetchOrdersFromApi("/api/apiVTEXRobotsBlanik", baseParams, "blanik"),
-      fetchOrdersFromApi("/api/apiVTEXRobotsBBQ", baseParams, "bbq")
+      fetchOrdersFromApi("/api/apiVTEXRobotsBBQ", baseParams, "bbq"),
+      fetchOrdersFromApi("/api/apiVTEXRobots", baseParams, "imegab2c") // AGREGAR ESTA LÍNEA
     ]);
-    
-    allOrders = [...blanikOrders, ...bbqOrders];
-    console.log(`Combined orders from Blanik and BBQ: ${allOrders.length}`);
+
+    allOrders = [...blanikOrders, ...bbqOrders, ...ventusOrders]; // ACTUALIZAR ESTA LÍNEA
+    console.log(`Combined orders from all brands: ${allOrders.length}`);
   } else {
     // Consultar la API correspondiente a la marca especificada
     let endpoint = "/api/apiVTEXRobots"; // Default endpoint (imegab2c)
     let marcaValue = "imegab2c";
-    
+
     if (brandToUse === "blanik") {
       endpoint = "/api/apiVTEXRobotsBlanik";
       marcaValue = "blanik";
@@ -369,7 +370,7 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
       endpoint = "/api/apiVTEXRobotsBBQ";
       marcaValue = "bbq";
     }
-    
+
     allOrders = await fetchOrdersFromApi(endpoint, baseParams, marcaValue);
   }
 
@@ -380,12 +381,12 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
 
   if (allOrders.length > uniqueOrderIds.size) {
     console.warn(`¡Atención! Se encontraron ${allOrders.length - uniqueOrderIds.size} órdenes duplicadas`);
-    
+
     // Deduplicar pedidos por orderId, priorizando Blanik sobre BBQ y ambos sobre imegab2c
     const orderMap = new Map();
     allOrders.forEach((order: any) => {
       const existingOrder = orderMap.get(order.orderId);
-      
+
       if (!existingOrder) {
         orderMap.set(order.orderId, order);
       } else if (order.marca === "blanik" && existingOrder.marca !== "blanik") {
@@ -396,7 +397,7 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
         orderMap.set(order.orderId, order);
       }
     });
-    
+
     allOrders = Array.from(orderMap.values());
     console.log(`After deduplication: ${allOrders.length} orders`);
   }
@@ -427,7 +428,7 @@ export async function fetchAllOrders(params: FetchAllOrdersParams) {
     console.log("Muestra de IDs de órdenes (primeras 5):", filteredOrders.slice(0, 5).map((o: any) => o.orderId));
     console.log("Muestra de IDs de órdenes (últimas 5):", filteredOrders.slice(-5).map((o: any) => o.orderId));
   }
-  
+
   return {
     success: true,
     list: filteredOrders,

@@ -159,6 +159,15 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
       deliveryType: "delivery",
       brand: filters.brand, // Mantener la marca actual
     },
+    samex: {
+      dateRange: { start: null, end: null },
+      daysBack: 14,
+      status: "handling",
+      courier: "SAMEX",
+      paymentType: "",
+      deliveryType: "delivery",
+      brand: filters.brand, // Mantener la marca actual
+    },
     localPickup: {
       dateRange: { start: null, end: null },
       daysBack: 14,
@@ -206,10 +215,19 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     },
     all: {
       dateRange: { start: null, end: null },
-      daysBack: 31,
-      status: "",
+      daysBack: 14,
+      status: "handling",
       courier: "",
       paymentType: "Webpay",
+      deliveryType: "",
+      brand: filters.brand, // Mantener la marca actual
+    },
+    all2: {
+      dateRange: { start: null, end: null },
+      daysBack: 14,
+      status: "handling",
+      courier: "",
+      paymentType: "Promissory",
       deliveryType: "",
       brand: filters.brand, // Mantener la marca actual
     },
@@ -289,6 +307,14 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
                   whileTap={{ scale: 0.97 }}
                 >
                   Starken
+                </motion.button>
+                <motion.button
+                  onClick={() => applyPreset('samex')}
+                  className="px-4 py-1.5 rounded-full text-sm bg-lime-500/20 text-lime-500 border border-lime-500/40 hover:bg-lime-500/30 shadow-sm shadow-lime-500/20"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  SAMEX
                 </motion.button>
                 <motion.button
                   onClick={() => applyPreset('localPickup')}
