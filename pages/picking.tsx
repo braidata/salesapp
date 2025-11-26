@@ -661,14 +661,14 @@ function PhotoUploader({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex justify-center">
           <button
             type="button"
             onClick={onUpload}
             disabled={disabled}
             className="flex-1 inline-flex items-center justify-between gap-2 text-slate-200 px-3 py-2 rounded-lg bg-slate-900/70 border border-sky-700/40 hover:bg-slate-900 disabled:opacity-40"
           >
-            <span className="text-left">Tomar / cargar foto</span>
+            <span className="text-left">Tomar foto</span>
             <Camera className="w-4 h-4 text-sky-300" />
           </button>
         </div>
@@ -711,7 +711,7 @@ function PhotoCapturePrompt({
           <p>Foto: {context.type === 'PICK' ? 'Picking' : 'Embalaje'}</p>
         </div>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
+          {/* <button
             onClick={() => {
               onClose()
               galleryInputRef.current?.click()
@@ -719,7 +719,7 @@ function PhotoCapturePrompt({
             className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-sky-700/30 border border-sky-500/40 text-sky-100 hover:bg-sky-700/40"
           >
             <ImageIcon className="w-4 h-4" /> Cargar foto
-          </button>
+          </button> */}
           <button
             onClick={() => {
               onClose()
@@ -759,7 +759,7 @@ function CameraCaptureModal({
           videoRef.current.srcObject = stream
         }
       } catch (err: any) {
-        setError('No se pudo acceder a la cámara. Revisa permisos o usa "Cargar foto".')
+        setError('No se pudo acceder a la cámara. Revisa permisos e intenta nuevamente.')
       }
     }
 
@@ -866,9 +866,9 @@ function ExistingPickingModal({
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Pedido {picking.sap_order_id}</p>
             <h3 className="text-2xl font-semibold text-white">Edición y aprobación</h3>
-            <p className="text-slate-300 text-sm">
+            {/* <p className="text-slate-300 text-sm">
               Valida cada etapa para pickings existentes en la tabla. Agrega evidencias o aprueba líneas según corresponda.
-            </p>
+            </p> */}
           </div>
           <button
             onClick={onClose}
@@ -881,9 +881,9 @@ function ExistingPickingModal({
 
         <div className="mb-4 grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-3 items-start">
           <div className="p-4 rounded-2xl border border-white/10 bg-slate-900/80">
-            <p className="text-xs text-slate-400">Packing final</p>
-            <h4 className="text-lg font-semibold text-white">Foto de embalaje general</h4>
-            <p className="text-sm text-slate-300">Solo se requiere una foto de packing para todo el pedido.</p>
+            <p className="text-xs text-slate-400">Picking y Packing</p>
+            <h4 className="text-lg font-semibold text-white">Fotos de picking y embalaje general</h4>
+            <p className="text-sm text-slate-300">Ingresa una foto para cada producto y una con el embalaje general.</p>
           </div>
           <PhotoUploader
             label="Foto packing"

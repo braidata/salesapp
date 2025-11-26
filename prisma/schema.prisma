@@ -483,14 +483,14 @@ model pickings {
 
 model picking_lines {
   id                Int               @id @default(autoincrement())
-  picking_id        Int
+  picking_id        Int?
   sap_order_line_id String?           @db.VarChar(100)
   sku               String            @db.VarChar(255)
   description       String?           @db.VarChar(512)
   quantity          Int               @default(0)
   status            PickingLineStatus @default(PENDING)
 
-  picking           pickings          @relation(fields: [picking_id], references: [id])
+  picking           pickings?          @relation(fields: [picking_id], references: [id])
   photos            picking_photos[]
 
   @@index([picking_id])
@@ -500,14 +500,14 @@ model picking_lines {
 model picking_photos {
   id                  Int               @id @default(autoincrement())
   picking_line_id     Int?
-  picking_id          Int
+  picking_id          Int?
   photo_type          PickingPhotoType
   s3_url              String            @db.Text
   uploaded_by_user_id Int?
   uploaded_at         DateTime          @default(now())
 
   picking_line        picking_lines?    @relation(fields: [picking_line_id], references: [id])
-  picking             pickings          @relation(fields: [picking_id], references: [id])
+  picking             pickings?          @relation(fields: [picking_id], references: [id])
   uploaded_by         users?            @relation("PickingPhotosUploadedBy", fields: [uploaded_by_user_id], references: [id])
 
   @@index([picking_id])
