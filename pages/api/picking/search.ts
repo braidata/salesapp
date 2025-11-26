@@ -83,9 +83,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           orderBy: { id: 'asc' },
         },
         created_by: true,
-        photos: true,
       },
     })
+
+    const packingPhoto = existingPicking
+      ? await prisma.picking_photos.findFirst({
+          where: { picking_id: existingPicking.id, picking_line_id: null, photo_type: 'PACK' },
+          orderBy: { uploaded_at: 'desc' },
+        })
+      : null
 
     // Algunos pedidos devuelven posiciones duplicadas en el payload.
     const dedupedLines = filteredResults
@@ -133,7 +139,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             status: existingPicking.status,
             createdAt: existingPicking.created_at,
             createdBy: existingPicking.created_by,
-            photos: existingPicking.photos,
+            packingPhoto,
             lines: existingPicking.lines.map((line) => ({
               id: line.id,
               sapLineId: line.sap_order_line_id,
