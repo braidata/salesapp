@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   const userId = providedUserId ? Number(providedUserId) : null
 
-  if (!photoType || !s3Url) {
+  if (!pickingLineId || !photoType || !s3Url) {
     return res.status(400).json({ message: 'Datos incompletos' })
   }
 
