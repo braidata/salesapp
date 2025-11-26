@@ -49,7 +49,7 @@ type Picking = {
   updated_at?: string
   created_by?: { name?: string | null }
   createdBy?: { id: number; name: string | null; email: string | null } | null
-  photos?: PickingPhoto[]
+  packingPhoto?: PickingPhoto | null
   lines: PickingLine[]
 }
 
@@ -386,7 +386,7 @@ export default function PickingDashboard() {
                   </div>
                   <PhotoUploader
                     label="Foto de packing"
-                    existingUrl={picking.photos?.find((p) => p.photo_type === 'PACK')?.s3_url}
+                    existingUrl={picking.packingPhoto?.s3_url}
                     disabled={loading}
                     onUpload={() =>
                       setUploadContext({
@@ -858,7 +858,7 @@ function ExistingPickingModal({
   onOpenUpload: (payload: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
   onPreview: (url: string, title: string) => void
 }) {
-  const packPhoto = picking.photos?.find((p) => p.photo_type === 'PACK')
+  const packPhoto = picking.packingPhoto
   return (
     <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
       <div className="bg-slate-950/95 border border-white/10 rounded-3xl w-full max-w-5xl p-7 shadow-2xl max-h-[90vh] overflow-y-auto">

@@ -74,11 +74,20 @@ async function listPickings(req: NextApiRequest, res: NextApiResponse) {
       include: {
         created_by: true,
         lines: { include: { photos: true } },
-        photos: true,
       },
     })
 
-    return res.status(200).json({ pickings })
+    const packingPhotos = await prisma.picking_photos.findMany({
+      where: { picking_id: { in: pickings.map((p) => p.id) }, picking_line_id: null, photo_type: 'PACK' },
+      orderBy: { uploaded_at: 'desc' },
+    })
+
+    const enriched = pickings.map((picking) => ({
+      ...picking,
+      packingPhoto: packingPhotos.find((photo) => photo.picking_id === picking.id) || null,
+    }))
+
+    return res.status(200).json({ pickings: enriched })
   } catch (error) {
     console.error('list pickings error', error)
     return res.status(500).json({ message: 'Error cargando pickings' })
@@ -134,7 +143,6 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       include: {
         lines: { include: { photos: true } },
         created_by: true,
-        photos: true,
       },
     })
 
@@ -145,6 +153,7 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       createdAt: picking.created_at,
       createdBy: picking.created_by,
       lines: picking.lines,
+      packingPhoto: null,
     }
 
     return res.status(201).json({ picking: formatted })
