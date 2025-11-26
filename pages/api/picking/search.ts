@@ -83,6 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           orderBy: { id: 'asc' },
         },
         created_by: true,
+        photos: true,
       },
     })
 
@@ -132,6 +133,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             status: existingPicking.status,
             createdAt: existingPicking.created_at,
             createdBy: existingPicking.created_by,
+            photos: existingPicking.photos,
             lines: existingPicking.lines.map((line) => ({
               id: line.id,
               sapLineId: line.sap_order_line_id,

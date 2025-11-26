@@ -475,6 +475,7 @@ model pickings {
 
   created_by        users?          @relation("PickingsCreatedBy", fields: [created_by_user_id], references: [id])
   lines             picking_lines[]
+  photos            picking_photos[]
 
   @@unique([sap_order_id])
   @@index([created_by_user_id])
@@ -498,15 +499,18 @@ model picking_lines {
 
 model picking_photos {
   id                  Int               @id @default(autoincrement())
-  picking_line_id     Int
+  picking_line_id     Int?
+  picking_id          Int
   photo_type          PickingPhotoType
   s3_url              String            @db.Text
   uploaded_by_user_id Int?
   uploaded_at         DateTime          @default(now())
 
-  picking_line        picking_lines     @relation(fields: [picking_line_id], references: [id])
+  picking_line        picking_lines?    @relation(fields: [picking_line_id], references: [id])
+  picking             pickings          @relation(fields: [picking_id], references: [id])
   uploaded_by         users?            @relation("PickingPhotosUploadedBy", fields: [uploaded_by_user_id], references: [id])
 
+  @@index([picking_id])
   @@index([picking_line_id])
   @@index([uploaded_by_user_id])
 }

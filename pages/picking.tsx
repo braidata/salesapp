@@ -28,6 +28,7 @@ type PickingPhoto = {
   s3_url: string
   uploaded_at: string
   uploaded_by_user_id: number | null
+  picking_id?: number
 }
 
 type PickingLine = {
@@ -48,6 +49,7 @@ type Picking = {
   updated_at?: string
   created_by?: { name?: string | null }
   createdBy?: { id: number; name: string | null; email: string | null } | null
+  photos?: PickingPhoto[]
   lines: PickingLine[]
 }
 
@@ -61,12 +63,12 @@ export default function PickingDashboard() {
   const [filters, setFilters] = useState({ status: '', sapOrder: '' })
   const [feedback, setFeedback] = useState<string | null>(null)
   const [uploadContext, setUploadContext] = useState<
-    { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+    { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
   | null>(null)
   const [selectedPicking, setSelectedPicking] = useState<Picking | null>(null)
   const [previewPhoto, setPreviewPhoto] = useState<{ url: string; title: string } | null>(null)
   const [cameraCapture, setCameraCapture] = useState<
-    { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+    { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
   | null>(null)
 
   const galleryInputRef = useRef<HTMLInputElement | null>(null)
@@ -139,10 +141,8 @@ export default function PickingDashboard() {
   }, [filters])
 
   const handleUpload = async (
-    lineId: number,
-    type: 'PICK' | 'PACK',
+    ctx: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string },
     file: File,
-    lineRef: string,
     sapOrderOverride?: string,
   ) => {
     const sapOrder = sapOrderOverride || picking?.sap_order_id || orderData?.sapOrder
@@ -151,7 +151,8 @@ export default function PickingDashboard() {
       return
     }
 
-    const folder = `picking/${sapOrder}/line-${lineRef}`
+    const folder =
+      ctx.type === 'PACK' ? `picking/${sapOrder}/packing` : `picking/${sapOrder}/line-${ctx.lineRef || 'linea'}`
     const formData = new FormData()
     formData.append('file', file)
 
@@ -172,15 +173,16 @@ export default function PickingDashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pickingLineId: lineId,
-          photoType: type,
+          pickingId: ctx.pickingId,
+          pickingLineId: ctx.lineId,
+          photoType: ctx.type,
           s3Url: photoUrl,
           userId: currentUserId,
         }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'Error guardando evidencia')
-      setFeedback(`Foto ${type === 'PICK' ? 'de picking' : 'de embalaje'} guardada`)
+      setFeedback(`Foto ${ctx.type === 'PICK' ? 'de picking' : 'de embalaje'} guardada`)
       await fetchSearch()
       await refreshDashboard()
 
@@ -298,7 +300,9 @@ export default function PickingDashboard() {
             <div className="p-4 rounded-2xl border border-sky-800/50 bg-sky-900/30">
               <p className="text-xs uppercase tracking-[0.3em] text-sky-200">Crea trazabilidad</p>
               <h3 className="text-lg font-semibold text-white mt-2">Crea el picking y registra fotos</h3>
-              <p className="text-slate-200 text-sm mt-1">Dos fotos por línea: una al pickear y otra al embalar.</p>
+              <p className="text-slate-200 text-sm mt-1">
+                Por línea solo se captura la foto de picking; el embalaje es una única foto general por pedido.
+              </p>
               <button
                 onClick={createPicking}
                 disabled={!orderData || !!picking || loading}
@@ -330,7 +334,6 @@ export default function PickingDashboard() {
                   const picked = picking?.lines?.find((l) => l.id === line.id) || line
                   const photos = picked?.photos || []
                   const pickPhoto = photos.find((p: any) => p.photo_type === 'PICK')
-                  const packPhoto = photos.find((p: any) => p.photo_type === 'PACK')
                   const status = picked?.status || 'PENDING'
                   const lineRef = line.sapLineId || (line as any).sap_order_line_id || line.sku || line.id
 
@@ -351,7 +354,7 @@ export default function PickingDashboard() {
                       </div>
                       <p className="text-sm text-slate-200">Cantidad: {line.quantity}</p>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="grid grid-cols-1 text-xs">
                         <PhotoUploader
                           label="Foto picking"
                           existingUrl={pickPhoto?.s3_url}
@@ -366,25 +369,37 @@ export default function PickingDashboard() {
                           }
                           onPreview={(url) => setPreviewPhoto({ url, title: `${line.sku} · Picking` })}
                         />
-                        <PhotoUploader
-                          label="Foto embalaje"
-                          existingUrl={packPhoto?.s3_url}
-                          disabled={!picking || loading}
-                          onUpload={() =>
-                            setUploadContext({
-                              lineId: picked?.id || line.id,
-                              type: 'PACK',
-                              lineRef: String(lineRef),
-                              sapOrder: picking?.sap_order_id || orderData?.sapOrder,
-                            })
-                          }
-                          onPreview={(url) => setPreviewPhoto({ url, title: `${line.sku} · Embalaje` })}
-                        />
                       </div>
                     </div>
                   )
                 })}
               </div>
+              {picking && (
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-4 items-start">
+                  <div className="p-4 rounded-2xl border border-white/10 bg-slate-900/70">
+                    <h4 className="text-sm text-slate-200 font-semibold flex items-center gap-2">
+                      <PackageCheck className="w-4 h-4 text-emerald-300" /> Foto de embalaje (única por picking)
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Sube una foto del packing final. Solo necesitas una por pedido.
+                    </p>
+                  </div>
+                  <PhotoUploader
+                    label="Foto de packing"
+                    existingUrl={picking.photos?.find((p) => p.photo_type === 'PACK')?.s3_url}
+                    disabled={loading}
+                    onUpload={() =>
+                      setUploadContext({
+                        pickingId: picking.id,
+                        type: 'PACK',
+                        lineRef: 'packing',
+                        sapOrder: picking.sap_order_id || orderData?.sapOrder,
+                      })
+                    }
+                    onPreview={(url) => setPreviewPhoto({ url, title: `${orderData?.sapOrder || picking.sap_order_id} · Packing` })}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="p-5 rounded-2xl border border-white/10 bg-slate-900/70 shadow-xl space-y-4">
@@ -408,7 +423,7 @@ export default function PickingDashboard() {
                   </span>
                 </div>
                 <p className="text-slate-400 text-xs">
-                  Registra siempre dos fotos por línea. El pedido se completa automáticamente cuando todas las líneas están PACKED, pero también puedes cerrarlo manualmente.
+                  Registra la foto de picking en cada línea y una única foto de packing general. El pedido se completa cuando todas las líneas están en PACKED.
                 </p>
               </div>
             </div>
@@ -516,10 +531,13 @@ export default function PickingDashboard() {
             onClose={() => setCameraCapture(null)}
             onCapture={async (file) => {
               await handleUpload(
-                cameraCapture.lineId,
-                cameraCapture.type,
+                {
+                  lineId: cameraCapture.lineId,
+                  pickingId: cameraCapture.pickingId,
+                  type: cameraCapture.type,
+                  lineRef: cameraCapture.lineRef,
+                },
                 file,
-                cameraCapture.lineRef,
                 cameraCapture.sapOrder,
               )
               setCameraCapture(null)
@@ -546,10 +564,13 @@ export default function PickingDashboard() {
           const file = e.target.files?.[0]
           if (file && uploadContext) {
             void handleUpload(
-              uploadContext.lineId,
-              uploadContext.type,
+              {
+                lineId: uploadContext.lineId,
+                pickingId: uploadContext.pickingId,
+                type: uploadContext.type,
+                lineRef: uploadContext.lineRef,
+              },
               file,
-              uploadContext.lineRef,
               uploadContext.sapOrder,
             )
           }
@@ -565,10 +586,13 @@ export default function PickingDashboard() {
           const file = e.target.files?.[0]
           if (file && uploadContext) {
             void handleUpload(
-              uploadContext.lineId,
-              uploadContext.type,
+              {
+                lineId: uploadContext.lineId,
+                pickingId: uploadContext.pickingId,
+                type: uploadContext.type,
+                lineRef: uploadContext.lineRef,
+              },
               file,
-              uploadContext.lineRef,
               uploadContext.sapOrder,
             )
           }
@@ -660,11 +684,11 @@ function PhotoCapturePrompt({
   cameraInputRef,
   onCamera,
 }: {
-  context: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  context: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
   onClose: () => void
   galleryInputRef: React.RefObject<HTMLInputElement>
   cameraInputRef: React.RefObject<HTMLInputElement>
-  onCamera: (ctx: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
+  onCamera: (ctx: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
 }) {
   return (
     <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
@@ -717,7 +741,7 @@ function CameraCaptureModal({
   onClose,
   onCapture,
 }: {
-  context: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  context: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
   onClose: () => void
   onCapture: (file: File) => Promise<void>
 }) {
@@ -831,9 +855,10 @@ function ExistingPickingModal({
 }: {
   picking: Picking
   onClose: () => void
-  onOpenUpload: (payload: { lineId: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
+  onOpenUpload: (payload: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
   onPreview: (url: string, title: string) => void
 }) {
+  const packPhoto = picking.photos?.find((p) => p.photo_type === 'PACK')
   return (
     <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
       <div className="bg-slate-950/95 border border-white/10 rounded-3xl w-full max-w-5xl p-7 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -854,10 +879,31 @@ function ExistingPickingModal({
           </button>
         </div>
 
+        <div className="mb-4 grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-3 items-start">
+          <div className="p-4 rounded-2xl border border-white/10 bg-slate-900/80">
+            <p className="text-xs text-slate-400">Packing final</p>
+            <h4 className="text-lg font-semibold text-white">Foto de embalaje general</h4>
+            <p className="text-sm text-slate-300">Solo se requiere una foto de packing para todo el pedido.</p>
+          </div>
+          <PhotoUploader
+            label="Foto packing"
+            existingUrl={packPhoto?.s3_url}
+            disabled={false}
+            onUpload={() =>
+              onOpenUpload({
+                pickingId: picking.id,
+                type: 'PACK',
+                lineRef: 'packing',
+                sapOrder: picking.sap_order_id || '',
+              })
+            }
+            onPreview={(url) => onPreview(url, `${picking.sap_order_id} · Packing`)}
+          />
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {picking.lines?.map((line) => {
             const pickPhoto = line.photos?.find((p) => p.photo_type === 'PICK')
-            const packPhoto = line.photos?.find((p) => p.photo_type === 'PACK')
             const lineRef = line.sapLineId || (line as any).sap_order_line_id || line.sku || line.id
             return (
               <div key={line.id} className="p-5 rounded-2xl border border-white/10 bg-slate-900/85 space-y-3 shadow-inner">
@@ -874,7 +920,7 @@ function ExistingPickingModal({
 
                 <p className="text-sm text-slate-200">Cantidad: {line.quantity}</p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-2 text-xs">
                   <PhotoUploader
                     label="Foto picking"
                     existingUrl={pickPhoto?.s3_url}
@@ -888,20 +934,6 @@ function ExistingPickingModal({
                       })
                     }
                     onPreview={(url) => onPreview(url, `${line.sku} · Picking`)}
-                  />
-                  <PhotoUploader
-                    label="Foto embalaje"
-                    existingUrl={packPhoto?.s3_url}
-                    disabled={false}
-                    onUpload={() =>
-                      onOpenUpload({
-                        lineId: line.id,
-                        type: 'PACK',
-                        lineRef: String(lineRef),
-                        sapOrder: picking.sap_order_id || '',
-                      })
-                    }
-                    onPreview={(url) => onPreview(url, `${line.sku} · Embalaje`)}
                   />
                 </div>
               </div>
