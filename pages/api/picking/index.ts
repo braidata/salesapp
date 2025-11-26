@@ -74,6 +74,7 @@ async function listPickings(req: NextApiRequest, res: NextApiResponse) {
       include: {
         created_by: true,
         lines: { include: { photos: true } },
+        photos: true,
       },
     })
 
@@ -133,6 +134,7 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
       include: {
         lines: { include: { photos: true } },
         created_by: true,
+        photos: true,
       },
     })
 
