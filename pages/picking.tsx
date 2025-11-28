@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
 import Head from 'next/head'
-import { Camera, CheckCircle, Image as ImageIcon, Loader2, PackageCheck, Search, Upload, X } from 'lucide-react'
+import { Camera, CheckCircle, Image as ImageIcon, Loader2, PackageCheck, Search, Trash2, Upload, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
 import { format } from 'date-fns'
@@ -63,13 +63,18 @@ export default function PickingDashboard() {
   const [filters, setFilters] = useState({ status: '', sapOrder: '' })
   const [feedback, setFeedback] = useState<string | null>(null)
   const [uploadContext, setUploadContext] = useState<
-    { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
-  | null>(null)
+    { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string; action?: 'create' | 'replace' }
+    | null>(null)
   const [selectedPicking, setSelectedPicking] = useState<Picking | null>(null)
   const [previewPhoto, setPreviewPhoto] = useState<{ url: string; title: string } | null>(null)
   const [cameraCapture, setCameraCapture] = useState<
-    { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
-  | null>(null)
+    { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string; action?: 'create' | 'replace' }
+    | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [completing, setCompleting] = useState(false)
+  const [deletingLineId, setDeletingLineId] = useState<number | null>(null)
+  const [deletingPhotoKey, setDeletingPhotoKey] = useState<string | null>(null)
+  const [deletingPickingId, setDeletingPickingId] = useState<number | null>(null)
 
   const galleryInputRef = useRef<HTMLInputElement | null>(null)
   const cameraInputRef = useRef<HTMLInputElement | null>(null)
@@ -136,12 +141,30 @@ export default function PickingDashboard() {
     }
   }
 
+  const refreshPickingData = async (sapOrderOverride?: string) => {
+    const sapOrder = sapOrderOverride || picking?.sap_order_id || orderData?.sapOrder || search.trim()
+    if (!sapOrder) return
+
+    const resp = await fetch(`/api/picking/search?sapOrder=${encodeURIComponent(sapOrder)}`)
+    if (resp.ok) {
+      const data = await resp.json()
+      setOrderData({ ...data.order, lines: data.lines })
+      setPicking(data.picking)
+
+      if (selectedPicking && data.picking?.sap_order_id === selectedPicking.sap_order_id) {
+        setSelectedPicking(data.picking)
+      }
+    }
+
+    await refreshDashboard()
+  }
+
   useEffect(() => {
     refreshDashboard()
   }, [filters])
 
   const handleUpload = async (
-    ctx: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string },
+    ctx: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; action?: 'create' | 'replace' },
     file: File,
     sapOrderOverride?: string,
   ) => {
@@ -156,7 +179,7 @@ export default function PickingDashboard() {
     const formData = new FormData()
     formData.append('file', file)
 
-    setLoading(true)
+    setUploading(true)
     setFeedback(null)
     try {
       const uploadResp = await fetch(`/api/uploaderS?folder=${encodeURIComponent(folder)}`, {
@@ -170,7 +193,7 @@ export default function PickingDashboard() {
       if (!photoUrl) throw new Error('No se obtuvo URL de la foto')
 
       const resp = await fetch('/api/picking/photo', {
-        method: 'POST',
+        method: ctx.action === 'replace' ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pickingId: ctx.pickingId,
@@ -182,30 +205,20 @@ export default function PickingDashboard() {
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'Error guardando evidencia')
-      setFeedback(`Foto ${ctx.type === 'PICK' ? 'de picking' : 'de embalaje'} guardada`)
-      await fetchSearch()
-      await refreshDashboard()
+      setFeedback(`Foto ${ctx.type === 'PICK' ? 'de picking' : 'de embalaje'} ${ctx.action === 'replace' ? 'actualizada' : 'guardada'}`)
 
-      if (sapOrder) {
-        const refreshed = await fetch(`/api/picking/search?sapOrder=${encodeURIComponent(sapOrder)}`)
-        if (refreshed.ok) {
-          const refreshedData = await refreshed.json()
-          if (refreshedData.picking?.sap_order_id === selectedPicking?.sap_order_id) {
-            setSelectedPicking(refreshedData.picking)
-          }
-        }
-      }
+      await refreshPickingData(sapOrder)
     } catch (error: any) {
       setFeedback(error?.message || 'No se pudo subir la foto')
     } finally {
-      setLoading(false)
+      setUploading(false)
       setUploadContext(null)
     }
   }
 
   const markCompleted = async () => {
     if (!picking?.id) return
-    setLoading(true)
+    setCompleting(true)
     setFeedback(null)
     try {
       const resp = await fetch('/api/picking/status', {
@@ -216,12 +229,94 @@ export default function PickingDashboard() {
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'No se pudo completar')
       setPicking(data.picking)
+      if (selectedPicking?.id === picking.id) setSelectedPicking(data.picking)
       await refreshDashboard()
       setFeedback('Pedido marcado como completado')
     } catch (error: any) {
       setFeedback(error?.message || 'No se pudo completar el picking')
     } finally {
-      setLoading(false)
+      setCompleting(false)
+    }
+  }
+
+  const handleDeletePhoto = async (ctx: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string }) => {
+    const sapOrder = picking?.sap_order_id || orderData?.sapOrder || selectedPicking?.sap_order_id
+    const key = `${ctx.type}-${ctx.lineId || ctx.pickingId}`
+    setDeletingPhotoKey(key)
+    setFeedback(null)
+
+    try {
+      const resp = await fetch('/api/picking/photo', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickingId: ctx.pickingId,
+          pickingLineId: ctx.lineId,
+          photoType: ctx.type,
+          userId: currentUserId,
+        }),
+      })
+
+      const data = await resp.json()
+      if (!resp.ok) throw new Error(data?.message || 'No se pudo eliminar la foto')
+
+      setFeedback('Foto eliminada')
+      await refreshPickingData(sapOrder)
+    } catch (error: any) {
+      setFeedback(error?.message || 'No se pudo eliminar la foto')
+    } finally {
+      setDeletingPhotoKey(null)
+    }
+  }
+
+  const handleDeleteLine = async (lineId: number) => {
+    if (!lineId) return
+    setDeletingLineId(lineId)
+    setFeedback(null)
+
+    try {
+      const resp = await fetch('/api/picking/line', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lineId }),
+      })
+
+      const data = await resp.json()
+      if (!resp.ok) throw new Error(data?.message || 'No se pudo eliminar la línea')
+
+      setFeedback('Línea eliminada')
+      await refreshPickingData()
+    } catch (error: any) {
+      setFeedback(error?.message || 'No se pudo eliminar la línea')
+    } finally {
+      setDeletingLineId(null)
+    }
+  }
+
+  const handleDeletePicking = async (pickingId?: number) => {
+    if (!pickingId) return
+    setDeletingPickingId(pickingId)
+    setFeedback(null)
+
+    try {
+      const resp = await fetch('/api/picking', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pickingId }),
+      })
+
+      const data = await resp.json()
+      if (!resp.ok) throw new Error(data?.message || 'No se pudo eliminar el picking')
+
+      setFeedback('Picking eliminado')
+      setPicking(null)
+      setOrderData(null)
+      setSelectedPicking(null)
+      await refreshDashboard()
+    } catch (error: any) {
+      setFeedback(error?.message || 'No se pudo eliminar el picking')
+    } finally {
+      setDeletingPickingId(null)
     }
   }
 
@@ -230,6 +325,14 @@ export default function PickingDashboard() {
     if (orderData?.lines) return orderData.lines as SapLine[]
     return []
   }, [picking, orderData])
+
+  const isCompleted = picking?.status === 'COMPLETED'
+  const canComplete = !!(
+    picking &&
+    picking.lines?.length &&
+    picking.lines.every((line) => line.status === 'PACKED') &&
+    picking.packingPhoto?.s3_url,
+  )
 
   if (status === 'loading') {
     return (
@@ -260,13 +363,27 @@ export default function PickingDashboard() {
                   {picking.status}
                 </span>
               )}
+              {picking && !isCompleted && (
+                <button
+                  onClick={() => {
+                    if (window.confirm('¿Eliminar este picking? Se perderán las fotos y líneas asociadas.')) {
+                      void handleDeletePicking(picking.id)
+                    }
+                  }}
+                  disabled={deletingPickingId === picking.id}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-100 border border-red-500/40 hover:bg-red-500/30 disabled:opacity-60"
+                >
+                  {deletingPickingId === picking.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Eliminar picking
+                </button>
+              )}
               <button
                 onClick={markCompleted}
-                disabled={!picking || loading}
+                disabled={!canComplete || completing || isCompleted}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-100 border border-emerald-500/40 hover:bg-emerald-500/30 disabled:opacity-50"
               >
-                <PackageCheck className="w-4 h-4" />
-                Completar pedido
+                {completing ? <Loader2 className="w-4 h-4 animate-spin" /> : <PackageCheck className="w-4 h-4" />}
+                {isCompleted ? 'Pedido completado' : 'Completar pedido'}
               </button>
             </div>
           </div>
@@ -336,6 +453,7 @@ export default function PickingDashboard() {
                   const pickPhoto = photos.find((p: any) => p.photo_type === 'PICK')
                   const status = picked?.status || 'PENDING'
                   const lineRef = line.sapLineId || (line as any).sap_order_line_id || line.sku || line.id
+                  const photoKey = `PICK-${picked?.id || line.id}`
 
                   return (
                     <div
@@ -348,9 +466,25 @@ export default function PickingDashboard() {
                           <h4 className="text-lg font-semibold text-white">{line.sku}</h4>
                           <p className="text-slate-300 text-sm line-clamp-2">{line.description}</p>
                         </div>
-                        <span className={`px-2 py-1 rounded-lg text-[11px] border ${statusBadges[status] || statusBadges.PENDING}`}>
-                          {status}
-                        </span>
+                        <div className="flex items-start gap-2">
+                          <span className={`px-2 py-1 rounded-lg text-[11px] border ${statusBadges[status] || statusBadges.PENDING}`}>
+                            {status}
+                          </span>
+                          {picking?.id && !isCompleted && (
+                            <button
+                              onClick={() => {
+                                if (window.confirm('¿Eliminar esta línea y sus fotos?')) {
+                                  void handleDeleteLine(picked?.id || line.id)
+                                }
+                              }}
+                              disabled={deletingLineId === (picked?.id || line.id)}
+                              className="p-2 rounded-lg border border-red-500/40 bg-red-500/10 text-red-100 hover:bg-red-500/20 disabled:opacity-60"
+                              aria-label="Eliminar línea"
+                            >
+                              {deletingLineId === (picked?.id || line.id) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <p className="text-sm text-slate-200">Cantidad: {line.quantity}</p>
 
@@ -358,16 +492,28 @@ export default function PickingDashboard() {
                         <PhotoUploader
                           label="Foto picking"
                           existingUrl={pickPhoto?.s3_url}
-                          disabled={!picking || loading}
+                          disabled={!picking || isCompleted}
+                          busy={uploading || deletingPhotoKey === photoKey}
                           onUpload={() =>
                             setUploadContext({
                               lineId: picked?.id || line.id,
                               type: 'PICK',
                               lineRef: String(lineRef),
                               sapOrder: picking?.sap_order_id || orderData?.sapOrder,
+                              action: pickPhoto ? 'replace' : 'create',
                             })
                           }
                           onPreview={(url) => setPreviewPhoto({ url, title: `${line.sku} · Picking` })}
+                          onDelete={
+                            pickPhoto && !isCompleted
+                              ? () =>
+                                  handleDeletePhoto({
+                                    lineId: picked?.id || line.id,
+                                    type: 'PICK',
+                                    lineRef: String(lineRef),
+                                  })
+                              : undefined
+                          }
                         />
                       </div>
                     </div>
@@ -387,16 +533,23 @@ export default function PickingDashboard() {
                   <PhotoUploader
                     label="Foto de packing"
                     existingUrl={picking.packingPhoto?.s3_url}
-                    disabled={loading}
+                    disabled={isCompleted}
+                    busy={uploading || deletingPhotoKey === `PACK-${picking.id}`}
                     onUpload={() =>
                       setUploadContext({
                         pickingId: picking.id,
                         type: 'PACK',
                         lineRef: 'packing',
                         sapOrder: picking.sap_order_id || orderData?.sapOrder,
+                        action: picking.packingPhoto?.s3_url ? 'replace' : 'create',
                       })
                     }
                     onPreview={(url) => setPreviewPhoto({ url, title: `${orderData?.sapOrder || picking.sap_order_id} · Packing` })}
+                    onDelete={
+                      picking.packingPhoto?.s3_url && !isCompleted
+                        ? () => handleDeletePhoto({ pickingId: picking.id, type: 'PACK', lineRef: 'packing' })
+                        : undefined
+                    }
                   />
                 </div>
               )}
@@ -488,21 +641,37 @@ export default function PickingDashboard() {
                       <td className="px-4 py-3 text-slate-200">
                         {packed}/{totalLines} líneas embaladas
                       </td>
-                      <td className="px-4 py-3 text-slate-400">
-                        {p.updated_at ? format(new Date(p.updated_at as any), 'dd MMM yyyy HH:mm') : '—'}
-                      </td>
-                      <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-slate-400">
+                    {p.updated_at ? format(new Date(p.updated_at as any), 'dd MMM yyyy HH:mm') : '—'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => setSelectedPicking(p)}
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 border border-white/10 text-slate-100 hover:bg-slate-800"
+                      >
+                        <Camera className="w-4 h-4" />
+                        {isViewOnly ? 'Ver' : 'Editar / aprobar'}
+                      </button>
+                      {p.status !== 'COMPLETED' && (
                         <button
-                          onClick={() => setSelectedPicking(p)}
-                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 border border-white/10 text-slate-100 hover:bg-slate-800"
+                          onClick={() => {
+                            if (window.confirm('¿Eliminar este picking?')) {
+                              void handleDeletePicking(p.id)
+                            }
+                          }}
+                          disabled={deletingPickingId === p.id}
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/15 border border-red-500/50 text-red-100 hover:bg-red-600/25 disabled:opacity-60"
                         >
-                          <Camera className="w-4 h-4" />
-                          {isViewOnly ? 'Ver' : 'Editar / aprobar'}
+                          {deletingPickingId === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          Eliminar
                         </button>
-                      </td>
-                    </tr>
-                  )
-                })}
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
               </tbody>
             </table>
           </div>
@@ -536,6 +705,7 @@ export default function PickingDashboard() {
                   pickingId: cameraCapture.pickingId,
                   type: cameraCapture.type,
                   lineRef: cameraCapture.lineRef,
+                  action: cameraCapture.action,
                 },
                 file,
                 cameraCapture.sapOrder,
@@ -551,6 +721,11 @@ export default function PickingDashboard() {
             onClose={() => setSelectedPicking(null)}
             onOpenUpload={(payload) => setUploadContext(payload)}
             onPreview={(url, title) => setPreviewPhoto({ url, title })}
+            onDeletePhoto={handleDeletePhoto}
+            onDeleteLine={handleDeleteLine}
+            uploading={uploading}
+            deletingPhotoKey={deletingPhotoKey}
+            deletingLineId={deletingLineId}
           />
         )}
       </div>
@@ -569,6 +744,7 @@ export default function PickingDashboard() {
                 pickingId: uploadContext.pickingId,
                 type: uploadContext.type,
                 lineRef: uploadContext.lineRef,
+                action: uploadContext.action,
               },
               file,
               uploadContext.sapOrder,
@@ -591,6 +767,7 @@ export default function PickingDashboard() {
                 pickingId: uploadContext.pickingId,
                 type: uploadContext.type,
                 lineRef: uploadContext.lineRef,
+                action: uploadContext.action,
               },
               file,
               uploadContext.sapOrder,
@@ -608,13 +785,18 @@ function PhotoUploader({
   onUpload,
   onPreview,
   disabled,
+  busy,
+  onDelete,
 }: {
   label: string
   existingUrl?: string
   onUpload: () => void
   onPreview?: (url: string) => void
   disabled?: boolean
+  busy?: boolean
+  onDelete?: () => void
 }) {
+  const isDisabled = disabled || busy
   return (
     <div className="p-3 rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950/80 via-slate-900/80 to-slate-950/60 shadow-inner flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
@@ -654,10 +836,21 @@ function PhotoUploader({
             <button
               type="button"
               onClick={onUpload}
-              className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-sky-700/40 border border-sky-500/40 text-sky-50 hover:bg-sky-700/50"
+              disabled={isDisabled}
+              className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-sky-700/40 border border-sky-500/40 text-sky-50 hover:bg-sky-700/50 disabled:opacity-60"
             >
               <Camera className="w-4 h-4" /> Reemplazar
             </button>
+            {onDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={isDisabled}
+                className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 border border-red-500/50 text-red-100 hover:bg-red-600/30 disabled:opacity-60"
+              >
+                <Trash2 className="w-4 h-4" /> Eliminar
+              </button>
+            )}
           </div>
         </div>
       ) : (
@@ -665,7 +858,7 @@ function PhotoUploader({
           <button
             type="button"
             onClick={onUpload}
-            disabled={disabled}
+            disabled={isDisabled}
             className="flex-1 inline-flex items-center justify-between gap-2 text-slate-200 px-3 py-2 rounded-lg bg-slate-900/70 border border-sky-700/40 hover:bg-slate-900 disabled:opacity-40"
           >
             <span className="text-left">Tomar foto</span>
@@ -684,11 +877,11 @@ function PhotoCapturePrompt({
   cameraInputRef,
   onCamera,
 }: {
-  context: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  context: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string; action?: 'create' | 'replace' }
   onClose: () => void
   galleryInputRef: React.RefObject<HTMLInputElement>
   cameraInputRef: React.RefObject<HTMLInputElement>
-  onCamera: (ctx: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
+  onCamera: (ctx: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string; action?: 'create' | 'replace' }) => void
 }) {
   return (
     <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
@@ -741,7 +934,7 @@ function CameraCaptureModal({
   onClose,
   onCapture,
 }: {
-  context: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }
+  context: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string; action?: 'create' | 'replace' }
   onClose: () => void
   onCapture: (file: File) => Promise<void>
 }) {
@@ -852,13 +1045,25 @@ function ExistingPickingModal({
   onClose,
   onOpenUpload,
   onPreview,
+  onDeletePhoto,
+  onDeleteLine,
+  uploading,
+  deletingPhotoKey,
+  deletingLineId,
 }: {
   picking: Picking
   onClose: () => void
-  onOpenUpload: (payload: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string }) => void
+  onOpenUpload: (payload: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string; action?: 'create' | 'replace' }) => void
   onPreview: (url: string, title: string) => void
+  onDeletePhoto: (payload: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string }) => Promise<void>
+  onDeleteLine: (lineId: number) => Promise<void>
+  uploading: boolean
+  deletingPhotoKey: string | null
+  deletingLineId: number | null
 }) {
   const packPhoto = picking.packingPhoto
+  const viewOnly = picking.status === 'COMPLETED'
+  const packPhotoKey = `PACK-${picking.id}`
   return (
     <div className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
       <div className="bg-slate-950/95 border border-white/10 rounded-3xl w-full max-w-5xl p-7 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -888,16 +1093,23 @@ function ExistingPickingModal({
           <PhotoUploader
             label="Foto packing"
             existingUrl={packPhoto?.s3_url}
-            disabled={false}
+            disabled={viewOnly}
+            busy={uploading || deletingPhotoKey === packPhotoKey}
             onUpload={() =>
               onOpenUpload({
                 pickingId: picking.id,
                 type: 'PACK',
                 lineRef: 'packing',
                 sapOrder: picking.sap_order_id || '',
+                action: packPhoto?.s3_url ? 'replace' : 'create',
               })
             }
             onPreview={(url) => onPreview(url, `${picking.sap_order_id} · Packing`)}
+            onDelete={
+              packPhoto?.s3_url && !viewOnly
+                ? () => onDeletePhoto({ pickingId: picking.id, type: 'PACK', lineRef: 'packing' })
+                : undefined
+            }
           />
         </div>
 
@@ -905,6 +1117,7 @@ function ExistingPickingModal({
           {picking.lines?.map((line) => {
             const pickPhoto = line.photos?.find((p) => p.photo_type === 'PICK')
             const lineRef = line.sapLineId || (line as any).sap_order_line_id || line.sku || line.id
+            const photoKey = `PICK-${line.id}`
             return (
               <div key={line.id} className="p-5 rounded-2xl border border-white/10 bg-slate-900/85 space-y-3 shadow-inner">
                 <div className="flex items-start justify-between gap-2">
@@ -913,9 +1126,25 @@ function ExistingPickingModal({
                     <h4 className="text-lg font-semibold text-white">{line.sku}</h4>
                     <p className="text-slate-300 text-sm line-clamp-2">{line.description}</p>
                   </div>
-                  <span className={`px-2 py-1 rounded-lg text-[11px] border ${statusBadges[line.status] || statusBadges.PENDING}`}>
-                    {line.status}
-                  </span>
+                  <div className="flex items-start gap-2">
+                    <span className={`px-2 py-1 rounded-lg text-[11px] border ${statusBadges[line.status] || statusBadges.PENDING}`}>
+                      {line.status}
+                    </span>
+                    {!viewOnly && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('¿Eliminar esta línea y sus fotos?')) {
+                            void onDeleteLine(line.id)
+                          }
+                        }}
+                        disabled={deletingLineId === line.id}
+                        className="p-2 rounded-lg border border-red-500/40 bg-red-500/10 text-red-100 hover:bg-red-500/20 disabled:opacity-60"
+                        aria-label="Eliminar línea"
+                      >
+                        {deletingLineId === line.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <p className="text-sm text-slate-200">Cantidad: {line.quantity}</p>
@@ -924,16 +1153,23 @@ function ExistingPickingModal({
                   <PhotoUploader
                     label="Foto picking"
                     existingUrl={pickPhoto?.s3_url}
-                    disabled={false}
+                    disabled={viewOnly}
+                    busy={uploading || deletingPhotoKey === photoKey}
                     onUpload={() =>
                       onOpenUpload({
                         lineId: line.id,
                         type: 'PICK',
                         lineRef: String(lineRef),
                         sapOrder: picking.sap_order_id || '',
+                        action: pickPhoto ? 'replace' : 'create',
                       })
                     }
                     onPreview={(url) => onPreview(url, `${line.sku} · Picking`)}
+                    onDelete={
+                      pickPhoto && !viewOnly
+                        ? () => onDeletePhoto({ lineId: line.id, type: 'PICK', lineRef: String(lineRef) })
+                        : undefined
+                    }
                   />
                 </div>
               </div>
