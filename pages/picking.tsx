@@ -71,7 +71,7 @@ export default function PickingDashboard() {
     { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string; sapOrder: string; action?: 'create' | 'replace' }
     | null>(null)
   const [uploading, setUploading] = useState(false)
-  const [completing, setCompleting] = useState(false)
+  const [completingId, setCompletingId] = useState<number | null>(null)
   const [deletingLineId, setDeletingLineId] = useState<number | null>(null)
   const [deletingPhotoKey, setDeletingPhotoKey] = useState<string | null>(null)
   const [deletingPickingId, setDeletingPickingId] = useState<number | null>(null)
@@ -160,6 +160,34 @@ export default function PickingDashboard() {
   }
 
   useEffect(() => {
+    if (selectedPicking?.sap_order_id) {
+      void refreshPickingData(selectedPicking.sap_order_id)
+    }
+  }, [selectedPicking?.id])
+
+  const refreshPickingData = async (sapOrderOverride?: string) => {
+    const sapOrder = sapOrderOverride || picking?.sap_order_id || orderData?.sapOrder || search.trim()
+    if (!sapOrder) return
+
+    const resp = await fetch(`/api/picking/search?sapOrder=${encodeURIComponent(sapOrder)}`)
+    if (resp.ok) {
+      const data = await resp.json()
+      setOrderData({ ...data.order, lines: data.lines })
+      setPicking(data.picking)
+
+      if (
+        selectedPicking &&
+        data.picking &&
+        (data.picking.id === selectedPicking.id || data.picking.sap_order_id === selectedPicking.sap_order_id)
+      ) {
+        setSelectedPicking(data.picking)
+      }
+    }
+
+    await refreshDashboard()
+  }
+
+  useEffect(() => {
     refreshDashboard()
   }, [filters])
 
@@ -216,26 +244,30 @@ export default function PickingDashboard() {
     }
   }
 
-  const markCompleted = async () => {
-    if (!picking?.id) return
-    setCompleting(true)
+  const markCompleted = async (targetId?: number, sapOrderOverride?: string) => {
+    const targetPickingId = targetId || picking?.id
+    if (!targetPickingId) return
+    setCompletingId(targetPickingId)
     setFeedback(null)
     try {
       const resp = await fetch('/api/picking/status', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pickingId: picking.id, status: 'COMPLETED', userId: currentUserId }),
+        body: JSON.stringify({ pickingId: targetPickingId, status: 'COMPLETED', userId: currentUserId }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.message || 'No se pudo completar')
-      setPicking(data.picking)
-      if (selectedPicking?.id === picking.id) setSelectedPicking(data.picking)
-      await refreshDashboard()
+      if (picking?.id === targetPickingId) setPicking(data.picking)
+      if (selectedPicking?.id === targetPickingId) setSelectedPicking(data.picking)
+
+      const sapOrder = sapOrderOverride || picking?.sap_order_id || selectedPicking?.sap_order_id
+
+      await refreshPickingData(sapOrder)
       setFeedback('Pedido marcado como completado')
     } catch (error: any) {
       setFeedback(error?.message || 'No se pudo completar el picking')
     } finally {
-      setCompleting(false)
+      setCompletingId(null)
     }
   }
 
@@ -327,12 +359,6 @@ export default function PickingDashboard() {
   }, [picking, orderData])
 
   const isCompleted = picking?.status === 'COMPLETED'
-  const canComplete = !!(
-    picking &&
-    picking.lines?.length &&
-    picking.lines.every((line) => line.status === 'PACKED') &&
-    picking.packingPhoto?.s3_url,
-  )
 
   if (status === 'loading') {
     return (
@@ -363,28 +389,6 @@ export default function PickingDashboard() {
                   {picking.status}
                 </span>
               )}
-              {picking && !isCompleted && (
-                <button
-                  onClick={() => {
-                    if (window.confirm('¿Eliminar este picking? Se perderán las fotos y líneas asociadas.')) {
-                      void handleDeletePicking(picking.id)
-                    }
-                  }}
-                  disabled={deletingPickingId === picking.id}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-100 border border-red-500/40 hover:bg-red-500/30 disabled:opacity-60"
-                >
-                  {deletingPickingId === picking.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  Eliminar picking
-                </button>
-              )}
-              <button
-                onClick={markCompleted}
-                disabled={!canComplete || completing || isCompleted}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-100 border border-emerald-500/40 hover:bg-emerald-500/30 disabled:opacity-50"
-              >
-                {completing ? <Loader2 className="w-4 h-4 animate-spin" /> : <PackageCheck className="w-4 h-4" />}
-                {isCompleted ? 'Pedido completado' : 'Completar pedido'}
-              </button>
             </div>
           </div>
 
@@ -654,18 +658,48 @@ export default function PickingDashboard() {
                         {isViewOnly ? 'Ver' : 'Editar / aprobar'}
                       </button>
                       {p.status !== 'COMPLETED' && (
-                        <button
-                          onClick={() => {
-                            if (window.confirm('¿Eliminar este picking?')) {
-                              void handleDeletePicking(p.id)
+                        <>
+                          <button
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  '¿Eliminar este picking? Se perderán las fotos y líneas asociadas.',
+                                )
+                              ) {
+                                void handleDeletePicking(p.id)
+                              }
+                            }}
+                            disabled={deletingPickingId === p.id}
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/15 border border-red-500/50 text-red-100 hover:bg-red-600/25 disabled:opacity-60"
+                          >
+                            {deletingPickingId === p.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                            Eliminar
+                          </button>
+                          <button
+                            onClick={() => void markCompleted(p.id, p.sap_order_id)}
+                            disabled={
+                              completingId === p.id ||
+                              p.status === 'COMPLETED' ||
+                              !(
+                                p.lines?.length &&
+                                p.lines.every((line) => line.status === 'PACKED') &&
+                                p.packingPhoto?.s3_url
+                              )
                             }
-                          }}
-                          disabled={deletingPickingId === p.id}
-                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/15 border border-red-500/50 text-red-100 hover:bg-red-600/25 disabled:opacity-60"
-                        >
-                          {deletingPickingId === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                          Eliminar
-                        </button>
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/50 text-emerald-50 hover:bg-emerald-600/30 disabled:opacity-50"
+                          >
+                            {completingId === p.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <PackageCheck className="w-4 h-4" />
+                            )}
+                            Completar
+                          </button>
+                        </>
                       )}
                     </div>
                   </td>
@@ -726,6 +760,10 @@ export default function PickingDashboard() {
             uploading={uploading}
             deletingPhotoKey={deletingPhotoKey}
             deletingLineId={deletingLineId}
+            onComplete={(pId, sapOrder) => void markCompleted(pId, sapOrder)}
+            onDeletePicking={(pId) => void handleDeletePicking(pId)}
+            completingId={completingId}
+            deletingPickingId={deletingPickingId}
           />
         )}
       </div>
@@ -1047,9 +1085,13 @@ function ExistingPickingModal({
   onPreview,
   onDeletePhoto,
   onDeleteLine,
+  onComplete,
+  onDeletePicking,
   uploading,
   deletingPhotoKey,
   deletingLineId,
+  completingId,
+  deletingPickingId,
 }: {
   picking: Picking
   onClose: () => void
@@ -1057,9 +1099,13 @@ function ExistingPickingModal({
   onPreview: (url: string, title: string) => void
   onDeletePhoto: (payload: { lineId?: number; pickingId?: number; type: 'PICK' | 'PACK'; lineRef: string }) => Promise<void>
   onDeleteLine: (lineId: number) => Promise<void>
+  onComplete: (pickingId: number, sapOrder?: string) => void
+  onDeletePicking: (pickingId: number) => void
   uploading: boolean
   deletingPhotoKey: string | null
   deletingLineId: number | null
+  completingId: number | null
+  deletingPickingId: number | null
 }) {
   const packPhoto = picking.packingPhoto
   const viewOnly = picking.status === 'COMPLETED'
@@ -1075,13 +1121,54 @@ function ExistingPickingModal({
               Valida cada etapa para pickings existentes en la tabla. Agrega evidencias o aprueba líneas según corresponda.
             </p> */}
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg border border-white/10 text-slate-200 hover:bg-white/10"
-            aria-label="Cerrar"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {picking.status !== 'COMPLETED' && (
+              <>
+                <button
+                  onClick={() => onComplete(picking.id, picking.sap_order_id)}
+                  disabled={
+                    completingId === picking.id ||
+                    !(
+                      picking.lines?.length &&
+                      picking.lines.every((line) => line.status === 'PACKED') &&
+                      picking.packingPhoto?.s3_url
+                    )
+                  }
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/50 text-emerald-50 hover:bg-emerald-600/30 disabled:opacity-50"
+                >
+                  {completingId === picking.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <PackageCheck className="w-4 h-4" />
+                  )}
+                  Completar
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm('¿Eliminar este picking? Se perderán las fotos y líneas.')) {
+                      onDeletePicking(picking.id)
+                    }
+                  }}
+                  disabled={deletingPickingId === picking.id}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/15 border border-red-500/50 text-red-100 hover:bg-red-600/25 disabled:opacity-60"
+                >
+                  {deletingPickingId === picking.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  Eliminar
+                </button>
+              </>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg border border-white/10 text-slate-200 hover:bg-white/10"
+              aria-label="Cerrar"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <div className="mb-4 grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-3 items-start">
