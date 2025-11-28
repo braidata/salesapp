@@ -35,17 +35,18 @@ function mapSapLine(item: any, idx: number, sapOrder: string) {
   }
 }
 
-type Method = 'GET' | 'POST'
+type Method = 'GET' | 'POST' | 'DELETE'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method as Method
 
-  if (!['GET', 'POST'].includes(method)) {
+  if (!['GET', 'POST', 'DELETE'].includes(method)) {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
   if (method === 'GET') return listPickings(req, res)
-  return createPicking(req, res)
+  if (method === 'POST') return createPicking(req, res)
+  return deletePicking(req, res)
 }
 
 async function listPickings(req: NextApiRequest, res: NextApiResponse) {
@@ -160,5 +161,29 @@ async function createPicking(req: NextApiRequest, res: NextApiResponse) {
   } catch (error) {
     console.error('create picking error', error)
     return res.status(500).json({ message: 'Error creando picking' })
+  }
+}
+
+async function deletePicking(req: NextApiRequest, res: NextApiResponse) {
+  const { pickingId } = req.body as { pickingId?: number }
+
+  if (!pickingId) return res.status(400).json({ message: 'pickingId es requerido' })
+
+  try {
+    const picking = await prisma.pickings.findUnique({ where: { id: Number(pickingId) } })
+
+    if (!picking) return res.status(404).json({ message: 'Picking no encontrado' })
+    if (picking.status === 'COMPLETED') {
+      return res.status(400).json({ message: 'No se puede eliminar un picking completado' })
+    }
+
+    await prisma.picking_photos.deleteMany({ where: { picking_id: picking.id } })
+    await prisma.picking_lines.deleteMany({ where: { picking_id: picking.id } })
+    await prisma.pickings.delete({ where: { id: picking.id } })
+
+    return res.status(200).json({ message: 'Picking eliminado' })
+  } catch (error) {
+    console.error('delete picking error', error)
+    return res.status(500).json({ message: 'No se pudo eliminar el picking' })
   }
 }
