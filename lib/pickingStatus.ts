@@ -11,6 +11,8 @@ export async function recalculatePickingState(pickingId: number) {
 
   if (!picking) return null
 
+  if (picking.status === 'COMPLETED') return 'COMPLETED'
+
   const hasPackingPhoto = picking.photos.some(
     (photo) => photo.photo_type === 'PACK' && photo.picking_line_id === null,
   )
@@ -35,7 +37,7 @@ export async function recalculatePickingState(pickingId: number) {
   const anyPicked = refreshedLineStatuses.some((line) => line.status === 'PICKED' || line.status === 'PACKED')
 
   const nextPickingStatus = allPacked
-    ? 'COMPLETED'
+    ? 'PACKED'
     : hasPackingPhoto && anyPicked
       ? 'PACKED'
       : anyPicked
