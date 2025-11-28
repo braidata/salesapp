@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/prisma'
+import { recalculatePickingState } from '@/lib/pickingStatus'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
+  if (!['POST', 'PUT', 'DELETE'].includes(req.method || '')) {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
@@ -15,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   const userId = providedUserId ? Number(providedUserId) : null
 
-  if (!photoType || !s3Url) {
+  if (req.method !== 'DELETE' && (!photoType || !s3Url)) {
     return res.status(400).json({ message: 'Datos incompletos' })
   }
 
@@ -26,6 +27,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     let targetPickingId: number | null = null
     let targetLineId: number | null = null
+
+    const ensureNotCompleted = async (id: number) => {
+      const current = await prisma.pickings.findUnique({ where: { id }, select: { status: true } })
+      if (current?.status === 'COMPLETED') {
+        throw new Error('El picking está completado y no permite cambios')
+      }
+    }
 
     if (photoType === 'PICK') {
       if (!pickingLineId) return res.status(400).json({ message: 'pickingLineId es requerido para foto de picking' })
@@ -39,27 +47,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ message: 'Línea o picking no encontrado' })
       }
 
+      await ensureNotCompleted(line.picking_id || line.picking.id)
+
       targetPickingId = line.picking_id
       targetLineId = line.id
 
-      await prisma.picking_photos.create({
-        data: {
-          picking_line_id: line.id,
-          picking_id: line.picking_id,
-          photo_type: photoType,
-          s3_url: s3Url,
-          uploaded_by_user_id: userId ?? undefined,
-        },
-      })
+      if (req.method === 'DELETE') {
+        const latestPhoto = await prisma.picking_photos.findFirst({
+          where: { picking_line_id: line.id, photo_type: 'PICK' },
+          orderBy: { uploaded_at: 'desc' },
+        })
 
-      const photos = await prisma.picking_photos.findMany({ where: { picking_line_id: line.id } })
-      const hasPick = photos.some((p) => p.photo_type === 'PICK')
-      const newStatus = hasPick ? 'PICKED' : 'PENDING'
+        if (!latestPhoto) return res.status(404).json({ message: 'No hay foto para eliminar' })
 
-      await prisma.picking_lines.update({
-        where: { id: line.id },
-        data: { status: newStatus },
-      })
+        await prisma.picking_photos.delete({ where: { id: latestPhoto.id } })
+      } else if (req.method === 'PUT') {
+        const latestPhoto = await prisma.picking_photos.findFirst({
+          where: { picking_line_id: line.id, photo_type: 'PICK' },
+          orderBy: { uploaded_at: 'desc' },
+        })
+
+        if (!latestPhoto) return res.status(404).json({ message: 'No hay foto previa para reemplazar' })
+
+        await prisma.picking_photos.update({
+          where: { id: latestPhoto.id },
+          data: { s3_url: s3Url as string, uploaded_by_user_id: userId ?? undefined },
+        })
+      } else {
+        await prisma.picking_photos.create({
+          data: {
+            picking_line_id: line.id,
+            picking_id: line.picking_id,
+            photo_type: photoType,
+            s3_url: s3Url,
+            uploaded_by_user_id: userId ?? undefined,
+          },
+        })
+      }
     } else {
       if (!pickingId && !pickingLineId) {
         return res.status(400).json({ message: 'Debe enviar pickingId para foto de embalaje' })
@@ -78,47 +102,53 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ message: 'Picking no encontrado' })
       }
 
+      await ensureNotCompleted(picking.id)
+
       targetPickingId = picking.id
 
-      await prisma.picking_photos.create({
-        data: {
-          picking_id: picking.id,
-          picking_line_id: pickingLineId ? Number(pickingLineId) : null,
-          photo_type: 'PACK',
-          s3_url: s3Url,
-          uploaded_by_user_id: userId ?? undefined,
-        },
-      })
+      if (req.method === 'DELETE') {
+        const packPhoto = await prisma.picking_photos.findFirst({
+          where: { picking_id: picking.id, picking_line_id: null, photo_type: 'PACK' },
+          orderBy: { uploaded_at: 'desc' },
+        })
 
-      // Marcar líneas como PACKED solo cuando ya tienen evidencia de picking
-      const pickedLineIds = picking.lines
-        .filter((line) => line.photos?.some((p) => p.photo_type === 'PICK'))
-        .map((line) => line.id)
+        if (!packPhoto) return res.status(404).json({ message: 'No hay foto de embalaje para eliminar' })
 
-      if (pickedLineIds.length) {
-        await prisma.picking_lines.updateMany({ where: { id: { in: pickedLineIds } }, data: { status: 'PACKED' } })
+        await prisma.picking_photos.delete({ where: { id: packPhoto.id } })
+      } else if (req.method === 'PUT') {
+        const packPhoto = await prisma.picking_photos.findFirst({
+          where: { picking_id: picking.id, picking_line_id: null, photo_type: 'PACK' },
+          orderBy: { uploaded_at: 'desc' },
+        })
+
+        if (!packPhoto) return res.status(404).json({ message: 'No hay foto de embalaje previa para reemplazar' })
+
+        await prisma.picking_photos.update({
+          where: { id: packPhoto.id },
+          data: { s3_url: s3Url as string, uploaded_by_user_id: userId ?? undefined },
+        })
+      } else {
+        await prisma.picking_photos.create({
+          data: {
+            picking_id: picking.id,
+            picking_line_id: pickingLineId ? Number(pickingLineId) : null,
+            photo_type: 'PACK',
+            s3_url: s3Url,
+            uploaded_by_user_id: userId ?? undefined,
+          },
+        })
       }
     }
 
     if (!targetPickingId) return res.status(500).json({ message: 'No se pudo determinar picking' })
 
-    const lineStatuses = await prisma.picking_lines.findMany({
-      where: { picking_id: targetPickingId },
-      select: { id: true, status: true },
-    })
-
-    const allPacked = lineStatuses.every((l) => l.status === 'PACKED')
-    const anyPick = photoType === 'PACK' || lineStatuses.some((l) => l.status === 'PICKED' || l.status === 'PACKED')
-    const pickingStatus = allPacked ? 'COMPLETED' : anyPick ? 'PACKED' : 'IN_PROGRESS'
-
-    await prisma.pickings.update({
-      where: { id: targetPickingId },
-      data: { status: pickingStatus },
-    })
+    const pickingStatus = await recalculatePickingState(targetPickingId)
 
     return res.status(200).json({ url: s3Url, pickingStatus, lineId: targetLineId })
   } catch (error) {
     console.error('photo upload error', error)
-    return res.status(500).json({ message: 'Error subiendo foto' })
+    const message = error instanceof Error ? error.message : 'Error subiendo foto'
+    const code = message.includes('completado') ? 400 : 500
+    return res.status(code).json({ message })
   }
 }
