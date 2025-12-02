@@ -141,23 +141,23 @@ export default function PickingDashboard() {
     }
   }
 
-  const refreshPickingData = async (sapOrderOverride?: string) => {
-    const sapOrder = sapOrderOverride || picking?.sap_order_id || orderData?.sapOrder || search.trim()
-    if (!sapOrder) return
+  // const refreshPickingData = async (sapOrderOverride?: string) => {
+  //   const sapOrder = sapOrderOverride || picking?.sap_order_id || orderData?.sapOrder || search.trim()
+  //   if (!sapOrder) return
 
-    const resp = await fetch(`/api/picking/search?sapOrder=${encodeURIComponent(sapOrder)}`)
-    if (resp.ok) {
-      const data = await resp.json()
-      setOrderData({ ...data.order, lines: data.lines })
-      setPicking(data.picking)
+  //   const resp = await fetch(`/api/picking/search?sapOrder=${encodeURIComponent(sapOrder)}`)
+  //   if (resp.ok) {
+  //     const data = await resp.json()
+  //     setOrderData({ ...data.order, lines: data.lines })
+  //     setPicking(data.picking)
 
-      if (selectedPicking && data.picking?.sap_order_id === selectedPicking.sap_order_id) {
-        setSelectedPicking(data.picking)
-      }
-    }
+  //     if (selectedPicking && data.picking?.sap_order_id === selectedPicking.sap_order_id) {
+  //       setSelectedPicking(data.picking)
+  //     }
+  //   }
 
-    await refreshDashboard()
-  }
+  //   await refreshDashboard()
+  // }
 
   useEffect(() => {
     if (selectedPicking?.sap_order_id) {

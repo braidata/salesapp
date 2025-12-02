@@ -70,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ message: 'Pedido SAP no encontrado o sin ítems' })
     }
 
-    const filteredResults = sapResults.filter((item) => !`${item.Material || ''}`.startsWith('60000'))
+    const filteredResults = sapResults.filter((item) => !`${item.Material || ''}`.startsWith('6000'))
     if (!filteredResults.length) {
       return res.status(404).json({ message: 'El pedido no tiene líneas pickeables (servicios de flete se omiten)' })
     }
